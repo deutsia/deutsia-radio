@@ -8,6 +8,8 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -47,6 +49,9 @@ class NowPlayingFragment : Fragment() {
     private var recordingStartTime = 0L
     private val recordingHandler = Handler(Looper.getMainLooper())
     private var previousPlayingState: Boolean? = null
+    private var previousStationId: Long? = null
+    private lateinit var infoContainer: View
+    private lateinit var controlsContainer: View
     private val recordingUpdateRunnable = object : Runnable {
         override fun run() {
             if (isRecording) {
@@ -93,22 +98,84 @@ class NowPlayingFragment : Fragment() {
             (activity as? MainActivity)?.switchToRadiosTab()
         }
 
+        // Get references to containers
+        infoContainer = view.findViewById(R.id.nowPlayingInfoContainer)
+        controlsContainer = view.findViewById(R.id.nowPlayingControlsContainer)
+
         // Observe current station
         viewModel.currentStation.observe(viewLifecycleOwner) { station ->
             if (station == null) {
+                // Fade out content
+                playingContent.animate()
+                    .alpha(0f)
+                    .setDuration(200)
+                    .withEndAction {
+                        playingContent.visibility = View.GONE
+                    }
+                    .start()
+                infoContainer.animate().alpha(0f).setDuration(200).start()
+                controlsContainer.animate().alpha(0f).setDuration(200).start()
+
+                // Show empty state
+                emptyState.alpha = 0f
                 emptyState.visibility = View.VISIBLE
-                playingContent.visibility = View.GONE
-                view.findViewById<View>(R.id.nowPlayingInfoContainer)?.visibility = View.GONE
-                view.findViewById<View>(R.id.nowPlayingControlsContainer)?.visibility = View.GONE
+                emptyState.animate().alpha(1f).setDuration(300).start()
+
                 // Stop recording if station is cleared
                 if (isRecording) {
                     stopRecording()
                 }
+                previousStationId = null
             } else {
+                val isNewStation = previousStationId != station.id
+                previousStationId = station.id
+
+                // Hide empty state
                 emptyState.visibility = View.GONE
-                playingContent.visibility = View.VISIBLE
-                view.findViewById<View>(R.id.nowPlayingInfoContainer)?.visibility = View.VISIBLE
-                view.findViewById<View>(R.id.nowPlayingControlsContainer)?.visibility = View.VISIBLE
+
+                // Show content with animation if this is a new station
+                if (isNewStation) {
+                    // Animate cover card
+                    playingContent.alpha = 0f
+                    playingContent.scaleX = 0.9f
+                    playingContent.scaleY = 0.9f
+                    playingContent.visibility = View.VISIBLE
+                    playingContent.animate()
+                        .alpha(1f)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(350)
+                        .setInterpolator(DecelerateInterpolator())
+                        .start()
+
+                    // Animate info container with delay
+                    infoContainer.alpha = 0f
+                    infoContainer.translationY = 20f
+                    infoContainer.visibility = View.VISIBLE
+                    infoContainer.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setStartDelay(100)
+                        .setDuration(300)
+                        .setInterpolator(DecelerateInterpolator())
+                        .start()
+
+                    // Animate controls with staggered delay
+                    controlsContainer.alpha = 0f
+                    controlsContainer.translationY = 30f
+                    controlsContainer.visibility = View.VISIBLE
+                    controlsContainer.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setStartDelay(200)
+                        .setDuration(300)
+                        .setInterpolator(DecelerateInterpolator())
+                        .start()
+                } else {
+                    playingContent.visibility = View.VISIBLE
+                    infoContainer.visibility = View.VISIBLE
+                    controlsContainer.visibility = View.VISIBLE
+                }
 
                 stationName.text = station.name
 
@@ -134,8 +201,24 @@ class NowPlayingFragment : Fragment() {
             updatePlayPauseButton(isPlaying)
         }
 
-        // Play/Pause button
+        // Play/Pause button with bounce animation
         playPauseButton.setOnClickListener {
+            // Bounce animation
+            playPauseButton.animate()
+                .scaleX(0.85f)
+                .scaleY(0.85f)
+                .setDuration(80)
+                .setInterpolator(DecelerateInterpolator())
+                .withEndAction {
+                    playPauseButton.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(2f))
+                        .start()
+                }
+                .start()
+
             val isPlaying = viewModel.isPlaying.value ?: false
             val station = viewModel.getCurrentStation()
 

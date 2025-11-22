@@ -3,8 +3,10 @@ package com.opensource.i2pradio.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -176,6 +178,29 @@ class RadioStationAdapter(
                 }
             } else {
                 coverArt.setImageResource(R.drawable.ic_radio)
+            }
+
+            // Touch animation for press feedback
+            itemView.setOnTouchListener { v, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        v.animate()
+                            .scaleX(0.97f)
+                            .scaleY(0.97f)
+                            .setDuration(100)
+                            .setInterpolator(DecelerateInterpolator())
+                            .start()
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .setInterpolator(DecelerateInterpolator())
+                            .start()
+                    }
+                }
+                false
             }
 
             itemView.setOnClickListener {

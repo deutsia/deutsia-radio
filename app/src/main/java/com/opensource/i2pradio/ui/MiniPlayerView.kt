@@ -87,7 +87,7 @@ class MiniPlayerView @JvmOverloads constructor(
             // Fade out animation
             animate()
                 .alpha(0f)
-                .setDuration(300)
+                .setDuration(200)
                 .withEndAction {
                     visibility = GONE
                 }
@@ -95,12 +95,20 @@ class MiniPlayerView @JvmOverloads constructor(
             return
         }
 
-        if (visibility == GONE) {
+        // Always ensure we're visible when setting a station
+        // Cancel any pending animations first
+        animate().cancel()
+
+        if (visibility != VISIBLE || alpha < 1f) {
             alpha = 0f
             visibility = VISIBLE
+            // Slide up and fade in animation
+            translationY = 50f
             animate()
                 .alpha(1f)
+                .translationY(0f)
                 .setDuration(300)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
                 .start()
         }
 
@@ -165,12 +173,20 @@ class MiniPlayerView @JvmOverloads constructor(
      * Show mini player with fade-in animation (used when returning from Now Playing)
      */
     fun showWithAnimation() {
-        if (currentStation != null && visibility == VISIBLE && alpha < 1f) {
+        if (currentStation != null) {
+            animate().cancel()
+            if (visibility != VISIBLE) {
+                alpha = 0f
+                translationY = 30f
+                visibility = VISIBLE
+            }
             animate()
                 .alpha(1f)
                 .scaleX(1f)
                 .scaleY(1f)
-                .setDuration(200)
+                .translationY(0f)
+                .setDuration(250)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
                 .start()
         }
     }
@@ -179,7 +195,9 @@ class MiniPlayerView @JvmOverloads constructor(
      * Hide mini player without animation (used when navigating to Now Playing)
      */
     fun hideForNowPlaying() {
+        animate().cancel()
         alpha = 0f
+        translationY = 30f
     }
 
     private fun togglePlayPause() {

@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.color.DynamicColors
 import com.opensource.i2pradio.ui.SettingsFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
@@ -62,6 +64,13 @@ class MainActivity : AppCompatActivity() {
         // Apply saved theme BEFORE super.onCreate
         val savedTheme = PreferencesHelper.getThemeMode(this)
         AppCompatDelegate.setDefaultNightMode(savedTheme)
+
+        // Apply Material You dynamic colors if enabled (Android 12+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            PreferencesHelper.isMaterialYouEnabled(this)) {
+            DynamicColors.applyToActivityIfAvailable(this)
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -141,6 +150,17 @@ class MainActivity : AppCompatActivity() {
     private fun setupViewPager() {
         val adapter = ViewPagerAdapter(this)
         viewPager.adapter = adapter
+
+        // Add smooth page transformation with fade and slight scale
+        viewPager.setPageTransformer { page, position ->
+            val absPosition = kotlin.math.abs(position)
+            // Fade effect
+            page.alpha = 1f - absPosition * 0.25f
+            // Slight scale effect
+            val scale = 1f - absPosition * 0.04f
+            page.scaleX = scale
+            page.scaleY = scale
+        }
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
