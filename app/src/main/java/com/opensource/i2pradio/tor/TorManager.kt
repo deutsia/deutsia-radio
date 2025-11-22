@@ -1,36 +1,64 @@
 package com.opensource.i2pradio.tor
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.util.Log
-import com.msopentech.thali.android.toronionproxy.AndroidOnionProxyManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.IOException
 
 /**
- * Singleton manager for the embedded Tor daemon.
- * Provides plug-and-play Tor connectivity for radio streams.
+ * Manager for Tor connectivity using Orbot (the official Tor client for Android).
+ *
+ * This implementation avoids the SELinux execute_no_trans error that occurs when
+ * trying to execute embedded Tor binaries on modern Android (10+) by delegating
+ * Tor network functionality to Orbot.
+ *
+ * Orbot provides:
+ * - A properly signed and sandboxed Tor implementation
+ * - System-level proxy support
+ * - Automatic circuit management
+ * - Regular security updates
  */
 object TorManager {
     private const val TAG = "TorManager"
-    private const val TOR_FILES_DIR = "torfiles"
-    private const val TOR_BINARY_NAME = "tor"
-    private const val TOR_STARTUP_TIMEOUT_SECONDS = 4 * 60  // 4 minutes
-    private const val TOR_STARTUP_TRIES = 5
 
-    private var onionProxyManager: AndroidOnionProxyManager? = null
-    private var startupJob: Job? = null
+    // Orbot package identifiers
+    private const val ORBOT_PACKAGE_NAME = "org.torproject.android"
+    private const val ORBOT_MARKET_URI = "market://details?id=$ORBOT_PACKAGE_NAME"
+    private const val ORBOT_FDROID_URI = "https://f-droid.org/packages/$ORBOT_PACKAGE_NAME/"
+
+    // Orbot Intent actions
+    private const val ACTION_START_TOR = "org.torproject.android.intent.action.START"
+    private const val ACTION_REQUEST_HS = "org.torproject.android.REQUEST_HS_PORT"
+    private const val ACTION_STATUS = "org.torproject.android.intent.action.STATUS"
+
+    // Orbot status broadcast
+    private const val EXTRA_STATUS = "org.torproject.android.intent.extra.STATUS"
+    private const val EXTRA_SOCKS_PROXY_HOST = "org.torproject.android.intent.extra.SOCKS_PROXY_HOST"
+    private const val EXTRA_SOCKS_PROXY_PORT = "org.torproject.android.intent.extra.SOCKS_PROXY_PORT"
+    private const val EXTRA_HTTP_PROXY_HOST = "org.torproject.android.intent.extra.HTTP_PROXY_HOST"
+    private const val EXTRA_HTTP_PROXY_PORT = "org.torproject.android.intent.extra.HTTP_PROXY_PORT"
+
+    // Orbot status values
+    private const val STATUS_ON = "ON"
+    private const val STATUS_OFF = "OFF"
+    private const val STATUS_STARTING = "STARTING"
+    private const val STATUS_STOPPING = "STOPPING"
+
+    // Default Orbot SOCKS port (when Orbot is running)
+    private const val DEFAULT_ORBOT_SOCKS_PORT = 9050
+    private const val DEFAULT_ORBOT_HTTP_PORT = 8118
 
     // Connection state
     enum class TorState {
         STOPPED,
         STARTING,
         CONNECTED,
-        ERROR
+        ERROR,
+        ORBOT_NOT_INSTALLED
     }
 
     private var _state: TorState = TorState.STOPPED
@@ -39,11 +67,21 @@ object TorManager {
     private var _socksPort: Int = -1
     val socksPort: Int get() = _socksPort
 
+    private var _httpPort: Int = -1
+    val httpPort: Int get() = _httpPort
+
+    private var _socksHost: String = "127.0.0.1"
+    val socksHost: String get() = _socksHost
+
     private var _errorMessage: String? = null
     val errorMessage: String? get() = _errorMessage
 
     // Listeners for state changes
     private val stateListeners = mutableListOf<(TorState) -> Unit>()
+
+    // Broadcast receiver for Orbot status updates
+    private var orbotStatusReceiver: BroadcastReceiver? = null
+    private var isReceiverRegistered = false
 
     fun addStateListener(listener: (TorState) -> Unit) {
         stateListeners.add(listener)
@@ -61,8 +99,43 @@ object TorManager {
     }
 
     /**
-     * Start the embedded Tor daemon asynchronously.
-     * Call this from a coroutine or use the callback.
+     * Check if Orbot is installed on the device.
+     */
+    fun isOrbotInstalled(context: Context): Boolean {
+        return try {
+            context.packageManager.getPackageInfo(ORBOT_PACKAGE_NAME, 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+
+    /**
+     * Open the app store to install Orbot.
+     */
+    fun openOrbotInstallPage(context: Context) {
+        try {
+            // Try Google Play first
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(ORBOT_MARKET_URI))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Fall back to F-Droid web page
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(ORBOT_FDROID_URI))
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+            } catch (e2: Exception) {
+                Log.e(TAG, "Failed to open Orbot install page", e2)
+            }
+        }
+    }
+
+    /**
+     * Request Orbot to start the Tor service.
+     *
+     * This sends an intent to Orbot to start Tor. The actual connection status
+     * will be received via broadcast.
      */
     fun start(context: Context, onComplete: ((Boolean) -> Unit)? = null) {
         if (_state == TorState.STARTING || _state == TorState.CONNECTED) {
@@ -71,101 +144,180 @@ object TorManager {
             return
         }
 
+        // Check if Orbot is installed
+        if (!isOrbotInstalled(context)) {
+            Log.w(TAG, "Orbot is not installed")
+            _errorMessage = "Orbot is not installed. Please install Orbot to use Tor."
+            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
+            onComplete?.invoke(false)
+            return
+        }
+
         notifyStateChange(TorState.STARTING)
         _errorMessage = null
 
-        startupJob = CoroutineScope(Dispatchers.IO).launch {
+        // Register receiver for Orbot status updates
+        registerOrbotStatusReceiver(context, onComplete)
+
+        // Send intent to start Orbot
+        try {
+            val intent = Intent(ACTION_START_TOR)
+            intent.setPackage(ORBOT_PACKAGE_NAME)
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+            context.sendBroadcast(intent)
+            Log.d(TAG, "Sent start request to Orbot")
+
+            // Also try to launch Orbot activity if broadcast doesn't work
             try {
-                Log.d(TAG, "Initializing Tor...")
-
-                // Create the onion proxy manager
-                val manager = AndroidOnionProxyManager(
-                    context.applicationContext,
-                    TOR_FILES_DIR
-                )
-                onionProxyManager = manager
-
-                // Fix permissions on the Tor binary (addresses "Permission denied" error)
-                ensureTorBinaryPermissions(context)
-                ensureAllTorFilesPermissions(context)
-
-                // Start Tor with retry logic
-                val started = manager.startWithRepeat(
-                    TOR_STARTUP_TIMEOUT_SECONDS,
-                    TOR_STARTUP_TRIES
-                )
-
-                if (started) {
-                    // Wait for Tor to fully initialize
-                    var waitCount = 0
-                    while (!manager.isRunning && waitCount < 100) {
-                        Thread.sleep(100)
-                        waitCount++
-                    }
-
-                    if (manager.isRunning) {
-                        _socksPort = manager.iPv4LocalHostSocksPort
-                        Log.d(TAG, "Tor started successfully on SOCKS port: $_socksPort")
-
-                        withContext(Dispatchers.Main) {
-                            notifyStateChange(TorState.CONNECTED)
-                            onComplete?.invoke(true)
-                        }
-                    } else {
-                        throw IOException("Tor daemon failed to enter running state")
-                    }
-                } else {
-                    throw IOException("Failed to start Tor after $TOR_STARTUP_TRIES attempts")
+                val launchIntent = context.packageManager.getLaunchIntentForPackage(ORBOT_PACKAGE_NAME)
+                if (launchIntent != null) {
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(launchIntent)
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to start Tor", e)
-                _errorMessage = e.message ?: "Unknown error"
-                _socksPort = -1
+                Log.d(TAG, "Could not launch Orbot activity (this is OK)", e)
+            }
 
-                withContext(Dispatchers.Main) {
+            // Set a timeout to check if Orbot responded
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                if (_state == TorState.STARTING) {
+                    // Assume Orbot is running on default ports if we haven't received a status update
+                    // This handles the case where Orbot is already running
+                    checkOrbotConnection(context, onComplete)
+                }
+            }, 3000)
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start Orbot", e)
+            _errorMessage = e.message ?: "Failed to start Orbot"
+            notifyStateChange(TorState.ERROR)
+            onComplete?.invoke(false)
+        }
+    }
+
+    /**
+     * Check if Orbot's SOCKS proxy is accessible.
+     */
+    private fun checkOrbotConnection(context: Context, onComplete: ((Boolean) -> Unit)?) {
+        Thread {
+            try {
+                // Try to connect to Orbot's SOCKS port
+                val socket = java.net.Socket()
+                socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_ORBOT_SOCKS_PORT), 2000)
+                socket.close()
+
+                // Connection successful - Orbot is running
+                _socksPort = DEFAULT_ORBOT_SOCKS_PORT
+                _httpPort = DEFAULT_ORBOT_HTTP_PORT
+                _socksHost = "127.0.0.1"
+
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    Log.d(TAG, "Orbot is running on SOCKS port $_socksPort")
+                    notifyStateChange(TorState.CONNECTED)
+                    onComplete?.invoke(true)
+                }
+            } catch (e: Exception) {
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    Log.w(TAG, "Orbot SOCKS port not accessible: ${e.message}")
+                    _errorMessage = "Please open Orbot and start the Tor service"
                     notifyStateChange(TorState.ERROR)
                     onComplete?.invoke(false)
                 }
             }
-        }
+        }.start()
     }
 
     /**
-     * Stop the embedded Tor daemon.
+     * Register a broadcast receiver for Orbot status updates.
+     */
+    private fun registerOrbotStatusReceiver(context: Context, onComplete: ((Boolean) -> Unit)?) {
+        if (isReceiverRegistered) {
+            return
+        }
+
+        orbotStatusReceiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context?, intent: Intent?) {
+                if (intent?.action == ACTION_STATUS) {
+                    val status = intent.getStringExtra(EXTRA_STATUS)
+                    Log.d(TAG, "Received Orbot status: $status")
+
+                    when (status) {
+                        STATUS_ON -> {
+                            _socksHost = intent.getStringExtra(EXTRA_SOCKS_PROXY_HOST) ?: "127.0.0.1"
+                            _socksPort = intent.getIntExtra(EXTRA_SOCKS_PROXY_PORT, DEFAULT_ORBOT_SOCKS_PORT)
+                            _httpPort = intent.getIntExtra(EXTRA_HTTP_PROXY_PORT, DEFAULT_ORBOT_HTTP_PORT)
+
+                            Log.d(TAG, "Orbot connected: SOCKS=$_socksHost:$_socksPort")
+                            notifyStateChange(TorState.CONNECTED)
+                            onComplete?.invoke(true)
+                        }
+                        STATUS_OFF -> {
+                            _socksPort = -1
+                            _httpPort = -1
+                            Log.d(TAG, "Orbot stopped")
+                            notifyStateChange(TorState.STOPPED)
+                        }
+                        STATUS_STARTING -> {
+                            Log.d(TAG, "Orbot is starting...")
+                            notifyStateChange(TorState.STARTING)
+                        }
+                        STATUS_STOPPING -> {
+                            Log.d(TAG, "Orbot is stopping...")
+                        }
+                    }
+                }
+            }
+        }
+
+        val filter = IntentFilter(ACTION_STATUS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(orbotStatusReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            context.registerReceiver(orbotStatusReceiver, filter)
+        }
+        isReceiverRegistered = true
+    }
+
+    /**
+     * Stop listening for Orbot status updates.
+     * Note: This doesn't stop Orbot itself - the user controls Orbot separately.
      */
     fun stop() {
-        Log.d(TAG, "Stopping Tor...")
-
-        startupJob?.cancel()
-        startupJob = null
-
-        try {
-            onionProxyManager?.stop()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error stopping Tor", e)
-        }
-
-        onionProxyManager = null
+        Log.d(TAG, "Stopping Tor manager...")
         _socksPort = -1
+        _httpPort = -1
         _errorMessage = null
         notifyStateChange(TorState.STOPPED)
-
-        Log.d(TAG, "Tor stopped")
+        Log.d(TAG, "Tor manager stopped")
     }
 
     /**
-     * Check if Tor is currently running and connected.
+     * Unregister the Orbot status receiver.
+     * Call this when the app is being destroyed.
+     */
+    fun cleanup(context: Context) {
+        if (isReceiverRegistered && orbotStatusReceiver != null) {
+            try {
+                context.unregisterReceiver(orbotStatusReceiver)
+            } catch (e: Exception) {
+                Log.w(TAG, "Error unregistering Orbot receiver", e)
+            }
+            isReceiverRegistered = false
+            orbotStatusReceiver = null
+        }
+    }
+
+    /**
+     * Check if Tor is currently running and connected via Orbot.
      */
     fun isConnected(): Boolean {
-        return _state == TorState.CONNECTED &&
-               onionProxyManager?.isRunning == true &&
-               _socksPort > 0
+        return _state == TorState.CONNECTED && _socksPort > 0
     }
 
     /**
-     * Get the SOCKS proxy host (always localhost for embedded Tor).
+     * Get the SOCKS proxy host.
      */
-    fun getProxyHost(): String = "127.0.0.1"
+    fun getProxyHost(): String = _socksHost
 
     /**
      * Get the SOCKS proxy port, or -1 if not connected.
@@ -173,79 +325,10 @@ object TorManager {
     fun getProxyPort(): Int = if (isConnected()) _socksPort else -1
 
     /**
-     * Restart Tor (stop then start).
+     * Restart Tor (request Orbot to restart).
      */
     fun restart(context: Context, onComplete: ((Boolean) -> Unit)? = null) {
         stop()
         start(context, onComplete)
-    }
-
-    /**
-     * Ensure the Tor binary has execute permissions.
-     * This fixes "Permission denied" errors on Android when running the Tor binary.
-     */
-    private fun ensureTorBinaryPermissions(context: Context): Boolean {
-        try {
-            val torDir = File(context.applicationContext.getDir(TOR_FILES_DIR, Context.MODE_PRIVATE).absolutePath)
-            val torBinary = File(torDir, TOR_BINARY_NAME)
-
-            if (torBinary.exists()) {
-                // Method 1: Use Java File API
-                var result = torBinary.setExecutable(true, false)
-                torBinary.setReadable(true, false)
-                Log.d(TAG, "Set executable permission via File API on ${torBinary.absolutePath}: $result")
-
-                // Method 2: Also try chmod via Runtime as a fallback (more reliable on some devices)
-                try {
-                    val process = Runtime.getRuntime().exec("chmod 755 ${torBinary.absolutePath}")
-                    val exitCode = process.waitFor()
-                    Log.d(TAG, "chmod 755 on Tor binary returned: $exitCode")
-                    if (exitCode == 0) {
-                        result = true
-                    }
-                } catch (e: Exception) {
-                    Log.w(TAG, "chmod fallback failed (this may be normal)", e)
-                }
-
-                return result
-            } else {
-                Log.d(TAG, "Tor binary not yet extracted at ${torBinary.absolutePath}")
-                return true // Will be extracted by the library
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to set Tor binary permissions", e)
-            return false
-        }
-    }
-
-    /**
-     * Set permissions on all binaries in the Tor files directory.
-     * Called after AndroidOnionProxyManager initialization to ensure all files are executable.
-     */
-    private fun ensureAllTorFilesPermissions(context: Context) {
-        try {
-            val torDir = context.applicationContext.getDir(TOR_FILES_DIR, Context.MODE_PRIVATE)
-
-            // Find and set permissions on all executable files
-            torDir.listFiles()?.forEach { file ->
-                if (file.isFile && !file.name.endsWith(".conf") && !file.name.endsWith(".pid")) {
-                    try {
-                        file.setExecutable(true, false)
-                        file.setReadable(true, false)
-
-                        // Also try chmod
-                        try {
-                            Runtime.getRuntime().exec("chmod 755 ${file.absolutePath}").waitFor()
-                        } catch (_: Exception) {}
-
-                        Log.d(TAG, "Set permissions on: ${file.name}")
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Failed to set permissions on ${file.name}", e)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to set Tor files permissions", e)
-        }
     }
 }

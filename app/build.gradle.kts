@@ -47,10 +47,7 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // Embedded Tor support (using jehy's fork of Tor-Onion-Proxy-Library)
-    implementation("com.github.jehy:Tor-Onion-Proxy-Library:0.0.7")
-    implementation("org.slf4j:slf4j-api:1.7.36")
-    implementation("org.slf4j:slf4j-android:1.7.36")
+    // Coroutines for async operations
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     testImplementation("junit:junit:4.13.2")

@@ -16,8 +16,8 @@ import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 
 /**
- * Foreground service that manages the embedded Tor daemon lifecycle.
- * This service keeps Tor running even when the app is in the background.
+ * Foreground service that manages Tor connectivity via Orbot.
+ * This service keeps the Tor connection status updated and provides notifications.
  */
 class TorService : Service() {
 
@@ -128,9 +128,10 @@ class TorService : Service() {
 
         val (title, text, icon) = when (state) {
             TorManager.TorState.STOPPED -> Triple("Tor Disconnected", "Tap to open app", R.drawable.ic_tor_off)
-            TorManager.TorState.STARTING -> Triple("Connecting to Tor...", "Please wait", R.drawable.ic_tor_connecting)
+            TorManager.TorState.STARTING -> Triple("Connecting via Orbot...", "Please wait", R.drawable.ic_tor_connecting)
             TorManager.TorState.CONNECTED -> Triple("Tor Connected", "SOCKS port: ${TorManager.socksPort}", R.drawable.ic_tor_on)
             TorManager.TorState.ERROR -> Triple("Tor Error", TorManager.errorMessage ?: "Connection failed", R.drawable.ic_tor_off)
+            TorManager.TorState.ORBOT_NOT_INSTALLED -> Triple("Orbot Required", "Please install Orbot for Tor support", R.drawable.ic_tor_off)
         }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
@@ -156,6 +157,7 @@ class TorService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         TorManager.removeStateListener(stateListener)
+        TorManager.cleanup(this)
         TorManager.stop()
     }
 }
