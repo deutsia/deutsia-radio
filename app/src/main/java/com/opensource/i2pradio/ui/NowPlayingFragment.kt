@@ -34,7 +34,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var genreText: TextView
     private lateinit var metadataText: TextView
     private lateinit var playPauseButton: FloatingActionButton
-    private lateinit var recordButton: MaterialButton
+    private lateinit var recordButton: FloatingActionButton
     private lateinit var volumeButton: FloatingActionButton
     private lateinit var audioManager: AudioManager
     private lateinit var emptyState: View
@@ -270,8 +270,10 @@ class NowPlayingFragment : Fragment() {
      */
     private fun updateRecordingUI(state: RecordingState) {
         if (state.isRecording) {
-            recordButton.setIconResource(R.drawable.ic_stop_record)
-            recordButton.setIconTintResource(android.R.color.white)
+            recordButton.setImageResource(R.drawable.ic_stop_record)
+            recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
+                resources.getColor(android.R.color.white, requireContext().theme)
+            )
             recordingIndicator?.visibility = View.VISIBLE
             // Calculate and display current elapsed time
             val elapsed = viewModel.getRecordingElapsedTime()
@@ -282,9 +284,11 @@ class NowPlayingFragment : Fragment() {
             recordingHandler.removeCallbacks(recordingUpdateRunnable)
             recordingHandler.post(recordingUpdateRunnable)
         } else {
-            recordButton.setIconResource(R.drawable.ic_fiber_manual_record)
-            // Remove tint to show the icon's original red color
-            recordButton.iconTint = null
+            recordButton.setImageResource(R.drawable.ic_fiber_manual_record)
+            // Use colorError tint to show the icon in red color (matching XML)
+            recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
+                com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorError)
+            )
             recordingIndicator?.visibility = View.GONE
             recordingHandler.removeCallbacks(recordingUpdateRunnable)
         }
