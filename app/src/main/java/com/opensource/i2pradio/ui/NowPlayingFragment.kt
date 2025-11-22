@@ -280,7 +280,8 @@ class NowPlayingFragment : Fragment() {
             recordingHandler.post(recordingUpdateRunnable)
         } else {
             recordButton.setIconResource(R.drawable.ic_fiber_manual_record)
-            recordButton.setIconTintResource(android.R.color.transparent)
+            // Remove tint to show the icon's original red color
+            recordButton.iconTint = null
             recordingIndicator?.visibility = View.GONE
             recordingHandler.removeCallbacks(recordingUpdateRunnable)
         }

@@ -14,6 +14,7 @@ object PreferencesHelper {
     const val FORMAT_MP3 = "mp3"
     const val FORMAT_M4A = "m4a"
     const val FORMAT_OGG = "ogg"
+    const val FORMAT_OPUS = "opus"
     const val FORMAT_WAV = "wav"
 
     fun saveThemeMode(context: Context, mode: Int) {
@@ -69,6 +70,7 @@ object PreferencesHelper {
             FORMAT_MP3 -> "MP3"
             FORMAT_M4A -> "M4A (AAC)"
             FORMAT_OGG -> "OGG (Vorbis)"
+            FORMAT_OPUS -> "Opus"
             FORMAT_WAV -> "WAV"
             else -> "MP3"
         }
@@ -79,6 +81,7 @@ object PreferencesHelper {
             FORMAT_MP3 -> "audio/mpeg"
             FORMAT_M4A -> "audio/mp4"
             FORMAT_OGG -> "audio/ogg"
+            FORMAT_OPUS -> "audio/opus"
             FORMAT_WAV -> "audio/wav"
             else -> "audio/mpeg"
         }

@@ -4,9 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
@@ -35,10 +38,28 @@ class SettingsFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             materialYouContainer?.visibility = View.VISIBLE
             materialYouSwitch?.isChecked = PreferencesHelper.isMaterialYouEnabled(requireContext())
-            materialYouSwitch?.setOnCheckedChangeListener { _, isChecked ->
+            materialYouSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+                // Animate the switch with a smooth bounce effect
+                switch.animate()
+                    .scaleX(1.1f)
+                    .scaleY(1.1f)
+                    .setDuration(100)
+                    .setInterpolator(OvershootInterpolator(2f))
+                    .withEndAction {
+                        switch.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(150)
+                            .setInterpolator(OvershootInterpolator(1.5f))
+                            .start()
+                    }
+                    .start()
+
                 PreferencesHelper.setMaterialYouEnabled(requireContext(), isChecked)
-                // Recreate activity to apply dynamic colors
-                activity?.recreate()
+                // Delay recreate to allow the animation to complete
+                Handler(Looper.getMainLooper()).postDelayed({
+                    activity?.recreate()
+                }, 300)
             }
         } else {
             materialYouContainer?.visibility = View.GONE
@@ -77,6 +98,7 @@ class SettingsFragment : Fragment() {
             PreferencesHelper.FORMAT_MP3,
             PreferencesHelper.FORMAT_M4A,
             PreferencesHelper.FORMAT_OGG,
+            PreferencesHelper.FORMAT_OPUS,
             PreferencesHelper.FORMAT_WAV
         )
         val formatNames = formats.map { PreferencesHelper.getRecordingFormatDisplayName(it) }.toTypedArray()
