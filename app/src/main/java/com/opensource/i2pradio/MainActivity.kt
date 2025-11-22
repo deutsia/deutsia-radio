@@ -139,9 +139,17 @@ class MainActivity : AppCompatActivity() {
             viewModel.setPlaying(isPlaying)
         }
 
-        // Close button hides the mini player
+        // Close button stops playback and hides the mini player
         miniPlayerView.setOnCloseListener {
             miniPlayerManuallyClosed = true
+            // Stop the radio service
+            val stopIntent = Intent(this, RadioService::class.java).apply {
+                action = RadioService.ACTION_STOP
+            }
+            startService(stopIntent)
+            // Clear the station from ViewModel
+            viewModel.setCurrentStation(null)
+            viewModel.setPlaying(false)
             miniPlayerView.setStation(null)
             miniPlayerContainer.visibility = View.GONE
         }
@@ -178,9 +186,11 @@ class MainActivity : AppCompatActivity() {
                 if (position == 1) {
                     // On Now Playing tab - keep mini player hidden
                     miniPlayerView.hideForNowPlaying()
+                    miniPlayerContainer.visibility = View.INVISIBLE
                 } else {
                     // On other tabs - show mini player if station is playing
                     if (viewModel.currentStation.value != null && !miniPlayerManuallyClosed) {
+                        miniPlayerContainer.visibility = View.VISIBLE
                         miniPlayerView.showWithAnimation()
                     }
                 }

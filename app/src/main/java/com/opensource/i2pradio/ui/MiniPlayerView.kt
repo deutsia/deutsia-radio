@@ -175,7 +175,8 @@ class MiniPlayerView @JvmOverloads constructor(
     fun showWithAnimation() {
         if (currentStation != null) {
             animate().cancel()
-            if (visibility != VISIBLE) {
+            // Always reset state before animating to ensure proper display
+            if (visibility != VISIBLE || alpha < 1f) {
                 alpha = 0f
                 translationY = 30f
                 visibility = VISIBLE
@@ -198,6 +199,7 @@ class MiniPlayerView @JvmOverloads constructor(
         animate().cancel()
         alpha = 0f
         translationY = 30f
+        visibility = INVISIBLE
     }
 
     private fun togglePlayPause() {
