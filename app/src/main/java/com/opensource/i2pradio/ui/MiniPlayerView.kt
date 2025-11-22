@@ -101,15 +101,28 @@ class MiniPlayerView @JvmOverloads constructor(
     fun setPlayingState(playing: Boolean) {
         // Only animate if state actually changed
         if (previousPlayingState != null && previousPlayingState != playing) {
-            val animDrawable = if (playing) {
-                AnimatedVectorDrawableCompat.create(context, R.drawable.avd_play_to_pause)
-            } else {
-                AnimatedVectorDrawableCompat.create(context, R.drawable.avd_pause_to_play)
-            }
+            try {
+                val animDrawable = if (playing) {
+                    AnimatedVectorDrawableCompat.create(context, R.drawable.avd_play_to_pause)
+                } else {
+                    AnimatedVectorDrawableCompat.create(context, R.drawable.avd_pause_to_play)
+                }
 
-            animDrawable?.let {
-                playPauseButton.icon = it
-                it.start()
+                animDrawable?.let {
+                    playPauseButton.icon = it
+                    it.start()
+                } ?: run {
+                    // Fallback to static icon if AVD creation fails
+                    playPauseButton.setIconResource(
+                        if (playing) R.drawable.ic_pause else R.drawable.ic_play
+                    )
+                }
+            } catch (e: Exception) {
+                // Fallback to static icon on AVD inflation error (e.g., path morph issues on some Android versions)
+                android.util.Log.w("MiniPlayerView", "AVD animation failed, using static icon", e)
+                playPauseButton.setIconResource(
+                    if (playing) R.drawable.ic_pause else R.drawable.ic_play
+                )
             }
         } else {
             // Initial state - no animation
