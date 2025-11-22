@@ -37,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
+import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import java.io.File
 import java.io.FileOutputStream
@@ -424,18 +425,47 @@ class RadioService : Service() {
 
             stopStream()
 
-            val okHttpClient = if (proxyHost.isNotEmpty() && proxyType != ProxyType.NONE) {
+            // Determine proxy configuration
+            // Priority: 1. Embedded Tor (if enabled and connected for Tor streams)
+            //           2. Tor for clearnet streams (anonymity/censorship bypass)
+            //           3. Manual proxy configuration
+            //           4. Direct connection
+            val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
+                // Use embedded Tor for Tor streams if enabled and connected
+                proxyType == ProxyType.TOR &&
+                PreferencesHelper.isEmbeddedTorEnabled(this) &&
+                TorManager.isConnected() -> {
+                    android.util.Log.d("RadioService", "Using embedded Tor proxy for .onion stream")
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
+                // Route clearnet streams through Tor for anonymity (when enabled and Tor is connected)
+                proxyType == ProxyType.NONE &&
+                PreferencesHelper.isEmbeddedTorEnabled(this) &&
+                PreferencesHelper.isTorForClearnetEnabled(this) &&
+                TorManager.isConnected() -> {
+                    android.util.Log.d("RadioService", "Routing clearnet stream through Tor for anonymity")
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
+                // Use manual proxy configuration
+                proxyHost.isNotEmpty() && proxyType != ProxyType.NONE -> {
+                    Triple(proxyHost, proxyPort, proxyType)
+                }
+                // Direct connection
+                else -> Triple("", 0, ProxyType.NONE)
+            }
+
+            val okHttpClient = if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
                 // Use SOCKS5 for Tor, HTTP for I2P
-                val javaProxyType = when (proxyType) {
+                val javaProxyType = when (effectiveProxyType) {
                     ProxyType.TOR -> Proxy.Type.SOCKS
                     ProxyType.I2P -> Proxy.Type.HTTP
                     ProxyType.NONE -> Proxy.Type.DIRECT
                 }
-                android.util.Log.d("RadioService", "Using ${proxyType.name} proxy: $proxyHost:$proxyPort (${javaProxyType.name})")
+                android.util.Log.d("RadioService", "Using ${effectiveProxyType.name} proxy: $effectiveProxyHost:$effectiveProxyPort (${javaProxyType.name})")
                 OkHttpClient.Builder()
-                    .proxy(Proxy(javaProxyType, InetSocketAddress(proxyHost, proxyPort)))
-                    .connectTimeout(60, TimeUnit.SECONDS) // Longer timeout for Tor/I2P
-                    .readTimeout(60, TimeUnit.SECONDS)
+                    .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
+                    .connectTimeout(90, TimeUnit.SECONDS) // Longer timeout for Tor/I2P
+                    .readTimeout(90, TimeUnit.SECONDS)
                     .build()
             } else {
                 OkHttpClient.Builder()

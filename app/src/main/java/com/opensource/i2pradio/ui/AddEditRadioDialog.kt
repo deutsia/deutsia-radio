@@ -72,6 +72,7 @@ class AddEditRadioDialog : DialogFragment() {
         val genreInput = view.findViewById<AutoCompleteTextView>(R.id.genreInput)
         val proxyTypeInput = view.findViewById<AutoCompleteTextView>(R.id.proxyTypeInput)
         val proxySettingsContainer = view.findViewById<View>(R.id.proxySettingsContainer)
+        val embeddedTorInfoContainer = view.findViewById<View>(R.id.embeddedTorInfoContainer)
         val proxyHostInput = view.findViewById<TextInputEditText>(R.id.proxyHostInput)
         val proxyPortInput = view.findViewById<TextInputEditText>(R.id.proxyPortInput)
         coverArtInput = view.findViewById(R.id.coverArtInput)
@@ -79,6 +80,9 @@ class AddEditRadioDialog : DialogFragment() {
         clearImageButton = view.findViewById(R.id.clearImageButton)
         coverArtPreview = view.findViewById(R.id.coverArtPreview)
         coverArtPreviewCard = view.findViewById(R.id.coverArtPreviewCard)
+
+        // Check if embedded Tor is enabled
+        val isEmbeddedTorEnabled = PreferencesHelper.isEmbeddedTorEnabled(requireContext())
 
         // Setup genre dropdown
         val genres = arrayOf(
@@ -98,14 +102,24 @@ class AddEditRadioDialog : DialogFragment() {
         // Toggle proxy settings visibility based on proxy type selection
         proxyTypeInput.setOnItemClickListener { _, _, position, _ ->
             val selectedType = proxyTypes[position]
-            if (selectedType == "None") {
-                proxySettingsContainer.visibility = View.GONE
-            } else {
-                proxySettingsContainer.visibility = View.VISIBLE
-                // Set default values based on proxy type
-                val proxyType = ProxyType.fromString(selectedType)
-                proxyHostInput.setText(proxyType.getDefaultHost())
-                proxyPortInput.setText(proxyType.getDefaultPort().toString())
+            when {
+                selectedType == "None" -> {
+                    proxySettingsContainer.visibility = View.GONE
+                    embeddedTorInfoContainer?.visibility = View.GONE
+                }
+                selectedType == "Tor" && isEmbeddedTorEnabled -> {
+                    // Show embedded Tor info, hide manual proxy settings
+                    embeddedTorInfoContainer?.visibility = View.VISIBLE
+                    proxySettingsContainer.visibility = View.GONE
+                }
+                else -> {
+                    // Show manual proxy settings for I2P or when embedded Tor is disabled
+                    embeddedTorInfoContainer?.visibility = View.GONE
+                    proxySettingsContainer.visibility = View.VISIBLE
+                    val proxyType = ProxyType.fromString(selectedType)
+                    proxyHostInput.setText(proxyType.getDefaultHost())
+                    proxyPortInput.setText(proxyType.getDefaultPort().toString())
+                }
             }
         }
 
@@ -144,9 +158,15 @@ class AddEditRadioDialog : DialogFragment() {
 
                     // Show proxy settings if using a proxy
                     if (it.useProxy && proxyType != ProxyType.NONE) {
-                        proxySettingsContainer.visibility = View.VISIBLE
-                        proxyHostInput.setText(it.proxyHost)
-                        proxyPortInput.setText(it.proxyPort.toString())
+                        if (proxyType == ProxyType.TOR && isEmbeddedTorEnabled) {
+                            // Show embedded Tor info for Tor stations when embedded Tor is enabled
+                            embeddedTorInfoContainer?.visibility = View.VISIBLE
+                            proxySettingsContainer.visibility = View.GONE
+                        } else {
+                            proxySettingsContainer.visibility = View.VISIBLE
+                            proxyHostInput.setText(it.proxyHost)
+                            proxyPortInput.setText(it.proxyPort.toString())
+                        }
                     }
 
                     it.coverArtUri?.let { uri ->

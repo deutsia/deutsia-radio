@@ -10,16 +10,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.opensource.i2pradio.R
+import com.opensource.i2pradio.tor.TorManager
+import com.opensource.i2pradio.tor.TorService
 
 class SettingsFragment : Fragment() {
 
     private lateinit var recordingFormatButton: MaterialButton
+
+    // Tor UI elements
+    private var embeddedTorSwitch: MaterialSwitch? = null
+    private var torStatusContainer: View? = null
+    private var torStatusIcon: ImageView? = null
+    private var torStatusText: TextView? = null
+    private var torStatusDetail: TextView? = null
+    private var torActionButton: MaterialButton? = null
+    private var torClearnetContainer: View? = null
+    private var torClearnetSwitch: MaterialSwitch? = null
+
+    private val torStateListener: (TorManager.TorState) -> Unit = { state ->
+        activity?.runOnUiThread {
+            updateTorStatusUI(state)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +53,16 @@ class SettingsFragment : Fragment() {
         val materialYouSwitch = view.findViewById<MaterialSwitch>(R.id.materialYouSwitch)
         val materialYouContainer = view.findViewById<View>(R.id.materialYouContainer)
         recordingFormatButton = view.findViewById(R.id.recordingFormatButton)
+
+        // Tor UI elements
+        embeddedTorSwitch = view.findViewById(R.id.embeddedTorSwitch)
+        torStatusContainer = view.findViewById(R.id.torStatusContainer)
+        torStatusIcon = view.findViewById(R.id.torStatusIcon)
+        torStatusText = view.findViewById(R.id.torStatusText)
+        torStatusDetail = view.findViewById(R.id.torStatusDetail)
+        torActionButton = view.findViewById(R.id.torActionButton)
+        torClearnetContainer = view.findViewById(R.id.torClearnetContainer)
+        torClearnetSwitch = view.findViewById(R.id.torClearnetSwitch)
 
         // Show Material You option only on Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -85,7 +115,138 @@ class SettingsFragment : Fragment() {
             showRecordingFormatDialog()
         }
 
+        // Setup Tor controls
+        setupTorControls()
+
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        TorManager.addStateListener(torStateListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        TorManager.removeStateListener(torStateListener)
+    }
+
+    private fun setupTorControls() {
+        // Initialize switch state
+        embeddedTorSwitch?.isChecked = PreferencesHelper.isEmbeddedTorEnabled(requireContext())
+
+        // Show/hide status container based on switch state
+        updateTorContainerVisibility(embeddedTorSwitch?.isChecked == true)
+
+        // Update initial Tor status
+        updateTorStatusUI(TorManager.state)
+
+        // Handle switch toggle
+        embeddedTorSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setEmbeddedTorEnabled(requireContext(), isChecked)
+            updateTorContainerVisibility(isChecked)
+
+            if (isChecked) {
+                // Auto-start Tor when enabled
+                if (PreferencesHelper.isAutoStartTorEnabled(requireContext())) {
+                    TorService.start(requireContext())
+                }
+            } else {
+                // Stop Tor when disabled
+                TorService.stop(requireContext())
+            }
+        }
+
+        // Handle action button
+        torActionButton?.setOnClickListener {
+            when (TorManager.state) {
+                TorManager.TorState.STOPPED, TorManager.TorState.ERROR -> {
+                    TorService.start(requireContext())
+                }
+                TorManager.TorState.CONNECTED -> {
+                    TorService.stop(requireContext())
+                }
+                TorManager.TorState.STARTING -> {
+                    // Do nothing while starting
+                }
+            }
+        }
+
+        // Setup clearnet through Tor toggle
+        torClearnetSwitch?.isChecked = PreferencesHelper.isTorForClearnetEnabled(requireContext())
+        torClearnetSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setTorForClearnet(requireContext(), isChecked)
+        }
+    }
+
+    private fun updateTorContainerVisibility(show: Boolean) {
+        torStatusContainer?.visibility = if (show) View.VISIBLE else View.GONE
+        torClearnetContainer?.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    private fun updateTorStatusUI(state: TorManager.TorState) {
+        when (state) {
+            TorManager.TorState.STOPPED -> {
+                torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
+                torStatusText?.text = "Disconnected"
+                torStatusDetail?.text = "Tor is not running"
+                torActionButton?.text = "Start"
+                torActionButton?.isEnabled = true
+            }
+            TorManager.TorState.STARTING -> {
+                torStatusIcon?.setImageResource(R.drawable.ic_tor_connecting)
+                torStatusText?.text = "Connecting..."
+                torStatusDetail?.text = "Establishing Tor connection"
+                torActionButton?.text = "Starting..."
+                torActionButton?.isEnabled = false
+            }
+            TorManager.TorState.CONNECTED -> {
+                torStatusIcon?.setImageResource(R.drawable.ic_tor_on)
+                torStatusText?.text = "Connected"
+                torStatusDetail?.text = "SOCKS port: ${TorManager.socksPort}"
+                torActionButton?.text = "Stop"
+                torActionButton?.isEnabled = true
+            }
+            TorManager.TorState.ERROR -> {
+                torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
+                torStatusText?.text = "Connection Failed"
+                torStatusDetail?.text = TorManager.errorMessage ?: "Unknown error"
+                torActionButton?.text = "Retry"
+                torActionButton?.isEnabled = true
+            }
+        }
     }
 
     private fun updateRecordingFormatButtonText() {
