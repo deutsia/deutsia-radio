@@ -30,6 +30,7 @@ class MiniPlayerView @JvmOverloads constructor(
     private var isPlaying: Boolean = false
     private var onClickListener: (() -> Unit)? = null
     private var onCloseListener: (() -> Unit)? = null
+    private var onPlayPauseToggleListener: ((Boolean) -> Unit)? = null
     private var previousPlayingState: Boolean? = null
 
     init {
@@ -41,9 +42,25 @@ class MiniPlayerView @JvmOverloads constructor(
         playPauseButton = findViewById(R.id.miniPlayerPlayPause)
         closeButton = findViewById(R.id.miniPlayerClose)
 
-        // Click whole view to go to Now Playing
+        // Click whole view to go to Now Playing with expand animation
         setOnClickListener {
-            onClickListener?.invoke()
+            // Scale up animation for expand effect
+            animate()
+                .scaleX(1.02f)
+                .scaleY(1.02f)
+                .setDuration(100)
+                .withEndAction {
+                    animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .alpha(0f)
+                        .setDuration(150)
+                        .withEndAction {
+                            onClickListener?.invoke()
+                        }
+                        .start()
+                }
+                .start()
         }
 
         playPauseButton.setOnClickListener {
@@ -57,6 +74,10 @@ class MiniPlayerView @JvmOverloads constructor(
 
     fun setOnCloseListener(listener: () -> Unit) {
         onCloseListener = listener
+    }
+
+    fun setOnPlayPauseToggleListener(listener: (Boolean) -> Unit) {
+        onPlayPauseToggleListener = listener
     }
 
     fun setStation(station: RadioStation?) {
@@ -140,8 +161,31 @@ class MiniPlayerView @JvmOverloads constructor(
         onClickListener = listener
     }
 
+    /**
+     * Show mini player with fade-in animation (used when returning from Now Playing)
+     */
+    fun showWithAnimation() {
+        if (currentStation != null && visibility == VISIBLE && alpha < 1f) {
+            animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(200)
+                .start()
+        }
+    }
+
+    /**
+     * Hide mini player without animation (used when navigating to Now Playing)
+     */
+    fun hideForNowPlaying() {
+        alpha = 0f
+    }
+
     private fun togglePlayPause() {
         val station = currentStation ?: return
+
+        val newPlayingState = !isPlaying
 
         if (isPlaying) {
             val intent = Intent(context, RadioService::class.java).apply {
@@ -157,5 +201,8 @@ class MiniPlayerView @JvmOverloads constructor(
             }
             context.startService(intent)
         }
+
+        // Notify listener to update ViewModel - this triggers the animation via setPlayingState
+        onPlayPauseToggleListener?.invoke(newPlayingState)
     }
 }

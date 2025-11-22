@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import coil.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,6 +46,7 @@ class NowPlayingFragment : Fragment() {
     private var isRecording = false
     private var recordingStartTime = 0L
     private val recordingHandler = Handler(Looper.getMainLooper())
+    private var previousPlayingState: Boolean? = null
     private val recordingUpdateRunnable = object : Runnable {
         override fun run() {
             if (isRecording) {
@@ -127,13 +129,9 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        // Observe playing state
+        // Observe playing state with animated transition
         viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
-            if (isPlaying) {
-                playPauseButton.setImageResource(R.drawable.ic_pause)
-            } else {
-                playPauseButton.setImageResource(R.drawable.ic_play)
-            }
+            updatePlayPauseButton(isPlaying)
         }
 
         // Play/Pause button
@@ -245,5 +243,42 @@ class NowPlayingFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         recordingHandler.removeCallbacks(recordingUpdateRunnable)
+        previousPlayingState = null
+    }
+
+    private fun updatePlayPauseButton(isPlaying: Boolean) {
+        // Only animate if state actually changed
+        if (previousPlayingState != null && previousPlayingState != isPlaying) {
+            try {
+                val animDrawable = if (isPlaying) {
+                    AnimatedVectorDrawableCompat.create(requireContext(), R.drawable.avd_play_to_pause)
+                } else {
+                    AnimatedVectorDrawableCompat.create(requireContext(), R.drawable.avd_pause_to_play)
+                }
+
+                animDrawable?.let {
+                    playPauseButton.setImageDrawable(it)
+                    it.start()
+                } ?: run {
+                    // Fallback to static icon if AVD creation fails
+                    playPauseButton.setImageResource(
+                        if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+                    )
+                }
+            } catch (e: Exception) {
+                // Fallback to static icon on AVD inflation error
+                android.util.Log.w("NowPlayingFragment", "AVD animation failed, using static icon", e)
+                playPauseButton.setImageResource(
+                    if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+                )
+            }
+        } else {
+            // Initial state - no animation
+            playPauseButton.setImageResource(
+                if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+            )
+        }
+
+        previousPlayingState = isPlaying
     }
 }
