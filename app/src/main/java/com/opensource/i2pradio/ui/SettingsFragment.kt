@@ -2,6 +2,7 @@ package com.opensource.i2pradio.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.opensource.i2pradio.R
 
 class SettingsFragment : Fragment() {
@@ -23,6 +25,21 @@ class SettingsFragment : Fragment() {
 
         val themeButton = view.findViewById<MaterialButton>(R.id.themeButton)
         val githubButton = view.findViewById<MaterialButton>(R.id.githubButton)
+        val materialYouSwitch = view.findViewById<MaterialSwitch>(R.id.materialYouSwitch)
+        val materialYouContainer = view.findViewById<View>(R.id.materialYouContainer)
+
+        // Show Material You option only on Android 12+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            materialYouContainer?.visibility = View.VISIBLE
+            materialYouSwitch?.isChecked = PreferencesHelper.isMaterialYouEnabled(requireContext())
+            materialYouSwitch?.setOnCheckedChangeListener { _, isChecked ->
+                PreferencesHelper.setMaterialYouEnabled(requireContext(), isChecked)
+                // Recreate activity to apply dynamic colors
+                activity?.recreate()
+            }
+        } else {
+            materialYouContainer?.visibility = View.GONE
+        }
 
         // Update theme button text
         updateThemeButtonText(themeButton)
@@ -32,7 +49,7 @@ class SettingsFragment : Fragment() {
             showThemeDialog(themeButton)
         }
 
-        // GitHub button (you can replace with your actual repo URL)
+        // GitHub button
         githubButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/yourusername/i2p-radio"))
             startActivity(intent)
@@ -69,7 +86,7 @@ class SettingsFragment : Fragment() {
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 }
                 AppCompatDelegate.setDefaultNightMode(newMode)
-                PreferencesHelper.saveThemeMode(requireContext(), newMode)  // ADD THIS LINE
+                PreferencesHelper.saveThemeMode(requireContext(), newMode)
                 updateThemeButtonText(themeButton)
                 dialog.dismiss()
             }
