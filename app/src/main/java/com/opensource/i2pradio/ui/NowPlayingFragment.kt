@@ -17,7 +17,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import coil.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -324,36 +323,25 @@ class NowPlayingFragment : Fragment() {
     }
 
     private fun updatePlayPauseButton(isPlaying: Boolean) {
+        val newIconRes = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+
         // Only animate if state actually changed
         if (previousPlayingState != null && previousPlayingState != isPlaying) {
-            try {
-                val animDrawable = if (isPlaying) {
-                    AnimatedVectorDrawableCompat.create(requireContext(), R.drawable.avd_play_to_pause)
-                } else {
-                    AnimatedVectorDrawableCompat.create(requireContext(), R.drawable.avd_pause_to_play)
+            // Simple fade animation for icon transition
+            playPauseButton.animate()
+                .alpha(0f)
+                .setDuration(100)
+                .withEndAction {
+                    playPauseButton.setImageResource(newIconRes)
+                    playPauseButton.animate()
+                        .alpha(1f)
+                        .setDuration(100)
+                        .start()
                 }
-
-                animDrawable?.let {
-                    playPauseButton.setImageDrawable(it)
-                    it.start()
-                } ?: run {
-                    // Fallback to static icon if AVD creation fails
-                    playPauseButton.setImageResource(
-                        if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
-                    )
-                }
-            } catch (e: Exception) {
-                // Fallback to static icon on AVD inflation error
-                android.util.Log.w("NowPlayingFragment", "AVD animation failed, using static icon", e)
-                playPauseButton.setImageResource(
-                    if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
-                )
-            }
+                .start()
         } else {
             // Initial state - no animation
-            playPauseButton.setImageResource(
-                if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
-            )
+            playPauseButton.setImageResource(newIconRes)
         }
 
         previousPlayingState = isPlaying

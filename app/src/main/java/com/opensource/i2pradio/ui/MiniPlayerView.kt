@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import coil.load
 import com.google.android.material.button.MaterialButton
 import com.opensource.i2pradio.R
@@ -128,37 +127,25 @@ class MiniPlayerView @JvmOverloads constructor(
     }
 
     fun setPlayingState(playing: Boolean) {
+        val newIconRes = if (playing) R.drawable.ic_pause else R.drawable.ic_play
+
         // Only animate if state actually changed
         if (previousPlayingState != null && previousPlayingState != playing) {
-            try {
-                val animDrawable = if (playing) {
-                    AnimatedVectorDrawableCompat.create(context, R.drawable.avd_play_to_pause)
-                } else {
-                    AnimatedVectorDrawableCompat.create(context, R.drawable.avd_pause_to_play)
+            // Simple fade animation for icon transition
+            playPauseButton.animate()
+                .alpha(0f)
+                .setDuration(100)
+                .withEndAction {
+                    playPauseButton.setIconResource(newIconRes)
+                    playPauseButton.animate()
+                        .alpha(1f)
+                        .setDuration(100)
+                        .start()
                 }
-
-                animDrawable?.let {
-                    playPauseButton.icon = it
-                    it.start()
-                } ?: run {
-                    // Fallback to static icon if AVD creation fails
-                    playPauseButton.setIconResource(
-                        if (playing) R.drawable.ic_pause else R.drawable.ic_play
-                    )
-                }
-            } catch (e: Exception) {
-                // Fallback to static icon on AVD inflation error (e.g., path morph issues on some Android versions)
-                android.util.Log.w("MiniPlayerView", "AVD animation failed, using static icon", e)
-                playPauseButton.setIconResource(
-                    if (playing) R.drawable.ic_pause else R.drawable.ic_play
-                )
-            }
+                .start()
         } else {
             // Initial state - no animation
-            playPauseButton.setIconResource(
-                if (playing) R.drawable.ic_pause
-                else R.drawable.ic_play
-            )
+            playPauseButton.setIconResource(newIconRes)
         }
 
         isPlaying = playing
