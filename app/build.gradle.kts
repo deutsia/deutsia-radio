@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("kotlin-kapt")  // ADD THIS LINE
+    id("kotlin-kapt")
 }
 
 android {
@@ -46,6 +46,12 @@ dependencies {
     implementation("androidx.media3:media3-session:1.2.1")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Embedded Tor support (using jehy's fork of Tor-Onion-Proxy-Library)
+    implementation("com.github.jehy:Tor-Onion-Proxy-Library:0.0.7")
+    implementation("org.slf4j:slf4j-api:1.7.36")
+    implementation("org.slf4j:slf4j-android:1.7.36")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
