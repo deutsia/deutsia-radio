@@ -24,7 +24,7 @@
         android:id="@+id/nowPlayingCoverCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="8dp"
         app:layout_constraintBottom_toTopOf="@id/nowPlayingInfoContainer"
@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/backButton"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintWidth_max="400dp">
+        app:layout_constraintWidth_max="320dp">
 
         <ImageView
             android:id="@+id/nowPlayingCoverArt"
@@ -50,7 +50,7 @@
         android:id="@+id/nowPlayingInfoContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/nowPlayingControlsContainer"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="28sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="?attr/colorOnSurface"
             android:maxLines="2"
@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="News • I2P" />
 
@@ -83,9 +83,9 @@
             android:id="@+id/nowPlayingMetadata"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:gravity="center"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:visibility="gone"
             tools:text="Song Name - Artist"
@@ -93,28 +93,47 @@
 
     </LinearLayout>
 
-    <!-- Playback Controls -->
-    <LinearLayout
+    <!-- Playback Controls - Properly Centered -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/nowPlayingControlsContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:gravity="center"
-        android:orientation="horizontal"
+        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nowPlayingInfoContainer">
 
-        <!-- Play/Pause Button -->
+        <!-- Record Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/recordButton"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:contentDescription="Record"
+            app:icon="@drawable/ic_record"
+            app:iconSize="24dp"
+            app:iconTint="@null"
+            app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
+            app:layout_constraintEnd_toStartOf="@id/playPauseButton"
+            app:layout_constraintTop_toTopOf="@id/playPauseButton"
+            android:layout_marginEnd="20dp" />
+
+        <!-- Main Play/Pause FAB - Large and Centered -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/playPauseButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="Play/Pause"
             app:srcCompat="@drawable/ic_pause"
-            app:fabSize="normal"
-            app:tint="?attr/colorOnPrimaryContainer" />
+            app:fabSize="large"
+            app:fabCustomSize="72dp"
+            app:maxImageSize="32dp"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Stop Button -->
         <com.google.android.material.button.MaterialButton
@@ -122,11 +141,44 @@
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:layout_marginStart="24dp"
             android:contentDescription="Stop"
             app:icon="@drawable/ic_stop"
             app:iconSize="24dp"
-            app:iconTint="?attr/colorOnSecondaryContainer" />
+            app:iconTint="?attr/colorOnSecondaryContainer"
+            app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
+            app:layout_constraintStart_toEndOf="@id/playPauseButton"
+            app:layout_constraintTop_toTopOf="@id/playPauseButton"
+            android:layout_marginStart="20dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Recording Indicator -->
+    <LinearLayout
+        android:id="@+id/recordingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="8dp"
+        android:background="@drawable/recording_indicator_bg"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <View
+            android:id="@+id/recordingDot"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/ic_record" />
+
+        <TextView
+            android:id="@+id/recordingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="00:00"
+            android:textSize="14sp"
+            android:textColor="?attr/colorOnSurface" />
 
     </LinearLayout>
 
@@ -143,11 +195,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_radio"
+            android:alpha="0.5"
+            app:tint="?attr/colorOnSurfaceVariant" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="No Station Playing"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="?attr/colorOnSurface" />
 

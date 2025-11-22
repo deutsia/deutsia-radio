@@ -142,18 +142,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
-// Simple placeholder fragment for Settings
-class SettingsFragment : Fragment() {
-    override fun onCreateView(
-        inflater: android.view.LayoutInflater,
-        container: android.view.ViewGroup?,
-        savedInstanceState: Bundle?
-    ): android.view.View {
-        val textView = android.widget.TextView(context)
-        textView.text = "Settings - Coming Soon!"
-        textView.textSize = 24f
-        textView.gravity = android.view.Gravity.CENTER
-        return textView
-    }
-}

@@ -5,14 +5,17 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Binder
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.MediaStore
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat as MediaNotificationCompat
 import androidx.media3.common.MediaItem
@@ -22,8 +25,14 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import okhttp3.OkHttpClient
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class RadioService : Service() {
@@ -38,10 +47,18 @@ class RadioService : Service() {
 
     private lateinit var audioManager: AudioManager
 
+    // Recording
+    private var isRecording = false
+    private var recordingOutputStream: OutputStream? = null
+    private var recordingFile: File? = null
+    private var currentStationName: String = "Unknown Station"
+
     companion object {
         const val ACTION_PLAY = "com.opensource.i2pradio.PLAY"
         const val ACTION_PAUSE = "com.opensource.i2pradio.PAUSE"
         const val ACTION_STOP = "com.opensource.i2pradio.STOP"
+        const val ACTION_START_RECORDING = "com.opensource.i2pradio.START_RECORDING"
+        const val ACTION_STOP_RECORDING = "com.opensource.i2pradio.STOP_RECORDING"
         const val CHANNEL_ID = "I2PRadioChannel"
         const val NOTIFICATION_ID = 1
     }
@@ -79,18 +96,89 @@ class RadioService : Service() {
                 startForeground(NOTIFICATION_ID, createNotification("Paused"))
             }
             ACTION_STOP -> {
+                stopRecording()
                 currentStreamUrl = null
                 stopStream()
                 stopForeground(true)
                 stopSelf()
             }
+            ACTION_START_RECORDING -> {
+                val stationName = intent.getStringExtra("station_name") ?: "Unknown Station"
+                startRecording(stationName)
+            }
+            ACTION_STOP_RECORDING -> {
+                stopRecording()
+            }
         }
         return START_STICKY
     }
 
+    private fun startRecording(stationName: String) {
+        if (isRecording) return
+
+        currentStationName = stationName
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val fileName = "${stationName.replace(Regex("[^a-zA-Z0-9]"), "_")}_$timestamp.mp3"
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // Use MediaStore for Android 10+
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
+                    put(MediaStore.Audio.Media.MIME_TYPE, "audio/mpeg")
+                    put(MediaStore.Audio.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MUSIC}/I2P Radio")
+                    put(MediaStore.Audio.Media.IS_PENDING, 1)
+                }
+
+                val uri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
+                uri?.let {
+                    recordingOutputStream = contentResolver.openOutputStream(it)
+                    isRecording = true
+                    android.util.Log.d("RadioService", "Recording started: $fileName")
+                    updateNotificationWithRecording()
+                }
+            } else {
+                // Legacy storage for older Android versions
+                val musicDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "I2P Radio")
+                if (!musicDir.exists()) musicDir.mkdirs()
+
+                recordingFile = File(musicDir, fileName)
+                recordingOutputStream = FileOutputStream(recordingFile)
+                isRecording = true
+                android.util.Log.d("RadioService", "Recording started: $fileName")
+                updateNotificationWithRecording()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("RadioService", "Failed to start recording", e)
+        }
+    }
+
+    private fun stopRecording() {
+        if (!isRecording) return
+
+        try {
+            recordingOutputStream?.close()
+            recordingOutputStream = null
+            isRecording = false
+            android.util.Log.d("RadioService", "Recording stopped")
+
+            // Update notification
+            if (player?.isPlaying == true) {
+                startForeground(NOTIFICATION_ID, createNotification("Playing"))
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("RadioService", "Failed to stop recording", e)
+        }
+    }
+
+    private fun updateNotificationWithRecording() {
+        if (player?.isPlaying == true) {
+            startForeground(NOTIFICATION_ID, createNotification("Playing • Recording"))
+        }
+    }
+
     private fun playStream(streamUrl: String, proxyHost: String, proxyPort: Int) {
         try {
-            // Request audio focus
             val result = audioManager.requestAudioFocus(
                 null,
                 AudioManager.STREAM_MUSIC,
@@ -138,7 +226,8 @@ class RadioService : Service() {
                         when (playbackState) {
                             Player.STATE_READY -> {
                                 reconnectAttempts = 0
-                                startForeground(NOTIFICATION_ID, createNotification("Playing"))
+                                val status = if (isRecording) "Playing • Recording" else "Playing"
+                                startForeground(NOTIFICATION_ID, createNotification(status))
                                 android.util.Log.d("RadioService", "Stream playing successfully")
                             }
                             Player.STATE_BUFFERING -> {
@@ -241,10 +330,10 @@ class RadioService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("I2P Radio")
             .setContentText(status)
-            .setSmallIcon(android.R.drawable.ic_media_play)
+            .setSmallIcon(R.drawable.ic_radio)
             .setContentIntent(pendingIntent)
-            .addAction(android.R.drawable.ic_media_pause, "Pause", playPausePendingIntent)
-            .addAction(android.R.drawable.ic_delete, "Stop", stopPendingIntent)
+            .addAction(R.drawable.ic_pause, "Pause", playPausePendingIntent)
+            .addAction(R.drawable.ic_stop, "Stop", stopPendingIntent)
             .setStyle(MediaNotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1))
             .setOngoing(true)
@@ -254,6 +343,7 @@ class RadioService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopRecording()
         stopStream()
     }
 }

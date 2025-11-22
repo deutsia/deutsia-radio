@@ -1,12 +1,18 @@
 package com.opensource.i2pradio.ui
 
 import android.app.Dialog
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import coil.load
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.R
@@ -20,6 +26,31 @@ class AddEditRadioDialog : DialogFragment() {
     private lateinit var repository: RadioRepository
     private var stationToEdit: RadioStation? = null
     private var onSaveCallback: ((RadioStation) -> Unit)? = null
+    private var selectedImageUri: Uri? = null
+
+    private var coverArtPreview: ImageView? = null
+    private var coverArtPreviewCard: MaterialCardView? = null
+    private var clearImageButton: MaterialButton? = null
+    private var coverArtInput: TextInputEditText? = null
+
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { selectedUri ->
+            // Take persistable permission to keep access after app restart
+            try {
+                requireContext().contentResolver.takePersistableUriPermission(
+                    selectedUri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                // Permission might not be available for all content providers
+            }
+
+            selectedImageUri = selectedUri
+            updateImagePreview(selectedUri.toString())
+        }
+    }
 
     companion object {
         fun newInstance(station: RadioStation? = null): AddEditRadioDialog {
@@ -43,7 +74,11 @@ class AddEditRadioDialog : DialogFragment() {
         val proxySettingsContainer = view.findViewById<View>(R.id.proxySettingsContainer)
         val proxyHostInput = view.findViewById<TextInputEditText>(R.id.proxyHostInput)
         val proxyPortInput = view.findViewById<TextInputEditText>(R.id.proxyPortInput)
-        val coverArtInput = view.findViewById<TextInputEditText>(R.id.coverArtInput)
+        coverArtInput = view.findViewById(R.id.coverArtInput)
+        val pickImageButton = view.findViewById<MaterialButton>(R.id.pickImageButton)
+        clearImageButton = view.findViewById(R.id.clearImageButton)
+        coverArtPreview = view.findViewById(R.id.coverArtPreview)
+        coverArtPreviewCard = view.findViewById(R.id.coverArtPreviewCard)
 
         // Setup genre dropdown
         val genres = arrayOf(
@@ -59,6 +94,19 @@ class AddEditRadioDialog : DialogFragment() {
             proxySettingsContainer.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
+        // Image picker button
+        pickImageButton.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
+
+        // Clear image button
+        clearImageButton?.setOnClickListener {
+            selectedImageUri = null
+            coverArtInput?.setText("")
+            coverArtPreviewCard?.visibility = View.GONE
+            clearImageButton?.visibility = View.GONE
+        }
+
         // Load station data if editing
         val stationId = arguments?.getLong("station_id", -1L) ?: -1L
         if (stationId != -1L) {
@@ -72,13 +120,16 @@ class AddEditRadioDialog : DialogFragment() {
                     useProxyCheckbox.isChecked = it.useProxy
                     proxyHostInput.setText(it.proxyHost)
                     proxyPortInput.setText(it.proxyPort.toString())
-                    coverArtInput.setText(it.coverArtUri ?: "")
+                    it.coverArtUri?.let { uri ->
+                        coverArtInput?.setText(uri)
+                        updateImagePreview(uri)
+                    }
                 }
             }
         }
 
         return AlertDialog.Builder(requireContext())
-            .setTitle(if (stationToEdit == null) "Add Radio Station" else "Edit Radio Station")
+            .setTitle(if (stationId == -1L) "Add Radio Station" else "Edit Radio Station")
             .setView(view)
             .setPositiveButton("Save") { _, _ ->
                 val name = nameInput.text.toString()
@@ -87,7 +138,10 @@ class AddEditRadioDialog : DialogFragment() {
                 val useProxy = useProxyCheckbox.isChecked
                 val proxyHost = if (useProxy) proxyHostInput.text.toString() else ""
                 val proxyPort = if (useProxy) proxyPortInput.text.toString().toIntOrNull() ?: 4444 else 4444
-                val coverArt = coverArtInput.text.toString().ifEmpty { null }
+
+                // Prefer local image over URL
+                val coverArt = selectedImageUri?.toString()
+                    ?: coverArtInput?.text.toString().ifEmpty { null }
 
                 if (name.isNotEmpty() && url.isNotEmpty()) {
                     val station = RadioStation(
@@ -115,6 +169,15 @@ class AddEditRadioDialog : DialogFragment() {
             }
             .setNegativeButton("Cancel", null)
             .create()
+    }
+
+    private fun updateImagePreview(uri: String) {
+        coverArtPreview?.load(uri) {
+            crossfade(true)
+            error(R.drawable.ic_radio)
+        }
+        coverArtPreviewCard?.visibility = View.VISIBLE
+        clearImageButton?.visibility = View.VISIBLE
     }
 
     fun setOnSaveCallback(callback: (RadioStation) -> Unit) {

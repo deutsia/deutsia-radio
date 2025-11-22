@@ -116,11 +116,78 @@
 
         </LinearLayout>
 
-        <!-- Cover Art URI (Optional) -->
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Cover Art Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Cover Art"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary" />
+
+        <!-- Cover Art Preview -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/coverArtPreviewCard"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="12dp"
+            android:layout_gravity="center"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/coverArtPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="Cover art preview" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Cover Art Options -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pickImageButton"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Choose Image"
+                app:icon="@drawable/ic_image" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/clearImageButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Clear"
+                android:visibility="gone"
+                app:icon="@drawable/ic_close" />
+
+        </LinearLayout>
+
+        <!-- Or use URL -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:text="Or enter image URL"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Cover Art URL (optional)"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
