@@ -25,6 +25,7 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import okhttp3.OkHttpClient
+import com.opensource.i2pradio.ui.PreferencesHelper
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -118,14 +119,16 @@ class RadioService : Service() {
 
         currentStationName = stationName
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "${stationName.replace(Regex("[^a-zA-Z0-9]"), "_")}_$timestamp.mp3"
+        val format = PreferencesHelper.getRecordingFormat(this)
+        val mimeType = PreferencesHelper.getRecordingFormatMimeType(format)
+        val fileName = "${stationName.replace(Regex("[^a-zA-Z0-9]"), "_")}_$timestamp.$format"
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 // Use MediaStore for Android 10+
                 val contentValues = ContentValues().apply {
                     put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
-                    put(MediaStore.Audio.Media.MIME_TYPE, "audio/mpeg")
+                    put(MediaStore.Audio.Media.MIME_TYPE, mimeType)
                     put(MediaStore.Audio.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MUSIC}/I2P Radio")
                     put(MediaStore.Audio.Media.IS_PENDING, 1)
                 }
