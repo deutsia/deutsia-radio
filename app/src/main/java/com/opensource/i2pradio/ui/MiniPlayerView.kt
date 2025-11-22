@@ -1,9 +1,12 @@
 package com.opensource.i2pradio.ui
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -44,25 +47,9 @@ class MiniPlayerView @JvmOverloads constructor(
         playPauseButton = findViewById(R.id.miniPlayerPlayPause)
         closeButton = findViewById(R.id.miniPlayerClose)
 
-        // Click the card to go to Now Playing with expand animation
+        // Click the card to go to Now Playing with smooth expand animation
         card.setOnClickListener {
-            // Scale up animation for expand effect
-            card.animate()
-                .scaleX(1.02f)
-                .scaleY(1.02f)
-                .setDuration(100)
-                .withEndAction {
-                    card.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .alpha(0f)
-                        .setDuration(150)
-                        .withEndAction {
-                            onClickListener?.invoke()
-                        }
-                        .start()
-                }
-                .start()
+            animateExpand()
         }
 
         playPauseButton.setOnClickListener {
@@ -118,12 +105,18 @@ class MiniPlayerView @JvmOverloads constructor(
         val proxyIndicator = if (station.useProxy) " • I2P" else ""
         genreText.text = "${station.genre}$proxyIndicator"
 
-        // Always use Coil to load images to properly clear cached state
-        // when switching between stations with/without cover art
-        coverImage.load(station.coverArtUri ?: R.drawable.ic_radio) {
-            crossfade(true)
-            placeholder(R.drawable.ic_radio)
-            error(R.drawable.ic_radio)
+        // Handle cover art update properly - clear old image when switching stations
+        if (station.coverArtUri != null) {
+            coverImage.load(station.coverArtUri) {
+                crossfade(true)
+                placeholder(R.drawable.ic_radio)
+                error(R.drawable.ic_radio)
+            }
+        } else {
+            // Explicitly clear any cached/loading state and set default drawable
+            coverImage.load(R.drawable.ic_radio) {
+                crossfade(true)
+            }
         }
     }
 
@@ -188,6 +181,43 @@ class MiniPlayerView @JvmOverloads constructor(
         card.alpha = 0f
         card.translationY = 30f
         visibility = INVISIBLE
+    }
+
+    /**
+     * Animate expand effect when clicking on mini player to go to Now Playing.
+     * Creates a smooth scale-up and fade-out animation that simulates expansion.
+     */
+    private fun animateExpand() {
+        // Cancel any pending animations
+        card.animate().cancel()
+
+        // Create a smooth expand animation using AnimatorSet for precise control
+        val scaleX = ObjectAnimator.ofFloat(card, "scaleX", 1f, 1.05f, 1.02f)
+        val scaleY = ObjectAnimator.ofFloat(card, "scaleY", 1f, 1.05f, 1.02f)
+        val alpha = ObjectAnimator.ofFloat(card, "alpha", 1f, 0.8f, 0f)
+        val translationY = ObjectAnimator.ofFloat(card, "translationY", 0f, -20f)
+
+        val animatorSet = AnimatorSet().apply {
+            playTogether(scaleX, scaleY, alpha, translationY)
+            duration = 250
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        animatorSet.addListener(object : android.animation.Animator.AnimatorListener {
+            override fun onAnimationStart(animation: android.animation.Animator) {}
+            override fun onAnimationEnd(animation: android.animation.Animator) {
+                // Reset card state for when it reappears
+                card.scaleX = 1f
+                card.scaleY = 1f
+                card.translationY = 0f
+                // Navigate to Now Playing
+                onClickListener?.invoke()
+            }
+            override fun onAnimationCancel(animation: android.animation.Animator) {}
+            override fun onAnimationRepeat(animation: android.animation.Animator) {}
+        })
+
+        animatorSet.start()
     }
 
     private fun togglePlayPause() {
