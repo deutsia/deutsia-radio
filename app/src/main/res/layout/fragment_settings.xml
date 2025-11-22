@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="View on GitHub"
-                    app:icon="@android:drawable/ic_menu_info_details" />
+                    app:icon="@drawable/ic_github" />
 
             </LinearLayout>
 

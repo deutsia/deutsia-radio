@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:text="Add Radio Station"
             android:layout_gravity="center_horizontal"
-            app:icon="@android:drawable/ic_input_add" />
+            app:icon="@drawable/ic_add" />
 
     </LinearLayout>
 
@@ -62,7 +62,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="Add Radio Station"
-        app:srcCompat="@android:drawable/ic_input_add"
+        app:srcCompat="@drawable/ic_add"
         app:tint="?attr/colorOnPrimary" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

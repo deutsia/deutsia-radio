@@ -14,7 +14,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:contentDescription="Back"
-        app:icon="@android:drawable/ic_menu_close_clear_cancel"
+        app:icon="@drawable/ic_arrow_back"
         app:iconTint="?attr/colorOnSurface"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -41,7 +41,7 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:contentDescription="Album art"
-            tools:src="@android:drawable/ic_dialog_info" />
+            tools:src="@drawable/ic_radio" />
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -112,20 +112,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="Play/Pause"
-            app:srcCompat="@android:drawable/ic_media_pause"
+            app:srcCompat="@drawable/ic_pause"
             app:fabSize="normal"
             app:tint="?attr/colorOnPrimaryContainer" />
 
         <!-- Stop Button -->
-<com.google.android.material.button.MaterialButton
-    android:id="@+id/stopButton"
-    style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-    android:layout_width="56dp"
-    android:layout_height="56dp"
-    android:layout_marginStart="24dp"
-    android:contentDescription="Stop"
-    app:icon="@android:drawable/ic_delete"
-    app:iconTint="?attr/colorOnSecondaryContainer" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/stopButton"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="24dp"
+            android:contentDescription="Stop"
+            app:icon="@drawable/ic_stop"
+            app:iconSize="24dp"
+            app:iconTint="?attr/colorOnSecondaryContainer" />
 
     </LinearLayout>
 

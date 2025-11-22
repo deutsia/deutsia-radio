@@ -159,11 +159,11 @@ class RadioStationAdapter(
             if (station.coverArtUri != null) {
                 coverArt.load(station.coverArtUri) {
                     crossfade(true)
-                    placeholder(android.R.drawable.ic_dialog_info)
-                    error(android.R.drawable.ic_dialog_info)
+                    placeholder(R.drawable.ic_radio)
+                    error(R.drawable.ic_radio)
                 }
             } else {
-                coverArt.setImageResource(android.R.drawable.ic_dialog_info)
+                coverArt.setImageResource(R.drawable.ic_radio)
             }
 
             itemView.setOnClickListener {
