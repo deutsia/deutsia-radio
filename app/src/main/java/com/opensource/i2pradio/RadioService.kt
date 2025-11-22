@@ -72,7 +72,9 @@ class RadioService : Service() {
     private var isRecording = false
     private var recordingOutputStream: OutputStream? = null
     private var recordingFile: File? = null
+    private var recordingUri: android.net.Uri? = null  // For Android 10+ MediaStore finalization
     private var currentStationName: String = "Unknown Station"
+    private var pendingRecordingStart = false  // Flag to start recording after player restarts
 
     companion object {
         const val ACTION_PLAY = "com.opensource.i2pradio.PLAY"
@@ -316,10 +318,13 @@ class RadioService : Service() {
 
                 val uri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
                 uri?.let {
+                    recordingUri = it
                     recordingOutputStream = contentResolver.openOutputStream(it)
                     isRecording = true
                     android.util.Log.d("RadioService", "Recording started: $fileName")
-                    updateNotificationWithRecording()
+
+                    // Restart player with recording data source
+                    restartPlayerWithRecording()
                 }
             } else {
                 // Legacy storage for older Android versions
@@ -330,11 +335,35 @@ class RadioService : Service() {
                 recordingOutputStream = FileOutputStream(recordingFile)
                 isRecording = true
                 android.util.Log.d("RadioService", "Recording started: $fileName")
-                updateNotificationWithRecording()
+
+                // Restart player with recording data source
+                restartPlayerWithRecording()
             }
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Failed to start recording", e)
+            cleanupRecording()
         }
+    }
+
+    private fun restartPlayerWithRecording() {
+        val streamUrl = currentStreamUrl ?: return
+        val proxyHost = currentProxyHost ?: ""
+
+        // Restart the player to use the recording data source
+        playStream(streamUrl, proxyHost, currentProxyPort, currentProxyType)
+        updateNotificationWithRecording()
+    }
+
+    private fun cleanupRecording() {
+        try {
+            recordingOutputStream?.close()
+        } catch (e: Exception) {
+            android.util.Log.e("RadioService", "Error closing recording stream", e)
+        }
+        recordingOutputStream = null
+        recordingFile = null
+        recordingUri = null
+        isRecording = false
     }
 
     private fun stopRecording() {
@@ -343,8 +372,26 @@ class RadioService : Service() {
         try {
             recordingOutputStream?.close()
             recordingOutputStream = null
+
+            // Finalize MediaStore entry for Android 10+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && recordingUri != null) {
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Audio.Media.IS_PENDING, 0)
+                }
+                contentResolver.update(recordingUri!!, contentValues, null, null)
+                android.util.Log.d("RadioService", "Recording finalized: $recordingUri")
+            }
+
+            recordingUri = null
+            recordingFile = null
             isRecording = false
             android.util.Log.d("RadioService", "Recording stopped")
+
+            // Restart player without recording to free up the recording stream
+            val streamUrl = currentStreamUrl
+            if (streamUrl != null && player?.isPlaying == true) {
+                playStream(streamUrl, currentProxyHost ?: "", currentProxyPort, currentProxyType)
+            }
 
             // Update notification
             if (player?.isPlaying == true) {
@@ -352,6 +399,7 @@ class RadioService : Service() {
             }
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Failed to stop recording", e)
+            cleanupRecording()
         }
     }
 
@@ -396,8 +444,15 @@ class RadioService : Service() {
                     .build()
             }
 
-            val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
+            val baseDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("I2PRadio/1.0")
+
+            // Wrap with recording data source if recording is active
+            val dataSourceFactory = if (isRecording && recordingOutputStream != null) {
+                RecordingDataSource.Factory(baseDataSourceFactory) { recordingOutputStream }
+            } else {
+                baseDataSourceFactory
+            }
 
             player = ExoPlayer.Builder(this).build().apply {
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
