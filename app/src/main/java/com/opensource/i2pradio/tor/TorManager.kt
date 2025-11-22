@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.io.IOException
 
 /**
@@ -17,6 +18,7 @@ import java.io.IOException
 object TorManager {
     private const val TAG = "TorManager"
     private const val TOR_FILES_DIR = "torfiles"
+    private const val TOR_BINARY_NAME = "tor"
     private const val TOR_STARTUP_TIMEOUT_SECONDS = 4 * 60  // 4 minutes
     private const val TOR_STARTUP_TRIES = 5
 
@@ -82,6 +84,10 @@ object TorManager {
                     TOR_FILES_DIR
                 )
                 onionProxyManager = manager
+
+                // Fix permissions on the Tor binary (addresses "Permission denied" error)
+                ensureTorBinaryPermissions(context)
+                ensureAllTorFilesPermissions(context)
 
                 // Start Tor with retry logic
                 val started = manager.startWithRepeat(
@@ -172,5 +178,74 @@ object TorManager {
     fun restart(context: Context, onComplete: ((Boolean) -> Unit)? = null) {
         stop()
         start(context, onComplete)
+    }
+
+    /**
+     * Ensure the Tor binary has execute permissions.
+     * This fixes "Permission denied" errors on Android when running the Tor binary.
+     */
+    private fun ensureTorBinaryPermissions(context: Context): Boolean {
+        try {
+            val torDir = File(context.applicationContext.getDir(TOR_FILES_DIR, Context.MODE_PRIVATE).absolutePath)
+            val torBinary = File(torDir, TOR_BINARY_NAME)
+
+            if (torBinary.exists()) {
+                // Method 1: Use Java File API
+                var result = torBinary.setExecutable(true, false)
+                torBinary.setReadable(true, false)
+                Log.d(TAG, "Set executable permission via File API on ${torBinary.absolutePath}: $result")
+
+                // Method 2: Also try chmod via Runtime as a fallback (more reliable on some devices)
+                try {
+                    val process = Runtime.getRuntime().exec("chmod 755 ${torBinary.absolutePath}")
+                    val exitCode = process.waitFor()
+                    Log.d(TAG, "chmod 755 on Tor binary returned: $exitCode")
+                    if (exitCode == 0) {
+                        result = true
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "chmod fallback failed (this may be normal)", e)
+                }
+
+                return result
+            } else {
+                Log.d(TAG, "Tor binary not yet extracted at ${torBinary.absolutePath}")
+                return true // Will be extracted by the library
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to set Tor binary permissions", e)
+            return false
+        }
+    }
+
+    /**
+     * Set permissions on all binaries in the Tor files directory.
+     * Called after AndroidOnionProxyManager initialization to ensure all files are executable.
+     */
+    private fun ensureAllTorFilesPermissions(context: Context) {
+        try {
+            val torDir = context.applicationContext.getDir(TOR_FILES_DIR, Context.MODE_PRIVATE)
+
+            // Find and set permissions on all executable files
+            torDir.listFiles()?.forEach { file ->
+                if (file.isFile && !file.name.endsWith(".conf") && !file.name.endsWith(".pid")) {
+                    try {
+                        file.setExecutable(true, false)
+                        file.setReadable(true, false)
+
+                        // Also try chmod
+                        try {
+                            Runtime.getRuntime().exec("chmod 755 ${file.absolutePath}").waitFor()
+                        } catch (_: Exception) {}
+
+                        Log.d(TAG, "Set permissions on: ${file.name}")
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed to set permissions on ${file.name}", e)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to set Tor files permissions", e)
+        }
     }
 }
