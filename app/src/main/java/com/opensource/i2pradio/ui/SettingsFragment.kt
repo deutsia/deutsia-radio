@@ -185,6 +185,9 @@ class SettingsFragment : Fragment() {
                 TorManager.TorState.STARTING -> {
                     // Do nothing while starting
                 }
+                TorManager.TorState.ORBOT_NOT_INSTALLED -> {
+                    TorManager.openOrbotInstallPage(requireContext())
+                }
             }
         }
 
@@ -244,6 +247,13 @@ class SettingsFragment : Fragment() {
                 torStatusText?.text = "Connection Failed"
                 torStatusDetail?.text = TorManager.errorMessage ?: "Unknown error"
                 torActionButton?.text = "Retry"
+                torActionButton?.isEnabled = true
+            }
+            TorManager.TorState.ORBOT_NOT_INSTALLED -> {
+                torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
+                torStatusText?.text = "Orbot Required"
+                torStatusDetail?.text = "Please install Orbot to use Tor"
+                torActionButton?.text = "Install Orbot"
                 torActionButton?.isEnabled = true
             }
         }
