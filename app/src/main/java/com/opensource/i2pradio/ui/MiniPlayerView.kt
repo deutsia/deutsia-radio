@@ -83,19 +83,19 @@ class MiniPlayerView @JvmOverloads constructor(
         if (station.coverArtUri != null) {
             coverImage.load(station.coverArtUri) {
                 crossfade(true)
-                placeholder(android.R.drawable.ic_dialog_info)
-                error(android.R.drawable.ic_dialog_info)
+                placeholder(R.drawable.ic_radio)
+                error(R.drawable.ic_radio)
             }
         } else {
-            coverImage.setImageResource(android.R.drawable.ic_dialog_info)
+            coverImage.setImageResource(R.drawable.ic_radio)
         }
     }
 
     fun setPlayingState(playing: Boolean) {
         isPlaying = playing
         playPauseButton.setIconResource(
-            if (playing) android.R.drawable.ic_media_pause
-            else android.R.drawable.ic_media_play
+            if (playing) R.drawable.ic_pause
+            else R.drawable.ic_play
         )
     }
 

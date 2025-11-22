@@ -33,7 +33,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:contentDescription="Cover art"
-                tools:src="@android:drawable/ic_dialog_info" />
+                tools:src="@drawable/ic_radio" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -80,7 +80,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="Play/Pause"
-            app:icon="@android:drawable/ic_media_pause"
+            app:icon="@drawable/ic_pause"
             app:iconSize="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/miniPlayerClose"
@@ -93,7 +93,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:contentDescription="Stop"
-            app:icon="@android:drawable/ic_menu_close_clear_cancel"
+            app:icon="@drawable/ic_close"
             app:iconSize="20dp"
             app:iconTint="?attr/colorOnSurfaceVariant"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:hint="Station Name"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            app:startIconDrawable="@android:drawable/ic_dialog_info">
+            app:startIconDrawable="@drawable/ic_label">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/nameInput"
@@ -37,7 +37,7 @@
             android:layout_marginTop="16dp"
             android:hint="Stream URL"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            app:startIconDrawable="@android:drawable/ic_menu_share">
+            app:startIconDrawable="@drawable/ic_link">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/urlInput"
