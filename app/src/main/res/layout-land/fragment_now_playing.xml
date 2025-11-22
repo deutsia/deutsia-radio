@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Landscape layout: Album art on left, controls on right (side-by-side) -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="false"
+    android:padding="16dp">
+
+    <!-- Back Button / Toolbar Area - top margin handled by WindowInsets -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/backButton"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="Back"
+        app:icon="@drawable/ic_arrow_back"
+        app:iconTint="?attr/colorOnSurface"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Recording Indicator - solid background to prevent bleed-through -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/recordingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:cardBackgroundColor="?attr/colorErrorContainer"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp">
+
+            <View
+                android:id="@+id/recordingDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/ic_record" />
+
+            <TextView
+                android:id="@+id/recordingTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="00:00"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="?attr/colorOnErrorContainer" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Cover Art - Left side in landscape -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/nowPlayingCoverCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/rightContentContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backButton"
+        app:layout_constraintWidth_max="280dp">
+
+        <ImageView
+            android:id="@+id/nowPlayingCoverArt"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:contentDescription="Album art"
+            tools:src="@drawable/ic_radio" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Right side content container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rightContentContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/nowPlayingCoverCard"
+        app:layout_constraintTop_toBottomOf="@id/backButton">
+
+        <!-- Station Info -->
+        <LinearLayout
+            android:id="@+id/nowPlayingInfoContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/nowPlayingControlsContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed">
+
+            <TextView
+                android:id="@+id/nowPlayingStationName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                android:maxLines="2"
+                android:ellipsize="end"
+                tools:text="BBC World Service" />
+
+            <TextView
+                android:id="@+id/nowPlayingGenre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="News - I2P" />
+
+            <!-- Metadata with marquee scrolling for long text -->
+            <TextView
+                android:id="@+id/nowPlayingMetadata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:gravity="center"
+                android:textSize="13sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:visibility="gone"
+                tools:text="Song Name - Artist"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+        <!-- Playback Controls - Grouped tightly in center -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/nowPlayingControlsContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nowPlayingInfoContainer"
+            app:layout_constraintWidth_max="280dp">
+
+            <!-- Record Button (Left) -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/recordButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Record"
+                app:srcCompat="@drawable/ic_fiber_manual_record"
+                app:fabSize="auto"
+                app:fabCustomSize="56dp"
+                app:maxImageSize="24dp"
+                app:tint="?attr/colorError"
+                app:backgroundTint="?attr/colorSurfaceContainerHighest"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                app:elevation="0dp"
+                app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
+                app:layout_constraintEnd_toStartOf="@id/playPauseButton"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/playPauseButton" />
+
+            <!-- Main Play/Pause FAB (Center) -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/playPauseButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Play/Pause"
+                app:srcCompat="@drawable/ic_pause"
+                app:fabSize="auto"
+                app:fabCustomSize="72dp"
+                app:maxImageSize="28dp"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/volumeButton"
+                app:layout_constraintStart_toEndOf="@id/recordButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Volume Button (Right) -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/volumeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:contentDescription="Volume"
+                app:srcCompat="@drawable/ic_volume"
+                app:fabSize="auto"
+                app:fabCustomSize="56dp"
+                app:maxImageSize="24dp"
+                app:backgroundTint="?attr/colorSecondaryContainer"
+                app:tint="?attr/colorOnSecondaryContainer"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/playPauseButton"
+                app:layout_constraintTop_toTopOf="@id/playPauseButton" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Empty State (when nothing playing) -->
+    <LinearLayout
+        android:id="@+id/emptyPlayingState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_radio"
+            android:alpha="0.5"
+            app:tint="?attr/colorOnSurfaceVariant" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="No Station Playing"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Select a station from the list"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+    </LinearLayout>
+
+    <!-- Buffering Indicator -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/bufferingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorSize="40dp"
+        app:layout_constraintBottom_toBottomOf="@id/nowPlayingCoverCard"
+        app:layout_constraintEnd_toEndOf="@id/nowPlayingCoverCard"
+        app:layout_constraintStart_toStartOf="@id/nowPlayingCoverCard"
+        app:layout_constraintTop_toTopOf="@id/nowPlayingCoverCard" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

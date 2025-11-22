@@ -8,17 +8,25 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import coil.load
+import coil.request.CachePolicy
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.slider.Slider
@@ -29,6 +37,7 @@ import com.opensource.i2pradio.RadioService
 class NowPlayingFragment : Fragment() {
     private val viewModel: RadioViewModel by activityViewModels()
 
+    private lateinit var rootContainer: ConstraintLayout
     private lateinit var coverArt: ImageView
     private lateinit var stationName: TextView
     private lateinit var genreText: TextView
@@ -40,14 +49,25 @@ class NowPlayingFragment : Fragment() {
     private lateinit var emptyState: View
     private lateinit var playingContent: View
     private lateinit var bufferingIndicator: CircularProgressIndicator
-    private var recordingIndicator: LinearLayout? = null
+    private var recordingIndicator: MaterialCardView? = null
+    private var recordingDot: View? = null
     private var recordingTimeText: TextView? = null
 
     private val recordingHandler = Handler(Looper.getMainLooper())
     private var previousPlayingState: Boolean? = null
     private var previousStationId: Long? = null
+    private var isBuffering: Boolean = false
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
+
+    // Animation for recording dot blink
+    private val blinkAnimation: AlphaAnimation by lazy {
+        AlphaAnimation(1f, 0.3f).apply {
+            duration = 500
+            repeatMode = Animation.REVERSE
+            repeatCount = Animation.INFINITE
+        }
+    }
 
     // Recording timer runnable - uses ViewModel state for elapsed time calculation
     private val recordingUpdateRunnable = object : Runnable {
@@ -70,6 +90,7 @@ class NowPlayingFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_now_playing, container, false)
 
+        rootContainer = view.findViewById(R.id.rootContainer)
         coverArt = view.findViewById(R.id.nowPlayingCoverArt)
         stationName = view.findViewById(R.id.nowPlayingStationName)
         genreText = view.findViewById(R.id.nowPlayingGenre)
@@ -81,14 +102,21 @@ class NowPlayingFragment : Fragment() {
         bufferingIndicator = view.findViewById(R.id.bufferingIndicator)
         playingContent = view.findViewById(R.id.nowPlayingCoverCard)
         recordingIndicator = view.findViewById(R.id.recordingIndicator)
+        recordingDot = view.findViewById(R.id.recordingDot)
         recordingTimeText = view.findViewById(R.id.recordingTime)
 
         // Initialize audio manager and volume control
         audioManager = requireContext().getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
 
-        // Volume button click shows volume dialog
+        // Setup Edge-to-Edge: Handle window insets for status bar
+        setupEdgeToEdge()
+
+        // Enable marquee for metadata text
+        metadataText.isSelected = true
+
+        // Volume button click shows volume bottom sheet
         volumeButton.setOnClickListener {
-            showVolumeDialog()
+            showVolumeBottomSheet()
         }
 
         // Back button
@@ -178,15 +206,27 @@ class NowPlayingFragment : Fragment() {
                 val proxyIndicator = if (station.useProxy) " • I2P" else ""
                 genreText.text = "${station.genre}$proxyIndicator"
 
-                // Handle cover art update properly - clear old image when switching stations
+                // Handle cover art update properly - switch scaleType based on content
                 if (station.coverArtUri != null) {
                     coverArt.load(station.coverArtUri) {
                         crossfade(true)
+                        memoryCachePolicy(CachePolicy.ENABLED)
                         placeholder(R.drawable.ic_radio)
                         error(R.drawable.ic_radio)
+                        listener(
+                            onSuccess = { _, _ ->
+                                // Real bitmap loaded - use centerCrop for best appearance
+                                coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
+                            },
+                            onError = { _, _ ->
+                                // Error loading - use centerInside for vector placeholder
+                                coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                            }
+                        )
                     }
                 } else {
-                    // Explicitly clear any cached/loading state and set default drawable
+                    // No cover art - use centerInside for vector placeholder
+                    coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     coverArt.load(R.drawable.ic_radio) {
                         crossfade(true)
                     }
@@ -270,63 +310,150 @@ class NowPlayingFragment : Fragment() {
      */
     private fun updateRecordingUI(state: RecordingState) {
         if (state.isRecording) {
+            // Change icon to stop square
             recordButton.setImageResource(R.drawable.ic_stop_record)
+            // Change icon tint to white for contrast
             recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
-                resources.getColor(android.R.color.white, requireContext().theme)
+                com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorOnError)
             )
-            recordingIndicator?.visibility = View.VISIBLE
+            // Change FAB background to error container (red) for recording state
+            recordButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorErrorContainer)
+            )
+
+            // Show recording indicator with animation
+            recordingIndicator?.apply {
+                visibility = View.VISIBLE
+                alpha = 0f
+                animate().alpha(1f).setDuration(200).start()
+            }
+
+            // Start blinking animation on recording dot
+            recordingDot?.startAnimation(blinkAnimation)
+
             // Calculate and display current elapsed time
             val elapsed = viewModel.getRecordingElapsedTime()
             val seconds = (elapsed / 1000) % 60
             val minutes = (elapsed / 1000) / 60
             recordingTimeText?.text = String.format("%02d:%02d", minutes, seconds)
+
             // Start the update runnable if not already running
             recordingHandler.removeCallbacks(recordingUpdateRunnable)
             recordingHandler.post(recordingUpdateRunnable)
         } else {
+            // Restore record icon
             recordButton.setImageResource(R.drawable.ic_fiber_manual_record)
             // Use colorError tint to show the icon in red color (matching XML)
             recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
                 com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorError)
             )
-            recordingIndicator?.visibility = View.GONE
+            // Restore FAB background to surface container
+            recordButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorSurfaceContainerHighest)
+            )
+
+            // Stop blinking animation
+            recordingDot?.clearAnimation()
+
+            // Hide recording indicator with animation
+            recordingIndicator?.animate()?.alpha(0f)?.setDuration(200)?.withEndAction {
+                recordingIndicator?.visibility = View.GONE
+            }?.start()
+
             recordingHandler.removeCallbacks(recordingUpdateRunnable)
         }
     }
 
-    private fun showVolumeDialog() {
+    /**
+     * Shows a Material 3 BottomSheet with a volume slider.
+     * Better UX than an AlertDialog for volume control.
+     */
+    private fun showVolumeBottomSheet() {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
-        val slider = Slider(requireContext()).apply {
-            valueFrom = 0f
-            valueTo = maxVolume.toFloat()
-            value = currentVolume.toFloat()
-            stepSize = 1f
-
-            addOnChangeListener { _, value, fromUser ->
-                if (fromUser) {
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value.toInt(), 0)
-                }
-            }
-        }
-
+        // Create the content view programmatically
         val container = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(64, 32, 64, 16)
+            setPadding(48, 32, 48, 48)
+
+            // Title
+            val title = TextView(requireContext()).apply {
+                text = "Volume"
+                textSize = 20f
+                setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                    this, com.google.android.material.R.attr.colorOnSurface))
+                setPadding(16, 0, 0, 24)
+            }
+            addView(title)
+
+            // Volume slider
+            val slider = Slider(requireContext()).apply {
+                valueFrom = 0f
+                valueTo = maxVolume.toFloat()
+                value = currentVolume.toFloat()
+                stepSize = 1f
+
+                addOnChangeListener { _, value, fromUser ->
+                    if (fromUser) {
+                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value.toInt(), 0)
+                    }
+                }
+            }
             addView(slider)
+
+            // Volume icon row
+            val iconRow = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, 8, 0, 0)
+                gravity = android.view.Gravity.CENTER_HORIZONTAL
+
+                val volumeIcon = ImageView(requireContext()).apply {
+                    setImageResource(R.drawable.ic_volume)
+                    imageTintList = android.content.res.ColorStateList.valueOf(
+                        com.google.android.material.color.MaterialColors.getColor(
+                            this, com.google.android.material.R.attr.colorOnSurfaceVariant))
+                    layoutParams = LinearLayout.LayoutParams(48, 48)
+                }
+                addView(volumeIcon)
+            }
+            addView(iconRow)
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Volume")
-            .setView(container)
-            .setPositiveButton("Done", null)
-            .show()
+        bottomSheetDialog.setContentView(container)
+        bottomSheetDialog.show()
+    }
+
+    /**
+     * Setup Edge-to-Edge: Apply window insets for proper status bar handling.
+     * This ensures proper spacing on devices with notches, punch holes, etc.
+     */
+    private fun setupEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(rootContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply top padding for status bar
+            view.updatePadding(top = insets.top)
+            windowInsets
+        }
+    }
+
+    /**
+     * Sets the buffering state and updates UI accordingly.
+     * Disables play/pause button during buffering to prevent spam-clicking.
+     */
+    private fun setBufferingState(buffering: Boolean) {
+        isBuffering = buffering
+        bufferingIndicator.visibility = if (buffering) View.VISIBLE else View.GONE
+        playPauseButton.isEnabled = !buffering
+        playPauseButton.alpha = if (buffering) 0.5f else 1f
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         recordingHandler.removeCallbacks(recordingUpdateRunnable)
+        recordingDot?.clearAnimation()
         previousPlayingState = null
     }
 
