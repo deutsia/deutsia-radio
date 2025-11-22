@@ -13,12 +13,14 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import coil.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.google.android.material.slider.Slider
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
@@ -32,7 +34,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var metadataText: TextView
     private lateinit var playPauseButton: FloatingActionButton
     private lateinit var recordButton: MaterialButton
-    private lateinit var volumeSeekBar: SeekBar
+    private lateinit var volumeButton: FloatingActionButton
     private lateinit var audioManager: AudioManager
     private lateinit var emptyState: View
     private lateinit var playingContent: View
@@ -68,7 +70,7 @@ class NowPlayingFragment : Fragment() {
         metadataText = view.findViewById(R.id.nowPlayingMetadata)
         playPauseButton = view.findViewById(R.id.playPauseButton)
         recordButton = view.findViewById(R.id.recordButton)
-        volumeSeekBar = view.findViewById(R.id.volumeSeekBar)
+        volumeButton = view.findViewById(R.id.volumeButton)
         emptyState = view.findViewById(R.id.emptyPlayingState)
         bufferingIndicator = view.findViewById(R.id.bufferingIndicator)
         playingContent = view.findViewById(R.id.nowPlayingCoverCard)
@@ -77,7 +79,11 @@ class NowPlayingFragment : Fragment() {
 
         // Initialize audio manager and volume control
         audioManager = requireContext().getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
-        setupVolumeControl()
+
+        // Volume button click shows volume dialog
+        volumeButton.setOnClickListener {
+            showVolumeDialog()
+        }
 
         // Back button
         val backButton = view.findViewById<MaterialButton>(R.id.backButton)
@@ -165,23 +171,34 @@ class NowPlayingFragment : Fragment() {
         return view
     }
 
-    private fun setupVolumeControl() {
+    private fun showVolumeDialog() {
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
-        volumeSeekBar.max = maxVolume
-        volumeSeekBar.progress = currentVolume
+        val slider = Slider(requireContext()).apply {
+            valueFrom = 0f
+            valueTo = maxVolume.toFloat()
+            value = currentVolume.toFloat()
+            stepSize = 1f
 
-        volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            addOnChangeListener { _, value, fromUser ->
                 if (fromUser) {
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value.toInt(), 0)
                 }
             }
+        }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+        val container = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(64, 32, 64, 16)
+            addView(slider)
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Volume")
+            .setView(container)
+            .setPositiveButton("Done", null)
+            .show()
     }
 
     private fun startRecording() {
