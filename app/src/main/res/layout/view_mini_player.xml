@@ -6,8 +6,8 @@
     android:layout_height="72dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardElevation="8dp"
-    app:cardCornerRadius="0dp"
+    app:cardElevation="12dp"
+    app:shapeAppearanceOverlay="@style/ShapeAppearance.MiniPlayer"
     app:cardBackgroundColor="?attr/colorSurfaceContainer">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -76,12 +76,13 @@
         <!-- Play/Pause Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/miniPlayerPlayPause"
-            style="@style/Widget.Material3.Button.IconButton.Filled"
+            style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="Play/Pause"
             app:icon="@drawable/ic_pause"
-            app:iconSize="24dp"
+            app:iconSize="28dp"
+            app:iconTint="?attr/colorOnSurface"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/miniPlayerClose"
             app:layout_constraintTop_toTopOf="parent" />

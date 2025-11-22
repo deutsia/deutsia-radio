@@ -52,6 +52,7 @@
         android:clipToPadding="false"
         android:paddingTop="8dp"
         android:paddingBottom="88dp"
+        android:layoutAnimation="@anim/layout_animation_fall_down"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <!-- Floating Action Button -->
