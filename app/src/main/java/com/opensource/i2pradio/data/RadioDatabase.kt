@@ -38,7 +38,7 @@ abstract class RadioDatabase : RoomDatabase() {
                     "radio_database"
                 )
                     .addMigrations(MIGRATION_1_2)
-                    .fallbackToDestructiveMigrationOnDowngrade()
+                    .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
                     .build()
                 INSTANCE = instance
                 instance
