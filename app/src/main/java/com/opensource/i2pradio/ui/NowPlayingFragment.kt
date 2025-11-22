@@ -1,6 +1,7 @@
 package com.opensource.i2pradio.ui
 
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -29,8 +31,9 @@ class NowPlayingFragment : Fragment() {
     private lateinit var genreText: TextView
     private lateinit var metadataText: TextView
     private lateinit var playPauseButton: FloatingActionButton
-    private lateinit var stopButton: MaterialButton
     private lateinit var recordButton: MaterialButton
+    private lateinit var volumeSeekBar: SeekBar
+    private lateinit var audioManager: AudioManager
     private lateinit var emptyState: View
     private lateinit var playingContent: View
     private lateinit var bufferingIndicator: CircularProgressIndicator
@@ -64,13 +67,17 @@ class NowPlayingFragment : Fragment() {
         genreText = view.findViewById(R.id.nowPlayingGenre)
         metadataText = view.findViewById(R.id.nowPlayingMetadata)
         playPauseButton = view.findViewById(R.id.playPauseButton)
-        stopButton = view.findViewById(R.id.stopButton)
         recordButton = view.findViewById(R.id.recordButton)
+        volumeSeekBar = view.findViewById(R.id.volumeSeekBar)
         emptyState = view.findViewById(R.id.emptyPlayingState)
         bufferingIndicator = view.findViewById(R.id.bufferingIndicator)
         playingContent = view.findViewById(R.id.nowPlayingCoverCard)
         recordingIndicator = view.findViewById(R.id.recordingIndicator)
         recordingTimeText = view.findViewById(R.id.recordingTime)
+
+        // Initialize audio manager and volume control
+        audioManager = requireContext().getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
+        setupVolumeControl()
 
         // Back button
         val backButton = view.findViewById<MaterialButton>(R.id.backButton)
@@ -146,19 +153,6 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        // Stop button
-        stopButton.setOnClickListener {
-            if (isRecording) {
-                stopRecording()
-            }
-            val intent = Intent(requireContext(), RadioService::class.java).apply {
-                action = RadioService.ACTION_STOP
-            }
-            requireContext().startService(intent)
-            viewModel.setPlaying(false)
-            viewModel.setCurrentStation(null)
-        }
-
         // Record button
         recordButton.setOnClickListener {
             if (isRecording) {
@@ -169,6 +163,25 @@ class NowPlayingFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun setupVolumeControl() {
+        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+
+        volumeSeekBar.max = maxVolume
+        volumeSeekBar.progress = currentVolume
+
+        volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
     }
 
     private fun startRecording() {
