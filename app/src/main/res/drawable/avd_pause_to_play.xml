@@ -9,20 +9,36 @@
             android:viewportHeight="24">
             <group android:name="icon">
                 <path
-                    android:name="icon_path"
+                    android:name="left_bar"
                     android:fillColor="@android:color/white"
-                    android:pathData="M6,19h4V5H6v14zM14,5v14h4V5h-4z"/>
+                    android:pathData="M6,5 L10,5 L10,19 L6,19 L6,5 Z"/>
+                <path
+                    android:name="right_bar"
+                    android:fillColor="@android:color/white"
+                    android:pathData="M14,5 L18,5 L18,19 L14,19 L14,5 Z"/>
             </group>
         </vector>
     </aapt:attr>
-    <target android:name="icon_path">
+    <target android:name="left_bar">
         <aapt:attr name="android:animation">
             <objectAnimator
                 android:duration="200"
                 android:propertyName="pathData"
-                android:valueFrom="M6,19h4V5H6v14zM14,5v14h4V5h-4z"
-                android:valueTo="M8,5v14l11,-7z"
-                android:valueType="pathType"/>
+                android:valueFrom="M6,5 L10,5 L10,19 L6,19 L6,5 Z"
+                android:valueTo="M8,5 L8,5 L13,9 L13,15 L8,19 Z"
+                android:valueType="pathType"
+                android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+    <target android:name="right_bar">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="200"
+                android:propertyName="pathData"
+                android:valueFrom="M14,5 L18,5 L18,19 L14,19 L14,5 Z"
+                android:valueTo="M13,9 L13,9 L19,12 L19,12 L13,15 Z"
+                android:valueType="pathType"
+                android:interpolator="@android:interpolator/fast_out_slow_in"/>
         </aapt:attr>
     </target>
 </animated-vector>
