@@ -125,6 +125,11 @@ class MainActivity : AppCompatActivity() {
             viewPager.currentItem = 1  // Switch to Now Playing tab
         }
 
+        // Play/pause toggle - update ViewModel to sync state and trigger animation
+        miniPlayerView.setOnPlayPauseToggleListener { isPlaying ->
+            viewModel.setPlaying(isPlaying)
+        }
+
         // Close button hides the mini player
         miniPlayerView.setOnCloseListener {
             miniPlayerManuallyClosed = true
@@ -145,6 +150,22 @@ class MainActivity : AppCompatActivity() {
                 else -> ""
             }
         }.attach()
+
+        // Handle page changes to show/hide mini player
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                if (position == 1) {
+                    // On Now Playing tab - keep mini player hidden
+                    miniPlayerView.hideForNowPlaying()
+                } else {
+                    // On other tabs - show mini player if station is playing
+                    if (viewModel.currentStation.value != null && !miniPlayerManuallyClosed) {
+                        miniPlayerView.showWithAnimation()
+                    }
+                }
+            }
+        })
     }
 
     override fun onDestroy() {
