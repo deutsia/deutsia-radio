@@ -126,7 +126,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="Play/Pause"
             app:srcCompat="@drawable/ic_pause"
-            app:fabSize="large"
+            app:fabSize="auto"
             app:fabCustomSize="72dp"
             app:maxImageSize="32dp"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
