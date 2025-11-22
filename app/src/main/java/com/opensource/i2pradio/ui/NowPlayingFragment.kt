@@ -33,6 +33,7 @@ import com.google.android.material.slider.Slider
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.data.ProxyType
 
 class NowPlayingFragment : Fragment() {
     private val viewModel: RadioViewModel by activityViewModels()
@@ -203,7 +204,13 @@ class NowPlayingFragment : Fragment() {
 
                 stationName.text = station.name
 
-                val proxyIndicator = if (station.useProxy) " • I2P" else ""
+                val proxyIndicator = if (station.useProxy) {
+                    when (station.getProxyTypeEnum()) {
+                        ProxyType.I2P -> " • I2P"
+                        ProxyType.TOR -> " • Tor"
+                        ProxyType.NONE -> ""
+                    }
+                } else ""
                 genreText.text = "${station.genre}$proxyIndicator"
 
                 // Handle cover art update properly - switch scaleType based on content

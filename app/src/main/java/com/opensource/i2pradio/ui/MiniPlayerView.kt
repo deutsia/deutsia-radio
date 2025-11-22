@@ -15,6 +15,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioStation
 
 class MiniPlayerView @JvmOverloads constructor(
@@ -102,7 +103,13 @@ class MiniPlayerView @JvmOverloads constructor(
         }
 
         stationName.text = station.name
-        val proxyIndicator = if (station.useProxy) " • I2P" else ""
+        val proxyIndicator = if (station.useProxy) {
+            when (station.getProxyTypeEnum()) {
+                ProxyType.I2P -> " • I2P"
+                ProxyType.TOR -> " • Tor"
+                ProxyType.NONE -> ""
+            }
+        } else ""
         genreText.text = "${station.genre}$proxyIndicator"
 
         // Handle cover art update properly - clear old image when switching stations

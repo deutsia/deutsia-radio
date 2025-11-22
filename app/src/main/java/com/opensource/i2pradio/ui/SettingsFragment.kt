@@ -32,6 +32,8 @@ class SettingsFragment : Fragment() {
     private var torStatusText: TextView? = null
     private var torStatusDetail: TextView? = null
     private var torActionButton: MaterialButton? = null
+    private var torClearnetContainer: View? = null
+    private var torClearnetSwitch: MaterialSwitch? = null
 
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
         activity?.runOnUiThread {
@@ -59,6 +61,8 @@ class SettingsFragment : Fragment() {
         torStatusText = view.findViewById(R.id.torStatusText)
         torStatusDetail = view.findViewById(R.id.torStatusDetail)
         torActionButton = view.findViewById(R.id.torActionButton)
+        torClearnetContainer = view.findViewById(R.id.torClearnetContainer)
+        torClearnetSwitch = view.findViewById(R.id.torClearnetSwitch)
 
         // Show Material You option only on Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -183,10 +187,33 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
+
+        // Setup clearnet through Tor toggle
+        torClearnetSwitch?.isChecked = PreferencesHelper.isTorForClearnetEnabled(requireContext())
+        torClearnetSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setTorForClearnet(requireContext(), isChecked)
+        }
     }
 
     private fun updateTorContainerVisibility(show: Boolean) {
         torStatusContainer?.visibility = if (show) View.VISIBLE else View.GONE
+        torClearnetContainer?.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun updateTorStatusUI(state: TorManager.TorState) {

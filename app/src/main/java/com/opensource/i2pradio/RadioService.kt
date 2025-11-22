@@ -427,14 +427,23 @@ class RadioService : Service() {
 
             // Determine proxy configuration
             // Priority: 1. Embedded Tor (if enabled and connected for Tor streams)
-            //           2. Manual proxy configuration
-            //           3. Direct connection
+            //           2. Tor for clearnet streams (anonymity/censorship bypass)
+            //           3. Manual proxy configuration
+            //           4. Direct connection
             val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
                 // Use embedded Tor for Tor streams if enabled and connected
                 proxyType == ProxyType.TOR &&
                 PreferencesHelper.isEmbeddedTorEnabled(this) &&
                 TorManager.isConnected() -> {
-                    android.util.Log.d("RadioService", "Using embedded Tor proxy")
+                    android.util.Log.d("RadioService", "Using embedded Tor proxy for .onion stream")
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
+                // Route clearnet streams through Tor for anonymity (when enabled and Tor is connected)
+                proxyType == ProxyType.NONE &&
+                PreferencesHelper.isEmbeddedTorEnabled(this) &&
+                PreferencesHelper.isTorForClearnetEnabled(this) &&
+                TorManager.isConnected() -> {
+                    android.util.Log.d("RadioService", "Routing clearnet stream through Tor for anonymity")
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
                 // Use manual proxy configuration
