@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import coil.load
 import com.google.android.material.button.MaterialButton
 import com.opensource.i2pradio.R
@@ -28,6 +29,8 @@ class MiniPlayerView @JvmOverloads constructor(
     private var currentStation: RadioStation? = null
     private var isPlaying: Boolean = false
     private var onClickListener: (() -> Unit)? = null
+    private var onCloseListener: (() -> Unit)? = null
+    private var previousPlayingState: Boolean? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_mini_player, this, true)
@@ -48,8 +51,12 @@ class MiniPlayerView @JvmOverloads constructor(
         }
 
         closeButton.setOnClickListener {
-            stopPlayback()
+            onCloseListener?.invoke()
         }
+    }
+
+    fun setOnCloseListener(listener: () -> Unit) {
+        onCloseListener = listener
     }
 
     fun setStation(station: RadioStation?) {
@@ -92,11 +99,28 @@ class MiniPlayerView @JvmOverloads constructor(
     }
 
     fun setPlayingState(playing: Boolean) {
+        // Only animate if state actually changed
+        if (previousPlayingState != null && previousPlayingState != playing) {
+            val animDrawable = if (playing) {
+                AnimatedVectorDrawableCompat.create(context, R.drawable.avd_play_to_pause)
+            } else {
+                AnimatedVectorDrawableCompat.create(context, R.drawable.avd_pause_to_play)
+            }
+
+            animDrawable?.let {
+                playPauseButton.icon = it
+                it.start()
+            }
+        } else {
+            // Initial state - no animation
+            playPauseButton.setIconResource(
+                if (playing) R.drawable.ic_pause
+                else R.drawable.ic_play
+            )
+        }
+
         isPlaying = playing
-        playPauseButton.setIconResource(
-            if (playing) R.drawable.ic_pause
-            else R.drawable.ic_play
-        )
+        previousPlayingState = playing
     }
 
     fun setOnMiniPlayerClickListener(listener: () -> Unit) {
@@ -120,12 +144,5 @@ class MiniPlayerView @JvmOverloads constructor(
             }
             context.startService(intent)
         }
-    }
-
-    private fun stopPlayback() {
-        val intent = Intent(context, RadioService::class.java).apply {
-            action = RadioService.ACTION_STOP
-        }
-        context.startService(intent)
     }
 }

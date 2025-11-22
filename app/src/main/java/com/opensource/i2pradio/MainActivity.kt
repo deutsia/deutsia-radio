@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
     private var radioService: RadioService? = null
     private var isServiceBound = false
+    private var miniPlayerManuallyClosed = false
+    private var lastStationId: Long? = null
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -90,8 +92,27 @@ class MainActivity : AppCompatActivity() {
 
         // Observe current station
         viewModel.currentStation.observe(this) { station ->
-            miniPlayerView.setStation(station)
-            miniPlayerContainer.visibility = if (station == null) View.GONE else View.VISIBLE
+            if (station == null) {
+                // Station cleared - hide mini player
+                miniPlayerView.setStation(null)
+                miniPlayerContainer.visibility = View.GONE
+                miniPlayerManuallyClosed = false
+                lastStationId = null
+            } else {
+                // Check if this is a new station (user clicked a new radio)
+                val isNewStation = lastStationId != station.id
+                if (isNewStation) {
+                    // Reset the manually closed flag when a new station is selected
+                    miniPlayerManuallyClosed = false
+                }
+                lastStationId = station.id
+
+                // Only show mini player if not manually closed
+                if (!miniPlayerManuallyClosed) {
+                    miniPlayerView.setStation(station)
+                    miniPlayerContainer.visibility = View.VISIBLE
+                }
+            }
         }
 
         // Observe playing state
@@ -102,6 +123,13 @@ class MainActivity : AppCompatActivity() {
         // Click mini-player to go to Now Playing tab
         miniPlayerView.setOnMiniPlayerClickListener {
             viewPager.currentItem = 1  // Switch to Now Playing tab
+        }
+
+        // Close button hides the mini player
+        miniPlayerView.setOnCloseListener {
+            miniPlayerManuallyClosed = true
+            miniPlayerView.setStation(null)
+            miniPlayerContainer.visibility = View.GONE
         }
     }
 
