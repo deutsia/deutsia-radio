@@ -112,7 +112,7 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:contentDescription="Record"
-            app:icon="@drawable/ic_record"
+            app:icon="@drawable/ic_fiber_manual_record"
             app:iconSize="24dp"
             app:iconTint="@null"
             app:layout_constraintStart_toStartOf="parent"

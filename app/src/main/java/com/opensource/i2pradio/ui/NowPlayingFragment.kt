@@ -12,7 +12,6 @@ import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -45,17 +44,18 @@ class NowPlayingFragment : Fragment() {
     private var recordingIndicator: LinearLayout? = null
     private var recordingTimeText: TextView? = null
 
-    private var isRecording = false
-    private var recordingStartTime = 0L
     private val recordingHandler = Handler(Looper.getMainLooper())
     private var previousPlayingState: Boolean? = null
     private var previousStationId: Long? = null
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
+
+    // Recording timer runnable - uses ViewModel state for elapsed time calculation
     private val recordingUpdateRunnable = object : Runnable {
         override fun run() {
-            if (isRecording) {
-                val elapsed = System.currentTimeMillis() - recordingStartTime
+            val recordingState = viewModel.recordingState.value
+            if (recordingState?.isRecording == true) {
+                val elapsed = viewModel.getRecordingElapsedTime()
                 val seconds = (elapsed / 1000) % 60
                 val minutes = (elapsed / 1000) / 60
                 recordingTimeText?.text = String.format("%02d:%02d", minutes, seconds)
@@ -121,10 +121,7 @@ class NowPlayingFragment : Fragment() {
                 emptyState.visibility = View.VISIBLE
                 emptyState.animate().alpha(1f).setDuration(300).start()
 
-                // Stop recording if station is cleared
-                if (isRecording) {
-                    stopRecording()
-                }
+                // Stop recording if station is cleared (handled by ViewModel)
                 previousStationId = null
             } else {
                 val isNewStation = previousStationId != station.id
@@ -240,16 +237,53 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        // Record button
+        // Record button - uses ViewModel for state management
         recordButton.setOnClickListener {
-            if (isRecording) {
-                stopRecording()
+            val recordingState = viewModel.recordingState.value
+            if (recordingState?.isRecording == true) {
+                viewModel.stopRecording()
+                Toast.makeText(requireContext(), "Recording saved to Music folder", Toast.LENGTH_SHORT).show()
             } else {
-                startRecording()
+                if (viewModel.startRecording()) {
+                    Toast.makeText(requireContext(), "Recording started", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "No station playing", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
+        // Observe recording state to update UI (survives configuration changes)
+        viewModel.recordingState.observe(viewLifecycleOwner) { state ->
+            updateRecordingUI(state)
+        }
+
         return view
+    }
+
+    /**
+     * Updates the recording UI based on the current recording state.
+     * This is called whenever the recording state changes and ensures the UI
+     * correctly reflects the state after configuration changes (e.g., screen rotation).
+     */
+    private fun updateRecordingUI(state: RecordingState) {
+        if (state.isRecording) {
+            recordButton.setIconResource(R.drawable.ic_stop_record)
+            recordButton.setIconTintResource(android.R.color.white)
+            recordingIndicator?.visibility = View.VISIBLE
+            // Calculate and display current elapsed time
+            val elapsed = viewModel.getRecordingElapsedTime()
+            val seconds = (elapsed / 1000) % 60
+            val minutes = (elapsed / 1000) / 60
+            recordingTimeText?.text = String.format("%02d:%02d", minutes, seconds)
+            // Start the update runnable if not already running
+            recordingHandler.removeCallbacks(recordingUpdateRunnable)
+            recordingHandler.post(recordingUpdateRunnable)
+        } else {
+            recordButton.setIconResource(R.drawable.ic_fiber_manual_record)
+            recordButton.setIconTintResource(android.R.color.transparent)
+            recordingIndicator?.visibility = View.GONE
+            recordingHandler.removeCallbacks(recordingUpdateRunnable)
+        }
     }
 
     private fun showVolumeDialog() {
@@ -280,47 +314,6 @@ class NowPlayingFragment : Fragment() {
             .setView(container)
             .setPositiveButton("Done", null)
             .show()
-    }
-
-    private fun startRecording() {
-        val station = viewModel.getCurrentStation()
-        if (station == null) {
-            Toast.makeText(requireContext(), "No station playing", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        isRecording = true
-        recordingStartTime = System.currentTimeMillis()
-        recordButton.setIconResource(R.drawable.ic_stop_record)
-        recordButton.setIconTintResource(android.R.color.white)
-        recordingIndicator?.visibility = View.VISIBLE
-        recordingTimeText?.text = "00:00"
-        recordingHandler.post(recordingUpdateRunnable)
-
-        // Send recording intent to service
-        val intent = Intent(requireContext(), RadioService::class.java).apply {
-            action = RadioService.ACTION_START_RECORDING
-            putExtra("station_name", station.name)
-        }
-        requireContext().startService(intent)
-
-        Toast.makeText(requireContext(), "Recording started", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun stopRecording() {
-        isRecording = false
-        recordingHandler.removeCallbacks(recordingUpdateRunnable)
-        recordButton.setIconResource(R.drawable.ic_record)
-        recordButton.setIconTintResource(android.R.color.transparent)
-        recordingIndicator?.visibility = View.GONE
-
-        // Send stop recording intent to service
-        val intent = Intent(requireContext(), RadioService::class.java).apply {
-            action = RadioService.ACTION_STOP_RECORDING
-        }
-        requireContext().startService(intent)
-
-        Toast.makeText(requireContext(), "Recording saved to Music folder", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {
