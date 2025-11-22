@@ -178,12 +178,18 @@ class NowPlayingFragment : Fragment() {
                 val proxyIndicator = if (station.useProxy) " • I2P" else ""
                 genreText.text = "${station.genre}$proxyIndicator"
 
-                // Always use Coil to load images to properly clear cached state
-                // when switching between stations with/without cover art
-                coverArt.load(station.coverArtUri ?: R.drawable.ic_radio) {
-                    crossfade(true)
-                    placeholder(R.drawable.ic_radio)
-                    error(R.drawable.ic_radio)
+                // Handle cover art update properly - clear old image when switching stations
+                if (station.coverArtUri != null) {
+                    coverArt.load(station.coverArtUri) {
+                        crossfade(true)
+                        placeholder(R.drawable.ic_radio)
+                        error(R.drawable.ic_radio)
+                    }
+                } else {
+                    // Explicitly clear any cached/loading state and set default drawable
+                    coverArt.load(R.drawable.ic_radio) {
+                        crossfade(true)
+                    }
                 }
 
                 metadataText.visibility = View.GONE
