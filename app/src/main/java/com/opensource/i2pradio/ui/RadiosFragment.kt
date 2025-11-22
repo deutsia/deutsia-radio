@@ -16,6 +16,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.data.RadioRepository
 import kotlinx.coroutines.CoroutineScope
@@ -76,11 +77,15 @@ class RadiosFragment : Fragment() {
         viewModel.setCurrentStation(station)
         viewModel.setPlaying(true)
 
+        val proxyType = station.getProxyTypeEnum()
         val intent = Intent(requireContext(), RadioService::class.java).apply {
             action = RadioService.ACTION_PLAY
             putExtra("stream_url", station.streamUrl)
+            putExtra("station_name", station.name)
             putExtra("proxy_host", if (station.useProxy) station.proxyHost else "")
             putExtra("proxy_port", station.proxyPort)
+            putExtra("proxy_type", proxyType.name)
+            putExtra("cover_art_uri", station.coverArtUri)
         }
         requireContext().startService(intent)
     }
@@ -153,7 +158,14 @@ class RadioStationAdapter(
         fun bind(station: RadioStation) {
             stationName.text = station.name
 
-            val proxyIndicator = if (station.useProxy) " • I2P" else ""
+            // Show proxy type indicator (I2P or Tor)
+            val proxyIndicator = if (station.useProxy) {
+                when (station.getProxyTypeEnum()) {
+                    ProxyType.I2P -> " • I2P"
+                    ProxyType.TOR -> " • Tor"
+                    ProxyType.NONE -> ""
+                }
+            } else ""
             genreText.text = "${station.genre}$proxyIndicator"
 
             if (station.coverArtUri != null) {

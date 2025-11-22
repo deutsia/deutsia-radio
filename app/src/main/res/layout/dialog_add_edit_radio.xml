@@ -65,14 +65,22 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Use Proxy Checkbox -->
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/useProxyCheckbox"
+        <!-- Proxy Type Dropdown -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/proxyTypeInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Use I2P Proxy"
-            android:checked="false" />
+            android:hint="Proxy Type"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+            <AutoCompleteTextView
+                android:id="@+id/proxyTypeInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Proxy Settings (Initially Hidden) -->
         <LinearLayout

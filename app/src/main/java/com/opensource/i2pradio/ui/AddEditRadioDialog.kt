@@ -13,9 +13,9 @@ import androidx.fragment.app.DialogFragment
 import coil.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.R
+import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
 import kotlinx.coroutines.CoroutineScope
@@ -70,7 +70,7 @@ class AddEditRadioDialog : DialogFragment() {
         val nameInput = view.findViewById<TextInputEditText>(R.id.nameInput)
         val urlInput = view.findViewById<TextInputEditText>(R.id.urlInput)
         val genreInput = view.findViewById<AutoCompleteTextView>(R.id.genreInput)
-        val useProxyCheckbox = view.findViewById<MaterialCheckBox>(R.id.useProxyCheckbox)
+        val proxyTypeInput = view.findViewById<AutoCompleteTextView>(R.id.proxyTypeInput)
         val proxySettingsContainer = view.findViewById<View>(R.id.proxySettingsContainer)
         val proxyHostInput = view.findViewById<TextInputEditText>(R.id.proxyHostInput)
         val proxyPortInput = view.findViewById<TextInputEditText>(R.id.proxyPortInput)
@@ -89,9 +89,24 @@ class AddEditRadioDialog : DialogFragment() {
         genreInput.setAdapter(genreAdapter)
         genreInput.setText("Other", false)
 
-        // Toggle proxy settings visibility
-        useProxyCheckbox.setOnCheckedChangeListener { _, isChecked ->
-            proxySettingsContainer.visibility = if (isChecked) View.VISIBLE else View.GONE
+        // Setup proxy type dropdown
+        val proxyTypes = arrayOf("None", "I2P", "Tor")
+        val proxyTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, proxyTypes)
+        proxyTypeInput.setAdapter(proxyTypeAdapter)
+        proxyTypeInput.setText("None", false)
+
+        // Toggle proxy settings visibility based on proxy type selection
+        proxyTypeInput.setOnItemClickListener { _, _, position, _ ->
+            val selectedType = proxyTypes[position]
+            if (selectedType == "None") {
+                proxySettingsContainer.visibility = View.GONE
+            } else {
+                proxySettingsContainer.visibility = View.VISIBLE
+                // Set default values based on proxy type
+                val proxyType = ProxyType.fromString(selectedType)
+                proxyHostInput.setText(proxyType.getDefaultHost())
+                proxyPortInput.setText(proxyType.getDefaultPort().toString())
+            }
         }
 
         // Image picker button
@@ -117,9 +132,23 @@ class AddEditRadioDialog : DialogFragment() {
                     nameInput.setText(it.name)
                     urlInput.setText(it.streamUrl)
                     genreInput.setText(it.genre, false)
-                    useProxyCheckbox.isChecked = it.useProxy
-                    proxyHostInput.setText(it.proxyHost)
-                    proxyPortInput.setText(it.proxyPort.toString())
+
+                    // Set proxy type dropdown
+                    val proxyType = it.getProxyTypeEnum()
+                    val proxyTypeDisplay = when (proxyType) {
+                        ProxyType.I2P -> "I2P"
+                        ProxyType.TOR -> "Tor"
+                        ProxyType.NONE -> "None"
+                    }
+                    proxyTypeInput.setText(proxyTypeDisplay, false)
+
+                    // Show proxy settings if using a proxy
+                    if (it.useProxy && proxyType != ProxyType.NONE) {
+                        proxySettingsContainer.visibility = View.VISIBLE
+                        proxyHostInput.setText(it.proxyHost)
+                        proxyPortInput.setText(it.proxyPort.toString())
+                    }
+
                     it.coverArtUri?.let { uri ->
                         coverArtInput?.setText(uri)
                         updateImagePreview(uri)
@@ -135,9 +164,17 @@ class AddEditRadioDialog : DialogFragment() {
                 val name = nameInput.text.toString()
                 val url = urlInput.text.toString()
                 val genre = genreInput.text.toString().ifEmpty { "Other" }
-                val useProxy = useProxyCheckbox.isChecked
+
+                // Get proxy type from dropdown
+                val proxyTypeText = proxyTypeInput.text.toString()
+                val proxyType = when (proxyTypeText) {
+                    "I2P" -> ProxyType.I2P
+                    "Tor" -> ProxyType.TOR
+                    else -> ProxyType.NONE
+                }
+                val useProxy = proxyType != ProxyType.NONE
                 val proxyHost = if (useProxy) proxyHostInput.text.toString() else ""
-                val proxyPort = if (useProxy) proxyPortInput.text.toString().toIntOrNull() ?: 4444 else 4444
+                val proxyPort = if (useProxy) proxyPortInput.text.toString().toIntOrNull() ?: proxyType.getDefaultPort() else proxyType.getDefaultPort()
 
                 // Prefer local image over URL
                 val coverArt = selectedImageUri?.toString()
@@ -150,6 +187,7 @@ class AddEditRadioDialog : DialogFragment() {
                         streamUrl = url,
                         genre = genre,
                         useProxy = useProxy,
+                        proxyType = proxyType.name,
                         proxyHost = proxyHost,
                         proxyPort = proxyPort,
                         coverArtUri = coverArt,
