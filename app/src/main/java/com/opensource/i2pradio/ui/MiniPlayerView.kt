@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import coil.load
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.RadioStation
@@ -19,6 +20,7 @@ class MiniPlayerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+    private val card: MaterialCardView
     private val coverImage: ImageView
     private val stationName: TextView
     private val genreText: TextView
@@ -35,21 +37,22 @@ class MiniPlayerView @JvmOverloads constructor(
     init {
         LayoutInflater.from(context).inflate(R.layout.view_mini_player, this, true)
 
+        card = findViewById(R.id.miniPlayerCard)
         coverImage = findViewById(R.id.miniPlayerCoverImage)
         stationName = findViewById(R.id.miniPlayerStationName)
         genreText = findViewById(R.id.miniPlayerGenre)
         playPauseButton = findViewById(R.id.miniPlayerPlayPause)
         closeButton = findViewById(R.id.miniPlayerClose)
 
-        // Click whole view to go to Now Playing with expand animation
-        setOnClickListener {
+        // Click the card to go to Now Playing with expand animation
+        card.setOnClickListener {
             // Scale up animation for expand effect
-            animate()
+            card.animate()
                 .scaleX(1.02f)
                 .scaleY(1.02f)
                 .setDuration(100)
                 .withEndAction {
-                    animate()
+                    card.animate()
                         .scaleX(1f)
                         .scaleY(1f)
                         .alpha(0f)
@@ -84,7 +87,7 @@ class MiniPlayerView @JvmOverloads constructor(
 
         if (station == null) {
             // Fade out animation
-            animate()
+            card.animate()
                 .alpha(0f)
                 .setDuration(200)
                 .withEndAction {
@@ -96,14 +99,14 @@ class MiniPlayerView @JvmOverloads constructor(
 
         // Always ensure we're visible when setting a station
         // Cancel any pending animations first
-        animate().cancel()
+        card.animate().cancel()
 
-        if (visibility != VISIBLE || alpha < 1f) {
-            alpha = 0f
+        if (visibility != VISIBLE || card.alpha < 1f) {
+            card.alpha = 0f
             visibility = VISIBLE
             // Slide up and fade in animation
-            translationY = 50f
-            animate()
+            card.translationY = 50f
+            card.animate()
                 .alpha(1f)
                 .translationY(0f)
                 .setDuration(300)
@@ -115,14 +118,12 @@ class MiniPlayerView @JvmOverloads constructor(
         val proxyIndicator = if (station.useProxy) " • I2P" else ""
         genreText.text = "${station.genre}$proxyIndicator"
 
-        if (station.coverArtUri != null) {
-            coverImage.load(station.coverArtUri) {
-                crossfade(true)
-                placeholder(R.drawable.ic_radio)
-                error(R.drawable.ic_radio)
-            }
-        } else {
-            coverImage.setImageResource(R.drawable.ic_radio)
+        // Always use Coil to load images to properly clear cached state
+        // when switching between stations with/without cover art
+        coverImage.load(station.coverArtUri ?: R.drawable.ic_radio) {
+            crossfade(true)
+            placeholder(R.drawable.ic_radio)
+            error(R.drawable.ic_radio)
         }
     }
 
@@ -161,14 +162,14 @@ class MiniPlayerView @JvmOverloads constructor(
      */
     fun showWithAnimation() {
         if (currentStation != null) {
-            animate().cancel()
+            card.animate().cancel()
             // Always reset state before animating to ensure proper display
-            if (visibility != VISIBLE || alpha < 1f) {
-                alpha = 0f
-                translationY = 30f
+            if (visibility != VISIBLE || card.alpha < 1f) {
+                card.alpha = 0f
+                card.translationY = 30f
                 visibility = VISIBLE
             }
-            animate()
+            card.animate()
                 .alpha(1f)
                 .scaleX(1f)
                 .scaleY(1f)
@@ -183,9 +184,9 @@ class MiniPlayerView @JvmOverloads constructor(
      * Hide mini player without animation (used when navigating to Now Playing)
      */
     fun hideForNowPlaying() {
-        animate().cancel()
-        alpha = 0f
-        translationY = 30f
+        card.animate().cancel()
+        card.alpha = 0f
+        card.translationY = 30f
         visibility = INVISIBLE
     }
 
