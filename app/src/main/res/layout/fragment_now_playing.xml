@@ -106,21 +106,26 @@
         app:layout_constraintTop_toBottomOf="@id/nowPlayingInfoContainer">
 
         <!-- Record Button (Left) -->
-        <com.google.android.material.button.MaterialButton
+        <!-- CHANGED: Converted to FAB to match Volume button styling -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/recordButton"
-            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:contentDescription="Record"
-            app:icon="@drawable/ic_fiber_manual_record"
-            app:iconSize="24dp"
-            app:iconTint="@null"
-            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_fiber_manual_record"
+            app:fabSize="auto"
+            app:fabCustomSize="64dp"
+            app:maxImageSize="28dp"
+            app:tint="?attr/colorError"
+            app:backgroundTint="?attr/colorSurfaceContainerHighest"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+            app:elevation="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
             app:layout_constraintEnd_toStartOf="@id/playPauseButton"
-            app:layout_constraintTop_toTopOf="@id/playPauseButton"
-            app:layout_constraintBottom_toBottomOf="@id/playPauseButton" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/playPauseButton" />
 
-        <!-- Main Play/Pause FAB - Large and Centered -->
+        <!-- Main Play/Pause FAB (Center) -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/playPauseButton"
             android:layout_width="wrap_content"
@@ -128,7 +133,7 @@
             android:contentDescription="Play/Pause"
             app:srcCompat="@drawable/ic_pause"
             app:fabSize="auto"
-            app:fabCustomSize="72dp"
+            app:fabCustomSize="80dp"
             app:maxImageSize="32dp"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -136,7 +141,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Volume Button (Right) - Large -->
+        <!-- Volume Button (Right) -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/volumeButton"
             android:layout_width="wrap_content"
@@ -149,10 +154,10 @@
             app:backgroundTint="?attr/colorSecondaryContainer"
             app:tint="?attr/colorOnSecondaryContainer"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-            app:layout_constraintStart_toEndOf="@id/playPauseButton"
+            app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/playPauseButton"
-            app:layout_constraintBottom_toBottomOf="@id/playPauseButton" />
+            app:layout_constraintStart_toEndOf="@id/playPauseButton"
+            app:layout_constraintTop_toTopOf="@id/playPauseButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
