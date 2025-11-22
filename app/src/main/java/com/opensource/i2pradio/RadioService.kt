@@ -8,6 +8,8 @@ import android.app.Service
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.media.AudioManager
 import android.os.Binder
 import android.os.Build
@@ -16,6 +18,9 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat as MediaNotificationCompat
 import androidx.media3.common.MediaItem
@@ -24,7 +29,14 @@ import androidx.media3.common.Player
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.ui.PreferencesHelper
 import java.io.File
 import java.io.FileOutputStream
@@ -42,11 +54,19 @@ class RadioService : Service() {
     private var currentStreamUrl: String? = null
     private var currentProxyHost: String? = null
     private var currentProxyPort: Int = 4444
+    private var currentProxyType: ProxyType = ProxyType.NONE
     private val handler = Handler(Looper.getMainLooper())
     private var reconnectAttempts = 0
     private val maxReconnectAttempts = 10
 
     private lateinit var audioManager: AudioManager
+
+    // MediaSession for Now Playing card on TV
+    private var mediaSession: MediaSessionCompat? = null
+    private var currentCoverArtUri: String? = null
+    private val sessionDeactivateHandler = Handler(Looper.getMainLooper())
+    private var sessionDeactivateRunnable: Runnable? = null
+    private val SESSION_DEACTIVATE_DELAY = 5 * 60 * 1000L // 5 minutes
 
     // Recording
     private var isRecording = false
@@ -72,6 +92,151 @@ class RadioService : Service() {
         super.onCreate()
         createNotificationChannel()
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        initializeMediaSession()
+    }
+
+    private fun initializeMediaSession() {
+        // Create MediaSession for Now Playing card on TV
+        mediaSession = MediaSessionCompat(this, "I2PRadioSession").apply {
+            // Set session activity - opens app when Now Playing card is selected
+            val sessionActivityIntent = Intent(this@RadioService, MainActivity::class.java)
+            val sessionActivityPendingIntent = PendingIntent.getActivity(
+                this@RadioService,
+                99,
+                sessionActivityIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            setSessionActivity(sessionActivityPendingIntent)
+
+            // Set flags for transport controls (needed for backwards compatibility)
+            @Suppress("DEPRECATION")
+            setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS)
+
+            // Set callback for transport controls
+            setCallback(object : MediaSessionCompat.Callback() {
+                override fun onPlay() {
+                    player?.play()
+                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                }
+
+                override fun onPause() {
+                    player?.pause()
+                    updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                    scheduleSessionDeactivation()
+                }
+
+                override fun onStop() {
+                    val stopIntent = Intent(this@RadioService, RadioService::class.java).apply {
+                        action = ACTION_STOP
+                    }
+                    startService(stopIntent)
+                }
+            })
+        }
+    }
+
+    /**
+     * Update the playback state in MediaSession
+     */
+    private fun updatePlaybackState(state: Int) {
+        val playbackStateBuilder = PlaybackStateCompat.Builder()
+            .setActions(
+                PlaybackStateCompat.ACTION_PLAY or
+                PlaybackStateCompat.ACTION_PAUSE or
+                PlaybackStateCompat.ACTION_STOP or
+                PlaybackStateCompat.ACTION_PLAY_PAUSE
+            )
+            .setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f)
+
+        mediaSession?.setPlaybackState(playbackStateBuilder.build())
+    }
+
+    /**
+     * Update media metadata for the Now Playing card
+     */
+    private fun updateMediaMetadata(stationName: String, coverArtUri: String?) {
+        val metadataBuilder = MediaMetadataCompat.Builder()
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, stationName)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "I2P Radio")
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "I2P Radio")
+
+        // Load cover art if available
+        if (!coverArtUri.isNullOrEmpty()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val imageLoader = ImageLoader(this@RadioService)
+                    val request = ImageRequest.Builder(this@RadioService)
+                        .data(coverArtUri)
+                        .allowHardware(false)
+                        .build()
+
+                    val result = imageLoader.execute(request)
+                    if (result is SuccessResult) {
+                        val bitmap = (result.drawable as? BitmapDrawable)?.bitmap
+                        if (bitmap != null) {
+                            val updatedMetadata = metadataBuilder
+                                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+                                .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, bitmap)
+                                .build()
+
+                            handler.post {
+                                mediaSession?.setMetadata(updatedMetadata)
+                            }
+                            return@launch
+                        }
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("RadioService", "Failed to load cover art for media session", e)
+                }
+
+                // Set metadata without cover art if loading failed
+                handler.post {
+                    mediaSession?.setMetadata(metadataBuilder.build())
+                }
+            }
+        } else {
+            mediaSession?.setMetadata(metadataBuilder.build())
+        }
+    }
+
+    /**
+     * Activate the media session
+     */
+    private fun activateMediaSession() {
+        cancelSessionDeactivation()
+        mediaSession?.isActive = true
+        android.util.Log.d("RadioService", "MediaSession activated")
+    }
+
+    /**
+     * Deactivate the media session
+     */
+    private fun deactivateMediaSession() {
+        mediaSession?.isActive = false
+        android.util.Log.d("RadioService", "MediaSession deactivated")
+    }
+
+    /**
+     * Schedule session deactivation after a delay (for pause state)
+     */
+    private fun scheduleSessionDeactivation() {
+        cancelSessionDeactivation()
+        sessionDeactivateRunnable = Runnable {
+            deactivateMediaSession()
+        }
+        sessionDeactivateHandler.postDelayed(sessionDeactivateRunnable!!, SESSION_DEACTIVATE_DELAY)
+        android.util.Log.d("RadioService", "Scheduled MediaSession deactivation in ${SESSION_DEACTIVATE_DELAY / 1000}s")
+    }
+
+    /**
+     * Cancel any pending session deactivation
+     */
+    private fun cancelSessionDeactivation() {
+        sessionDeactivateRunnable?.let {
+            sessionDeactivateHandler.removeCallbacks(it)
+            sessionDeactivateRunnable = null
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -84,21 +249,37 @@ class RadioService : Service() {
                 val streamUrl = intent.getStringExtra("stream_url") ?: return START_NOT_STICKY
                 val proxyHost = intent.getStringExtra("proxy_host") ?: ""
                 val proxyPort = intent.getIntExtra("proxy_port", 4444)
+                val proxyTypeStr = intent.getStringExtra("proxy_type") ?: ProxyType.NONE.name
+                val proxyType = ProxyType.fromString(proxyTypeStr)
+                val stationName = intent.getStringExtra("station_name") ?: "Unknown Station"
+                val coverArtUri = intent.getStringExtra("cover_art_uri")
 
                 currentStreamUrl = streamUrl
                 currentProxyHost = proxyHost
                 currentProxyPort = proxyPort
+                currentProxyType = proxyType
+                currentStationName = stationName
+                currentCoverArtUri = coverArtUri
                 reconnectAttempts = 0
 
-                playStream(streamUrl, proxyHost, proxyPort)
+                // Activate media session and set metadata
+                activateMediaSession()
+                updateMediaMetadata(stationName, coverArtUri)
+                updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
+
+                playStream(streamUrl, proxyHost, proxyPort, proxyType)
             }
             ACTION_PAUSE -> {
                 player?.pause()
+                updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                scheduleSessionDeactivation()
                 startForeground(NOTIFICATION_ID, createNotification("Paused"))
             }
             ACTION_STOP -> {
                 stopRecording()
                 currentStreamUrl = null
+                updatePlaybackState(PlaybackStateCompat.STATE_STOPPED)
+                deactivateMediaSession()
                 stopStream()
                 stopForeground(true)
                 stopSelf()
@@ -180,7 +361,7 @@ class RadioService : Service() {
         }
     }
 
-    private fun playStream(streamUrl: String, proxyHost: String, proxyPort: Int) {
+    private fun playStream(streamUrl: String, proxyHost: String, proxyPort: Int, proxyType: ProxyType = ProxyType.NONE) {
         try {
             val result = audioManager.requestAudioFocus(
                 null,
@@ -195,11 +376,18 @@ class RadioService : Service() {
 
             stopStream()
 
-            val okHttpClient = if (proxyHost.isNotEmpty()) {
+            val okHttpClient = if (proxyHost.isNotEmpty() && proxyType != ProxyType.NONE) {
+                // Use SOCKS5 for Tor, HTTP for I2P
+                val javaProxyType = when (proxyType) {
+                    ProxyType.TOR -> Proxy.Type.SOCKS
+                    ProxyType.I2P -> Proxy.Type.HTTP
+                    ProxyType.NONE -> Proxy.Type.DIRECT
+                }
+                android.util.Log.d("RadioService", "Using ${proxyType.name} proxy: $proxyHost:$proxyPort (${javaProxyType.name})")
                 OkHttpClient.Builder()
-                    .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(proxyHost, proxyPort)))
-                    .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
+                    .proxy(Proxy(javaProxyType, InetSocketAddress(proxyHost, proxyPort)))
+                    .connectTimeout(60, TimeUnit.SECONDS) // Longer timeout for Tor/I2P
+                    .readTimeout(60, TimeUnit.SECONDS)
                     .build()
             } else {
                 OkHttpClient.Builder()
@@ -222,6 +410,7 @@ class RadioService : Service() {
                 addListener(object : Player.Listener {
                     override fun onPlayerError(error: PlaybackException) {
                         android.util.Log.e("RadioService", "Playback error: ${error.message}")
+                        updatePlaybackState(PlaybackStateCompat.STATE_ERROR)
                         scheduleReconnect()
                     }
 
@@ -231,19 +420,33 @@ class RadioService : Service() {
                                 reconnectAttempts = 0
                                 val status = if (isRecording) "Playing • Recording" else "Playing"
                                 startForeground(NOTIFICATION_ID, createNotification(status))
+                                updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                                activateMediaSession()
                                 android.util.Log.d("RadioService", "Stream playing successfully")
                             }
                             Player.STATE_BUFFERING -> {
                                 startForeground(NOTIFICATION_ID, createNotification("Buffering..."))
+                                updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
                             Player.STATE_ENDED -> {
                                 android.util.Log.d("RadioService", "Stream ended, reconnecting...")
+                                updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
                                 scheduleReconnect()
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
                             }
+                        }
+                    }
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        if (isPlaying) {
+                            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
+                            cancelSessionDeactivation()
+                        } else if (player?.playbackState == Player.STATE_READY) {
+                            // Player is paused but ready
+                            updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
                         }
                     }
                 })
@@ -277,7 +480,7 @@ class RadioService : Service() {
 
         handler.postDelayed({
             currentStreamUrl?.let { url ->
-                playStream(url, currentProxyHost ?: "", currentProxyPort)
+                playStream(url, currentProxyHost ?: "", currentProxyPort, currentProxyType)
             }
         }, delay)
     }
@@ -330,15 +533,23 @@ class RadioService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
+        // Build media style with session token for Now Playing card integration
+        val mediaStyle = MediaNotificationCompat.MediaStyle()
+            .setShowActionsInCompactView(0, 1)
+
+        // Set session token for media notification integration
+        mediaSession?.sessionToken?.let { token ->
+            mediaStyle.setMediaSession(token)
+        }
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("I2P Radio")
+            .setContentTitle(currentStationName)
             .setContentText(status)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_pause, "Pause", playPausePendingIntent)
             .addAction(R.drawable.ic_stop, "Stop", stopPendingIntent)
-            .setStyle(MediaNotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(0, 1))
+            .setStyle(mediaStyle)
             .setOngoing(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
@@ -348,5 +559,11 @@ class RadioService : Service() {
         super.onDestroy()
         stopRecording()
         stopStream()
+        cancelSessionDeactivation()
+        mediaSession?.apply {
+            isActive = false
+            release()
+        }
+        mediaSession = null
     }
 }
