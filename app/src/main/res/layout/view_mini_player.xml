@@ -4,40 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/miniPlayerCard"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginBottom="16dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardElevation="12dp"
-    app:rippleColor="?attr/colorControlHighlight"
-    app:shapeAppearanceOverlay="@style/ShapeAppearance.MiniPlayer"
-    app:cardBackgroundColor="?attr/colorSurfaceContainer">
+    app:cardBackgroundColor="?attr/colorSurfaceContainerHighest"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:rippleColor="?attr/colorControlHighlight">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="8dp">
+        android:layout_height="wrap_content"
+        android:paddingEnd="8dp">
 
         <!-- Cover Art -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/miniPlayerCover"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="0dp"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/miniPlayerCoverImage"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="8dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@id/miniPlayerProgress"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <ImageView
-                android:id="@+id/miniPlayerCoverImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:contentDescription="Cover art"
-                tools:src="@drawable/ic_radio" />
-
-        </com.google.android.material.card.MaterialCardView>
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
+            tools:src="@drawable/ic_radio" />
 
         <!-- Station Info -->
         <LinearLayout
@@ -45,21 +38,22 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/miniPlayerCoverImage"
             app:layout_constraintEnd_toStartOf="@id/miniPlayerPlayPause"
-            app:layout_constraintStart_toEndOf="@id/miniPlayerCover"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toEndOf="@id/miniPlayerCoverImage"
+            app:layout_constraintTop_toTopOf="@id/miniPlayerCoverImage">
 
             <TextView
                 android:id="@+id/miniPlayerStationName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="15sp"
+                android:textStyle="bold"
                 tools:text="BBC World Service" />
 
             <TextView
@@ -67,55 +61,54 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textSize="12sp"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="12sp"
                 tools:text="News • I2P" />
 
         </LinearLayout>
 
-        <!-- Play/Pause Button - Material You Filled Tonal -->
+        <!-- Play/Pause Button (Hero of the mini player) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/miniPlayerPlayPause"
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="Play/Pause"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:insetLeft="0dp"
-            android:insetRight="0dp"
-            android:padding="0dp"
+            app:backgroundTint="?attr/colorSecondaryContainer"
             app:icon="@drawable/ic_pause"
-            app:iconSize="28dp"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+            app:iconTint="?attr/colorOnSecondaryContainer"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/miniPlayerClose"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Close Button -->
+        <!-- Close Button (Subtle) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/miniPlayerClose"
             style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:contentDescription="Stop"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:insetLeft="0dp"
-            android:insetRight="0dp"
-            android:padding="0dp"
             app:icon="@drawable/ic_close"
             app:iconSize="20dp"
             app:iconTint="?attr/colorOnSurfaceVariant"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Progress Indicator (Adds life to the component) -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/miniPlayerProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:trackColor="?attr/colorSurfaceContainerHighest"
+            app:indicatorColor="?attr/colorPrimary"
+            app:trackThickness="2dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
