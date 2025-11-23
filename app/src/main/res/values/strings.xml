@@ -8,6 +8,10 @@
     <string name="equalizer">Equalizer</string>
     <string name="equalizer_no_audio">Start playing a station first</string>
     <string name="equalizer_not_found">No equalizer app found. Install an equalizer app like Wavelet.</string>
+    <string name="equalizer_preset">Preset</string>
+    <string name="equalizer_custom">Custom</string>
+    <string name="equalizer_reset">Reset to Flat</string>
+    <string name="equalizer_init_failed">Could not initialize equalizer</string>
 
     <!-- Sort options -->
     <string name="sort_default">Default</string>
