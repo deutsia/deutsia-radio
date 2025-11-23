@@ -5,7 +5,18 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- Sort Button Header -->
+    <!-- Radio Stations List - placed first so sort header is drawn on top -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/radiosRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="56dp"
+        android:paddingBottom="100dp"
+        android:scrollbars="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <!-- Sort Button Header - placed after RecyclerView so it's on top and receives touch events -->
     <LinearLayout
         android:id="@+id/sortHeader"
         android:layout_width="match_parent"
@@ -13,7 +24,9 @@
         android:orientation="horizontal"
         android:gravity="end"
         android:paddingHorizontal="8dp"
-        android:paddingTop="8dp">
+        android:paddingTop="8dp"
+        android:background="?attr/colorSurface"
+        android:elevation="2dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/sortButton"
@@ -26,17 +39,6 @@
             app:iconSize="18dp" />
 
     </LinearLayout>
-
-    <!-- Radio Stations List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/radiosRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingTop="56dp"
-        android:paddingBottom="100dp"
-        android:scrollbars="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <!-- Empty State (Centered and styled) -->
     <LinearLayout

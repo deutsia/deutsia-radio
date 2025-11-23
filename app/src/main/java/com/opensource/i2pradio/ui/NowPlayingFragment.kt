@@ -376,11 +376,15 @@ class NowPlayingFragment : Fragment() {
                 requireContext().startService(intent)
                 viewModel.setPlaying(false)
             } else if (station != null) {
+                val proxyType = station.getProxyTypeEnum()
                 val intent = Intent(requireContext(), RadioService::class.java).apply {
                     action = RadioService.ACTION_PLAY
                     putExtra("stream_url", station.streamUrl)
+                    putExtra("station_name", station.name)
                     putExtra("proxy_host", if (station.useProxy) station.proxyHost else "")
                     putExtra("proxy_port", station.proxyPort)
+                    putExtra("proxy_type", proxyType.name)
+                    putExtra("cover_art_uri", station.coverArtUri)
                 }
                 requireContext().startService(intent)
                 viewModel.setPlaying(true)
