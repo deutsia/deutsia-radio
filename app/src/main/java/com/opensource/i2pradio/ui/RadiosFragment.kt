@@ -12,8 +12,10 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.request.Disposable
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.opensource.i2pradio.R
@@ -126,7 +128,7 @@ class RadiosFragment : Fragment() {
     }
 }
 
-// Updated Adapter
+// Updated Adapter with DiffUtil and stable IDs to prevent cover art duplication
 class RadioStationAdapter(
     private val onStationClick: (RadioStation) -> Unit,
     private val onMenuClick: (RadioStation, View) -> Unit
@@ -134,10 +136,18 @@ class RadioStationAdapter(
 
     private var stations = listOf<RadioStation>()
 
-    fun submitList(newStations: List<RadioStation>) {
-        stations = newStations
-        notifyDataSetChanged()
+    init {
+        setHasStableIds(true)
     }
+
+    fun submitList(newStations: List<RadioStation>) {
+        val diffCallback = RadioStationDiffCallback(stations, newStations)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        stations = newStations
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    override fun getItemId(position: Int): Long = stations[position].id
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -156,6 +166,7 @@ class RadioStationAdapter(
         private val stationName: TextView = itemView.findViewById(R.id.stationNameText)
         private val genreText: TextView = itemView.findViewById(R.id.genreText)
         private val menuButton: MaterialButton = itemView.findViewById(R.id.menuButton)
+        private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioStation) {
             stationName.text = station.name
@@ -170,14 +181,16 @@ class RadioStationAdapter(
             } else ""
             genreText.text = "${station.genre}$proxyIndicator"
 
+            // Cancel any pending image load and clear the image first to prevent ghosting
+            imageLoadDisposable?.dispose()
+            coverArt.setImageResource(R.drawable.ic_radio)
+
             if (station.coverArtUri != null) {
-                coverArt.load(station.coverArtUri) {
+                imageLoadDisposable = coverArt.load(station.coverArtUri) {
                     crossfade(true)
                     placeholder(R.drawable.ic_radio)
                     error(R.drawable.ic_radio)
                 }
-            } else {
-                coverArt.setImageResource(R.drawable.ic_radio)
             }
 
             // Touch animation for press feedback
@@ -210,6 +223,29 @@ class RadioStationAdapter(
             menuButton.setOnClickListener {
                 onMenuClick(station, it)
             }
+        }
+    }
+
+    // DiffUtil callback for efficient list updates
+    private class RadioStationDiffCallback(
+        private val oldList: List<RadioStation>,
+        private val newList: List<RadioStation>
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize() = oldList.size
+        override fun getNewListSize() = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].id == newList[newItemPosition].id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val old = oldList[oldItemPosition]
+            val new = newList[newItemPosition]
+            return old.name == new.name &&
+                    old.genre == new.genre &&
+                    old.coverArtUri == new.coverArtUri &&
+                    old.useProxy == new.useProxy &&
+                    old.proxyType == new.proxyType
         }
     }
 }
