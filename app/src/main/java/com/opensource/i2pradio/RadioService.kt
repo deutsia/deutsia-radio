@@ -10,6 +10,7 @@ import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
+import com.opensource.i2pradio.audio.EqualizerManager
 import android.os.Binder
 import android.os.Build
 import android.os.Handler
@@ -132,6 +133,9 @@ class RadioService : Service() {
     private var currentBitrate: Int = 0
     private var currentCodec: String? = null
 
+    // Built-in equalizer manager
+    private var equalizerManager: EqualizerManager? = null
+
     companion object {
         const val ACTION_PLAY = "com.opensource.i2pradio.PLAY"
         const val ACTION_PAUSE = "com.opensource.i2pradio.PAUSE"
@@ -162,6 +166,7 @@ class RadioService : Service() {
         super.onCreate()
         createNotificationChannel()
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        equalizerManager = EqualizerManager(this)
         initializeMediaSession()
     }
 
@@ -403,12 +408,17 @@ class RadioService : Service() {
     }
 
     /**
-     * Start recording using a SEPARATE network request.
-     * This is the key improvement: the recording stream is completely independent
-     * from the playback stream, so it cannot cause audio glitches.
+     * Start recording using a COMPLETELY SEPARATE network request.
+     * This is critical: the recording stream uses its own OkHttpClient instance
+     * that is completely independent from the playback stream.
+     * This ensures recording cannot cause any audio glitches or affect playback.
      */
     private fun startRecording(stationName: String) {
-        if (isRecording) return
+        if (isRecording) {
+            android.util.Log.w("RadioService", "Recording already in progress")
+            return
+        }
+
         val streamUrl = currentStreamUrl ?: run {
             android.util.Log.e("RadioService", "Cannot start recording: no stream URL")
             return
@@ -417,59 +427,79 @@ class RadioService : Service() {
         currentStationName = stationName
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val format = detectStreamFormat(streamUrl)
-        val fileName = "${stationName.replace(Regex("[^a-zA-Z0-9]"), "_")}_$timestamp.$format"
+        val sanitizedName = stationName.replace(Regex("[^a-zA-Z0-9\\s]"), "").replace(Regex("\\s+"), "_")
+        val fileName = "${sanitizedName}_$timestamp.$format"
+
+        android.util.Log.d("RadioService", "Starting recording for: $stationName, URL: $streamUrl")
 
         try {
             // Create recording file in app's external files directory (no permission needed)
-            val musicDir = getExternalFilesDir("Recordings")
-            if (musicDir == null) {
+            val recordingsDir = getExternalFilesDir("Recordings")
+            if (recordingsDir == null) {
                 android.util.Log.e("RadioService", "Cannot get external files directory for recording")
+                broadcastRecordingError("Storage not available")
                 return
             }
-            if (!musicDir.exists()) {
-                if (!musicDir.mkdirs()) {
-                    android.util.Log.e("RadioService", "Failed to create recordings directory: $musicDir")
+
+            if (!recordingsDir.exists()) {
+                val created = recordingsDir.mkdirs()
+                android.util.Log.d("RadioService", "Created recordings directory: $created, path: ${recordingsDir.absolutePath}")
+                if (!created) {
+                    android.util.Log.e("RadioService", "Failed to create recordings directory")
+                    broadcastRecordingError("Cannot create directory")
                     return
                 }
             }
-            recordingFile = File(musicDir, fileName)
-            android.util.Log.d("RadioService", "Recording file path: ${recordingFile?.absolutePath}")
 
-            // Build a completely separate OkHttp client for recording
-            // This ensures recording network issues cannot affect playback
-            val okHttpClient = buildRecordingHttpClient()
+            val file = File(recordingsDir, fileName)
+            recordingFile = file
+            android.util.Log.d("RadioService", "Recording file will be: ${file.absolutePath}")
 
-            // Create request for the stream
+            // Create the file to ensure it's writable
+            if (!file.createNewFile() && !file.exists()) {
+                android.util.Log.e("RadioService", "Cannot create recording file")
+                broadcastRecordingError("Cannot create file")
+                return
+            }
+
+            // Build a COMPLETELY SEPARATE OkHttp client for recording
+            // This is a NEW instance, independent from the playback client
+            val recordingClient = buildRecordingHttpClient()
+
+            // Create request for the stream - using separate connection
             val request = Request.Builder()
                 .url(streamUrl)
-                .header("User-Agent", "I2PRadio/1.0")
+                .header("User-Agent", "I2PRadio-Recorder/1.0") // Different user agent to distinguish
                 .header("Icy-MetaData", "0") // Don't need metadata for recording
-                .header("Connection", "keep-alive")
+                .header("Accept", "*/*")
                 .build()
 
-            recordingCall = okHttpClient.newCall(request)
+            // Set flags before starting
             isRecordingActive.set(true)
             isRecording = true
 
-            // Start recording on a background thread
+            // Create and store the call
+            val call = recordingClient.newCall(request)
+            recordingCall = call
+
+            // Start recording on a dedicated background thread
             recordingThread = Thread({
                 var response: Response? = null
                 var outputStream: BufferedOutputStream? = null
                 var totalBytesWritten = 0L
                 var lastFlushBytes = 0L
-                val flushInterval = 256 * 1024L // Flush every 256KB for data safety
+                val flushInterval = 128 * 1024L // Flush every 128KB for data safety
 
                 try {
-                    android.util.Log.d("RadioService", "Recording thread started, connecting to: $streamUrl")
-                    response = recordingCall?.execute()
+                    android.util.Log.d("RadioService", "Recording thread started, connecting...")
 
-                    if (response == null) {
-                        android.util.Log.e("RadioService", "Recording request returned null response")
-                        return@Thread
-                    }
+                    // Execute the request on this thread (blocking)
+                    response = call.execute()
+
+                    android.util.Log.d("RadioService", "Recording response received: ${response.code}")
 
                     if (!response.isSuccessful) {
-                        android.util.Log.e("RadioService", "Recording request failed with code: ${response.code}")
+                        android.util.Log.e("RadioService", "Recording request failed: ${response.code} - ${response.message}")
                         return@Thread
                     }
 
@@ -479,23 +509,34 @@ class RadioService : Service() {
                         return@Thread
                     }
 
-                    val inputStream = responseBody.byteStream()
-                    android.util.Log.d("RadioService", "Recording connection established, starting to write: $fileName")
+                    android.util.Log.d("RadioService", "Recording stream connected, writing to: ${file.name}")
 
+                    // Open output stream with buffering for efficient writes
                     outputStream = BufferedOutputStream(
-                        FileOutputStream(recordingFile),
-                        64 * 1024 // 64KB buffer for efficient writes
+                        FileOutputStream(file),
+                        64 * 1024 // 64KB write buffer
                     )
                     recordingOutputStream = outputStream
 
-                    val buffer = ByteArray(8192)
+                    val inputStream = responseBody.byteStream()
+                    val buffer = ByteArray(16384) // 16KB read buffer
 
-                    while (isRecordingActive.get()) {
-                        val bytesRead = inputStream.read(buffer)
+                    // Read loop - continues until stopped or stream ends
+                    while (isRecordingActive.get() && !Thread.currentThread().isInterrupted) {
+                        val bytesRead = try {
+                            inputStream.read(buffer)
+                        } catch (e: java.io.IOException) {
+                            if (isRecordingActive.get()) {
+                                android.util.Log.e("RadioService", "Read error: ${e.message}")
+                            }
+                            -1
+                        }
+
                         if (bytesRead == -1) {
                             android.util.Log.d("RadioService", "Recording stream ended (EOF)")
                             break
                         }
+
                         if (bytesRead > 0) {
                             outputStream.write(buffer, 0, bytesRead)
                             totalBytesWritten += bytesRead
@@ -504,71 +545,75 @@ class RadioService : Service() {
                             if (totalBytesWritten - lastFlushBytes >= flushInterval) {
                                 outputStream.flush()
                                 lastFlushBytes = totalBytesWritten
-                                android.util.Log.d("RadioService", "Recording progress: ${totalBytesWritten / 1024}KB written")
+                                android.util.Log.d("RadioService", "Recording: ${totalBytesWritten / 1024}KB written")
                             }
                         }
                     }
 
-                    // Final flush
+                    // Final flush before closing
                     outputStream.flush()
-                    android.util.Log.d("RadioService", "Recording completed: $fileName (${totalBytesWritten / 1024}KB)")
+                    android.util.Log.d("RadioService", "Recording loop ended, total: ${totalBytesWritten / 1024}KB")
 
                 } catch (e: java.io.IOException) {
                     if (isRecordingActive.get()) {
                         android.util.Log.e("RadioService", "Recording I/O error: ${e.message}", e)
                     } else {
-                        android.util.Log.d("RadioService", "Recording stopped by user (${totalBytesWritten / 1024}KB written)")
+                        android.util.Log.d("RadioService", "Recording stopped (${totalBytesWritten / 1024}KB saved)")
                     }
                 } catch (e: Exception) {
-                    if (isRecordingActive.get()) {
-                        android.util.Log.e("RadioService", "Recording error: ${e.message}", e)
-                    } else {
-                        android.util.Log.d("RadioService", "Recording stopped by user")
-                    }
+                    android.util.Log.e("RadioService", "Recording error: ${e.javaClass.simpleName}: ${e.message}", e)
                 } finally {
-                    // Ensure streams are closed properly
+                    // Close streams in reverse order
                     try {
                         outputStream?.flush()
-                    } catch (e: Exception) {
-                        android.util.Log.w("RadioService", "Error flushing recording output", e)
-                    }
-                    try {
                         outputStream?.close()
                     } catch (e: Exception) {
-                        android.util.Log.w("RadioService", "Error closing recording output", e)
+                        android.util.Log.w("RadioService", "Error closing output: ${e.message}")
                     }
                     try {
                         response?.close()
                     } catch (e: Exception) {
-                        android.util.Log.w("RadioService", "Error closing recording response", e)
+                        android.util.Log.w("RadioService", "Error closing response: ${e.message}")
                     }
+
                     recordingOutputStream = null
 
-                    // Log final file status
-                    recordingFile?.let { file ->
-                        if (file.exists()) {
-                            android.util.Log.d("RadioService", "Recording file saved: ${file.absolutePath} (${file.length() / 1024}KB)")
-                        } else {
-                            android.util.Log.e("RadioService", "Recording file not found after recording: ${file.absolutePath}")
-                        }
+                    // Log final file info
+                    if (file.exists()) {
+                        val sizeKB = file.length() / 1024
+                        android.util.Log.d("RadioService", "Recording saved: ${file.absolutePath} (${sizeKB}KB)")
+                    } else {
+                        android.util.Log.e("RadioService", "Recording file missing: ${file.absolutePath}")
                     }
                 }
-            }, "RecordingThread").apply {
+            }, "RecordingThread-${System.currentTimeMillis()}").apply {
                 priority = Thread.MIN_PRIORITY // Low priority to not affect audio playback
+                isDaemon = false // Ensure thread completes even if app is closing
             }
-            recordingThread?.start()
 
+            recordingThread?.start()
             updateNotificationWithRecording()
-            android.util.Log.d("RadioService", "Recording initiated for: $stationName")
+            android.util.Log.d("RadioService", "Recording thread started for: $stationName")
 
         } catch (e: Exception) {
-            android.util.Log.e("RadioService", "Failed to start recording", e)
+            android.util.Log.e("RadioService", "Failed to start recording: ${e.message}", e)
             cleanupRecording()
+            broadcastRecordingError("Failed to start: ${e.message}")
         }
     }
 
     /**
-     * Build an OkHttp client for recording with the same proxy settings as playback.
+     * Broadcast a recording error to the UI
+     */
+    private fun broadcastRecordingError(message: String) {
+        android.util.Log.e("RadioService", "Recording error: $message")
+        // Could add a broadcast here if UI needs to be notified
+    }
+
+    /**
+     * Build a COMPLETELY SEPARATE OkHttp client for recording.
+     * This client has its own connection pool, dispatcher, and settings
+     * to ensure it cannot interfere with the playback OkHttp client.
      */
     private fun buildRecordingHttpClient(): OkHttpClient {
         val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
@@ -583,23 +628,42 @@ class RadioService : Service() {
             else -> Triple("", 0, ProxyType.NONE)
         }
 
-        return if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
+        // Create a completely new connection pool for recording
+        // This ensures recording uses separate TCP connections from playback
+        val recordingConnectionPool = okhttp3.ConnectionPool(
+            maxIdleConnections = 1,
+            keepAliveDuration = 30,
+            timeUnit = TimeUnit.SECONDS
+        )
+
+        // Create a separate dispatcher for recording
+        val recordingDispatcher = okhttp3.Dispatcher().apply {
+            maxRequests = 1
+            maxRequestsPerHost = 1
+        }
+
+        val builder = OkHttpClient.Builder()
+            .connectionPool(recordingConnectionPool)
+            .dispatcher(recordingDispatcher)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+
+        // Apply proxy if needed
+        if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
             val javaProxyType = when (effectiveProxyType) {
                 ProxyType.TOR -> Proxy.Type.SOCKS
                 ProxyType.I2P -> Proxy.Type.HTTP
                 ProxyType.NONE -> Proxy.Type.DIRECT
             }
-            OkHttpClient.Builder()
-                .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
-                .build()
+            builder.proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
+            android.util.Log.d("RadioService", "Recording client using ${effectiveProxyType.name} proxy: $effectiveProxyHost:$effectiveProxyPort")
         } else {
-            OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
-                .build()
+            android.util.Log.d("RadioService", "Recording client using direct connection")
         }
+
+        return builder.build()
     }
 
     /**
@@ -619,56 +683,85 @@ class RadioService : Service() {
 
     /**
      * Stop recording and close the separate network connection.
+     * This method is safe to call from any thread.
      */
     private fun stopRecording() {
-        if (!isRecording) return
+        if (!isRecording) {
+            android.util.Log.d("RadioService", "stopRecording called but not recording")
+            return
+        }
 
         android.util.Log.d("RadioService", "Stopping recording...")
 
-        // Signal the recording thread to stop FIRST (before canceling network)
-        // This allows the thread to flush and close the output stream properly
+        // Capture references before cleanup
+        val currentCall = recordingCall
+        val currentThread = recordingThread
+        val currentFile = recordingFile
+
+        // Signal the recording thread to stop FIRST
+        // This allows the thread to finish its current write and flush
         isRecordingActive.set(false)
 
-        // Give the thread a moment to notice the flag and finish writing
-        Thread.sleep(100)
+        // Mark as not recording immediately to prevent double-stop
+        isRecording = false
 
-        // Cancel the network call (this will cause the read to throw and exit)
-        recordingCall?.cancel()
-
-        // Wait for the thread to finish (up to 3 seconds for proper cleanup)
-        recordingThread?.let { thread ->
+        // Run cleanup in background to avoid blocking UI
+        Thread({
             try {
-                thread.join(3000) // Wait up to 3 seconds for clean shutdown
-                if (thread.isAlive) {
-                    android.util.Log.w("RadioService", "Recording thread still alive, interrupting")
-                    thread.interrupt()
-                    thread.join(500) // Brief wait after interrupt
+                // Give the thread a moment to notice the flag
+                Thread.sleep(200)
+
+                // Cancel the network call (this causes the read to fail and exit)
+                try {
+                    currentCall?.cancel()
+                } catch (e: Exception) {
+                    android.util.Log.w("RadioService", "Error canceling recording call: ${e.message}")
                 }
-            } catch (e: InterruptedException) {
-                android.util.Log.w("RadioService", "Interrupted while stopping recording")
-                Thread.currentThread().interrupt()
+
+                // Wait for the thread to finish (up to 5 seconds for proper cleanup)
+                currentThread?.let { thread ->
+                    try {
+                        thread.join(5000) // Wait up to 5 seconds
+                        if (thread.isAlive) {
+                            android.util.Log.w("RadioService", "Recording thread still alive after 5s, interrupting")
+                            thread.interrupt()
+                            thread.join(1000) // Wait 1 more second after interrupt
+                        }
+                    } catch (e: InterruptedException) {
+                        android.util.Log.w("RadioService", "Interrupted while waiting for recording thread")
+                        Thread.currentThread().interrupt()
+                    }
+                }
+
+                // Log the recorded file info
+                currentFile?.let { file ->
+                    if (file.exists()) {
+                        val sizeKB = file.length() / 1024
+                        if (sizeKB > 0) {
+                            android.util.Log.d("RadioService", "Recording complete: ${file.absolutePath} (${sizeKB}KB)")
+                        } else {
+                            android.util.Log.w("RadioService", "Recording file is empty: ${file.absolutePath}")
+                            // Delete empty files
+                            file.delete()
+                        }
+                    } else {
+                        android.util.Log.e("RadioService", "Recording file not found: ${file.absolutePath}")
+                    }
+                }
+
+            } catch (e: Exception) {
+                android.util.Log.e("RadioService", "Error during recording cleanup: ${e.message}", e)
+            } finally {
+                // Final cleanup on main thread for notification update
+                handler.post {
+                    cleanupRecording()
+                    if (player?.isPlaying == true) {
+                        startForeground(NOTIFICATION_ID, createNotification("Playing"))
+                    }
+                    android.util.Log.d("RadioService", "Recording stopped and cleaned up")
+                }
             }
-        }
-
-        // Log the recorded file info
-        recordingFile?.let { file ->
-            if (file.exists() && file.length() > 0) {
-                android.util.Log.d("RadioService", "Recording saved: ${file.absolutePath} (${file.length() / 1024}KB)")
-            } else if (file.exists()) {
-                android.util.Log.w("RadioService", "Recording file is empty: ${file.absolutePath}")
-            } else {
-                android.util.Log.e("RadioService", "Recording file does not exist: ${file.absolutePath}")
-            }
-        }
-
-        cleanupRecording()
-
-        // Update notification
-        if (player?.isPlaying == true) {
-            startForeground(NOTIFICATION_ID, createNotification("Playing"))
-        }
-
-        android.util.Log.d("RadioService", "Recording stopped")
+        }, "RecordingCleanup").start()
     }
 
     /**
@@ -818,10 +911,13 @@ class RadioService : Service() {
                                 startForeground(NOTIFICATION_ID, createNotification(status))
                                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
                                 activateMediaSession()
-                                // Broadcast audio session open for equalizer apps
+                                // Initialize built-in equalizer with audio session
                                 player?.audioSessionId?.let { sessionId ->
                                     if (sessionId != 0) {
+                                        // Broadcast for external equalizer apps (compatibility)
                                         broadcastAudioSessionOpen(sessionId)
+                                        // Initialize built-in equalizer
+                                        equalizerManager?.initialize(sessionId)
                                     }
                                 }
                                 // Extract stream info when ready
@@ -1073,6 +1169,11 @@ class RadioService : Service() {
     fun getAudioSessionId(): Int = player?.audioSessionId ?: 0
 
     /**
+     * Get the built-in equalizer manager
+     */
+    fun getEqualizerManager(): EqualizerManager? = equalizerManager
+
+    /**
      * Broadcast audio session open to allow equalizer apps to attach.
      * This follows the standard Android audio effect protocol.
      */
@@ -1106,6 +1207,8 @@ class RadioService : Service() {
         super.onDestroy()
         stopRecording()
         cancelSleepTimer()
+        equalizerManager?.release()
+        equalizerManager = null
         stopStream()
         cancelSessionDeactivation()
         mediaSession?.apply {

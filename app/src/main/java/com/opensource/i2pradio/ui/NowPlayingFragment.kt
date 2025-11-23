@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.media.AudioManager
-import android.media.audiofx.AudioEffect
+import com.opensource.i2pradio.audio.EqualizerManager
 import android.os.IBinder
 import android.os.Bundle
 import android.os.Handler
@@ -205,9 +205,9 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        // Equalizer button click handler - opens system/external equalizer
+        // Equalizer button click handler - opens built-in equalizer
         equalizerButton.setOnClickListener {
-            openSystemEqualizer()
+            openBuiltInEqualizer()
         }
 
         // Setup Edge-to-Edge: Handle window insets for status bar
@@ -597,32 +597,34 @@ class NowPlayingFragment : Fragment() {
     }
 
     /**
-     * Opens the system equalizer or external equalizer app (like Wavelet).
-     * Uses the standard Android AudioEffect intent protocol that apps like Auxio use.
+     * Opens the built-in equalizer using the app's own UI.
+     * Uses Android's Equalizer API attached to the audio session.
      */
-    private fun openSystemEqualizer() {
+    private fun openBuiltInEqualizer() {
+        val equalizerManager = radioService?.getEqualizerManager()
+        if (equalizerManager == null) {
+            Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val audioSessionId = radioService?.getAudioSessionId() ?: 0
         if (audioSessionId == 0) {
             Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
             return
         }
 
-        val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
-            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
-            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, requireContext().packageName)
-            putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+        // Initialize equalizer if not already done
+        if (!equalizerManager.isInitialized()) {
+            val initialized = equalizerManager.initialize(audioSessionId)
+            if (!initialized) {
+                Toast.makeText(requireContext(), getString(R.string.equalizer_init_failed), Toast.LENGTH_SHORT).show()
+                return
+            }
         }
 
-        try {
-            startActivity(intent)
-        } catch (e: Exception) {
-            // No equalizer app found - show helpful message
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.equalizer_not_found),
-                Toast.LENGTH_LONG
-            ).show()
-        }
+        // Show the equalizer bottom sheet
+        val bottomSheet = EqualizerBottomSheet.newInstance(equalizerManager)
+        bottomSheet.show(parentFragmentManager, EqualizerBottomSheet.TAG)
     }
 
     private fun updateLikeButton(isLiked: Boolean) {
