@@ -12,13 +12,14 @@ import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.audio.EqualizerManager
 
 /**
  * Bottom sheet dialog for the built-in equalizer.
- * Displays band sliders, presets, and enable/disable toggle.
+ * Displays band sliders, presets, bass boost, surround sound, and enable/disable toggle.
  */
 class EqualizerBottomSheet(
     private val equalizerManager: EqualizerManager
@@ -30,9 +31,15 @@ class EqualizerBottomSheet(
     private lateinit var resetButton: MaterialButton
     private lateinit var minDbLabel: TextView
     private lateinit var maxDbLabel: TextView
+    private lateinit var dbScaleContainer: LinearLayout
+
+    // Bass Boost and Surround Sound
+    private lateinit var bassBoostContainer: LinearLayout
+    private lateinit var bassBoostSlider: Slider
+    private lateinit var surroundSoundContainer: LinearLayout
+    private lateinit var surroundSoundSlider: Slider
 
     private val bandSliders = mutableListOf<SeekBar>()
-    private val bandDbValues = mutableListOf<TextView>()
 
     // Flag to prevent feedback loops when updating UI from preset
     private var isUpdatingFromPreset = false
@@ -54,10 +61,19 @@ class EqualizerBottomSheet(
         resetButton = view.findViewById(R.id.resetButton)
         minDbLabel = view.findViewById(R.id.minDbLabel)
         maxDbLabel = view.findViewById(R.id.maxDbLabel)
+        dbScaleContainer = view.findViewById(R.id.dbScaleContainer)
+
+        // Bass Boost and Surround Sound
+        bassBoostContainer = view.findViewById(R.id.bassBoostContainer)
+        bassBoostSlider = view.findViewById(R.id.bassBoostSlider)
+        surroundSoundContainer = view.findViewById(R.id.surroundSoundContainer)
+        surroundSoundSlider = view.findViewById(R.id.surroundSoundSlider)
 
         setupEnableSwitch()
         setupPresetDropdown()
         setupBandSliders()
+        setupBassBoostSlider()
+        setupSurroundSoundSlider()
         setupResetButton()
         setupDbLabels()
         updateUIState()
@@ -106,7 +122,6 @@ class EqualizerBottomSheet(
     private fun setupBandSliders() {
         bandSlidersContainer.removeAllViews()
         bandSliders.clear()
-        bandDbValues.clear()
 
         val inflater = LayoutInflater.from(context)
         val levelRange = equalizerManager.bandLevelRange
@@ -118,20 +133,16 @@ class EqualizerBottomSheet(
             val bandView = inflater.inflate(R.layout.item_equalizer_band, bandSlidersContainer, false)
 
             val slider = bandView.findViewById<SeekBar>(R.id.bandSlider)
-            val dbValue = bandView.findViewById<TextView>(R.id.bandDbValue)
             val freqLabel = bandView.findViewById<TextView>(R.id.bandFrequency)
 
             // Set frequency label
             val freq = equalizerManager.centerFrequencies.getOrNull(band) ?: 0
-            freqLabel.text = equalizerManager.formatFrequency(freq)
+            freqLabel.text = formatFrequencyLabel(freq)
 
             // Configure slider
             slider.max = range
             val currentLevel = equalizerManager.getBandLevel(band.toShort()).toInt()
             slider.progress = currentLevel - minLevel
-
-            // Update dB display
-            updateDbDisplay(dbValue, currentLevel)
 
             // Set listener
             slider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -139,7 +150,6 @@ class EqualizerBottomSheet(
                     if (fromUser && !isUpdatingFromPreset) {
                         val level = (minLevel + progress).toShort()
                         equalizerManager.setBandLevel(band.toShort(), level)
-                        updateDbDisplay(dbValue, level.toInt())
                         // Set dropdown to "Custom" when user manually adjusts
                         presetDropdown.setText(getString(R.string.equalizer_custom), false)
                     }
@@ -150,8 +160,41 @@ class EqualizerBottomSheet(
             })
 
             bandSliders.add(slider)
-            bandDbValues.add(dbValue)
             bandSlidersContainer.addView(bandView)
+        }
+    }
+
+    private fun setupBassBoostSlider() {
+        // Hide if not supported
+        if (!equalizerManager.isBassBoostSupported) {
+            bassBoostContainer.visibility = View.GONE
+            return
+        }
+
+        bassBoostContainer.visibility = View.VISIBLE
+        bassBoostSlider.value = equalizerManager.getBassBoostStrength().toFloat()
+
+        bassBoostSlider.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                equalizerManager.setBassBoostStrength(value.toInt().toShort())
+            }
+        }
+    }
+
+    private fun setupSurroundSoundSlider() {
+        // Hide if not supported
+        if (!equalizerManager.isVirtualizerSupported) {
+            surroundSoundContainer.visibility = View.GONE
+            return
+        }
+
+        surroundSoundContainer.visibility = View.VISIBLE
+        surroundSoundSlider.value = equalizerManager.getVirtualizerStrength().toFloat()
+
+        surroundSoundSlider.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                equalizerManager.setVirtualizerStrength(value.toInt().toShort())
+            }
         }
     }
 
@@ -160,6 +203,16 @@ class EqualizerBottomSheet(
             equalizerManager.resetToFlat()
             updateBandSliders()
             presetDropdown.setText(getString(R.string.equalizer_custom), false)
+
+            // Reset bass boost and surround sound
+            if (equalizerManager.isBassBoostSupported) {
+                equalizerManager.setBassBoostStrength(0)
+                bassBoostSlider.value = 0f
+            }
+            if (equalizerManager.isVirtualizerSupported) {
+                equalizerManager.setVirtualizerStrength(0)
+                surroundSoundSlider.value = 0f
+            }
         }
     }
 
@@ -179,18 +232,18 @@ class EqualizerBottomSheet(
         for (band in 0 until equalizerManager.numberOfBands) {
             val currentLevel = equalizerManager.getBandLevel(band.toShort()).toInt()
             bandSliders.getOrNull(band)?.progress = currentLevel - minLevel
-            bandDbValues.getOrNull(band)?.let { updateDbDisplay(it, currentLevel) }
         }
     }
 
-    private fun updateDbDisplay(textView: TextView, levelMillibels: Int) {
-        val db = levelMillibels / 100f
-        val text = if (db >= 0) {
-            String.format("+%.0f dB", db)
+    /**
+     * Format frequency for display with proper spacing
+     */
+    private fun formatFrequencyLabel(freqHz: Int): String {
+        return if (freqHz >= 1000) {
+            "${freqHz / 1000} kHz"
         } else {
-            String.format("%.0f dB", db)
+            "$freqHz Hz"
         }
-        textView.text = text
     }
 
     private fun updateUIState() {
@@ -201,10 +254,15 @@ class EqualizerBottomSheet(
         val alpha = if (isEnabled) 1f else 0.5f
         view?.findViewById<TextInputLayout>(R.id.presetInputLayout)?.alpha = alpha
         bandSlidersContainer.alpha = alpha
+        dbScaleContainer.alpha = alpha
+        bassBoostContainer.alpha = alpha
+        surroundSoundContainer.alpha = alpha
         resetButton.alpha = alpha
 
         // Enable/disable all sliders
         bandSliders.forEach { it.isEnabled = isEnabled }
+        bassBoostSlider.isEnabled = isEnabled
+        surroundSoundSlider.isEnabled = isEnabled
     }
 
     companion object {
