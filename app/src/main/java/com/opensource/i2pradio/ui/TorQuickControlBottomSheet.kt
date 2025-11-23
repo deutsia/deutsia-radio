@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -35,7 +34,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     private lateinit var primaryActionButton: MaterialButton
     private lateinit var secondaryActionButton: MaterialButton
     private lateinit var orbotInfoCard: MaterialCardView
-    private lateinit var connectionDetailsContainer: LinearLayout
+    private lateinit var connectionDetailsContainer: MaterialCardView
     private lateinit var proxyHostText: TextView
     private lateinit var proxyPortText: TextView
 

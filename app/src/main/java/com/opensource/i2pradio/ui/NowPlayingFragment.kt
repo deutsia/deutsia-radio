@@ -319,13 +319,15 @@ class NowPlayingFragment : Fragment() {
         if (state.isRecording) {
             // Change icon to stop square
             recordButton.setImageResource(R.drawable.ic_stop_record)
+            // Get colors from the current theme context to reflect theme changes properly
+            val ctx = requireContext()
             // Change icon tint to white for contrast
             recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorOnError)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnError, android.graphics.Color.WHITE)
             )
             // Change FAB background to error container (red) for recording state
             recordButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorErrorContainer)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorErrorContainer, android.graphics.Color.RED)
             )
 
             // Show recording indicator with animation
@@ -350,13 +352,14 @@ class NowPlayingFragment : Fragment() {
         } else {
             // Restore record icon
             recordButton.setImageResource(R.drawable.ic_fiber_manual_record)
-            // Use colorError tint to show the icon in red color (matching XML)
+            // Get colors from the current theme context to reflect theme changes properly
+            // Using requireContext() ensures we get colors from the recreated activity's theme
+            val ctx = requireContext()
             recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorError)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorError, android.graphics.Color.RED)
             )
-            // Restore FAB background to surface container
             recordButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(recordButton, com.google.android.material.R.attr.colorSurfaceContainerHighest)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorSurfaceContainerHighest, android.graphics.Color.GRAY)
             )
 
             // Stop blinking animation
