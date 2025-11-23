@@ -303,8 +303,14 @@ class RadioService : Service() {
 
         currentStationName = stationName
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val format = PreferencesHelper.getRecordingFormat(this)
-        val mimeType = PreferencesHelper.getRecordingFormatMimeType(format)
+
+        // Detect format from current stream URL to avoid corruption
+        // Recording writes raw stream bytes, so we must use the stream's actual format
+        val detectedFormat = detectStreamFormat(currentStreamUrl)
+        val format = detectedFormat.first
+        val mimeType = detectedFormat.second
+        android.util.Log.d("RadioService", "Recording format detected: $format (mime: $mimeType) from URL: $currentStreamUrl")
+
         val fileName = "${stationName.replace(Regex("[^a-zA-Z0-9]"), "_")}_$timestamp.$format"
 
         try {
@@ -356,6 +362,42 @@ class RadioService : Service() {
         recordingFile = null
         recordingUri = null
         isRecording = false
+    }
+
+    /**
+     * Detects the audio format from a stream URL.
+     * Since recording writes raw stream bytes, we must save with the correct format
+     * to avoid file corruption (e.g., saving OGG stream as MP3).
+     *
+     * @return Pair of (file extension, MIME type)
+     */
+    private fun detectStreamFormat(streamUrl: String?): Pair<String, String> {
+        if (streamUrl == null) {
+            return Pair("ogg", "audio/ogg") // Default to OGG for streaming
+        }
+
+        val urlLower = streamUrl.lowercase()
+
+        // Check URL path for format hints
+        return when {
+            urlLower.contains(".mp3") || urlLower.contains("/mp3") || urlLower.contains("type=mp3") ->
+                Pair("mp3", "audio/mpeg")
+            urlLower.contains(".aac") || urlLower.contains("/aac") || urlLower.contains("type=aac") ->
+                Pair("aac", "audio/aac")
+            urlLower.contains(".m4a") || urlLower.contains("/m4a") ->
+                Pair("m4a", "audio/mp4")
+            urlLower.contains(".opus") || urlLower.contains("/opus") || urlLower.contains("type=opus") ->
+                Pair("opus", "audio/opus")
+            urlLower.contains(".flac") || urlLower.contains("/flac") ->
+                Pair("flac", "audio/flac")
+            urlLower.contains(".wav") || urlLower.contains("/wav") ->
+                Pair("wav", "audio/wav")
+            urlLower.contains(".ogg") || urlLower.contains("/ogg") || urlLower.contains("type=ogg") ||
+            urlLower.contains("vorbis") || urlLower.contains("/vorbis") ->
+                Pair("ogg", "audio/ogg")
+            // Default to OGG for unknown formats as many Icecast/I2P streams use OGG Vorbis
+            else -> Pair("ogg", "audio/ogg")
+        }
     }
 
     private fun stopRecording() {
