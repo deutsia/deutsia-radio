@@ -7,6 +7,7 @@ import androidx.media3.datasource.TransferListener
 import java.io.BufferedOutputStream
 import java.io.OutputStream
 import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
@@ -18,13 +19,16 @@ import java.util.concurrent.atomic.AtomicReference
  * and written to disk on a background thread, ensuring audio playback is never
  * blocked by disk I/O.
  *
- * The recording output stream can be dynamically set/cleared without
- * recreating the player, allowing seamless recording toggle.
+ * Optimized for minimal overhead when not recording to prevent audio glitching:
+ * - Uses a buffer pool to reduce allocations
+ * - Volatile boolean check is extremely fast when not recording
+ * - No synchronization on the hot path when not recording
  */
 class RecordingDataSource(
     private val upstream: DataSource,
     private val writeQueue: ArrayBlockingQueue<ByteArray>,
-    private val isRecordingActive: AtomicBoolean
+    private val isRecordingActive: AtomicBoolean,
+    private val bufferPool: ConcurrentLinkedQueue<ByteArray>
 ) : DataSource {
 
     private var dataSpec: DataSpec? = null
@@ -41,24 +45,49 @@ class RecordingDataSource(
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         val bytesRead = upstream.read(buffer, offset, length)
 
-        // Queue data for async writing if recording is active
+        // Fast path: skip everything if not recording (just a volatile read)
+        // This ensures minimal overhead during normal playback
         if (bytesRead > 0 && isRecordingActive.get()) {
-            try {
-                // Copy the data to avoid buffer reuse issues
-                val dataCopy = ByteArray(bytesRead)
-                System.arraycopy(buffer, offset, dataCopy, 0, bytesRead)
-                // Use offer() which is non-blocking - if queue is full, drop this chunk
-                // This prevents audio hitching at the cost of potentially losing some data
-                // Queue size is large enough (1000 chunks) that this should rarely happen
-                if (!writeQueue.offer(dataCopy)) {
-                    android.util.Log.w("RecordingDataSource", "Write queue full, dropping chunk")
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("RecordingDataSource", "Error queueing recording data", e)
-            }
+            queueForRecording(buffer, offset, bytesRead)
         }
 
         return bytesRead
+    }
+
+    /**
+     * Queue data for async writing to disk.
+     * Uses a buffer pool to reduce allocations and GC pressure.
+     */
+    private fun queueForRecording(buffer: ByteArray, offset: Int, bytesRead: Int) {
+        try {
+            // Try to get a buffer from the pool, or create a new one
+            val dataCopy = if (bytesRead <= BUFFER_SIZE) {
+                bufferPool.poll() ?: ByteArray(BUFFER_SIZE)
+            } else {
+                // Large read - allocate exact size (rare case)
+                ByteArray(bytesRead)
+            }
+
+            System.arraycopy(buffer, offset, dataCopy, 0, bytesRead)
+
+            // Create exact-sized copy for the queue
+            val exactCopy = if (bytesRead == dataCopy.size) {
+                dataCopy
+            } else {
+                // Return pooled buffer and create exact copy
+                if (dataCopy.size == BUFFER_SIZE && bufferPool.size < MAX_POOL_SIZE) {
+                    bufferPool.offer(dataCopy)
+                }
+                dataCopy.copyOf(bytesRead)
+            }
+
+            // Use offer() which is non-blocking - if queue is full, drop this chunk
+            if (!writeQueue.offer(exactCopy)) {
+                android.util.Log.w("RecordingDataSource", "Write queue full, dropping chunk")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("RecordingDataSource", "Error queueing recording data", e)
+        }
     }
 
     override fun getUri(): Uri? = upstream.uri
@@ -70,27 +99,38 @@ class RecordingDataSource(
 
     /**
      * Factory for creating RecordingDataSource instances.
-     * Uses a shared write queue for async disk writes, preventing audio hitching.
+     * Uses a shared write queue and buffer pool for async disk writes.
      */
     class Factory(
         private val upstreamFactory: DataSource.Factory,
         private val writeQueue: ArrayBlockingQueue<ByteArray>,
         private val isRecordingActive: AtomicBoolean
     ) : DataSource.Factory {
+        // Shared buffer pool across all data source instances
+        private val bufferPool = ConcurrentLinkedQueue<ByteArray>()
 
         override fun createDataSource(): DataSource {
             return RecordingDataSource(
                 upstreamFactory.createDataSource(),
                 writeQueue,
-                isRecordingActive
+                isRecordingActive,
+                bufferPool
             )
         }
     }
 
     companion object {
+        // Standard buffer size for audio chunks - matches typical network read sizes
+        private const val BUFFER_SIZE = 8192
+        // Maximum number of buffers to keep in the pool
+        private const val MAX_POOL_SIZE = 50
+
         /**
          * Creates and starts a background writer thread that drains the write queue
          * and writes data to the output stream.
+         *
+         * Uses a larger buffer for more efficient disk writes and reduces
+         * the frequency of flush operations.
          */
         fun startWriterThread(
             writeQueue: ArrayBlockingQueue<ByteArray>,
@@ -101,6 +141,8 @@ class RecordingDataSource(
                 android.util.Log.d("RecordingDataSource", "Writer thread started")
                 var bufferedStream: BufferedOutputStream? = null
                 var currentOutputStream: OutputStream? = null
+                var bytesWrittenSinceFlush = 0
+                val flushThreshold = 128 * 1024 // Flush every 128KB instead of every empty queue
 
                 while (true) {
                     try {
@@ -112,9 +154,10 @@ class RecordingDataSource(
                         if (newOutputStream != currentOutputStream) {
                             // Flush and update the buffered stream
                             bufferedStream?.flush()
+                            bytesWrittenSinceFlush = 0
                             currentOutputStream = newOutputStream
                             bufferedStream = if (newOutputStream != null) {
-                                BufferedOutputStream(newOutputStream, 64 * 1024) // 64KB buffer
+                                BufferedOutputStream(newOutputStream, 128 * 1024) // 128KB buffer
                             } else {
                                 null
                             }
@@ -122,11 +165,14 @@ class RecordingDataSource(
 
                         if (data != null && bufferedStream != null) {
                             bufferedStream.write(data)
-                        }
+                            bytesWrittenSinceFlush += data.size
 
-                        // Periodic flush to ensure data is written (every ~1 second worth of data)
-                        if (writeQueue.isEmpty() && bufferedStream != null) {
-                            bufferedStream.flush()
+                            // Periodic flush based on bytes written, not queue state
+                            // This is more efficient than flushing on every empty queue
+                            if (bytesWrittenSinceFlush >= flushThreshold) {
+                                bufferedStream.flush()
+                                bytesWrittenSinceFlush = 0
+                            }
                         }
 
                         // Exit if recording stopped and queue is drained

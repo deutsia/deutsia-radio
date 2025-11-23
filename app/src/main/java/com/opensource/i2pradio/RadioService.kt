@@ -31,7 +31,10 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.metadata.icy.IcyInfo
 import coil.ImageLoader
@@ -684,12 +687,12 @@ class RadioService : Service() {
             // before starting playback and after rebuffering events
             val loadControl = DefaultLoadControl.Builder()
                 .setBufferDurationsMs(
-                    50_000,  // Min buffer before playback starts (50s) - prevents underrun during network hiccups
-                    120_000, // Max buffer size (120s) - large buffer for network streams
-                    5_000,   // Buffer for playback to start (5s) - ensures enough data before audio starts
-                    10_000   // Buffer for playback after rebuffer (10s) - prevents rapid rebuffer cycles
+                    30_000,  // Min buffer (30s) - reduced from 50s for faster start while still stable
+                    90_000,  // Max buffer (90s) - enough for network variability without excessive memory
+                    2_500,   // Buffer for playback to start (2.5s) - faster initial playback
+                    5_000    // Buffer for playback after rebuffer (5s) - quick recovery
                 )
-                .setBackBuffer(30_000, true) // Keep 30s of back buffer, trim when low on memory
+                .setBackBuffer(15_000, true) // Keep 15s back buffer
                 .setPrioritizeTimeOverSizeThresholds(true)
                 .build()
 
@@ -700,7 +703,47 @@ class RadioService : Service() {
                 .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
                 .build()
 
-            player = ExoPlayer.Builder(this)
+            // Create a custom audio sink with a larger buffer to prevent glitching
+            // The default AudioTrack buffer is often too small for streaming radio,
+            // causing glitches when there are minor delays in data delivery
+            val largeBufferProvider = object : DefaultAudioSink.AudioTrackBufferSizeProvider {
+                override fun getBufferSizeInBytes(
+                    minBufferSizeInBytes: Int,
+                    encoding: Int,
+                    outputMode: Int,
+                    pcmFrameSize: Int,
+                    sampleRate: Int,
+                    bitrate: Int,
+                    maxAudioTrackPlaybackSpeed: Double
+                ): Int {
+                    // Use at least 1.5 seconds of audio buffer, or 3x the minimum
+                    // This prevents glitches from minor thread scheduling delays
+                    val targetBufferMs = 1500
+                    val targetBufferBytes = (sampleRate * pcmFrameSize * targetBufferMs) / 1000
+                    return maxOf(minBufferSizeInBytes * 3, targetBufferBytes)
+                }
+            }
+
+            val audioSink = DefaultAudioSink.Builder(this)
+                .setAudioTrackBufferSizeProvider(largeBufferProvider)
+                .build()
+
+            // Create custom renderers factory with our audio sink
+            // This ensures audio rendering uses our larger buffer configuration
+            val renderersFactory = object : DefaultRenderersFactory(this) {
+                override fun buildAudioSink(
+                    context: Context,
+                    enableFloatOutput: Boolean,
+                    enableAudioTrackPlaybackParams: Boolean
+                ): AudioSink {
+                    return audioSink
+                }
+            }.apply {
+                // Use decoder extensions if available for better codec support
+                setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
+            }
+
+            player = ExoPlayer.Builder(this, renderersFactory)
                 .setLoadControl(loadControl)
                 .setAudioAttributes(audioAttributes, false) // Don't handle audio focus here, we do it manually
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK) // Keep CPU/network awake during playback
