@@ -108,13 +108,18 @@ class RadiosFragment : Fragment() {
     }
 
     private fun showSortDialog() {
-        val sortOptions = arrayOf("Default", "Name", "Recently Played")
+        val sortOptions = arrayOf(
+            getString(R.string.sort_default),
+            getString(R.string.sort_name),
+            getString(R.string.sort_recent),
+            getString(R.string.sort_liked)
+        )
         val currentIndex = currentSortOrder.ordinal
 
         AlertDialog.Builder(requireContext())
             .setTitle("Sort Stations")
             .setSingleChoiceItems(sortOptions, currentIndex) { dialog, which ->
-                currentSortOrder = SortOrder.values()[which]
+                currentSortOrder = SortOrder.entries[which]
                 PreferencesHelper.setSortOrder(requireContext(), currentSortOrder.name)
                 updateSortButtonText()
                 observeStations()
@@ -125,9 +130,10 @@ class RadiosFragment : Fragment() {
 
     private fun updateSortButtonText() {
         sortButton.text = when (currentSortOrder) {
-            SortOrder.DEFAULT -> "Default"
-            SortOrder.NAME -> "Name"
-            SortOrder.RECENTLY_PLAYED -> "Recent"
+            SortOrder.DEFAULT -> getString(R.string.sort_default)
+            SortOrder.NAME -> getString(R.string.sort_name)
+            SortOrder.RECENTLY_PLAYED -> getString(R.string.sort_recent)
+            SortOrder.LIKED -> getString(R.string.sort_liked)
         }
     }
 

@@ -598,12 +598,12 @@ class NowPlayingFragment : Fragment() {
 
     /**
      * Opens the system equalizer or external equalizer app (like Wavelet).
-     * This is the same approach used by Auxio and other music players.
+     * Uses the standard Android AudioEffect intent protocol that apps like Auxio use.
      */
     private fun openSystemEqualizer() {
         val audioSessionId = radioService?.getAudioSessionId() ?: 0
         if (audioSessionId == 0) {
-            Toast.makeText(requireContext(), "Start playing a station first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -613,10 +613,15 @@ class NowPlayingFragment : Fragment() {
             putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
         }
 
-        if (intent.resolveActivity(requireContext().packageManager) != null) {
+        try {
             startActivity(intent)
-        } else {
-            Toast.makeText(requireContext(), "No equalizer app found. Install an equalizer like Wavelet.", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            // No equalizer app found - show helpful message
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.equalizer_not_found),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 

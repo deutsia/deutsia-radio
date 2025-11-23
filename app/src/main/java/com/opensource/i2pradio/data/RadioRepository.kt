@@ -7,9 +7,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 enum class SortOrder {
-    DEFAULT,      // Liked first, then presets, then by added time
-    NAME,         // Alphabetical by name
-    RECENTLY_PLAYED  // Most recently played first
+    DEFAULT,         // Liked first, then presets, then by added time
+    NAME,            // Alphabetical by name
+    RECENTLY_PLAYED, // Most recently played first
+    LIKED            // Only liked stations
 }
 
 class RadioRepository(context: Context) {
@@ -22,6 +23,7 @@ class RadioRepository(context: Context) {
             SortOrder.DEFAULT -> radioDao.getAllStations()
             SortOrder.NAME -> radioDao.getAllStationsSortedByName()
             SortOrder.RECENTLY_PLAYED -> radioDao.getAllStationsSortedByRecentlyPlayed()
+            SortOrder.LIKED -> radioDao.getLikedStations()
         }
     }
 

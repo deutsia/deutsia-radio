@@ -11,6 +11,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.media.AudioManager
+import android.media.audiofx.AudioEffect
 import android.os.Binder
 import android.os.Build
 import android.os.Environment
@@ -771,6 +772,12 @@ class RadioService : Service() {
                                 startForeground(NOTIFICATION_ID, createNotification(status))
                                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
                                 activateMediaSession()
+                                // Broadcast audio session open for equalizer apps
+                                player?.audioSessionId?.let { sessionId ->
+                                    if (sessionId != 0) {
+                                        broadcastAudioSessionOpen(sessionId)
+                                    }
+                                }
                                 // Extract stream info when ready
                                 extractStreamInfo()
                                 // Broadcast to UI that we're no longer buffering
@@ -860,6 +867,14 @@ class RadioService : Service() {
 
     private fun stopStream() {
         handler.removeCallbacksAndMessages(null)
+
+        // Broadcast audio session close before releasing player
+        player?.audioSessionId?.let { sessionId ->
+            if (sessionId != 0) {
+                broadcastAudioSessionClose(sessionId)
+            }
+        }
+
         player?.apply {
             stop()
             release()
@@ -1010,6 +1025,36 @@ class RadioService : Service() {
      * Get ExoPlayer's audio session ID for equalizer
      */
     fun getAudioSessionId(): Int = player?.audioSessionId ?: 0
+
+    /**
+     * Broadcast audio session open to allow equalizer apps to attach.
+     * This follows the standard Android audio effect protocol.
+     */
+    private fun broadcastAudioSessionOpen(audioSessionId: Int) {
+        if (audioSessionId == 0) return
+
+        val intent = Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
+            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
+            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
+            putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+        }
+        sendBroadcast(intent)
+        android.util.Log.d("RadioService", "Broadcast audio session open: $audioSessionId")
+    }
+
+    /**
+     * Broadcast audio session close to notify equalizer apps to detach.
+     */
+    private fun broadcastAudioSessionClose(audioSessionId: Int) {
+        if (audioSessionId == 0) return
+
+        val intent = Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION).apply {
+            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
+            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
+        }
+        sendBroadcast(intent)
+        android.util.Log.d("RadioService", "Broadcast audio session close: $audioSessionId")
+    }
 
     override fun onDestroy() {
         super.onDestroy()

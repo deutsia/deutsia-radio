@@ -23,17 +23,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Recording Indicator - solid background to prevent bleed-through -->
+    <!-- Equalizer Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/equalizerButton"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="Equalizer"
+        app:icon="@drawable/ic_equalizer"
+        app:iconTint="?attr/colorOnSurface"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Like Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/likeButton"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="Like"
+        app:icon="@drawable/ic_favorite_border"
+        app:iconTint="?attr/colorOnSurface"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Recording Indicator - positioned below like button to avoid overlap -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordingIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:visibility="gone"
         app:cardBackgroundColor="?attr/colorErrorContainer"
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
         app:strokeWidth="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/likeButton"
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
@@ -155,6 +180,21 @@
                 android:focusableInTouchMode="true"
                 android:visibility="gone"
                 tools:text="Song Name - Artist"
+                tools:visibility="visible" />
+
+            <!-- Stream Info (bitrate/codec) -->
+            <TextView
+                android:id="@+id/nowPlayingStreamInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:paddingHorizontal="8dp"
+                android:gravity="center"
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:alpha="0.7"
+                android:visibility="gone"
+                tools:text="128 kbps • MP3"
                 tools:visibility="visible" />
 
         </LinearLayout>
