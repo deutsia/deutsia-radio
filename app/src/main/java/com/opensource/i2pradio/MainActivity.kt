@@ -176,13 +176,16 @@ class MainActivity : AppCompatActivity() {
                 if (isNewStation) {
                     // Reset the manually closed flag when a new station is selected
                     miniPlayerManuallyClosed = false
-                }
-                lastStationId = station.id
+                    lastStationId = station.id
 
-                // Only show mini player if not manually closed
-                if (!miniPlayerManuallyClosed) {
-                    miniPlayerView.setStation(station)
-                    miniPlayerContainer.visibility = View.VISIBLE
+                    // Only show mini player if not manually closed
+                    if (!miniPlayerManuallyClosed) {
+                        miniPlayerView.setStation(station)
+                        miniPlayerContainer.visibility = View.VISIBLE
+                    }
+                } else {
+                    // Same station, just update like state without animations
+                    miniPlayerView.updateLikeState(station.isLiked)
                 }
             }
         }
@@ -220,6 +223,23 @@ class MainActivity : AppCompatActivity() {
             viewModel.setPlaying(false)
             miniPlayerView.setStation(null)
             miniPlayerContainer.visibility = View.GONE
+        }
+
+        // Like button toggles liked state in database
+        miniPlayerView.setOnLikeToggleListener { station ->
+            CoroutineScope(Dispatchers.IO).launch {
+                repository.toggleLike(station.id)
+                // Refresh the station to update UI
+                val updatedStation = repository.getStationById(station.id)
+                CoroutineScope(Dispatchers.Main).launch {
+                    updatedStation?.let {
+                        // Update the like state in miniplayer without triggering station change animations
+                        miniPlayerView.updateLikeState(it.isLiked)
+                        // Update the ViewModel station's like state without triggering full refresh
+                        viewModel.updateCurrentStationLikeState(it.isLiked)
+                    }
+                }
+            }
         }
     }
 

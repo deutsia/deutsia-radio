@@ -102,22 +102,15 @@
 
         </LinearLayout>
 
-        <!-- Band sliders container -->
-        <HorizontalScrollView
+        <!-- Band sliders container - 5 bands distributed evenly -->
+        <LinearLayout
+            android:id="@+id/bandSlidersContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:scrollbars="none"
-            android:fillViewport="true">
-
-            <LinearLayout
-                android:id="@+id/bandSlidersContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center" />
-
-        </HorizontalScrollView>
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:baselineAligned="false" />
 
     </LinearLayout>
 

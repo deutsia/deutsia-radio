@@ -1203,6 +1203,22 @@ class RadioService : Service() {
         android.util.Log.d("RadioService", "Broadcast audio session close: $audioSessionId")
     }
 
+    /**
+     * Called when the user swipes the app away from recent apps.
+     * Stop playback and clean up resources.
+     */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        android.util.Log.d("RadioService", "App task removed, stopping playback")
+        stopRecording()
+        cancelSleepTimer()
+        updatePlaybackState(PlaybackStateCompat.STATE_STOPPED)
+        deactivateMediaSession()
+        stopStream()
+        stopForeground(true)
+        stopSelf()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         stopRecording()
