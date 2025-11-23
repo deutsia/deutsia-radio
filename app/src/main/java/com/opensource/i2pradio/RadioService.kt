@@ -451,7 +451,7 @@ class RadioService : Service() {
                         )
 
                         val buffer = ByteArray(8192)
-                        var bytesRead: Int
+                        var bytesRead = -1
 
                         while (isRecordingActive.get() &&
                                inputStream?.read(buffer).also { bytesRead = it ?: -1 } != -1) {
