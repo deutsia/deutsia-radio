@@ -337,6 +337,13 @@ class RadioService : Service() {
                 currentCoverArtUri = coverArtUri
                 reconnectAttempts = 0
 
+                // CRITICAL: Start foreground immediately to comply with Android 8+ requirements
+                // This must be called within 5 seconds of startForegroundService()
+                startForeground(NOTIFICATION_ID, createNotification("Connecting..."))
+
+                // Broadcast buffering state to UI immediately
+                broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
+
                 // Activate media session and set metadata
                 activateMediaSession()
                 updateMediaMetadata(stationName, coverArtUri)
@@ -815,6 +822,9 @@ class RadioService : Service() {
 
             if (focusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 android.util.Log.w("RadioService", "Failed to gain audio focus")
+                // Broadcast failure to UI so it can update the play button state
+                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                startForeground(NOTIFICATION_ID, createNotification("Audio focus denied"))
                 return
             }
             hasAudioFocus = true
@@ -974,10 +984,12 @@ class RadioService : Service() {
                 })
             }
 
-            startForeground(NOTIFICATION_ID, createNotification("Connecting..."))
+            // Note: startForeground is called in onStartCommand before playStream()
 
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Error playing stream", e)
+            // Broadcast failure to UI
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
             scheduleReconnect()
         }
     }
@@ -985,11 +997,14 @@ class RadioService : Service() {
     private fun scheduleReconnect() {
         if (currentStreamUrl == null) {
             android.util.Log.d("RadioService", "No stream to reconnect to")
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
             return
         }
 
         if (reconnectAttempts >= maxReconnectAttempts) {
             android.util.Log.e("RadioService", "Max reconnection attempts reached")
+            // Broadcast final failure to UI
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
             startForeground(NOTIFICATION_ID, createNotification("Connection failed"))
             return
         }
@@ -998,6 +1013,8 @@ class RadioService : Service() {
         val delay = minOf(1000L * reconnectAttempts, 5000L)
 
         android.util.Log.d("RadioService", "Reconnecting in ${delay}ms (attempt $reconnectAttempts)")
+        // Keep buffering state while reconnecting
+        broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
         startForeground(NOTIFICATION_ID, createNotification("Reconnecting..."))
 
         handler.postDelayed({

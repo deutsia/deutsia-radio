@@ -3,6 +3,7 @@ package com.opensource.i2pradio.ui
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -58,7 +59,8 @@ class RadiosFragment : Fragment() {
 
         adapter = RadioStationAdapter(
             onStationClick = { station -> playStation(station) },
-            onMenuClick = { station, anchor -> showStationMenu(station, anchor) }
+            onMenuClick = { station, anchor -> showStationMenu(station, anchor) },
+            onLikeClick = { station -> toggleLike(station) }
         )
         recyclerView.adapter = adapter
 
@@ -139,7 +141,7 @@ class RadiosFragment : Fragment() {
 
     private fun playStation(station: RadioStation) {
         viewModel.setCurrentStation(station)
-        viewModel.setPlaying(true)
+        viewModel.setBuffering(true)  // Show buffering state while connecting
 
         // Update last played timestamp
         CoroutineScope(Dispatchers.IO).launch {
@@ -156,12 +158,29 @@ class RadiosFragment : Fragment() {
             putExtra("proxy_type", proxyType.name)
             putExtra("cover_art_uri", station.coverArtUri)
         }
-        requireContext().startService(intent)
+        // Use startForegroundService for Android 8+ compatibility
+        ContextCompat.startForegroundService(requireContext(), intent)
     }
 
     private fun showAddRadioDialog() {
         val dialog = AddEditRadioDialog.newInstance()
         dialog.show(parentFragmentManager, "AddEditRadioDialog")
+    }
+
+    private fun toggleLike(station: RadioStation) {
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.toggleLike(station.id)
+            // Also update ViewModel if this is the currently playing station
+            val updatedStation = repository.getStationById(station.id)
+            CoroutineScope(Dispatchers.Main).launch {
+                updatedStation?.let {
+                    // Update current station's like state in ViewModel if it matches
+                    if (viewModel.getCurrentStation()?.id == it.id) {
+                        viewModel.updateCurrentStationLikeState(it.isLiked)
+                    }
+                }
+            }
+        }
     }
 
     private fun showStationMenu(station: RadioStation, anchor: View) {
@@ -191,7 +210,8 @@ class RadiosFragment : Fragment() {
 // Updated Adapter with DiffUtil and stable IDs to prevent cover art duplication
 class RadioStationAdapter(
     private val onStationClick: (RadioStation) -> Unit,
-    private val onMenuClick: (RadioStation, View) -> Unit
+    private val onMenuClick: (RadioStation, View) -> Unit,
+    private val onLikeClick: (RadioStation) -> Unit
 ) : RecyclerView.Adapter<RadioStationAdapter.ViewHolder>() {
 
     private var stations = listOf<RadioStation>()
@@ -226,7 +246,7 @@ class RadioStationAdapter(
         private val stationName: TextView = itemView.findViewById(R.id.stationNameText)
         private val genreText: TextView = itemView.findViewById(R.id.genreText)
         private val menuButton: MaterialButton = itemView.findViewById(R.id.menuButton)
-        private val likeIcon: ImageView = itemView.findViewById(R.id.likeIcon)
+        private val likeButton: MaterialButton = itemView.findViewById(R.id.likeButton)
         private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioStation) {
@@ -242,8 +262,8 @@ class RadioStationAdapter(
             } else ""
             genreText.text = "${station.genre}$proxyIndicator"
 
-            // Show/hide like icon based on liked state
-            likeIcon.visibility = if (station.isLiked) View.VISIBLE else View.GONE
+            // Update like button icon and color based on liked state
+            updateLikeButton(station.isLiked)
 
             // Cancel any pending image load and clear the image first to prevent ghosting
             imageLoadDisposable?.dispose()
@@ -286,6 +306,24 @@ class RadioStationAdapter(
 
             menuButton.setOnClickListener {
                 onMenuClick(station, it)
+            }
+
+            likeButton.setOnClickListener {
+                onLikeClick(station)
+            }
+        }
+
+        private fun updateLikeButton(isLiked: Boolean) {
+            val iconRes = if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+            likeButton.setIconResource(iconRes)
+            if (isLiked) {
+                likeButton.setIconTintResource(com.google.android.material.R.color.design_default_color_error)
+            } else {
+                likeButton.iconTint = android.content.res.ColorStateList.valueOf(
+                    com.google.android.material.color.MaterialColors.getColor(
+                        itemView, com.google.android.material.R.attr.colorOnSurfaceVariant
+                    )
+                )
             }
         }
     }

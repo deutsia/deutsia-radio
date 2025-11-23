@@ -12,6 +12,7 @@ import android.os.IBinder
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -381,12 +382,14 @@ class NowPlayingFragment : Fragment() {
             val station = viewModel.getCurrentStation()
 
             if (isPlaying) {
+                // Pause - can use regular startService since service is already running
                 val intent = Intent(requireContext(), RadioService::class.java).apply {
                     action = RadioService.ACTION_PAUSE
                 }
                 requireContext().startService(intent)
                 viewModel.setPlaying(false)
             } else if (station != null) {
+                // Play - use startForegroundService for Android 8+ compatibility
                 val proxyType = station.getProxyTypeEnum()
                 val intent = Intent(requireContext(), RadioService::class.java).apply {
                     action = RadioService.ACTION_PLAY
@@ -397,8 +400,9 @@ class NowPlayingFragment : Fragment() {
                     putExtra("proxy_type", proxyType.name)
                     putExtra("cover_art_uri", station.coverArtUri)
                 }
-                requireContext().startService(intent)
-                viewModel.setPlaying(true)
+                ContextCompat.startForegroundService(requireContext(), intent)
+                // Show buffering state while connecting - service will update when ready
+                viewModel.setBuffering(true)
             }
         }
 

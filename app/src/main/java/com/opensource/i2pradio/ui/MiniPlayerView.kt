@@ -10,6 +10,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import coil.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -279,14 +280,16 @@ class MiniPlayerView @JvmOverloads constructor(
     private fun togglePlayPause() {
         val station = currentStation ?: return
 
-        val newPlayingState = !isPlaying
-
         if (isPlaying) {
+            // Pause - can use regular startService since service is already running
             val intent = Intent(context, RadioService::class.java).apply {
                 action = RadioService.ACTION_PAUSE
             }
             context.startService(intent)
+            // Notify listener to update ViewModel
+            onPlayPauseToggleListener?.invoke(false)
         } else {
+            // Play - use startForegroundService for Android 8+ compatibility
             val proxyType = station.getProxyTypeEnum()
             val intent = Intent(context, RadioService::class.java).apply {
                 action = RadioService.ACTION_PLAY
@@ -297,10 +300,9 @@ class MiniPlayerView @JvmOverloads constructor(
                 putExtra("proxy_type", proxyType.name)
                 putExtra("cover_art_uri", station.coverArtUri)
             }
-            context.startService(intent)
+            ContextCompat.startForegroundService(context, intent)
+            // Don't update playing state here - wait for service to confirm playback started
+            // The service will broadcast PLAYBACK_STATE_CHANGED when ready
         }
-
-        // Notify listener to update ViewModel - this triggers the animation via setPlayingState
-        onPlayPauseToggleListener?.invoke(newPlayingState)
     }
 }
