@@ -24,6 +24,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Equalizer Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/equalizerButton"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Equalizer"
+        app:icon="@drawable/ic_equalizer"
+        app:iconTint="?attr/colorOnSurface"
+        app:layout_constraintEnd_toStartOf="@id/likeButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- Like Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/likeButton"

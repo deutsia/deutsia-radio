@@ -1,10 +1,14 @@
 package com.opensource.i2pradio.ui
 
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
+import android.media.audiofx.AudioEffect
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
@@ -12,12 +16,14 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.opensource.i2pradio.R
+import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 
@@ -32,6 +38,23 @@ class SettingsFragment : Fragment() {
     private var torActionButton: MaterialButton? = null
     private var torClearnetContainer: View? = null
     private var torClearnetSwitch: MaterialSwitch? = null
+
+    // Service binding for equalizer
+    private var radioService: RadioService? = null
+    private var serviceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as RadioService.RadioBinder
+            radioService = binder.getService()
+            serviceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            radioService = null
+            serviceBound = false
+        }
+    }
 
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
         activity?.runOnUiThread {
@@ -113,10 +136,44 @@ class SettingsFragment : Fragment() {
             showSleepTimerDialog(sleepTimerButton)
         }
 
+        // Equalizer button - opens system/external equalizer
+        val equalizerButton = view.findViewById<MaterialButton>(R.id.equalizerButton)
+        equalizerButton.setOnClickListener {
+            openSystemEqualizer()
+        }
+
         // Setup Tor controls
         setupTorControls()
 
+        // Bind to RadioService to get audio session ID
+        val serviceIntent = Intent(requireContext(), RadioService::class.java)
+        requireContext().bindService(serviceIntent, serviceConnection, android.content.Context.BIND_AUTO_CREATE)
+
         return view
+    }
+
+    /**
+     * Opens the system equalizer or external equalizer app (like Wavelet).
+     * This is the same approach used by Auxio and other music players.
+     */
+    private fun openSystemEqualizer() {
+        val audioSessionId = radioService?.getAudioSessionId() ?: 0
+        if (audioSessionId == 0) {
+            Toast.makeText(requireContext(), "Start playing a station first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
+            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
+            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, requireContext().packageName)
+            putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+        }
+
+        if (intent.resolveActivity(requireContext().packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(requireContext(), "No equalizer app found. Install an equalizer like Wavelet.", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun updateSleepTimerButtonText(button: MaterialButton) {
@@ -164,6 +221,14 @@ class SettingsFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         TorManager.removeStateListener(torStateListener)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (serviceBound) {
+            requireContext().unbindService(serviceConnection)
+            serviceBound = false
+        }
     }
 
     private fun setupTorControls() {

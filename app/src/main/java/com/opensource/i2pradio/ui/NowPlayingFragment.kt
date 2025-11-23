@@ -1,10 +1,14 @@
 package com.opensource.i2pradio.ui
 
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.media.AudioManager
+import android.media.audiofx.AudioEffect
+import android.os.IBinder
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -64,6 +68,24 @@ class NowPlayingFragment : Fragment() {
     private var recordingIndicator: MaterialCardView? = null
     private var recordingDot: View? = null
     private var recordingTimeText: TextView? = null
+    private lateinit var equalizerButton: MaterialButton
+
+    // Service binding for equalizer
+    private var radioService: RadioService? = null
+    private var serviceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as RadioService.RadioBinder
+            radioService = binder.getService()
+            serviceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            radioService = null
+            serviceBound = false
+        }
+    }
 
     private val recordingHandler = Handler(Looper.getMainLooper())
     private var previousPlayingState: Boolean? = null
@@ -140,9 +162,14 @@ class NowPlayingFragment : Fragment() {
         recordingIndicator = view.findViewById(R.id.recordingIndicator)
         recordingDot = view.findViewById(R.id.recordingDot)
         recordingTimeText = view.findViewById(R.id.recordingTime)
+        equalizerButton = view.findViewById(R.id.equalizerButton)
 
         // Initialize audio manager and volume control
         audioManager = requireContext().getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
+
+        // Bind to RadioService to get audio session ID for equalizer
+        val serviceIntent = Intent(requireContext(), RadioService::class.java)
+        requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
         // Register broadcast receiver for metadata updates
         val filter = IntentFilter().apply {
@@ -166,6 +193,11 @@ class NowPlayingFragment : Fragment() {
                     }
                 }
             }
+        }
+
+        // Equalizer button click handler - opens system/external equalizer
+        equalizerButton.setOnClickListener {
+            openSystemEqualizer()
         }
 
         // Setup Edge-to-Edge: Handle window insets for status bar
@@ -544,6 +576,34 @@ class NowPlayingFragment : Fragment() {
         recordingDot?.clearAnimation()
         previousPlayingState = null
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(metadataReceiver)
+        if (serviceBound) {
+            requireContext().unbindService(serviceConnection)
+            serviceBound = false
+        }
+    }
+
+    /**
+     * Opens the system equalizer or external equalizer app (like Wavelet).
+     * This is the same approach used by Auxio and other music players.
+     */
+    private fun openSystemEqualizer() {
+        val audioSessionId = radioService?.getAudioSessionId() ?: 0
+        if (audioSessionId == 0) {
+            Toast.makeText(requireContext(), "Start playing a station first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
+            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
+            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, requireContext().packageName)
+            putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+        }
+
+        if (intent.resolveActivity(requireContext().packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(requireContext(), "No equalizer app found. Install an equalizer like Wavelet.", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun updateLikeButton(isLiked: Boolean) {
