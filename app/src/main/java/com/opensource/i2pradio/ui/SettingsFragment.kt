@@ -163,6 +163,8 @@ class SettingsFragment : Fragment() {
             updateTorContainerVisibility(isChecked)
 
             if (isChecked) {
+                // Initialize TorManager first to set up status detection
+                TorManager.initialize(requireContext())
                 // Auto-start Tor when enabled
                 if (PreferencesHelper.isAutoStartTorEnabled(requireContext())) {
                     TorService.start(requireContext())

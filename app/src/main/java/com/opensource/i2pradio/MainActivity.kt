@@ -108,8 +108,10 @@ class MainActivity : AppCompatActivity() {
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         }
 
-        // Initialize TorManager to detect Orbot status
-        TorManager.initialize(this)
+        // Only initialize TorManager if user has enabled Orbot integration in settings
+        if (PreferencesHelper.isEmbeddedTorEnabled(this)) {
+            TorManager.initialize(this)
+        }
     }
 
     private fun setupTorStatusView() {
@@ -240,8 +242,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh Tor status when app comes to foreground
-        TorManager.requestOrbotStatus(this)
+        // Refresh Tor status when app comes to foreground (only if Orbot integration is enabled)
+        if (PreferencesHelper.isEmbeddedTorEnabled(this)) {
+            TorManager.requestOrbotStatus(this)
+        }
     }
 
     override fun onDestroy() {
