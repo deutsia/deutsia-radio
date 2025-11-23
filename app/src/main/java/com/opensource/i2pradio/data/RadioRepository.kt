@@ -6,10 +6,26 @@ import com.opensource.i2pradio.ui.PreferencesHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+enum class SortOrder {
+    DEFAULT,      // Liked first, then presets, then by added time
+    NAME,         // Alphabetical by name
+    RECENTLY_PLAYED  // Most recently played first
+}
+
 class RadioRepository(context: Context) {
     private val radioDao = RadioDatabase.getDatabase(context).radioDao()
 
     val allStations: LiveData<List<RadioStation>> = radioDao.getAllStations()
+
+    fun getStationsSorted(sortOrder: SortOrder): LiveData<List<RadioStation>> {
+        return when (sortOrder) {
+            SortOrder.DEFAULT -> radioDao.getAllStations()
+            SortOrder.NAME -> radioDao.getAllStationsSortedByName()
+            SortOrder.RECENTLY_PLAYED -> radioDao.getAllStationsSortedByRecentlyPlayed()
+        }
+    }
+
+    fun getLikedStations(): LiveData<List<RadioStation>> = radioDao.getLikedStations()
 
     suspend fun insertStation(station: RadioStation): Long {
         return withContext(Dispatchers.IO) {
@@ -32,6 +48,18 @@ class RadioRepository(context: Context) {
     suspend fun getStationById(id: Long): RadioStation? {
         return withContext(Dispatchers.IO) {
             radioDao.getStationById(id)
+        }
+    }
+
+    suspend fun toggleLike(stationId: Long) {
+        withContext(Dispatchers.IO) {
+            radioDao.toggleLike(stationId)
+        }
+    }
+
+    suspend fun updateLastPlayedAt(stationId: Long) {
+        withContext(Dispatchers.IO) {
+            radioDao.updateLastPlayedAt(stationId, System.currentTimeMillis())
         }
     }
 

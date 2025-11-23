@@ -41,7 +41,7 @@
             android:gravity="center_vertical"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="@id/miniPlayerCoverImage"
-            app:layout_constraintEnd_toStartOf="@id/miniPlayerPlayPause"
+            app:layout_constraintEnd_toStartOf="@id/miniPlayerLikeButton"
             app:layout_constraintStart_toEndOf="@id/miniPlayerCoverImage"
             app:layout_constraintTop_toTopOf="@id/miniPlayerCoverImage">
 
@@ -68,6 +68,20 @@
                 tools:text="News • I2P" />
 
         </LinearLayout>
+
+        <!-- Like/Heart Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/miniPlayerLikeButton"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="Like"
+            app:icon="@drawable/ic_favorite_border"
+            app:iconSize="22dp"
+            app:iconTint="?attr/colorOnSurfaceVariant"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/miniPlayerPlayPause"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Play/Pause Button (Hero of the mini player) -->
         <com.google.android.material.button.MaterialButton

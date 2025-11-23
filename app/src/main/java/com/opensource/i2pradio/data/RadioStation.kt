@@ -53,7 +53,9 @@ data class RadioStation(
     val genre: String = "Other",
     val coverArtUri: String? = null,
     val isPreset: Boolean = false,
-    val addedTimestamp: Long = System.currentTimeMillis()
+    val addedTimestamp: Long = System.currentTimeMillis(),
+    val isLiked: Boolean = false,
+    val lastPlayedAt: Long = 0L
 ) {
     /**
      * Get the ProxyType enum from the stored string

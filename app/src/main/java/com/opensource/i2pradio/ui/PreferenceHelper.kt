@@ -8,17 +8,14 @@ object PreferencesHelper {
     private const val KEY_THEME_MODE = "theme_mode"
     private const val KEY_PRESETS_INITIALIZED = "presets_initialized"
     private const val KEY_MATERIAL_YOU_ENABLED = "material_you_enabled"
-    private const val KEY_RECORDING_FORMAT = "recording_format"
     private const val KEY_EMBEDDED_TOR_ENABLED = "embedded_tor_enabled"
     private const val KEY_AUTO_START_TOR = "auto_start_tor"
     private const val KEY_TOR_FOR_CLEARNET = "tor_for_clearnet"
-
-    // Recording format constants
-    const val FORMAT_MP3 = "mp3"
-    const val FORMAT_M4A = "m4a"
-    const val FORMAT_OGG = "ogg"
-    const val FORMAT_OPUS = "opus"
-    const val FORMAT_WAV = "wav"
+    private const val KEY_SLEEP_TIMER_MINUTES = "sleep_timer_minutes"
+    private const val KEY_SORT_ORDER = "sort_order"
+    private const val KEY_EQUALIZER_ENABLED = "equalizer_enabled"
+    private const val KEY_EQUALIZER_PRESET = "equalizer_preset"
+    private const val KEY_EQUALIZER_BANDS = "equalizer_bands"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -54,40 +51,6 @@ object PreferencesHelper {
     fun arePresetsInitialized(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_PRESETS_INITIALIZED, false)
-    }
-
-    fun setRecordingFormat(context: Context, format: String) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_RECORDING_FORMAT, format)
-            .apply()
-    }
-
-    fun getRecordingFormat(context: Context): String {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_RECORDING_FORMAT, FORMAT_MP3) ?: FORMAT_MP3
-    }
-
-    fun getRecordingFormatDisplayName(format: String): String {
-        return when (format) {
-            FORMAT_MP3 -> "MP3"
-            FORMAT_M4A -> "M4A (AAC)"
-            FORMAT_OGG -> "OGG (Vorbis)"
-            FORMAT_OPUS -> "Opus"
-            FORMAT_WAV -> "WAV"
-            else -> "MP3"
-        }
-    }
-
-    fun getRecordingFormatMimeType(format: String): String {
-        return when (format) {
-            FORMAT_MP3 -> "audio/mpeg"
-            FORMAT_M4A -> "audio/mp4"
-            FORMAT_OGG -> "audio/ogg"
-            FORMAT_OPUS -> "audio/opus"
-            FORMAT_WAV -> "audio/wav"
-            else -> "audio/mpeg"
-        }
     }
 
     // Embedded Tor preferences
@@ -126,5 +89,69 @@ object PreferencesHelper {
     fun isTorForClearnetEnabled(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_TOR_FOR_CLEARNET, false)
+    }
+
+    // Sleep timer preferences (0 = off)
+    fun setSleepTimerMinutes(context: Context, minutes: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_SLEEP_TIMER_MINUTES, minutes)
+            .apply()
+    }
+
+    fun getSleepTimerMinutes(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_SLEEP_TIMER_MINUTES, 0)
+    }
+
+    // Sort order preferences
+    fun setSortOrder(context: Context, sortOrder: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_SORT_ORDER, sortOrder)
+            .apply()
+    }
+
+    fun getSortOrder(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_SORT_ORDER, "DEFAULT") ?: "DEFAULT"
+    }
+
+    // Equalizer preferences
+    fun setEqualizerEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_EQUALIZER_ENABLED, enabled)
+            .apply()
+    }
+
+    fun isEqualizerEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_EQUALIZER_ENABLED, false)
+    }
+
+    fun setEqualizerPreset(context: Context, preset: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_EQUALIZER_PRESET, preset)
+            .apply()
+    }
+
+    fun getEqualizerPreset(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_EQUALIZER_PRESET, 0)
+    }
+
+    // Store band levels as comma-separated string
+    fun setEqualizerBands(context: Context, bands: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_EQUALIZER_BANDS, bands)
+            .apply()
+    }
+
+    fun getEqualizerBands(context: Context): String? {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_EQUALIZER_BANDS, null)
     }
 }

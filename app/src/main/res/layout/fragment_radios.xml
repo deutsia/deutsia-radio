@@ -5,13 +5,35 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
+    <!-- Sort Button Header -->
+    <LinearLayout
+        android:id="@+id/sortHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sortButton"
+            style="@style/Widget.Material3.Button.TextButton.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Default"
+            android:textSize="12sp"
+            app:icon="@drawable/ic_sort"
+            app:iconSize="18dp" />
+
+    </LinearLayout>
+
     <!-- Radio Stations List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/radiosRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingTop="16dp"
+        android:paddingTop="56dp"
         android:paddingBottom="100dp"
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

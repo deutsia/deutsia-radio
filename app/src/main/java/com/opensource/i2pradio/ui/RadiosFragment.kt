@@ -1,5 +1,6 @@
 package com.opensource.i2pradio.ui
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -23,6 +25,7 @@ import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.data.RadioRepository
+import com.opensource.i2pradio.data.SortOrder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,9 +34,13 @@ class RadiosFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyStateContainer: View
     private lateinit var fabAddRadio: FloatingActionButton
+    private lateinit var sortButton: MaterialButton
     private lateinit var adapter: RadioStationAdapter
     private lateinit var repository: RadioRepository
     private val viewModel: RadioViewModel by activityViewModels()
+
+    private var currentSortOrder = SortOrder.DEFAULT
+    private var currentStationsObserver: LiveData<List<RadioStation>>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +54,7 @@ class RadiosFragment : Fragment() {
         recyclerView = view.findViewById(R.id.radiosRecyclerView)
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
         fabAddRadio = view.findViewById(R.id.fabAddRadio)
+        sortButton = view.findViewById(R.id.sortButton)
 
         adapter = RadioStationAdapter(
             onStationClick = { station -> playStation(station) },
@@ -54,20 +62,24 @@ class RadiosFragment : Fragment() {
         )
         recyclerView.adapter = adapter
 
-        // Observe radio stations from database
-        repository.allStations.observe(viewLifecycleOwner) { stations ->
-            if (stations.isEmpty()) {
-                recyclerView.visibility = View.GONE
-                emptyStateContainer.visibility = View.VISIBLE
-            } else {
-                recyclerView.visibility = View.VISIBLE
-                emptyStateContainer.visibility = View.GONE
-                adapter.submitList(stations)
-            }
+        // Load saved sort order
+        val savedSortOrder = PreferencesHelper.getSortOrder(requireContext())
+        currentSortOrder = try {
+            SortOrder.valueOf(savedSortOrder)
+        } catch (e: Exception) {
+            SortOrder.DEFAULT
         }
+        updateSortButtonText()
+
+        // Observe radio stations with current sort order
+        observeStations()
 
         fabAddRadio.setOnClickListener {
             showAddRadioDialog()
+        }
+
+        sortButton.setOnClickListener {
+            showSortDialog()
         }
 
         view.findViewById<MaterialButton>(R.id.emptyStateAddButton).setOnClickListener {
@@ -77,9 +89,56 @@ class RadiosFragment : Fragment() {
         return view
     }
 
+    private fun observeStations() {
+        // Remove old observer
+        currentStationsObserver?.removeObservers(viewLifecycleOwner)
+
+        // Get new LiveData based on sort order
+        currentStationsObserver = repository.getStationsSorted(currentSortOrder)
+        currentStationsObserver?.observe(viewLifecycleOwner) { stations ->
+            if (stations.isEmpty()) {
+                recyclerView.visibility = View.GONE
+                emptyStateContainer.visibility = View.VISIBLE
+            } else {
+                recyclerView.visibility = View.VISIBLE
+                emptyStateContainer.visibility = View.GONE
+                adapter.submitList(stations)
+            }
+        }
+    }
+
+    private fun showSortDialog() {
+        val sortOptions = arrayOf("Default", "Name", "Recently Played")
+        val currentIndex = currentSortOrder.ordinal
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Sort Stations")
+            .setSingleChoiceItems(sortOptions, currentIndex) { dialog, which ->
+                currentSortOrder = SortOrder.entries[which]
+                PreferencesHelper.setSortOrder(requireContext(), currentSortOrder.name)
+                updateSortButtonText()
+                observeStations()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun updateSortButtonText() {
+        sortButton.text = when (currentSortOrder) {
+            SortOrder.DEFAULT -> "Default"
+            SortOrder.NAME -> "Name"
+            SortOrder.RECENTLY_PLAYED -> "Recent"
+        }
+    }
+
     private fun playStation(station: RadioStation) {
         viewModel.setCurrentStation(station)
         viewModel.setPlaying(true)
+
+        // Update last played timestamp
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.updateLastPlayedAt(station.id)
+        }
 
         val proxyType = station.getProxyTypeEnum()
         val intent = Intent(requireContext(), RadioService::class.java).apply {
@@ -102,11 +161,6 @@ class RadiosFragment : Fragment() {
     private fun showStationMenu(station: RadioStation, anchor: View) {
         val popup = PopupMenu(requireContext(), anchor)
         popup.menuInflater.inflate(R.menu.station_menu, popup.menu)
-
-        // Remove this block - allow deleting all stations
-        // if (station.isPreset) {
-        //     popup.menu.findItem(R.id.action_delete)?.isVisible = false
-        // }
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -171,7 +225,7 @@ class RadioStationAdapter(
         fun bind(station: RadioStation) {
             stationName.text = station.name
 
-            // Show proxy type indicator (I2P or Tor)
+            // Show proxy type indicator (I2P or Tor) and liked indicator
             val proxyIndicator = if (station.useProxy) {
                 when (station.getProxyTypeEnum()) {
                     ProxyType.I2P -> " • I2P"
@@ -179,7 +233,8 @@ class RadioStationAdapter(
                     ProxyType.NONE -> ""
                 }
             } else ""
-            genreText.text = "${station.genre}$proxyIndicator"
+            val likedIndicator = if (station.isLiked) " ♥" else ""
+            genreText.text = "${station.genre}$proxyIndicator$likedIndicator"
 
             // Cancel any pending image load and clear the image first to prevent ghosting
             imageLoadDisposable?.dispose()
@@ -245,7 +300,8 @@ class RadioStationAdapter(
                     old.genre == new.genre &&
                     old.coverArtUri == new.coverArtUri &&
                     old.useProxy == new.useProxy &&
-                    old.proxyType == new.proxyType
+                    old.proxyType == new.proxyType &&
+                    old.isLiked == new.isLiked
         }
     }
 }

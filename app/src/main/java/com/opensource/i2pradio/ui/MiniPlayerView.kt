@@ -30,12 +30,14 @@ class MiniPlayerView @JvmOverloads constructor(
     private val genreText: TextView
     private val playPauseButton: MaterialButton
     private val closeButton: MaterialButton
+    private val likeButton: MaterialButton
 
     private var currentStation: RadioStation? = null
     private var isPlaying: Boolean = false
     private var onClickListener: (() -> Unit)? = null
     private var onCloseListener: (() -> Unit)? = null
     private var onPlayPauseToggleListener: ((Boolean) -> Unit)? = null
+    private var onLikeToggleListener: ((RadioStation) -> Unit)? = null
     private var previousPlayingState: Boolean? = null
 
     init {
@@ -47,6 +49,7 @@ class MiniPlayerView @JvmOverloads constructor(
         genreText = findViewById(R.id.miniPlayerGenre)
         playPauseButton = findViewById(R.id.miniPlayerPlayPause)
         closeButton = findViewById(R.id.miniPlayerClose)
+        likeButton = findViewById(R.id.miniPlayerLikeButton)
 
         // Click the card to go to Now Playing with smooth expand animation
         card.setOnClickListener {
@@ -60,6 +63,12 @@ class MiniPlayerView @JvmOverloads constructor(
         closeButton.setOnClickListener {
             onCloseListener?.invoke()
         }
+
+        likeButton.setOnClickListener {
+            currentStation?.let { station ->
+                onLikeToggleListener?.invoke(station)
+            }
+        }
     }
 
     fun setOnCloseListener(listener: () -> Unit) {
@@ -68,6 +77,29 @@ class MiniPlayerView @JvmOverloads constructor(
 
     fun setOnPlayPauseToggleListener(listener: (Boolean) -> Unit) {
         onPlayPauseToggleListener = listener
+    }
+
+    fun setOnLikeToggleListener(listener: (RadioStation) -> Unit) {
+        onLikeToggleListener = listener
+    }
+
+    fun updateLikeState(isLiked: Boolean) {
+        val iconRes = if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+        val tintColor = if (isLiked) {
+            context.getColor(com.google.android.material.R.color.design_default_color_error)
+        } else {
+            com.google.android.material.R.attr.colorOnSurfaceVariant
+        }
+        likeButton.setIconResource(iconRes)
+        if (isLiked) {
+            likeButton.setIconTintResource(com.google.android.material.R.color.design_default_color_error)
+        } else {
+            likeButton.iconTint = android.content.res.ColorStateList.valueOf(
+                context.obtainStyledAttributes(intArrayOf(com.google.android.material.R.attr.colorOnSurfaceVariant)).use {
+                    it.getColor(0, 0)
+                }
+            )
+        }
     }
 
     fun setStation(station: RadioStation?) {
@@ -111,6 +143,9 @@ class MiniPlayerView @JvmOverloads constructor(
             }
         } else ""
         genreText.text = "${station.genre}$proxyIndicator"
+
+        // Update like button state
+        updateLikeState(station.isLiked)
 
         // Handle cover art update properly - clear old image when switching stations
         if (station.coverArtUri != null) {
