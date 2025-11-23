@@ -23,8 +23,6 @@ import com.opensource.i2pradio.tor.TorService
 
 class SettingsFragment : Fragment() {
 
-    private lateinit var recordingFormatButton: MaterialButton
-
     // Tor UI elements
     private var embeddedTorSwitch: MaterialSwitch? = null
     private var torStatusContainer: View? = null
@@ -52,7 +50,6 @@ class SettingsFragment : Fragment() {
         val githubButton = view.findViewById<MaterialButton>(R.id.githubButton)
         val materialYouSwitch = view.findViewById<MaterialSwitch>(R.id.materialYouSwitch)
         val materialYouContainer = view.findViewById<View>(R.id.materialYouContainer)
-        recordingFormatButton = view.findViewById(R.id.recordingFormatButton)
 
         // Tor UI elements
         embeddedTorSwitch = view.findViewById(R.id.embeddedTorSwitch)
@@ -107,12 +104,6 @@ class SettingsFragment : Fragment() {
         githubButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/yourusername/i2p-radio"))
             startActivity(intent)
-        }
-
-        // Recording format
-        updateRecordingFormatButtonText()
-        recordingFormatButton.setOnClickListener {
-            showRecordingFormatDialog()
         }
 
         // Setup Tor controls
@@ -259,33 +250,6 @@ class SettingsFragment : Fragment() {
                 torActionButton?.isEnabled = true
             }
         }
-    }
-
-    private fun updateRecordingFormatButtonText() {
-        val currentFormat = PreferencesHelper.getRecordingFormat(requireContext())
-        recordingFormatButton.text = PreferencesHelper.getRecordingFormatDisplayName(currentFormat)
-    }
-
-    private fun showRecordingFormatDialog() {
-        val formats = arrayOf(
-            PreferencesHelper.FORMAT_MP3,
-            PreferencesHelper.FORMAT_M4A,
-            PreferencesHelper.FORMAT_OGG,
-            PreferencesHelper.FORMAT_OPUS,
-            PreferencesHelper.FORMAT_WAV
-        )
-        val formatNames = formats.map { PreferencesHelper.getRecordingFormatDisplayName(it) }.toTypedArray()
-        val currentFormat = PreferencesHelper.getRecordingFormat(requireContext())
-        val selectedIndex = formats.indexOf(currentFormat).coerceAtLeast(0)
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("Recording Format")
-            .setSingleChoiceItems(formatNames, selectedIndex) { dialog, which ->
-                PreferencesHelper.setRecordingFormat(requireContext(), formats[which])
-                updateRecordingFormatButtonText()
-                dialog.dismiss()
-            }
-            .show()
     }
 
     private fun updateThemeButtonText(button: MaterialButton) {
