@@ -24,6 +24,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Like Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/likeButton"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Like"
+        app:icon="@drawable/ic_favorite_border"
+        app:iconTint="?attr/colorOnSurface"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- Cover Art - uses tonal surface for dark mode visibility -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/nowPlayingCoverCard"
@@ -105,6 +118,21 @@
             android:focusableInTouchMode="true"
             android:visibility="gone"
             tools:text="Song Name - Artist - This is a very long metadata text that should scroll"
+            tools:visibility="visible" />
+
+        <!-- Stream Info (bitrate/codec) -->
+        <TextView
+            android:id="@+id/nowPlayingStreamInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingHorizontal="12dp"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:alpha="0.7"
+            android:visibility="gone"
+            tools:text="128 kbps • MP3"
             tools:visibility="visible" />
 
     </LinearLayout>

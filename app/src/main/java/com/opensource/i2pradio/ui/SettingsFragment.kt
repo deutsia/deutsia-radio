@@ -106,10 +106,54 @@ class SettingsFragment : Fragment() {
             startActivity(intent)
         }
 
+        // Sleep timer button
+        val sleepTimerButton = view.findViewById<MaterialButton>(R.id.sleepTimerButton)
+        updateSleepTimerButtonText(sleepTimerButton)
+        sleepTimerButton.setOnClickListener {
+            showSleepTimerDialog(sleepTimerButton)
+        }
+
         // Setup Tor controls
         setupTorControls()
 
         return view
+    }
+
+    private fun updateSleepTimerButtonText(button: MaterialButton) {
+        val minutes = PreferencesHelper.getSleepTimerMinutes(requireContext())
+        button.text = when (minutes) {
+            0 -> "Off"
+            else -> "$minutes min"
+        }
+    }
+
+    private fun showSleepTimerDialog(button: MaterialButton) {
+        val options = arrayOf("Off", "15 minutes", "30 minutes", "45 minutes", "60 minutes", "90 minutes")
+        val values = intArrayOf(0, 15, 30, 45, 60, 90)
+        val currentMinutes = PreferencesHelper.getSleepTimerMinutes(requireContext())
+        val selectedIndex = values.indexOf(currentMinutes).coerceAtLeast(0)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Sleep Timer")
+            .setSingleChoiceItems(options, selectedIndex) { dialog, which ->
+                val minutes = values[which]
+                PreferencesHelper.setSleepTimerMinutes(requireContext(), minutes)
+                updateSleepTimerButtonText(button)
+
+                // Send intent to RadioService to set/cancel sleep timer
+                val intent = Intent(requireContext(), com.opensource.i2pradio.RadioService::class.java).apply {
+                    action = if (minutes > 0) {
+                        com.opensource.i2pradio.RadioService.ACTION_SET_SLEEP_TIMER
+                    } else {
+                        com.opensource.i2pradio.RadioService.ACTION_CANCEL_SLEEP_TIMER
+                    }
+                    putExtra("minutes", minutes)
+                }
+                requireContext().startService(intent)
+
+                dialog.dismiss()
+            }
+            .show()
     }
 
     override fun onResume() {

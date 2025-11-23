@@ -22,13 +22,17 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.media.app.NotificationCompat as MediaNotificationCompat
+import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Metadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.extractor.metadata.icy.IcyInfo
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
@@ -80,14 +84,32 @@ class RadioService : Service() {
     private var recordingUri: android.net.Uri? = null  // For Android 10+ MediaStore finalization
     private var currentStationName: String = "Unknown Station"
 
+    // Sleep timer
+    private var sleepTimerRunnable: Runnable? = null
+    private var sleepTimerEndTime: Long = 0L
+
+    // Stream metadata
+    private var currentMetadata: String? = null
+    private var currentBitrate: Int = 0
+    private var currentCodec: String? = null
+
     companion object {
         const val ACTION_PLAY = "com.opensource.i2pradio.PLAY"
         const val ACTION_PAUSE = "com.opensource.i2pradio.PAUSE"
         const val ACTION_STOP = "com.opensource.i2pradio.STOP"
         const val ACTION_START_RECORDING = "com.opensource.i2pradio.START_RECORDING"
         const val ACTION_STOP_RECORDING = "com.opensource.i2pradio.STOP_RECORDING"
+        const val ACTION_SET_SLEEP_TIMER = "com.opensource.i2pradio.SET_SLEEP_TIMER"
+        const val ACTION_CANCEL_SLEEP_TIMER = "com.opensource.i2pradio.CANCEL_SLEEP_TIMER"
         const val CHANNEL_ID = "I2PRadioChannel"
         const val NOTIFICATION_ID = 1
+
+        // Broadcast actions for metadata updates
+        const val BROADCAST_METADATA_CHANGED = "com.opensource.i2pradio.METADATA_CHANGED"
+        const val BROADCAST_STREAM_INFO_CHANGED = "com.opensource.i2pradio.STREAM_INFO_CHANGED"
+        const val EXTRA_METADATA = "metadata"
+        const val EXTRA_BITRATE = "bitrate"
+        const val EXTRA_CODEC = "codec"
     }
 
     inner class RadioBinder : Binder() {
@@ -297,8 +319,45 @@ class RadioService : Service() {
             ACTION_STOP_RECORDING -> {
                 stopRecording()
             }
+            ACTION_SET_SLEEP_TIMER -> {
+                val minutes = intent.getIntExtra("minutes", 0)
+                setSleepTimer(minutes)
+            }
+            ACTION_CANCEL_SLEEP_TIMER -> {
+                cancelSleepTimer()
+            }
         }
         return START_STICKY
+    }
+
+    private fun setSleepTimer(minutes: Int) {
+        cancelSleepTimer()
+        if (minutes <= 0) return
+
+        sleepTimerEndTime = System.currentTimeMillis() + (minutes * 60 * 1000L)
+        sleepTimerRunnable = Runnable {
+            android.util.Log.d("RadioService", "Sleep timer triggered, stopping playback")
+            val stopIntent = Intent(this, RadioService::class.java).apply {
+                action = ACTION_STOP
+            }
+            startService(stopIntent)
+        }
+        handler.postDelayed(sleepTimerRunnable!!, minutes * 60 * 1000L)
+        android.util.Log.d("RadioService", "Sleep timer set for $minutes minutes")
+    }
+
+    private fun cancelSleepTimer() {
+        sleepTimerRunnable?.let {
+            handler.removeCallbacks(it)
+            sleepTimerRunnable = null
+        }
+        sleepTimerEndTime = 0L
+    }
+
+    fun getSleepTimerRemainingMillis(): Long {
+        return if (sleepTimerEndTime > 0) {
+            maxOf(0L, sleepTimerEndTime - System.currentTimeMillis())
+        } else 0L
     }
 
     private fun startRecording(stationName: String) {
@@ -591,6 +650,8 @@ class RadioService : Service() {
                                 startForeground(NOTIFICATION_ID, createNotification(status))
                                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
                                 activateMediaSession()
+                                // Extract stream info when ready
+                                extractStreamInfo()
                                 android.util.Log.d("RadioService", "Stream playing successfully")
                             }
                             Player.STATE_BUFFERING -> {
@@ -616,6 +677,22 @@ class RadioService : Service() {
                         } else if (player?.playbackState == Player.STATE_READY) {
                             // Player is paused but ready
                             updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                        }
+                    }
+
+                    override fun onMetadata(metadata: Metadata) {
+                        // Extract ICY metadata (artist/track info)
+                        for (i in 0 until metadata.length()) {
+                            val entry = metadata.get(i)
+                            if (entry is IcyInfo) {
+                                entry.title?.let { title ->
+                                    if (title.isNotBlank() && title != currentMetadata) {
+                                        currentMetadata = title
+                                        broadcastMetadataChanged(title)
+                                        android.util.Log.d("RadioService", "ICY metadata: $title")
+                                    }
+                                }
+                            }
                         }
                     }
                 })
@@ -724,9 +801,71 @@ class RadioService : Service() {
             .build()
     }
 
+    /**
+     * Extract stream format info (bitrate, codec) from ExoPlayer
+     */
+    private fun extractStreamInfo() {
+        player?.let { exoPlayer ->
+            val format = exoPlayer.audioFormat
+            if (format != null) {
+                val newBitrate = format.bitrate.takeIf { it != Format.NO_VALUE } ?: 0
+                val newCodec = format.codecs ?: format.sampleMimeType?.replace("audio/", "")?.uppercase() ?: "Unknown"
+
+                if (newBitrate != currentBitrate || newCodec != currentCodec) {
+                    currentBitrate = newBitrate
+                    currentCodec = newCodec
+                    broadcastStreamInfoChanged(currentBitrate, currentCodec ?: "Unknown")
+                    android.util.Log.d("RadioService", "Stream info: ${currentBitrate / 1000}kbps, $currentCodec")
+                }
+            }
+        }
+    }
+
+    /**
+     * Broadcast metadata change to UI
+     */
+    private fun broadcastMetadataChanged(metadata: String) {
+        val intent = Intent(BROADCAST_METADATA_CHANGED).apply {
+            putExtra(EXTRA_METADATA, metadata)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    /**
+     * Broadcast stream info change to UI
+     */
+    private fun broadcastStreamInfoChanged(bitrate: Int, codec: String) {
+        val intent = Intent(BROADCAST_STREAM_INFO_CHANGED).apply {
+            putExtra(EXTRA_BITRATE, bitrate)
+            putExtra(EXTRA_CODEC, codec)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    /**
+     * Get current metadata (for UI binding)
+     */
+    fun getCurrentMetadata(): String? = currentMetadata
+
+    /**
+     * Get current bitrate in bps (for UI binding)
+     */
+    fun getCurrentBitrate(): Int = currentBitrate
+
+    /**
+     * Get current codec (for UI binding)
+     */
+    fun getCurrentCodec(): String? = currentCodec
+
+    /**
+     * Get ExoPlayer's audio session ID for equalizer
+     */
+    fun getAudioSessionId(): Int = player?.audioSessionId ?: 0
+
     override fun onDestroy() {
         super.onDestroy()
         stopRecording()
+        cancelSleepTimer()
         stopStream()
         cancelSessionDeactivation()
         mediaSession?.apply {

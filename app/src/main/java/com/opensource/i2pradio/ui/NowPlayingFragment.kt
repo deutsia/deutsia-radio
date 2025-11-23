@@ -1,6 +1,9 @@
 package com.opensource.i2pradio.ui
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
@@ -22,6 +25,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import coil.load
 import coil.request.CachePolicy
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -34,15 +38,22 @@ import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
+import com.opensource.i2pradio.data.RadioRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NowPlayingFragment : Fragment() {
     private val viewModel: RadioViewModel by activityViewModels()
+    private lateinit var repository: RadioRepository
 
     private lateinit var rootContainer: ConstraintLayout
     private lateinit var coverArt: ImageView
     private lateinit var stationName: TextView
     private lateinit var genreText: TextView
     private lateinit var metadataText: TextView
+    private lateinit var streamInfoText: TextView
+    private lateinit var likeButton: MaterialButton
     private lateinit var playPauseButton: FloatingActionButton
     private lateinit var recordButton: FloatingActionButton
     private lateinit var volumeButton: FloatingActionButton
@@ -60,6 +71,26 @@ class NowPlayingFragment : Fragment() {
     private var isBuffering: Boolean = false
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
+
+    // Broadcast receiver for metadata and stream info updates
+    private val metadataReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                RadioService.BROADCAST_METADATA_CHANGED -> {
+                    val metadata = intent.getStringExtra(RadioService.EXTRA_METADATA)
+                    if (!metadata.isNullOrBlank()) {
+                        metadataText.text = metadata
+                        metadataText.visibility = View.VISIBLE
+                    }
+                }
+                RadioService.BROADCAST_STREAM_INFO_CHANGED -> {
+                    val bitrate = intent.getIntExtra(RadioService.EXTRA_BITRATE, 0)
+                    val codec = intent.getStringExtra(RadioService.EXTRA_CODEC) ?: "Unknown"
+                    updateStreamInfo(bitrate, codec)
+                }
+            }
+        }
+    }
 
     // Animation for recording dot blink
     private val blinkAnimation: AlphaAnimation by lazy {
@@ -91,11 +122,15 @@ class NowPlayingFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_now_playing, container, false)
 
+        repository = RadioRepository(requireContext())
+
         rootContainer = view.findViewById(R.id.rootContainer)
         coverArt = view.findViewById(R.id.nowPlayingCoverArt)
         stationName = view.findViewById(R.id.nowPlayingStationName)
         genreText = view.findViewById(R.id.nowPlayingGenre)
         metadataText = view.findViewById(R.id.nowPlayingMetadata)
+        streamInfoText = view.findViewById(R.id.nowPlayingStreamInfo)
+        likeButton = view.findViewById(R.id.likeButton)
         playPauseButton = view.findViewById(R.id.playPauseButton)
         recordButton = view.findViewById(R.id.recordButton)
         volumeButton = view.findViewById(R.id.volumeButton)
@@ -108,6 +143,30 @@ class NowPlayingFragment : Fragment() {
 
         // Initialize audio manager and volume control
         audioManager = requireContext().getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
+
+        // Register broadcast receiver for metadata updates
+        val filter = IntentFilter().apply {
+            addAction(RadioService.BROADCAST_METADATA_CHANGED)
+            addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
+        }
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
+
+        // Like button click handler
+        likeButton.setOnClickListener {
+            viewModel.getCurrentStation()?.let { station ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    repository.toggleLike(station.id)
+                    // Refresh the station to update UI
+                    val updatedStation = repository.getStationById(station.id)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        updatedStation?.let {
+                            viewModel.setCurrentStation(it)
+                            updateLikeButton(it.isLiked)
+                        }
+                    }
+                }
+            }
+        }
 
         // Setup Edge-to-Edge: Handle window insets for status bar
         setupEdgeToEdge()
@@ -212,6 +271,15 @@ class NowPlayingFragment : Fragment() {
                     }
                 } else ""
                 genreText.text = "${station.genre}$proxyIndicator"
+
+                // Update like button state
+                updateLikeButton(station.isLiked)
+
+                // Reset metadata and stream info for new station
+                if (isNewStation) {
+                    metadataText.visibility = View.GONE
+                    streamInfoText.visibility = View.GONE
+                }
 
                 // Handle cover art update properly - switch scaleType based on content
                 if (station.coverArtUri != null) {
@@ -475,6 +543,32 @@ class NowPlayingFragment : Fragment() {
         recordingHandler.removeCallbacks(recordingUpdateRunnable)
         recordingDot?.clearAnimation()
         previousPlayingState = null
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(metadataReceiver)
+    }
+
+    private fun updateLikeButton(isLiked: Boolean) {
+        val iconRes = if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+        likeButton.setIconResource(iconRes)
+        if (isLiked) {
+            likeButton.setIconTintResource(com.google.android.material.R.color.design_default_color_error)
+        } else {
+            likeButton.iconTint = android.content.res.ColorStateList.valueOf(
+                com.google.android.material.color.MaterialColors.getColor(
+                    requireContext(), com.google.android.material.R.attr.colorOnSurface, android.graphics.Color.WHITE
+                )
+            )
+        }
+    }
+
+    private fun updateStreamInfo(bitrate: Int, codec: String) {
+        if (bitrate > 0) {
+            val bitrateKbps = bitrate / 1000
+            streamInfoText.text = "$bitrateKbps kbps • $codec"
+            streamInfoText.visibility = View.VISIBLE
+        } else if (codec.isNotBlank() && codec != "Unknown") {
+            streamInfoText.text = codec
+            streamInfoText.visibility = View.VISIBLE
+        }
     }
 
     private fun updatePlayPauseButton(isPlaying: Boolean) {
