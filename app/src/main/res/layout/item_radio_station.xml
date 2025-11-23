@@ -45,27 +45,27 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/genreText"
-            app:layout_constraintEnd_toStartOf="@id/likeIcon"
+            app:layout_constraintEnd_toStartOf="@id/likeButton"
             app:layout_constraintStart_toEndOf="@id/coverArtImage"
             app:layout_constraintTop_toTopOf="@id/coverArtImage"
             app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintHorizontal_bias="0"
             tools:text="BBC World Service" />
 
-        <!-- Like/Heart Icon - shown when station is liked -->
-        <ImageView
-            android:id="@+id/likeIcon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_favorite"
-            android:visibility="gone"
-            android:contentDescription="Liked"
-            app:tint="@color/design_default_color_error"
-            app:layout_constraintBottom_toBottomOf="@id/stationNameText"
+        <!-- Like/Heart Button - toggles liked state -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/likeButton"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="4dp"
+            android:contentDescription="Like"
+            app:icon="@drawable/ic_favorite_border"
+            app:iconSize="20dp"
+            app:iconTint="?attr/colorOnSurfaceVariant"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/menuButton"
-            app:layout_constraintTop_toTopOf="@id/stationNameText"
-            tools:visibility="visible" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/genreText"
