@@ -18,6 +18,10 @@ class EqualizerManager(private val context: Context) {
         private const val TAG = "EqualizerManager"
         const val BASS_BOOST_MAX = 1000.toShort()
         const val VIRTUALIZER_MAX = 1000.toShort()
+
+        // Fixed 5-band EQ frequencies (in Hz) for consistent UI
+        val FIXED_BAND_FREQUENCIES = listOf(60, 230, 910, 3600, 14000)
+        const val FIXED_BAND_COUNT = 5
     }
 
     private var equalizer: Equalizer? = null
@@ -40,6 +44,12 @@ class EqualizerManager(private val context: Context) {
         private set
     var isVirtualizerSupported: Boolean = false
         private set
+
+    // Mapping from fixed band indices to native band indices
+    private var fixedToNativeBandMap: IntArray = IntArray(FIXED_BAND_COUNT) { it }
+
+    // Stored levels for the 5 fixed bands (for UI consistency)
+    private var fixedBandLevels: ShortArray = ShortArray(FIXED_BAND_COUNT) { 0 }
 
     /**
      * Initialize the equalizer for the given audio session.
@@ -81,11 +91,14 @@ class EqualizerManager(private val context: Context) {
                 }
                 this@EqualizerManager.centerFrequencies = frequencies
 
+                // Build mapping from fixed bands to native bands
+                buildFixedToNativeBandMap()
+
                 // Enable equalizer if previously enabled
                 enabled = PreferencesHelper.isEqualizerEnabled(context)
 
                 // Restore saved band levels
-                restoreBandLevels()
+                restoreFixedBandLevels()
             }
 
             // Initialize Bass Boost
@@ -157,26 +170,60 @@ class EqualizerManager(private val context: Context) {
     }
 
     /**
-     * Get the current level for a specific band
+     * Get the current level for a specific fixed band (0-4)
      */
     fun getBandLevel(band: Short): Short {
-        return equalizer?.getBandLevel(band) ?: 0
+        return fixedBandLevels.getOrNull(band.toInt()) ?: 0
     }
 
     /**
-     * Set the level for a specific band
-     * @param band The band index (0 to numberOfBands-1)
+     * Set the level for a specific fixed band (0-4)
+     * @param band The fixed band index (0 to 4)
      * @param level The level in millibels (within bandLevelRange)
      */
     fun setBandLevel(band: Short, level: Short) {
+        if (band < 0 || band >= FIXED_BAND_COUNT) return
+
         equalizer?.let { eq ->
             try {
-                eq.setBandLevel(band, level)
-                saveBandLevels()
+                // Store the level for this fixed band
+                fixedBandLevels[band.toInt()] = level
+
+                // Apply to the mapped native band
+                val nativeBand = fixedToNativeBandMap[band.toInt()]
+                eq.setBandLevel(nativeBand.toShort(), level)
+
+                saveFixedBandLevels()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to set band level", e)
             }
         }
+    }
+
+    /**
+     * Build mapping from fixed 5-band frequencies to native equalizer bands.
+     * Each fixed band is mapped to the closest native band.
+     */
+    private fun buildFixedToNativeBandMap() {
+        if (centerFrequencies.isEmpty()) return
+
+        for (fixedBand in 0 until FIXED_BAND_COUNT) {
+            val targetFreq = FIXED_BAND_FREQUENCIES[fixedBand]
+            var closestNativeBand = 0
+            var closestDiff = Int.MAX_VALUE
+
+            for (nativeBand in centerFrequencies.indices) {
+                val diff = kotlin.math.abs(centerFrequencies[nativeBand] - targetFreq)
+                if (diff < closestDiff) {
+                    closestDiff = diff
+                    closestNativeBand = nativeBand
+                }
+            }
+            fixedToNativeBandMap[fixedBand] = closestNativeBand
+        }
+
+        Log.d(TAG, "Fixed band mapping: ${fixedToNativeBandMap.contentToString()}")
+        Log.d(TAG, "Native frequencies: $centerFrequencies")
     }
 
     /**
@@ -188,11 +235,24 @@ class EqualizerManager(private val context: Context) {
             try {
                 eq.usePreset(preset)
                 PreferencesHelper.setEqualizerPreset(context, preset.toInt())
-                // Save the resulting band levels
-                saveBandLevels()
+                // Sync fixed band levels from native bands
+                syncFixedBandLevelsFromNative()
+                saveFixedBandLevels()
                 Log.d(TAG, "Applied preset: ${presetNames.getOrNull(preset.toInt())}")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to apply preset", e)
+            }
+        }
+    }
+
+    /**
+     * Sync fixed band levels from native equalizer bands (after preset applied)
+     */
+    private fun syncFixedBandLevelsFromNative() {
+        equalizer?.let { eq ->
+            for (fixedBand in 0 until FIXED_BAND_COUNT) {
+                val nativeBand = fixedToNativeBandMap[fixedBand]
+                fixedBandLevels[fixedBand] = eq.getBandLevel(nativeBand.toShort())
             }
         }
     }
@@ -209,13 +269,10 @@ class EqualizerManager(private val context: Context) {
     }
 
     /**
-     * Get all band levels as an array
+     * Get all fixed band levels as an array (5 bands)
      */
     fun getAllBandLevels(): ShortArray {
-        val eq = equalizer ?: return shortArrayOf()
-        return ShortArray(numberOfBands.toInt()) { band ->
-            eq.getBandLevel(band.toShort())
-        }
+        return fixedBandLevels.copyOf()
     }
 
     /**
@@ -223,42 +280,60 @@ class EqualizerManager(private val context: Context) {
      */
     fun resetToFlat() {
         equalizer?.let { eq ->
+            // Reset all native bands
             for (band in 0 until numberOfBands) {
                 eq.setBandLevel(band.toShort(), 0)
             }
-            saveBandLevels()
+            // Reset fixed band levels
+            for (i in 0 until FIXED_BAND_COUNT) {
+                fixedBandLevels[i] = 0
+            }
+            saveFixedBandLevels()
             Log.d(TAG, "Reset to flat")
         }
     }
 
     /**
-     * Save current band levels to preferences
+     * Save current fixed band levels to preferences
      */
-    private fun saveBandLevels() {
-        val levels = getAllBandLevels()
-        val bandsString = levels.joinToString(",")
+    private fun saveFixedBandLevels() {
+        val bandsString = fixedBandLevels.joinToString(",")
         PreferencesHelper.setEqualizerBands(context, bandsString)
     }
 
     /**
-     * Restore band levels from preferences
+     * Restore fixed band levels from preferences and apply to native bands
      */
-    private fun restoreBandLevels() {
+    private fun restoreFixedBandLevels() {
         val bandsString = PreferencesHelper.getEqualizerBands(context) ?: return
         val levels = bandsString.split(",").mapNotNull { it.toShortOrNull() }
 
         equalizer?.let { eq ->
             levels.forEachIndexed { index, level ->
-                if (index < numberOfBands) {
+                if (index < FIXED_BAND_COUNT) {
+                    fixedBandLevels[index] = level
+                    val nativeBand = fixedToNativeBandMap[index]
                     try {
-                        eq.setBandLevel(index.toShort(), level)
+                        eq.setBandLevel(nativeBand.toShort(), level)
                     } catch (e: Exception) {
-                        Log.w(TAG, "Failed to restore band $index level", e)
+                        Log.w(TAG, "Failed to restore fixed band $index level", e)
                     }
                 }
             }
-            Log.d(TAG, "Restored ${levels.size} band levels")
+            Log.d(TAG, "Restored ${levels.size} fixed band levels")
         }
+    }
+
+    /**
+     * Get the number of fixed bands (always 5)
+     */
+    fun getFixedBandCount(): Int = FIXED_BAND_COUNT
+
+    /**
+     * Get the frequency for a fixed band
+     */
+    fun getFixedBandFrequency(band: Int): Int {
+        return FIXED_BAND_FREQUENCIES.getOrElse(band) { 0 }
     }
 
     /**
