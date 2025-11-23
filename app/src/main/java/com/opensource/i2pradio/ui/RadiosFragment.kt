@@ -226,12 +226,13 @@ class RadioStationAdapter(
         private val stationName: TextView = itemView.findViewById(R.id.stationNameText)
         private val genreText: TextView = itemView.findViewById(R.id.genreText)
         private val menuButton: MaterialButton = itemView.findViewById(R.id.menuButton)
+        private val likeIcon: ImageView = itemView.findViewById(R.id.likeIcon)
         private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioStation) {
             stationName.text = station.name
 
-            // Show proxy type indicator (I2P or Tor) and liked indicator
+            // Show proxy type indicator (I2P or Tor)
             val proxyIndicator = if (station.useProxy) {
                 when (station.getProxyTypeEnum()) {
                     ProxyType.I2P -> " • I2P"
@@ -239,8 +240,10 @@ class RadioStationAdapter(
                     ProxyType.NONE -> ""
                 }
             } else ""
-            val likedIndicator = if (station.isLiked) " ♥" else ""
-            genreText.text = "${station.genre}$proxyIndicator$likedIndicator"
+            genreText.text = "${station.genre}$proxyIndicator"
+
+            // Show/hide like icon based on liked state
+            likeIcon.visibility = if (station.isLiked) View.VISIBLE else View.GONE
 
             // Cancel any pending image load and clear the image first to prevent ghosting
             imageLoadDisposable?.dispose()

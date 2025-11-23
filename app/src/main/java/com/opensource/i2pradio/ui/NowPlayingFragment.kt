@@ -197,7 +197,8 @@ class NowPlayingFragment : Fragment() {
                     val updatedStation = repository.getStationById(station.id)
                     CoroutineScope(Dispatchers.Main).launch {
                         updatedStation?.let {
-                            viewModel.setCurrentStation(it)
+                            // Update like state without triggering full station change animations
+                            viewModel.updateCurrentStationLikeState(it.isLiked)
                             updateLikeButton(it.isLiked)
                         }
                     }

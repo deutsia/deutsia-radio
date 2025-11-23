@@ -49,6 +49,17 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     fun getCurrentStation(): RadioStation? = _currentStation.value
 
     /**
+     * Update only the like state of the current station without triggering full UI refresh.
+     * This prevents animations from firing when the user toggles like state.
+     */
+    fun updateCurrentStationLikeState(isLiked: Boolean) {
+        _currentStation.value?.let { station ->
+            // Create a copy with updated like state
+            _currentStation.value = station.copy(isLiked = isLiked)
+        }
+    }
+
+    /**
      * Start recording the current station.
      * Communicates with RadioService to handle the actual file I/O.
      * @return true if recording started, false if no station is playing
