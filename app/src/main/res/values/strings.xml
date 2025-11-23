@@ -3,4 +3,15 @@
     <string name="tab_radios">Stations</string>
     <string name="tab_now_playing">Now Playing</string>
     <string name="tab_settings">Settings</string>
+
+    <!-- Equalizer -->
+    <string name="equalizer">Equalizer</string>
+    <string name="equalizer_no_audio">Start playing a station first</string>
+    <string name="equalizer_not_found">No equalizer app found. Install an equalizer app like Wavelet.</string>
+
+    <!-- Sort options -->
+    <string name="sort_default">Default</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_recent">Recent</string>
+    <string name="sort_liked">Liked</string>
 </resources>
