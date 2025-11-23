@@ -5,20 +5,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
 import android.os.Binder
 import android.os.Build
-import android.os.Environment
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.provider.MediaStore
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -32,10 +28,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.audio.AudioSink
-import androidx.media3.exoplayer.audio.DefaultAudioSink
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.metadata.icy.IcyInfo
 import coil.ImageLoader
@@ -48,6 +41,10 @@ import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
+import okhttp3.Call
+import okhttp3.Request
+import okhttp3.Response
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -57,7 +54,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicBoolean
 
 class RadioService : Service() {
     private var player: ExoPlayer? = null
@@ -117,15 +114,14 @@ class RadioService : Service() {
     private var sessionDeactivateRunnable: Runnable? = null
     private val SESSION_DEACTIVATE_DELAY = 5 * 60 * 1000L // 5 minutes
 
-    // Recording - using async write queue to prevent audio hitching
+    // Recording - uses separate network request to avoid affecting audio pipeline
     private var isRecording = false
-    private val recordingOutputStreamHolder = AtomicReference<OutputStream?>(null)
-    private val recordingWriteQueue = java.util.concurrent.ArrayBlockingQueue<ByteArray>(1000)
-    private val isRecordingActive = java.util.concurrent.atomic.AtomicBoolean(false)
-    private var writerThread: Thread? = null
-    private var recordingFile: File? = null
-    private var recordingUri: android.net.Uri? = null  // For Android 10+ MediaStore finalization
     private var currentStationName: String = "Unknown Station"
+    private var recordingCall: Call? = null
+    private var recordingThread: Thread? = null
+    private var recordingOutputStream: OutputStream? = null
+    private val isRecordingActive = AtomicBoolean(false)
+    private var recordingFile: File? = null
 
     // Sleep timer
     private var sleepTimerRunnable: Runnable? = null
@@ -406,193 +402,198 @@ class RadioService : Service() {
         } else 0L
     }
 
+    /**
+     * Start recording using a SEPARATE network request.
+     * This is the key improvement: the recording stream is completely independent
+     * from the playback stream, so it cannot cause audio glitches.
+     */
     private fun startRecording(stationName: String) {
         if (isRecording) return
+        val streamUrl = currentStreamUrl ?: return
 
         currentStationName = stationName
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-
-        // Detect format from current stream URL to avoid corruption
-        // Recording writes raw stream bytes, so we must use the stream's actual format
-        val detectedFormat = detectStreamFormat(currentStreamUrl)
-        val format = detectedFormat.first
-        val mimeType = detectedFormat.second
-        android.util.Log.d("RadioService", "Recording format detected: $format (mime: $mimeType) from URL: $currentStreamUrl")
-
+        val format = detectStreamFormat(streamUrl)
         val fileName = "${stationName.replace(Regex("[^a-zA-Z0-9]"), "_")}_$timestamp.$format"
 
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                // Use MediaStore for Android 10+
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
-                    put(MediaStore.Audio.Media.MIME_TYPE, mimeType)
-                    put(MediaStore.Audio.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MUSIC}/I2P Radio")
-                    put(MediaStore.Audio.Media.IS_PENDING, 1)
-                }
+            // Create recording file in app's external files directory (no permission needed)
+            val musicDir = getExternalFilesDir("Recordings")
+            if (musicDir != null && !musicDir.exists()) musicDir.mkdirs()
+            recordingFile = File(musicDir, fileName)
 
-                val uri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
-                uri?.let {
-                    recordingUri = it
-                    val outputStream = contentResolver.openOutputStream(it)
-                    // Set the output stream and start the writer thread
-                    recordingOutputStreamHolder.set(outputStream)
-                    isRecordingActive.set(true)
-                    // Start the async writer thread
-                    writerThread = RecordingDataSource.startWriterThread(
-                        recordingWriteQueue,
-                        recordingOutputStreamHolder,
-                        isRecordingActive
-                    )
-                    writerThread?.start()
-                    isRecording = true
-                    android.util.Log.d("RadioService", "Recording started (no reconnect): $fileName")
-                    updateNotificationWithRecording()
-                }
-            } else {
-                // Legacy storage for older Android versions
-                val musicDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "I2P Radio")
-                if (!musicDir.exists()) musicDir.mkdirs()
+            // Build OkHttp client with same proxy settings as playback
+            val okHttpClient = buildRecordingHttpClient()
 
-                recordingFile = File(musicDir, fileName)
-                val outputStream = FileOutputStream(recordingFile)
-                // Set the output stream and start the writer thread
-                recordingOutputStreamHolder.set(outputStream)
-                isRecordingActive.set(true)
-                // Start the async writer thread
-                writerThread = RecordingDataSource.startWriterThread(
-                    recordingWriteQueue,
-                    recordingOutputStreamHolder,
-                    isRecordingActive
-                )
-                writerThread?.start()
-                isRecording = true
-                android.util.Log.d("RadioService", "Recording started (no reconnect): $fileName")
-                updateNotificationWithRecording()
+            // Create request for the stream
+            val request = Request.Builder()
+                .url(streamUrl)
+                .header("User-Agent", "I2PRadio/1.0")
+                .header("Icy-MetaData", "0") // Don't need metadata for recording
+                .build()
+
+            recordingCall = okHttpClient.newCall(request)
+            isRecordingActive.set(true)
+            isRecording = true
+
+            // Start recording on a background thread
+            recordingThread = Thread({
+                var response: Response? = null
+                try {
+                    android.util.Log.d("RadioService", "Recording started: $fileName")
+                    response = recordingCall?.execute()
+
+                    if (response?.isSuccessful == true) {
+                        val inputStream = response.body?.byteStream()
+                        recordingOutputStream = BufferedOutputStream(
+                            FileOutputStream(recordingFile),
+                            64 * 1024 // 64KB buffer for efficient writes
+                        )
+
+                        val buffer = ByteArray(8192)
+                        var bytesRead: Int
+
+                        while (isRecordingActive.get() &&
+                               inputStream?.read(buffer).also { bytesRead = it ?: -1 } != -1) {
+                            if (bytesRead > 0) {
+                                recordingOutputStream?.write(buffer, 0, bytesRead)
+                            }
+                        }
+
+                        recordingOutputStream?.flush()
+                        android.util.Log.d("RadioService", "Recording completed: $fileName")
+                    } else {
+                        android.util.Log.e("RadioService", "Recording request failed: ${response?.code}")
+                    }
+                } catch (e: Exception) {
+                    if (isRecordingActive.get()) {
+                        android.util.Log.e("RadioService", "Recording error", e)
+                    } else {
+                        android.util.Log.d("RadioService", "Recording stopped by user")
+                    }
+                } finally {
+                    try {
+                        recordingOutputStream?.close()
+                        response?.close()
+                    } catch (e: Exception) {
+                        android.util.Log.e("RadioService", "Error closing recording streams", e)
+                    }
+                }
+            }, "RecordingThread").apply {
+                priority = Thread.MIN_PRIORITY // Low priority to not affect audio
             }
+            recordingThread?.start()
+
+            updateNotificationWithRecording()
+            android.util.Log.d("RadioService", "Recording initiated for: $stationName")
+
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Failed to start recording", e)
             cleanupRecording()
         }
     }
 
-    private fun cleanupRecording() {
-        // Stop the writer thread
-        isRecordingActive.set(false)
-        writerThread?.interrupt()
-        writerThread = null
-
-        try {
-            recordingOutputStreamHolder.get()?.close()
-        } catch (e: Exception) {
-            android.util.Log.e("RadioService", "Error closing recording stream", e)
+    /**
+     * Build an OkHttp client for recording with the same proxy settings as playback.
+     */
+    private fun buildRecordingHttpClient(): OkHttpClient {
+        val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
+            currentProxyType == ProxyType.TOR &&
+            PreferencesHelper.isEmbeddedTorEnabled(this) &&
+            TorManager.isConnected() -> {
+                Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+            }
+            currentProxyHost?.isNotEmpty() == true && currentProxyType != ProxyType.NONE -> {
+                Triple(currentProxyHost!!, currentProxyPort, currentProxyType)
+            }
+            else -> Triple("", 0, ProxyType.NONE)
         }
-        recordingOutputStreamHolder.set(null)
-        recordingWriteQueue.clear()
-        recordingFile = null
-        recordingUri = null
-        isRecording = false
+
+        return if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
+            val javaProxyType = when (effectiveProxyType) {
+                ProxyType.TOR -> Proxy.Type.SOCKS
+                ProxyType.I2P -> Proxy.Type.HTTP
+                ProxyType.NONE -> Proxy.Type.DIRECT
+            }
+            OkHttpClient.Builder()
+                .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
+                .build()
+        } else {
+            OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
+                .build()
+        }
     }
 
     /**
-     * Detects the audio format from a stream URL.
-     * Since recording writes raw stream bytes, we must save with the correct format
-     * to avoid file corruption (e.g., saving OGG stream as MP3).
-     *
-     * @return Pair of (file extension, MIME type)
+     * Detect audio format from stream URL for proper file extension.
      */
-    private fun detectStreamFormat(streamUrl: String?): Pair<String, String> {
-        if (streamUrl == null) {
-            return Pair("mp3", "audio/mpeg") // Default to MP3 as most universally compatible
-        }
-
+    private fun detectStreamFormat(streamUrl: String): String {
         val urlLower = streamUrl.lowercase()
-
-        // Check URL path for format hints - order matters, check specific patterns first
         return when {
-            // OGG/Vorbis detection - check this before mp3 to avoid false positives on URLs like "stream.ogg?format=mp3"
-            urlLower.endsWith(".ogg") || urlLower.contains("/ogg/") || urlLower.contains("type=ogg") ||
-            urlLower.contains("vorbis") || urlLower.contains("/vorbis") || urlLower.contains("codec=vorbis") ->
-                Pair("ogg", "audio/ogg")
-            // Opus detection
-            urlLower.endsWith(".opus") || urlLower.contains("/opus/") || urlLower.contains("type=opus") ||
-            urlLower.contains("codec=opus") ->
-                Pair("opus", "audio/opus")
-            // AAC detection - check before mp3 as some URLs might have both hints
-            urlLower.endsWith(".aac") || urlLower.contains("/aac/") || urlLower.contains("type=aac") ||
-            urlLower.contains("codec=aac") || urlLower.contains("/;stream.nsv") ->
-                Pair("aac", "audio/aac")
-            // M4A detection
-            urlLower.endsWith(".m4a") || urlLower.contains("/m4a/") ->
-                Pair("m4a", "audio/mp4")
-            // FLAC detection
-            urlLower.endsWith(".flac") || urlLower.contains("/flac/") || urlLower.contains("type=flac") ->
-                Pair("flac", "audio/flac")
-            // WAV detection
-            urlLower.endsWith(".wav") || urlLower.contains("/wav/") ->
-                Pair("wav", "audio/wav")
-            // MP3 detection - most common streaming format
-            urlLower.endsWith(".mp3") || urlLower.contains("/mp3") || urlLower.contains("type=mp3") ||
-            urlLower.contains("codec=mp3") || urlLower.contains(";stream.mp3") ||
-            urlLower.contains("/stream") || urlLower.contains("/listen") ||
-            urlLower.contains(":8000") || urlLower.contains(":8080") ->
-                Pair("mp3", "audio/mpeg")
-            // Default to MP3 for unknown formats as it's the most common and universally compatible
-            // Most players can auto-detect the actual format from the file header even if extension differs
-            else -> Pair("mp3", "audio/mpeg")
+            urlLower.contains(".ogg") || urlLower.contains("/ogg") || urlLower.contains("vorbis") -> "ogg"
+            urlLower.contains(".opus") || urlLower.contains("/opus") -> "opus"
+            urlLower.contains(".aac") || urlLower.contains("/aac") -> "aac"
+            urlLower.contains(".flac") || urlLower.contains("/flac") -> "flac"
+            urlLower.contains(".m4a") -> "m4a"
+            else -> "mp3" // Default to mp3 as most common
         }
     }
 
+    /**
+     * Stop recording and close the separate network connection.
+     */
     private fun stopRecording() {
         if (!isRecording) return
 
-        try {
-            // Signal the writer thread to stop accepting new data
-            isRecordingActive.set(false)
+        android.util.Log.d("RadioService", "Stopping recording...")
 
-            // Wait for writer thread to finish draining the queue and flush
-            writerThread?.let { thread ->
-                try {
-                    thread.join(2000) // Wait up to 2 seconds for queue to drain
-                    if (thread.isAlive) {
-                        android.util.Log.w("RadioService", "Writer thread still alive after timeout, interrupting")
-                        thread.interrupt()
-                    }
-                } catch (e: InterruptedException) {
-                    android.util.Log.w("RadioService", "Interrupted while waiting for writer thread")
+        // Signal the recording thread to stop
+        isRecordingActive.set(false)
+
+        // Cancel the network call (this will cause the read to throw and exit)
+        recordingCall?.cancel()
+
+        // Wait briefly for the thread to finish
+        recordingThread?.let { thread ->
+            try {
+                thread.join(1000) // Wait up to 1 second
+                if (thread.isAlive) {
+                    thread.interrupt()
                 }
+            } catch (e: InterruptedException) {
+                android.util.Log.w("RadioService", "Interrupted while stopping recording")
             }
-            writerThread = null
-
-            // Now close the output stream
-            recordingOutputStreamHolder.get()?.close()
-            recordingOutputStreamHolder.set(null)
-
-            // Clear the write queue
-            recordingWriteQueue.clear()
-
-            // Finalize MediaStore entry for Android 10+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && recordingUri != null) {
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.Audio.Media.IS_PENDING, 0)
-                }
-                contentResolver.update(recordingUri!!, contentValues, null, null)
-                android.util.Log.d("RadioService", "Recording finalized: $recordingUri")
-            }
-
-            recordingUri = null
-            recordingFile = null
-            isRecording = false
-            android.util.Log.d("RadioService", "Recording stopped (no reconnect)")
-
-            // Update notification without restarting player
-            if (player?.isPlaying == true) {
-                startForeground(NOTIFICATION_ID, createNotification("Playing"))
-            }
-        } catch (e: Exception) {
-            android.util.Log.e("RadioService", "Failed to stop recording", e)
-            cleanupRecording()
         }
+
+        cleanupRecording()
+
+        // Update notification
+        if (player?.isPlaying == true) {
+            startForeground(NOTIFICATION_ID, createNotification("Playing"))
+        }
+
+        android.util.Log.d("RadioService", "Recording stopped")
+    }
+
+    /**
+     * Clean up recording resources.
+     */
+    private fun cleanupRecording() {
+        try {
+            recordingOutputStream?.close()
+        } catch (e: Exception) {
+            android.util.Log.e("RadioService", "Error closing output stream", e)
+        }
+
+        recordingCall = null
+        recordingThread = null
+        recordingOutputStream = null
+        isRecording = false
+        isRecordingActive.set(false)
     }
 
     private fun updateNotificationWithRecording() {
@@ -655,18 +656,18 @@ class RadioService : Service() {
                 else -> Triple("", 0, ProxyType.NONE)
             }
 
+            // Simple, clean OkHttp client - let ExoPlayer handle buffering
             val okHttpClient = if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
-                // Use SOCKS5 for Tor, HTTP for I2P
                 val javaProxyType = when (effectiveProxyType) {
                     ProxyType.TOR -> Proxy.Type.SOCKS
                     ProxyType.I2P -> Proxy.Type.HTTP
                     ProxyType.NONE -> Proxy.Type.DIRECT
                 }
-                android.util.Log.d("RadioService", "Using ${effectiveProxyType.name} proxy: $effectiveProxyHost:$effectiveProxyPort (${javaProxyType.name})")
+                android.util.Log.d("RadioService", "Using ${effectiveProxyType.name} proxy: $effectiveProxyHost:$effectiveProxyPort")
                 OkHttpClient.Builder()
                     .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
-                    .connectTimeout(90, TimeUnit.SECONDS) // Longer timeout for Tor/I2P
-                    .readTimeout(90, TimeUnit.SECONDS)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
                     .build()
             } else {
                 OkHttpClient.Builder()
@@ -675,80 +676,33 @@ class RadioService : Service() {
                     .build()
             }
 
-            val baseDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
+            // Direct data source - no wrapper, no middleware
+            // This is the key simplification: let the stream go directly to ExoPlayer
+            val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("I2PRadio/1.0")
 
-            // Always wrap with recording data source using async write queue
-            // This allows recording to be toggled without recreating the player
-            // and prevents audio hitching by writing to disk on a background thread
-            val dataSourceFactory = RecordingDataSource.Factory(baseDataSourceFactory, recordingWriteQueue, isRecordingActive)
-
-            // Configure load control for smooth streaming with larger buffers
-            // This prevents audio buffer underrun by ensuring enough data is buffered
-            // before starting playback and after rebuffering events
+            // Simple load control - trust ExoPlayer's defaults with minor tuning
+            // Key insight: smaller buffers = less latency = fewer sync issues
             val loadControl = DefaultLoadControl.Builder()
                 .setBufferDurationsMs(
-                    30_000,  // Min buffer (30s) - reduced from 50s for faster start while still stable
-                    90_000,  // Max buffer (90s) - enough for network variability without excessive memory
-                    2_500,   // Buffer for playback to start (2.5s) - faster initial playback
-                    5_000    // Buffer for playback after rebuffer (5s) - quick recovery
+                    5_000,   // Min buffer (5s) - enough for network jitter
+                    15_000,  // Max buffer (15s) - don't over-buffer live streams
+                    1_000,   // Buffer for playback to start (1s) - fast start
+                    2_000    // Buffer for playback after rebuffer (2s) - quick recovery
                 )
-                .setBackBuffer(15_000, true) // Keep 15s back buffer
-                .setPrioritizeTimeOverSizeThresholds(true)
                 .build()
 
-            // Configure audio attributes for proper audio focus and routing
-            // This ensures audio is treated as music and routed correctly
+            // Simple audio attributes
             val audioAttributes = androidx.media3.common.AudioAttributes.Builder()
                 .setUsage(androidx.media3.common.C.USAGE_MEDIA)
                 .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
                 .build()
 
-            // Create a custom audio sink with a much larger buffer to prevent glitching
-            // The default AudioTrack buffer is often too small for streaming radio,
-            // causing glitches when there are minor delays in data delivery
-            val largeBufferProvider = object : DefaultAudioSink.AudioTrackBufferSizeProvider {
-                override fun getBufferSizeInBytes(
-                    minBufferSizeInBytes: Int,
-                    encoding: Int,
-                    outputMode: Int,
-                    pcmFrameSize: Int,
-                    sampleRate: Int,
-                    bitrate: Int,
-                    maxAudioTrackPlaybackSpeed: Double
-                ): Int {
-                    // Use at least 3 seconds of audio buffer, or 5x the minimum
-                    // This provides ample headroom for thread scheduling, GC pauses,
-                    // and any momentary delays in the audio pipeline
-                    val targetBufferMs = 3000
-                    val targetBufferBytes = (sampleRate * pcmFrameSize * targetBufferMs) / 1000
-                    return maxOf(minBufferSizeInBytes * 5, targetBufferBytes)
-                }
-            }
-
-            val audioSink = DefaultAudioSink.Builder(this)
-                .setAudioTrackBufferSizeProvider(largeBufferProvider)
-                .build()
-
-            // Create custom renderers factory with our audio sink
-            // This ensures audio rendering uses our larger buffer configuration
-            val renderersFactory = object : DefaultRenderersFactory(this) {
-                override fun buildAudioSink(
-                    context: Context,
-                    enableFloatOutput: Boolean,
-                    enableAudioTrackPlaybackParams: Boolean
-                ): AudioSink {
-                    return audioSink
-                }
-            }.apply {
-                // Use decoder extensions if available for better codec support
-                setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
-            }
-
-            player = ExoPlayer.Builder(this, renderersFactory)
+            // Use ExoPlayer's default renderers and audio sink - they're highly optimized
+            player = ExoPlayer.Builder(this)
                 .setLoadControl(loadControl)
-                .setAudioAttributes(audioAttributes, false) // Don't handle audio focus here, we do it manually
-                .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK) // Keep CPU/network awake during playback
+                .setAudioAttributes(audioAttributes, false)
+                .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(MediaItem.fromUri(streamUrl))
