@@ -94,7 +94,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
 
-    // Broadcast receiver for metadata and stream info updates
+    // Broadcast receiver for metadata, stream info, and playback state updates
     private val metadataReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -109,6 +109,15 @@ class NowPlayingFragment : Fragment() {
                     val bitrate = intent.getIntExtra(RadioService.EXTRA_BITRATE, 0)
                     val codec = intent.getStringExtra(RadioService.EXTRA_CODEC) ?: "Unknown"
                     updateStreamInfo(bitrate, codec)
+                }
+                RadioService.BROADCAST_PLAYBACK_STATE_CHANGED -> {
+                    val isBuffering = intent.getBooleanExtra(RadioService.EXTRA_IS_BUFFERING, false)
+                    val isPlaying = intent.getBooleanExtra(RadioService.EXTRA_IS_PLAYING, false)
+                    setBufferingState(isBuffering)
+                    // Sync playing state from service to ViewModel
+                    if (isPlaying != viewModel.isPlaying.value) {
+                        viewModel.setPlaying(isPlaying)
+                    }
                 }
             }
         }
@@ -171,10 +180,11 @@ class NowPlayingFragment : Fragment() {
         val serviceIntent = Intent(requireContext(), RadioService::class.java)
         requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-        // Register broadcast receiver for metadata updates
+        // Register broadcast receiver for metadata, stream info, and playback state updates
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_METADATA_CHANGED)
             addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
+            addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
         }
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
 

@@ -255,7 +255,7 @@
                 android:layout_marginStart="8dp"
                 android:text="00:00"
                 android:textSize="14sp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="monospace"
                 android:textColor="?attr/colorOnErrorContainer" />
 
         </LinearLayout>
