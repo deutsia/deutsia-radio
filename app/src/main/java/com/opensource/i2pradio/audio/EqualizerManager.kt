@@ -50,23 +50,23 @@ class EqualizerManager(private val context: Context) {
 
         return try {
             equalizer = Equalizer(0, audioSessionId).apply {
-                // Get equalizer properties
-                numberOfBands = this.numberOfBands
-                bandLevelRange = this.bandLevelRange
+                // Get equalizer properties - use this@EqualizerManager to reference outer class properties
+                this@EqualizerManager.numberOfBands = this.numberOfBands
+                this@EqualizerManager.bandLevelRange = this.bandLevelRange
 
                 // Get preset names
                 val presets = mutableListOf<String>()
                 for (i in 0 until this.numberOfPresets) {
                     presets.add(this.getPresetName(i.toShort()))
                 }
-                presetNames = presets
+                this@EqualizerManager.presetNames = presets
 
                 // Get center frequencies for each band
                 val frequencies = mutableListOf<Int>()
-                for (i in 0 until numberOfBands) {
+                for (i in 0 until this@EqualizerManager.numberOfBands) {
                     frequencies.add(this.getCenterFreq(i.toShort()) / 1000) // Convert mHz to Hz
                 }
-                centerFrequencies = frequencies
+                this@EqualizerManager.centerFrequencies = frequencies
 
                 // Enable equalizer if previously enabled
                 enabled = PreferencesHelper.isEqualizerEnabled(context)
