@@ -460,6 +460,16 @@ class NowPlayingFragment : Fragment() {
         playPauseButton.alpha = if (buffering) 0.5f else 1f
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Force refresh recording button colors when resuming (handles theme changes)
+        // This ensures colors update properly when switching themes, as the LiveData
+        // observer might not fire if the recording state hasn't changed
+        viewModel.recordingState.value?.let { state ->
+            updateRecordingUI(state)
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         recordingHandler.removeCallbacks(recordingUpdateRunnable)
