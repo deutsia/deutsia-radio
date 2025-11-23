@@ -703,7 +703,7 @@ class RadioService : Service() {
                 .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
                 .build()
 
-            // Create a custom audio sink with a larger buffer to prevent glitching
+            // Create a custom audio sink with a much larger buffer to prevent glitching
             // The default AudioTrack buffer is often too small for streaming radio,
             // causing glitches when there are minor delays in data delivery
             val largeBufferProvider = object : DefaultAudioSink.AudioTrackBufferSizeProvider {
@@ -716,11 +716,12 @@ class RadioService : Service() {
                     bitrate: Int,
                     maxAudioTrackPlaybackSpeed: Double
                 ): Int {
-                    // Use at least 1.5 seconds of audio buffer, or 3x the minimum
-                    // This prevents glitches from minor thread scheduling delays
-                    val targetBufferMs = 1500
+                    // Use at least 3 seconds of audio buffer, or 5x the minimum
+                    // This provides ample headroom for thread scheduling, GC pauses,
+                    // and any momentary delays in the audio pipeline
+                    val targetBufferMs = 3000
                     val targetBufferBytes = (sampleRate * pcmFrameSize * targetBufferMs) / 1000
-                    return maxOf(minBufferSizeInBytes * 3, targetBufferBytes)
+                    return maxOf(minBufferSizeInBytes * 5, targetBufferBytes)
                 }
             }
 
