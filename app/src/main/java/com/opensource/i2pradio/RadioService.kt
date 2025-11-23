@@ -70,9 +70,12 @@ class RadioService : Service() {
     private var sessionDeactivateRunnable: Runnable? = null
     private val SESSION_DEACTIVATE_DELAY = 5 * 60 * 1000L // 5 minutes
 
-    // Recording - using AtomicReference for thread-safe dynamic toggle without player restart
+    // Recording - using async write queue to prevent audio hitching
     private var isRecording = false
     private val recordingOutputStreamHolder = AtomicReference<OutputStream?>(null)
+    private val recordingWriteQueue = java.util.concurrent.ArrayBlockingQueue<ByteArray>(1000)
+    private val isRecordingActive = java.util.concurrent.atomic.AtomicBoolean(false)
+    private var writerThread: Thread? = null
     private var recordingFile: File? = null
     private var recordingUri: android.net.Uri? = null  // For Android 10+ MediaStore finalization
     private var currentStationName: String = "Unknown Station"
@@ -327,8 +330,16 @@ class RadioService : Service() {
                 uri?.let {
                     recordingUri = it
                     val outputStream = contentResolver.openOutputStream(it)
-                    // Set the output stream in the atomic reference - recording starts immediately
+                    // Set the output stream and start the writer thread
                     recordingOutputStreamHolder.set(outputStream)
+                    isRecordingActive.set(true)
+                    // Start the async writer thread
+                    writerThread = RecordingDataSource.startWriterThread(
+                        recordingWriteQueue,
+                        recordingOutputStreamHolder,
+                        isRecordingActive
+                    )
+                    writerThread?.start()
                     isRecording = true
                     android.util.Log.d("RadioService", "Recording started (no reconnect): $fileName")
                     updateNotificationWithRecording()
@@ -340,8 +351,16 @@ class RadioService : Service() {
 
                 recordingFile = File(musicDir, fileName)
                 val outputStream = FileOutputStream(recordingFile)
-                // Set the output stream in the atomic reference - recording starts immediately
+                // Set the output stream and start the writer thread
                 recordingOutputStreamHolder.set(outputStream)
+                isRecordingActive.set(true)
+                // Start the async writer thread
+                writerThread = RecordingDataSource.startWriterThread(
+                    recordingWriteQueue,
+                    recordingOutputStreamHolder,
+                    isRecordingActive
+                )
+                writerThread?.start()
                 isRecording = true
                 android.util.Log.d("RadioService", "Recording started (no reconnect): $fileName")
                 updateNotificationWithRecording()
@@ -353,12 +372,18 @@ class RadioService : Service() {
     }
 
     private fun cleanupRecording() {
+        // Stop the writer thread
+        isRecordingActive.set(false)
+        writerThread?.interrupt()
+        writerThread = null
+
         try {
             recordingOutputStreamHolder.get()?.close()
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Error closing recording stream", e)
         }
         recordingOutputStreamHolder.set(null)
+        recordingWriteQueue.clear()
         recordingFile = null
         recordingUri = null
         isRecording = false
@@ -417,9 +442,29 @@ class RadioService : Service() {
         if (!isRecording) return
 
         try {
-            // Close the output stream and clear the reference (no player restart needed)
+            // Signal the writer thread to stop accepting new data
+            isRecordingActive.set(false)
+
+            // Wait for writer thread to finish draining the queue and flush
+            writerThread?.let { thread ->
+                try {
+                    thread.join(2000) // Wait up to 2 seconds for queue to drain
+                    if (thread.isAlive) {
+                        android.util.Log.w("RadioService", "Writer thread still alive after timeout, interrupting")
+                        thread.interrupt()
+                    }
+                } catch (e: InterruptedException) {
+                    android.util.Log.w("RadioService", "Interrupted while waiting for writer thread")
+                }
+            }
+            writerThread = null
+
+            // Now close the output stream
             recordingOutputStreamHolder.get()?.close()
             recordingOutputStreamHolder.set(null)
+
+            // Clear the write queue
+            recordingWriteQueue.clear()
 
             // Finalize MediaStore entry for Android 10+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && recordingUri != null) {
@@ -518,9 +563,10 @@ class RadioService : Service() {
             val baseDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("I2PRadio/1.0")
 
-            // Always wrap with recording data source using atomic reference holder
+            // Always wrap with recording data source using async write queue
             // This allows recording to be toggled without recreating the player
-            val dataSourceFactory = RecordingDataSource.Factory(baseDataSourceFactory, recordingOutputStreamHolder)
+            // and prevents audio hitching by writing to disk on a background thread
+            val dataSourceFactory = RecordingDataSource.Factory(baseDataSourceFactory, recordingWriteQueue, isRecordingActive)
 
             player = ExoPlayer.Builder(this).build().apply {
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)

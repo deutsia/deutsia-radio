@@ -121,7 +121,7 @@
         app:layout_constraintTop_toBottomOf="@id/nowPlayingInfoContainer"
         app:layout_constraintWidth_max="320dp">
 
-        <!-- Record Button (Left) -->
+        <!-- Record Button (Left) - Default blue, changes to red when recording -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/recordButton"
             android:layout_width="wrap_content"
@@ -132,8 +132,8 @@
             app:fabSize="auto"
             app:fabCustomSize="64dp"
             app:maxImageSize="28dp"
-            app:tint="?attr/colorError"
-            app:backgroundTint="?attr/colorSurfaceContainerHighest"
+            app:tint="?attr/colorOnPrimaryContainer"
+            app:backgroundTint="?attr/colorPrimaryContainer"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
             app:elevation="0dp"
             app:layout_constraintBottom_toBottomOf="@id/playPauseButton"

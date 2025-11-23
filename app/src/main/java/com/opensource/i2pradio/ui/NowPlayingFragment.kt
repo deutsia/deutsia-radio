@@ -350,16 +350,16 @@ class NowPlayingFragment : Fragment() {
             recordingHandler.removeCallbacks(recordingUpdateRunnable)
             recordingHandler.post(recordingUpdateRunnable)
         } else {
-            // Restore record icon
+            // Restore record icon with default blue/primary color
             recordButton.setImageResource(R.drawable.ic_fiber_manual_record)
             // Get colors from the current theme context to reflect theme changes properly
             // Using requireContext() ensures we get colors from the recreated activity's theme
             val ctx = requireContext()
             recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorError, android.graphics.Color.RED)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnPrimaryContainer, android.graphics.Color.WHITE)
             )
             recordButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorSurfaceContainerHighest, android.graphics.Color.GRAY)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorPrimaryContainer, android.graphics.Color.BLUE)
             )
 
             // Stop blinking animation
