@@ -129,14 +129,17 @@ class EqualizerBottomSheet(
         val maxLevel = levelRange[1].toInt()
         val range = maxLevel - minLevel
 
-        for (band in 0 until equalizerManager.numberOfBands) {
+        // Use fixed 5 bands for consistent UI
+        val bandCount = equalizerManager.getFixedBandCount()
+
+        for (band in 0 until bandCount) {
             val bandView = inflater.inflate(R.layout.item_equalizer_band, bandSlidersContainer, false)
 
             val slider = bandView.findViewById<SeekBar>(R.id.bandSlider)
             val freqLabel = bandView.findViewById<TextView>(R.id.bandFrequency)
 
-            // Set frequency label
-            val freq = equalizerManager.centerFrequencies.getOrNull(band) ?: 0
+            // Set frequency label using fixed frequencies
+            val freq = equalizerManager.getFixedBandFrequency(band)
             freqLabel.text = formatFrequencyLabel(freq)
 
             // Configure slider
@@ -229,7 +232,8 @@ class EqualizerBottomSheet(
         val levelRange = equalizerManager.bandLevelRange
         val minLevel = levelRange[0].toInt()
 
-        for (band in 0 until equalizerManager.numberOfBands) {
+        // Use fixed 5 bands
+        for (band in 0 until equalizerManager.getFixedBandCount()) {
             val currentLevel = equalizerManager.getBandLevel(band.toShort()).toInt()
             bandSliders.getOrNull(band)?.progress = currentLevel - minLevel
         }
