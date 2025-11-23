@@ -41,9 +41,20 @@ import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
+import okhttp3.Call
+import okhttp3.Request
+import okhttp3.Response
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 class RadioService : Service() {
     private var player: ExoPlayer? = null
@@ -103,10 +114,14 @@ class RadioService : Service() {
     private var sessionDeactivateRunnable: Runnable? = null
     private val SESSION_DEACTIVATE_DELAY = 5 * 60 * 1000L // 5 minutes
 
-    // Recording - temporarily disabled to simplify audio pipeline
-    // TODO: Implement recording using separate network request instead of data source wrapper
+    // Recording - uses separate network request to avoid affecting audio pipeline
     private var isRecording = false
     private var currentStationName: String = "Unknown Station"
+    private var recordingCall: Call? = null
+    private var recordingThread: Thread? = null
+    private var recordingOutputStream: OutputStream? = null
+    private val isRecordingActive = AtomicBoolean(false)
+    private var recordingFile: File? = null
 
     // Sleep timer
     private var sleepTimerRunnable: Runnable? = null
@@ -387,16 +402,198 @@ class RadioService : Service() {
         } else 0L
     }
 
+    /**
+     * Start recording using a SEPARATE network request.
+     * This is the key improvement: the recording stream is completely independent
+     * from the playback stream, so it cannot cause audio glitches.
+     */
     private fun startRecording(stationName: String) {
-        // Recording temporarily disabled to fix audio glitches
-        // The previous implementation intercepted all audio data which caused pipeline issues
-        android.util.Log.w("RadioService", "Recording is temporarily disabled to improve audio quality")
+        if (isRecording) return
+        val streamUrl = currentStreamUrl ?: return
+
         currentStationName = stationName
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val format = detectStreamFormat(streamUrl)
+        val fileName = "${stationName.replace(Regex("[^a-zA-Z0-9]"), "_")}_$timestamp.$format"
+
+        try {
+            // Create recording file in app's external files directory (no permission needed)
+            val musicDir = getExternalFilesDir("Recordings")
+            if (musicDir != null && !musicDir.exists()) musicDir.mkdirs()
+            recordingFile = File(musicDir, fileName)
+
+            // Build OkHttp client with same proxy settings as playback
+            val okHttpClient = buildRecordingHttpClient()
+
+            // Create request for the stream
+            val request = Request.Builder()
+                .url(streamUrl)
+                .header("User-Agent", "I2PRadio/1.0")
+                .header("Icy-MetaData", "0") // Don't need metadata for recording
+                .build()
+
+            recordingCall = okHttpClient.newCall(request)
+            isRecordingActive.set(true)
+            isRecording = true
+
+            // Start recording on a background thread
+            recordingThread = Thread({
+                var response: Response? = null
+                try {
+                    android.util.Log.d("RadioService", "Recording started: $fileName")
+                    response = recordingCall?.execute()
+
+                    if (response?.isSuccessful == true) {
+                        val inputStream = response.body?.byteStream()
+                        recordingOutputStream = BufferedOutputStream(
+                            FileOutputStream(recordingFile),
+                            64 * 1024 // 64KB buffer for efficient writes
+                        )
+
+                        val buffer = ByteArray(8192)
+                        var bytesRead: Int
+
+                        while (isRecordingActive.get() &&
+                               inputStream?.read(buffer).also { bytesRead = it ?: -1 } != -1) {
+                            if (bytesRead > 0) {
+                                recordingOutputStream?.write(buffer, 0, bytesRead)
+                            }
+                        }
+
+                        recordingOutputStream?.flush()
+                        android.util.Log.d("RadioService", "Recording completed: $fileName")
+                    } else {
+                        android.util.Log.e("RadioService", "Recording request failed: ${response?.code}")
+                    }
+                } catch (e: Exception) {
+                    if (isRecordingActive.get()) {
+                        android.util.Log.e("RadioService", "Recording error", e)
+                    } else {
+                        android.util.Log.d("RadioService", "Recording stopped by user")
+                    }
+                } finally {
+                    try {
+                        recordingOutputStream?.close()
+                        response?.close()
+                    } catch (e: Exception) {
+                        android.util.Log.e("RadioService", "Error closing recording streams", e)
+                    }
+                }
+            }, "RecordingThread").apply {
+                priority = Thread.MIN_PRIORITY // Low priority to not affect audio
+            }
+            recordingThread?.start()
+
+            updateNotificationWithRecording()
+            android.util.Log.d("RadioService", "Recording initiated for: $stationName")
+
+        } catch (e: Exception) {
+            android.util.Log.e("RadioService", "Failed to start recording", e)
+            cleanupRecording()
+        }
     }
 
+    /**
+     * Build an OkHttp client for recording with the same proxy settings as playback.
+     */
+    private fun buildRecordingHttpClient(): OkHttpClient {
+        val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
+            currentProxyType == ProxyType.TOR &&
+            PreferencesHelper.isEmbeddedTorEnabled(this) &&
+            TorManager.isConnected() -> {
+                Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+            }
+            currentProxyHost?.isNotEmpty() == true && currentProxyType != ProxyType.NONE -> {
+                Triple(currentProxyHost!!, currentProxyPort, currentProxyType)
+            }
+            else -> Triple("", 0, ProxyType.NONE)
+        }
+
+        return if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
+            val javaProxyType = when (effectiveProxyType) {
+                ProxyType.TOR -> Proxy.Type.SOCKS
+                ProxyType.I2P -> Proxy.Type.HTTP
+                ProxyType.NONE -> Proxy.Type.DIRECT
+            }
+            OkHttpClient.Builder()
+                .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
+                .build()
+        } else {
+            OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
+                .build()
+        }
+    }
+
+    /**
+     * Detect audio format from stream URL for proper file extension.
+     */
+    private fun detectStreamFormat(streamUrl: String): String {
+        val urlLower = streamUrl.lowercase()
+        return when {
+            urlLower.contains(".ogg") || urlLower.contains("/ogg") || urlLower.contains("vorbis") -> "ogg"
+            urlLower.contains(".opus") || urlLower.contains("/opus") -> "opus"
+            urlLower.contains(".aac") || urlLower.contains("/aac") -> "aac"
+            urlLower.contains(".flac") || urlLower.contains("/flac") -> "flac"
+            urlLower.contains(".m4a") -> "m4a"
+            else -> "mp3" // Default to mp3 as most common
+        }
+    }
+
+    /**
+     * Stop recording and close the separate network connection.
+     */
     private fun stopRecording() {
-        // Recording temporarily disabled
+        if (!isRecording) return
+
+        android.util.Log.d("RadioService", "Stopping recording...")
+
+        // Signal the recording thread to stop
+        isRecordingActive.set(false)
+
+        // Cancel the network call (this will cause the read to throw and exit)
+        recordingCall?.cancel()
+
+        // Wait briefly for the thread to finish
+        recordingThread?.let { thread ->
+            try {
+                thread.join(1000) // Wait up to 1 second
+                if (thread.isAlive) {
+                    thread.interrupt()
+                }
+            } catch (e: InterruptedException) {
+                android.util.Log.w("RadioService", "Interrupted while stopping recording")
+            }
+        }
+
+        cleanupRecording()
+
+        // Update notification
+        if (player?.isPlaying == true) {
+            startForeground(NOTIFICATION_ID, createNotification("Playing"))
+        }
+
+        android.util.Log.d("RadioService", "Recording stopped")
+    }
+
+    /**
+     * Clean up recording resources.
+     */
+    private fun cleanupRecording() {
+        try {
+            recordingOutputStream?.close()
+        } catch (e: Exception) {
+            android.util.Log.e("RadioService", "Error closing output stream", e)
+        }
+
+        recordingCall = null
+        recordingThread = null
+        recordingOutputStream = null
         isRecording = false
+        isRecordingActive.set(false)
     }
 
     private fun updateNotificationWithRecording() {
