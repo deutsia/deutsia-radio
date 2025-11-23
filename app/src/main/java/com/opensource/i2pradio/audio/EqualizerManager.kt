@@ -1,21 +1,28 @@
 package com.opensource.i2pradio.audio
 
 import android.content.Context
+import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
+import android.media.audiofx.Virtualizer
 import android.util.Log
 import com.opensource.i2pradio.ui.PreferencesHelper
 
 /**
  * Manages the built-in Android Equalizer attached to the audio session.
  * This provides an in-app equalizer with custom UI instead of relying on external apps.
+ * Also manages BassBoost and Virtualizer (Surround Sound) effects.
  */
 class EqualizerManager(private val context: Context) {
 
     companion object {
         private const val TAG = "EqualizerManager"
+        const val BASS_BOOST_MAX = 1000.toShort()
+        const val VIRTUALIZER_MAX = 1000.toShort()
     }
 
     private var equalizer: Equalizer? = null
+    private var bassBoost: BassBoost? = null
+    private var virtualizer: Virtualizer? = null
     private var currentAudioSessionId: Int = 0
 
     // Equalizer properties (populated after initialization)
@@ -26,6 +33,12 @@ class EqualizerManager(private val context: Context) {
     var presetNames: List<String> = emptyList()
         private set
     var centerFrequencies: List<Int> = emptyList()
+        private set
+
+    // Bass Boost and Virtualizer availability
+    var isBassBoostSupported: Boolean = false
+        private set
+    var isVirtualizerSupported: Boolean = false
         private set
 
     /**
@@ -75,6 +88,36 @@ class EqualizerManager(private val context: Context) {
                 restoreBandLevels()
             }
 
+            // Initialize Bass Boost
+            try {
+                bassBoost = BassBoost(0, audioSessionId).apply {
+                    this@EqualizerManager.isBassBoostSupported = strengthSupported
+                    if (strengthSupported) {
+                        enabled = PreferencesHelper.isEqualizerEnabled(context)
+                        setStrength(PreferencesHelper.getBassBoostStrength(context))
+                    }
+                }
+                Log.d(TAG, "BassBoost initialized, supported: $isBassBoostSupported")
+            } catch (e: Exception) {
+                Log.w(TAG, "BassBoost not available", e)
+                isBassBoostSupported = false
+            }
+
+            // Initialize Virtualizer (Surround Sound)
+            try {
+                virtualizer = Virtualizer(0, audioSessionId).apply {
+                    this@EqualizerManager.isVirtualizerSupported = strengthSupported
+                    if (strengthSupported) {
+                        enabled = PreferencesHelper.isEqualizerEnabled(context)
+                        setStrength(PreferencesHelper.getVirtualizerStrength(context))
+                    }
+                }
+                Log.d(TAG, "Virtualizer initialized, supported: $isVirtualizerSupported")
+            } catch (e: Exception) {
+                Log.w(TAG, "Virtualizer not available", e)
+                isVirtualizerSupported = false
+            }
+
             currentAudioSessionId = audioSessionId
             Log.d(TAG, "Equalizer initialized: $numberOfBands bands, session $audioSessionId")
             true
@@ -96,13 +139,20 @@ class EqualizerManager(private val context: Context) {
     fun isEnabled(): Boolean = equalizer?.enabled ?: false
 
     /**
-     * Enable or disable the equalizer
+     * Enable or disable the equalizer and audio effects
      */
     fun setEnabled(enabled: Boolean) {
         equalizer?.let { eq ->
             eq.enabled = enabled
             PreferencesHelper.setEqualizerEnabled(context, enabled)
             Log.d(TAG, "Equalizer enabled: $enabled")
+        }
+        // Also enable/disable bass boost and virtualizer
+        if (isBassBoostSupported) {
+            bassBoost?.enabled = enabled
+        }
+        if (isVirtualizerSupported) {
+            virtualizer?.enabled = enabled
         }
     }
 
@@ -229,6 +279,64 @@ class EqualizerManager(private val context: Context) {
         return millibels / 100f
     }
 
+    // ========== Bass Boost Methods ==========
+
+    /**
+     * Get current bass boost strength (0-1000)
+     */
+    fun getBassBoostStrength(): Short {
+        return try {
+            bassBoost?.roundedStrength ?: 0
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    /**
+     * Set bass boost strength (0-1000)
+     */
+    fun setBassBoostStrength(strength: Short) {
+        if (!isBassBoostSupported) return
+        bassBoost?.let { bb ->
+            try {
+                bb.setStrength(strength)
+                PreferencesHelper.setBassBoostStrength(context, strength)
+                Log.d(TAG, "Bass boost strength set to: $strength")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to set bass boost strength", e)
+            }
+        }
+    }
+
+    // ========== Virtualizer (Surround Sound) Methods ==========
+
+    /**
+     * Get current virtualizer strength (0-1000)
+     */
+    fun getVirtualizerStrength(): Short {
+        return try {
+            virtualizer?.roundedStrength ?: 0
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    /**
+     * Set virtualizer strength (0-1000)
+     */
+    fun setVirtualizerStrength(strength: Short) {
+        if (!isVirtualizerSupported) return
+        virtualizer?.let { virt ->
+            try {
+                virt.setStrength(strength)
+                PreferencesHelper.setVirtualizerStrength(context, strength)
+                Log.d(TAG, "Virtualizer strength set to: $strength")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to set virtualizer strength", e)
+            }
+        }
+    }
+
     /**
      * Release the equalizer resources
      */
@@ -238,8 +346,20 @@ class EqualizerManager(private val context: Context) {
         } catch (e: Exception) {
             Log.e(TAG, "Error releasing equalizer", e)
         }
+        try {
+            bassBoost?.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing bass boost", e)
+        }
+        try {
+            virtualizer?.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing virtualizer", e)
+        }
         equalizer = null
+        bassBoost = null
+        virtualizer = null
         currentAudioSessionId = 0
-        Log.d(TAG, "Equalizer released")
+        Log.d(TAG, "Equalizer and effects released")
     }
 }

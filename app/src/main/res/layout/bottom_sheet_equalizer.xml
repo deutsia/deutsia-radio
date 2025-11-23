@@ -51,64 +51,141 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Band sliders container -->
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:id="@+id/bandSlidersContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:minHeight="200dp"
-            android:paddingHorizontal="8dp" />
-
-    </HorizontalScrollView>
-
-    <!-- dB labels -->
+    <!-- EQ Bands Section with dB scale on left -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingTop="4dp">
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/minDbLabel"
+        <!-- dB Scale on the left -->
+        <LinearLayout
+            android:id="@+id/dbScaleContainer"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            tools:text="-15 dB" />
+            android:layout_height="180dp"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingEnd="8dp">
 
-        <View
+            <TextView
+                android:id="@+id/maxDbLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="+10 dB" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 dB"
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/minDbLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="-10 dB" />
+
+        </LinearLayout>
+
+        <!-- Band sliders container -->
+        <HorizontalScrollView
             android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="none"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/bandSlidersContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center" />
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+    <!-- Bass Booster Section -->
+    <LinearLayout
+        android:id="@+id/bassBoostContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="24dp"
+        android:paddingVertical="8dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 dB"
-            android:textSize="11sp"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:text="@string/equalizer_bass_boost"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
+            android:minWidth="140dp" />
 
-        <View
+        <com.google.android.material.slider.Slider
+            android:id="@+id/bassBoostSlider"
             android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:valueFrom="0"
+            android:valueTo="1000"
+            android:stepSize="10"
+            app:trackColorActive="?attr/colorPrimary"
+            app:trackColorInactive="?attr/colorSurfaceVariant"
+            app:thumbColor="?attr/colorPrimary"
+            app:labelBehavior="gone" />
+
+    </LinearLayout>
+
+    <!-- Surround Sound Section -->
+    <LinearLayout
+        android:id="@+id/surroundSoundContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:paddingVertical="8dp">
 
         <TextView
-            android:id="@+id/maxDbLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            tools:text="+15 dB" />
+            android:text="@string/equalizer_surround_sound"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
+            android:minWidth="140dp" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/surroundSoundSlider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:valueFrom="0"
+            android:valueTo="1000"
+            android:stepSize="10"
+            app:trackColorActive="?attr/colorPrimary"
+            app:trackColorInactive="?attr/colorSurfaceVariant"
+            app:thumbColor="?attr/colorPrimary"
+            app:labelBehavior="gone" />
 
     </LinearLayout>
 

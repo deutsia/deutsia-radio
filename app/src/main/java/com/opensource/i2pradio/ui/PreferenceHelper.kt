@@ -15,6 +15,8 @@ object PreferencesHelper {
     private const val KEY_EQUALIZER_ENABLED = "equalizer_enabled"
     private const val KEY_EQUALIZER_PRESET = "equalizer_preset"
     private const val KEY_EQUALIZER_BANDS = "equalizer_bands"
+    private const val KEY_BASS_BOOST_STRENGTH = "bass_boost_strength"
+    private const val KEY_VIRTUALIZER_STRENGTH = "virtualizer_strength"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -139,5 +141,31 @@ object PreferencesHelper {
     fun getEqualizerBands(context: Context): String? {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_EQUALIZER_BANDS, null)
+    }
+
+    // Bass Boost preferences
+    fun setBassBoostStrength(context: Context, strength: Short) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_BASS_BOOST_STRENGTH, strength.toInt())
+            .apply()
+    }
+
+    fun getBassBoostStrength(context: Context): Short {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_BASS_BOOST_STRENGTH, 0).toShort()
+    }
+
+    // Virtualizer (Surround Sound) preferences
+    fun setVirtualizerStrength(context: Context, strength: Short) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_VIRTUALIZER_STRENGTH, strength.toInt())
+            .apply()
+    }
+
+    fun getVirtualizerStrength(context: Context): Short {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_VIRTUALIZER_STRENGTH, 0).toShort()
     }
 }
