@@ -680,19 +680,30 @@ class RadioService : Service() {
             val dataSourceFactory = RecordingDataSource.Factory(baseDataSourceFactory, recordingWriteQueue, isRecordingActive)
 
             // Configure load control for smooth streaming with larger buffers
-            // This prevents audio hitching by ensuring enough data is buffered
+            // This prevents audio buffer underrun by ensuring enough data is buffered
+            // before starting playback and after rebuffering events
             val loadControl = DefaultLoadControl.Builder()
                 .setBufferDurationsMs(
-                    30_000,  // Min buffer before playback starts (30s)
-                    60_000,  // Max buffer size (60s)
-                    2_500,   // Buffer for playback to start (2.5s)
-                    5_000    // Buffer for playback after rebuffer (5s)
+                    50_000,  // Min buffer before playback starts (50s) - prevents underrun during network hiccups
+                    120_000, // Max buffer size (120s) - large buffer for network streams
+                    5_000,   // Buffer for playback to start (5s) - ensures enough data before audio starts
+                    10_000   // Buffer for playback after rebuffer (10s) - prevents rapid rebuffer cycles
                 )
+                .setBackBuffer(30_000, true) // Keep 30s of back buffer, trim when low on memory
                 .setPrioritizeTimeOverSizeThresholds(true)
+                .build()
+
+            // Configure audio attributes for proper audio focus and routing
+            // This ensures audio is treated as music and routed correctly
+            val audioAttributes = androidx.media3.common.AudioAttributes.Builder()
+                .setUsage(androidx.media3.common.C.USAGE_MEDIA)
+                .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
                 .build()
 
             player = ExoPlayer.Builder(this)
                 .setLoadControl(loadControl)
+                .setAudioAttributes(audioAttributes, false) // Don't handle audio focus here, we do it manually
+                .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK) // Keep CPU/network awake during playback
                 .build().apply {
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(MediaItem.fromUri(streamUrl))
