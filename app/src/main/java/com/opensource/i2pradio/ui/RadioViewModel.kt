@@ -24,6 +24,9 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _isPlaying = MutableLiveData<Boolean>(false)
     val isPlaying: LiveData<Boolean> = _isPlaying
 
+    private val _isBuffering = MutableLiveData<Boolean>(false)
+    val isBuffering: LiveData<Boolean> = _isBuffering
+
     private val _recordingState = MutableLiveData(RecordingState())
     val recordingState: LiveData<RecordingState> = _recordingState
 
@@ -37,6 +40,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setPlaying(playing: Boolean) {
         _isPlaying.value = playing
+    }
+
+    fun setBuffering(buffering: Boolean) {
+        _isBuffering.value = buffering
     }
 
     fun getCurrentStation(): RadioStation? = _currentStation.value

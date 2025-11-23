@@ -1,14 +1,17 @@
 package com.opensource.i2pradio
 
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
 import android.widget.FrameLayout
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -52,6 +55,20 @@ class MainActivity : AppCompatActivity() {
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
         runOnUiThread {
             torStatusView.updateState(state)
+        }
+    }
+
+    // Broadcast receiver for playback state changes
+    private val playbackStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                RadioService.BROADCAST_PLAYBACK_STATE_CHANGED -> {
+                    val isBuffering = intent.getBooleanExtra(RadioService.EXTRA_IS_BUFFERING, false)
+                    val isPlaying = intent.getBooleanExtra(RadioService.EXTRA_IS_PLAYING, false)
+                    viewModel.setBuffering(isBuffering)
+                    viewModel.setPlaying(isPlaying)
+                }
+            }
         }
     }
 
@@ -112,6 +129,10 @@ class MainActivity : AppCompatActivity() {
         if (PreferencesHelper.isEmbeddedTorEnabled(this)) {
             TorManager.initialize(this)
         }
+
+        // Register broadcast receiver for playback state changes
+        val filter = IntentFilter(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
+        LocalBroadcastManager.getInstance(this).registerReceiver(playbackStateReceiver, filter)
     }
 
     private fun setupTorStatusView() {
@@ -169,6 +190,11 @@ class MainActivity : AppCompatActivity() {
         // Observe playing state
         viewModel.isPlaying.observe(this) { isPlaying ->
             miniPlayerView.setPlayingState(isPlaying)
+        }
+
+        // Observe buffering state to show/hide loading indicator
+        viewModel.isBuffering.observe(this) { isBuffering ->
+            miniPlayerView.setBufferingState(isBuffering)
         }
 
         // Click mini-player to go to Now Playing tab
@@ -252,6 +278,9 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         // Remove Tor state listener
         TorManager.removeStateListener(torStateListener)
+
+        // Unregister playback state receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(playbackStateReceiver)
 
         if (isServiceBound) {
             unbindService(serviceConnection)

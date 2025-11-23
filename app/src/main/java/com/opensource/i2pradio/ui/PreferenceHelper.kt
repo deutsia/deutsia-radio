@@ -10,7 +10,6 @@ object PreferencesHelper {
     private const val KEY_MATERIAL_YOU_ENABLED = "material_you_enabled"
     private const val KEY_EMBEDDED_TOR_ENABLED = "embedded_tor_enabled"
     private const val KEY_AUTO_START_TOR = "auto_start_tor"
-    private const val KEY_TOR_FOR_CLEARNET = "tor_for_clearnet"
     private const val KEY_SLEEP_TIMER_MINUTES = "sleep_timer_minutes"
     private const val KEY_SORT_ORDER = "sort_order"
     private const val KEY_EQUALIZER_ENABLED = "equalizer_enabled"
@@ -76,19 +75,6 @@ object PreferencesHelper {
     fun isAutoStartTorEnabled(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_AUTO_START_TOR, true) // Auto-start by default when Tor is enabled
-    }
-
-    // Route clearnet streams through Tor for anonymity/censorship bypass
-    fun setTorForClearnet(context: Context, enabled: Boolean) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putBoolean(KEY_TOR_FOR_CLEARNET, enabled)
-            .apply()
-    }
-
-    fun isTorForClearnetEnabled(context: Context): Boolean {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getBoolean(KEY_TOR_FOR_CLEARNET, false)
     }
 
     // Sleep timer preferences (0 = off)

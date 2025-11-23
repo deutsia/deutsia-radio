@@ -24,7 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Equalizer Button -->
+    <!-- Equalizer Button - positioned next to back button to avoid recording indicator -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/equalizerButton"
         style="@style/Widget.Material3.Button.IconButton"
@@ -34,7 +34,7 @@
         android:contentDescription="Equalizer"
         app:icon="@drawable/ic_equalizer"
         app:iconTint="?attr/colorOnSurface"
-        app:layout_constraintEnd_toStartOf="@id/likeButton"
+        app:layout_constraintStart_toEndOf="@id/backButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Like Button -->
