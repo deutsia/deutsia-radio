@@ -287,11 +287,15 @@ class MiniPlayerView @JvmOverloads constructor(
             }
             context.startService(intent)
         } else {
+            val proxyType = station.getProxyTypeEnum()
             val intent = Intent(context, RadioService::class.java).apply {
                 action = RadioService.ACTION_PLAY
                 putExtra("stream_url", station.streamUrl)
+                putExtra("station_name", station.name)
                 putExtra("proxy_host", if (station.useProxy) station.proxyHost else "")
                 putExtra("proxy_port", station.proxyPort)
+                putExtra("proxy_type", proxyType.name)
+                putExtra("cover_art_uri", station.coverArtUri)
             }
             context.startService(intent)
         }

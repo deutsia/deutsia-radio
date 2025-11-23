@@ -67,6 +67,44 @@ class RadioService : Service() {
     private val maxReconnectAttempts = 10
 
     private lateinit var audioManager: AudioManager
+    private var audioFocusRequest: android.media.AudioFocusRequest? = null
+    private var hasAudioFocus = false
+
+    // Audio focus change listener to handle interruptions gracefully
+    // This prevents static/scratches when other apps briefly request audio focus
+    private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
+        when (focusChange) {
+            AudioManager.AUDIOFOCUS_GAIN -> {
+                // Regained focus - resume playback at normal volume
+                hasAudioFocus = true
+                player?.let { exoPlayer ->
+                    exoPlayer.volume = 1.0f
+                    if (exoPlayer.playbackState == Player.STATE_READY && !exoPlayer.isPlaying) {
+                        exoPlayer.play()
+                    }
+                }
+                android.util.Log.d("RadioService", "Audio focus gained")
+            }
+            AudioManager.AUDIOFOCUS_LOSS -> {
+                // Permanent loss - stop playback
+                hasAudioFocus = false
+                player?.pause()
+                android.util.Log.d("RadioService", "Audio focus lost permanently")
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                // Temporary loss (e.g., phone call) - pause playback
+                hasAudioFocus = false
+                player?.pause()
+                android.util.Log.d("RadioService", "Audio focus lost transiently")
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                // Can duck - lower volume instead of pausing
+                // This prevents audio artifacts from constant pause/resume
+                player?.volume = 0.2f
+                android.util.Log.d("RadioService", "Audio focus ducking")
+            }
+        }
+    }
 
     // MediaSession for Now Playing card on TV
     private var mediaSession: MediaSessionCompat? = null
@@ -561,16 +599,35 @@ class RadioService : Service() {
 
     private fun playStream(streamUrl: String, proxyHost: String, proxyPort: Int, proxyType: ProxyType = ProxyType.NONE) {
         try {
-            val result = audioManager.requestAudioFocus(
-                null,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN
-            )
+            // Request audio focus with proper listener to handle interruptions
+            val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Use AudioFocusRequest for API 26+
+                audioFocusRequest = android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(
+                        android.media.AudioAttributes.Builder()
+                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build()
+                    )
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener(audioFocusChangeListener, handler)
+                    .build()
+                audioManager.requestAudioFocus(audioFocusRequest!!)
+            } else {
+                // Legacy audio focus request for older APIs
+                @Suppress("DEPRECATION")
+                audioManager.requestAudioFocus(
+                    audioFocusChangeListener,
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.AUDIOFOCUS_GAIN
+                )
+            }
 
-            if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            if (focusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 android.util.Log.w("RadioService", "Failed to gain audio focus")
                 return
             }
+            hasAudioFocus = true
 
             stopStream()
 
@@ -753,7 +810,18 @@ class RadioService : Service() {
             release()
         }
         player = null
-        audioManager.abandonAudioFocus(null)
+
+        // Properly abandon audio focus with the correct listener/request
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioFocusRequest?.let { request ->
+                audioManager.abandonAudioFocusRequest(request)
+            }
+            audioFocusRequest = null
+        } else {
+            @Suppress("DEPRECATION")
+            audioManager.abandonAudioFocus(audioFocusChangeListener)
+        }
+        hasAudioFocus = false
     }
 
     private fun createNotificationChannel() {
