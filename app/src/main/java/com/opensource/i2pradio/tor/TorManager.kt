@@ -341,7 +341,8 @@ object TorManager {
 
         val filter = IntentFilter(ACTION_STATUS)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(orbotStatusReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+            // Use RECEIVER_EXPORTED to receive broadcasts from Orbot (external app)
+            context.registerReceiver(orbotStatusReceiver, filter, Context.RECEIVER_EXPORTED)
         } else {
             context.registerReceiver(orbotStatusReceiver, filter)
         }
@@ -409,7 +410,7 @@ object TorManager {
             Log.w(TAG, "Failed to request Orbot status", e)
         }
 
-        // Also check the socket as a fallback
+        // Also check the socket as a fallback - this is the most reliable way to detect Tor status
         Thread {
             try {
                 val socket = java.net.Socket()
@@ -426,10 +427,13 @@ object TorManager {
                     }
                 }
             } catch (e: Exception) {
-                // Orbot not running or not accessible
+                // Orbot not running or not accessible - update state regardless of current state
                 Handler(Looper.getMainLooper()).post {
-                    if (_state == TorState.CONNECTED) {
+                    if (_state == TorState.CONNECTED || _state == TorState.STARTING) {
+                        _socksPort = -1
+                        _httpPort = -1
                         notifyStateChange(TorState.STOPPED)
+                        Log.d(TAG, "Tor socket check failed - marking as stopped")
                     }
                 }
             }

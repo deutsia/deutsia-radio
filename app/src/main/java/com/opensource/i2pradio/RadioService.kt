@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
 class RadioService : Service() {
     private var player: ExoPlayer? = null
@@ -69,13 +70,12 @@ class RadioService : Service() {
     private var sessionDeactivateRunnable: Runnable? = null
     private val SESSION_DEACTIVATE_DELAY = 5 * 60 * 1000L // 5 minutes
 
-    // Recording
+    // Recording - using AtomicReference for thread-safe dynamic toggle without player restart
     private var isRecording = false
-    private var recordingOutputStream: OutputStream? = null
+    private val recordingOutputStreamHolder = AtomicReference<OutputStream?>(null)
     private var recordingFile: File? = null
     private var recordingUri: android.net.Uri? = null  // For Android 10+ MediaStore finalization
     private var currentStationName: String = "Unknown Station"
-    private var pendingRecordingStart = false  // Flag to start recording after player restarts
 
     companion object {
         const val ACTION_PLAY = "com.opensource.i2pradio.PLAY"
@@ -320,12 +320,12 @@ class RadioService : Service() {
                 val uri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
                 uri?.let {
                     recordingUri = it
-                    recordingOutputStream = contentResolver.openOutputStream(it)
+                    val outputStream = contentResolver.openOutputStream(it)
+                    // Set the output stream in the atomic reference - recording starts immediately
+                    recordingOutputStreamHolder.set(outputStream)
                     isRecording = true
-                    android.util.Log.d("RadioService", "Recording started: $fileName")
-
-                    // Restart player with recording data source
-                    restartPlayerWithRecording()
+                    android.util.Log.d("RadioService", "Recording started (no reconnect): $fileName")
+                    updateNotificationWithRecording()
                 }
             } else {
                 // Legacy storage for older Android versions
@@ -333,12 +333,12 @@ class RadioService : Service() {
                 if (!musicDir.exists()) musicDir.mkdirs()
 
                 recordingFile = File(musicDir, fileName)
-                recordingOutputStream = FileOutputStream(recordingFile)
+                val outputStream = FileOutputStream(recordingFile)
+                // Set the output stream in the atomic reference - recording starts immediately
+                recordingOutputStreamHolder.set(outputStream)
                 isRecording = true
-                android.util.Log.d("RadioService", "Recording started: $fileName")
-
-                // Restart player with recording data source
-                restartPlayerWithRecording()
+                android.util.Log.d("RadioService", "Recording started (no reconnect): $fileName")
+                updateNotificationWithRecording()
             }
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Failed to start recording", e)
@@ -346,22 +346,13 @@ class RadioService : Service() {
         }
     }
 
-    private fun restartPlayerWithRecording() {
-        val streamUrl = currentStreamUrl ?: return
-        val proxyHost = currentProxyHost ?: ""
-
-        // Restart the player to use the recording data source
-        playStream(streamUrl, proxyHost, currentProxyPort, currentProxyType)
-        updateNotificationWithRecording()
-    }
-
     private fun cleanupRecording() {
         try {
-            recordingOutputStream?.close()
+            recordingOutputStreamHolder.get()?.close()
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Error closing recording stream", e)
         }
-        recordingOutputStream = null
+        recordingOutputStreamHolder.set(null)
         recordingFile = null
         recordingUri = null
         isRecording = false
@@ -371,8 +362,9 @@ class RadioService : Service() {
         if (!isRecording) return
 
         try {
-            recordingOutputStream?.close()
-            recordingOutputStream = null
+            // Close the output stream and clear the reference (no player restart needed)
+            recordingOutputStreamHolder.get()?.close()
+            recordingOutputStreamHolder.set(null)
 
             // Finalize MediaStore entry for Android 10+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && recordingUri != null) {
@@ -386,15 +378,9 @@ class RadioService : Service() {
             recordingUri = null
             recordingFile = null
             isRecording = false
-            android.util.Log.d("RadioService", "Recording stopped")
+            android.util.Log.d("RadioService", "Recording stopped (no reconnect)")
 
-            // Restart player without recording to free up the recording stream
-            val streamUrl = currentStreamUrl
-            if (streamUrl != null && player?.isPlaying == true) {
-                playStream(streamUrl, currentProxyHost ?: "", currentProxyPort, currentProxyType)
-            }
-
-            // Update notification
+            // Update notification without restarting player
             if (player?.isPlaying == true) {
                 startForeground(NOTIFICATION_ID, createNotification("Playing"))
             }
@@ -477,12 +463,9 @@ class RadioService : Service() {
             val baseDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("I2PRadio/1.0")
 
-            // Wrap with recording data source if recording is active
-            val dataSourceFactory = if (isRecording && recordingOutputStream != null) {
-                RecordingDataSource.Factory(baseDataSourceFactory) { recordingOutputStream }
-            } else {
-                baseDataSourceFactory
-            }
+            // Always wrap with recording data source using atomic reference holder
+            // This allows recording to be toggled without recreating the player
+            val dataSourceFactory = RecordingDataSource.Factory(baseDataSourceFactory, recordingOutputStreamHolder)
 
             player = ExoPlayer.Builder(this).build().apply {
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
