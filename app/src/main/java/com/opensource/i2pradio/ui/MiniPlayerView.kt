@@ -13,6 +13,7 @@ import android.widget.TextView
 import coil.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
@@ -31,6 +32,7 @@ class MiniPlayerView @JvmOverloads constructor(
     private val playPauseButton: MaterialButton
     private val closeButton: MaterialButton
     private val likeButton: MaterialButton
+    private val progressIndicator: LinearProgressIndicator
 
     private var currentStation: RadioStation? = null
     private var isPlaying: Boolean = false
@@ -50,6 +52,7 @@ class MiniPlayerView @JvmOverloads constructor(
         playPauseButton = findViewById(R.id.miniPlayerPlayPause)
         closeButton = findViewById(R.id.miniPlayerClose)
         likeButton = findViewById(R.id.miniPlayerLikeButton)
+        progressIndicator = findViewById(R.id.miniPlayerProgress)
 
         // Click the card to go to Now Playing with smooth expand animation
         card.setOnClickListener {
@@ -160,6 +163,9 @@ class MiniPlayerView @JvmOverloads constructor(
                 crossfade(true)
             }
         }
+
+        // Show loading indicator when a new station is set (buffering will start)
+        progressIndicator.visibility = VISIBLE
     }
 
     fun setPlayingState(playing: Boolean) {
@@ -186,6 +192,14 @@ class MiniPlayerView @JvmOverloads constructor(
 
         isPlaying = playing
         previousPlayingState = playing
+    }
+
+    /**
+     * Set the buffering/loading state of the miniplayer.
+     * Shows or hides the progress indicator.
+     */
+    fun setBufferingState(buffering: Boolean) {
+        progressIndicator.visibility = if (buffering) VISIBLE else GONE
     }
 
     fun setOnMiniPlayerClickListener(listener: () -> Unit) {

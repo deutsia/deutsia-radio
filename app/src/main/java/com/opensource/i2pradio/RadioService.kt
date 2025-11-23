@@ -30,6 +30,7 @@ import androidx.media3.common.Metadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.okhttp.OkHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.metadata.icy.IcyInfo
@@ -107,9 +108,12 @@ class RadioService : Service() {
         // Broadcast actions for metadata updates
         const val BROADCAST_METADATA_CHANGED = "com.opensource.i2pradio.METADATA_CHANGED"
         const val BROADCAST_STREAM_INFO_CHANGED = "com.opensource.i2pradio.STREAM_INFO_CHANGED"
+        const val BROADCAST_PLAYBACK_STATE_CHANGED = "com.opensource.i2pradio.PLAYBACK_STATE_CHANGED"
         const val EXTRA_METADATA = "metadata"
         const val EXTRA_BITRATE = "bitrate"
         const val EXTRA_CODEC = "codec"
+        const val EXTRA_IS_BUFFERING = "is_buffering"
+        const val EXTRA_IS_PLAYING = "is_playing"
     }
 
     inner class RadioBinder : Binder() {
@@ -572,23 +576,14 @@ class RadioService : Service() {
 
             // Determine proxy configuration
             // Priority: 1. Embedded Tor (if enabled and connected for Tor streams)
-            //           2. Tor for clearnet streams (anonymity/censorship bypass)
-            //           3. Manual proxy configuration
-            //           4. Direct connection
+            //           2. Manual proxy configuration
+            //           3. Direct connection
             val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
                 // Use embedded Tor for Tor streams if enabled and connected
                 proxyType == ProxyType.TOR &&
                 PreferencesHelper.isEmbeddedTorEnabled(this) &&
                 TorManager.isConnected() -> {
                     android.util.Log.d("RadioService", "Using embedded Tor proxy for .onion stream")
-                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
-                }
-                // Route clearnet streams through Tor for anonymity (when enabled and Tor is connected)
-                proxyType == ProxyType.NONE &&
-                PreferencesHelper.isEmbeddedTorEnabled(this) &&
-                PreferencesHelper.isTorForClearnetEnabled(this) &&
-                TorManager.isConnected() -> {
-                    android.util.Log.d("RadioService", "Routing clearnet stream through Tor for anonymity")
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
                 // Use manual proxy configuration
@@ -627,7 +622,21 @@ class RadioService : Service() {
             // and prevents audio hitching by writing to disk on a background thread
             val dataSourceFactory = RecordingDataSource.Factory(baseDataSourceFactory, recordingWriteQueue, isRecordingActive)
 
-            player = ExoPlayer.Builder(this).build().apply {
+            // Configure load control for smooth streaming with larger buffers
+            // This prevents audio hitching by ensuring enough data is buffered
+            val loadControl = DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                    30_000,  // Min buffer before playback starts (30s)
+                    60_000,  // Max buffer size (60s)
+                    2_500,   // Buffer for playback to start (2.5s)
+                    5_000    // Buffer for playback after rebuffer (5s)
+                )
+                .setPrioritizeTimeOverSizeThresholds(true)
+                .build()
+
+            player = ExoPlayer.Builder(this)
+                .setLoadControl(loadControl)
+                .build().apply {
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(MediaItem.fromUri(streamUrl))
 
@@ -652,20 +661,26 @@ class RadioService : Service() {
                                 activateMediaSession()
                                 // Extract stream info when ready
                                 extractStreamInfo()
+                                // Broadcast to UI that we're no longer buffering
+                                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = true)
                                 android.util.Log.d("RadioService", "Stream playing successfully")
                             }
                             Player.STATE_BUFFERING -> {
                                 startForeground(NOTIFICATION_ID, createNotification("Buffering..."))
                                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
+                                // Broadcast to UI that we're buffering
+                                broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
                             Player.STATE_ENDED -> {
                                 android.util.Log.d("RadioService", "Stream ended, reconnecting...")
                                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
+                                broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
                                 scheduleReconnect()
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
+                                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                             }
                         }
                     }
@@ -838,6 +853,17 @@ class RadioService : Service() {
         val intent = Intent(BROADCAST_STREAM_INFO_CHANGED).apply {
             putExtra(EXTRA_BITRATE, bitrate)
             putExtra(EXTRA_CODEC, codec)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    /**
+     * Broadcast playback state change to UI (buffering, playing, etc.)
+     */
+    private fun broadcastPlaybackStateChanged(isBuffering: Boolean, isPlaying: Boolean) {
+        val intent = Intent(BROADCAST_PLAYBACK_STATE_CHANGED).apply {
+            putExtra(EXTRA_IS_BUFFERING, isBuffering)
+            putExtra(EXTRA_IS_PLAYING, isPlaying)
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }

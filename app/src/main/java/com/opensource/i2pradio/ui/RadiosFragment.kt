@@ -114,7 +114,7 @@ class RadiosFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle("Sort Stations")
             .setSingleChoiceItems(sortOptions, currentIndex) { dialog, which ->
-                currentSortOrder = SortOrder.entries[which]
+                currentSortOrder = SortOrder.values()[which]
                 PreferencesHelper.setSortOrder(requireContext(), currentSortOrder.name)
                 updateSortButtonText()
                 observeStations()
