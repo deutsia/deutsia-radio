@@ -373,30 +373,43 @@ class RadioService : Service() {
      */
     private fun detectStreamFormat(streamUrl: String?): Pair<String, String> {
         if (streamUrl == null) {
-            return Pair("ogg", "audio/ogg") // Default to OGG for streaming
+            return Pair("mp3", "audio/mpeg") // Default to MP3 as most universally compatible
         }
 
         val urlLower = streamUrl.lowercase()
 
-        // Check URL path for format hints
+        // Check URL path for format hints - order matters, check specific patterns first
         return when {
-            urlLower.contains(".mp3") || urlLower.contains("/mp3") || urlLower.contains("type=mp3") ->
-                Pair("mp3", "audio/mpeg")
-            urlLower.contains(".aac") || urlLower.contains("/aac") || urlLower.contains("type=aac") ->
-                Pair("aac", "audio/aac")
-            urlLower.contains(".m4a") || urlLower.contains("/m4a") ->
-                Pair("m4a", "audio/mp4")
-            urlLower.contains(".opus") || urlLower.contains("/opus") || urlLower.contains("type=opus") ->
-                Pair("opus", "audio/opus")
-            urlLower.contains(".flac") || urlLower.contains("/flac") ->
-                Pair("flac", "audio/flac")
-            urlLower.contains(".wav") || urlLower.contains("/wav") ->
-                Pair("wav", "audio/wav")
-            urlLower.contains(".ogg") || urlLower.contains("/ogg") || urlLower.contains("type=ogg") ||
-            urlLower.contains("vorbis") || urlLower.contains("/vorbis") ->
+            // OGG/Vorbis detection - check this before mp3 to avoid false positives on URLs like "stream.ogg?format=mp3"
+            urlLower.endsWith(".ogg") || urlLower.contains("/ogg/") || urlLower.contains("type=ogg") ||
+            urlLower.contains("vorbis") || urlLower.contains("/vorbis") || urlLower.contains("codec=vorbis") ->
                 Pair("ogg", "audio/ogg")
-            // Default to OGG for unknown formats as many Icecast/I2P streams use OGG Vorbis
-            else -> Pair("ogg", "audio/ogg")
+            // Opus detection
+            urlLower.endsWith(".opus") || urlLower.contains("/opus/") || urlLower.contains("type=opus") ||
+            urlLower.contains("codec=opus") ->
+                Pair("opus", "audio/opus")
+            // AAC detection - check before mp3 as some URLs might have both hints
+            urlLower.endsWith(".aac") || urlLower.contains("/aac/") || urlLower.contains("type=aac") ||
+            urlLower.contains("codec=aac") || urlLower.contains("/;stream.nsv") ->
+                Pair("aac", "audio/aac")
+            // M4A detection
+            urlLower.endsWith(".m4a") || urlLower.contains("/m4a/") ->
+                Pair("m4a", "audio/mp4")
+            // FLAC detection
+            urlLower.endsWith(".flac") || urlLower.contains("/flac/") || urlLower.contains("type=flac") ->
+                Pair("flac", "audio/flac")
+            // WAV detection
+            urlLower.endsWith(".wav") || urlLower.contains("/wav/") ->
+                Pair("wav", "audio/wav")
+            // MP3 detection - most common streaming format
+            urlLower.endsWith(".mp3") || urlLower.contains("/mp3") || urlLower.contains("type=mp3") ||
+            urlLower.contains("codec=mp3") || urlLower.contains(";stream.mp3") ||
+            urlLower.contains("/stream") || urlLower.contains("/listen") ||
+            urlLower.contains(":8000") || urlLower.contains(":8080") ->
+                Pair("mp3", "audio/mpeg")
+            // Default to MP3 for unknown formats as it's the most common and universally compatible
+            // Most players can auto-detect the actual format from the file header even if extension differs
+            else -> Pair("mp3", "audio/mpeg")
         }
     }
 
