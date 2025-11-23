@@ -239,7 +239,7 @@
                     android:textColor="?attr/colorPrimary"
                     android:layout_marginBottom="16dp" />
 
-                <!-- Embedded Tor Toggle -->
+                <!-- Orbot Tor Toggle -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -256,14 +256,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Embedded Tor"
+                            android:text="Enable Tor (via Orbot)"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Run Tor directly in the app"
+                            android:text="Connect through the Tor network"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -374,7 +374,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="When enabled, Tor stations will connect automatically without external proxy configuration. First connection may take up to 2 minutes."
+                    android:text="Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access to connection controls."
                     android:textSize="12sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:lineSpacingExtra="2dp" />

@@ -21,11 +21,14 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.opensource.i2pradio.data.RadioRepository
+import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.MiniPlayerView
 import com.opensource.i2pradio.ui.NowPlayingFragment
 import com.opensource.i2pradio.ui.PreferencesHelper
 import com.opensource.i2pradio.ui.RadioViewModel
 import com.opensource.i2pradio.ui.RadiosFragment
+import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
+import com.opensource.i2pradio.ui.TorStatusView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
     private lateinit var miniPlayerContainer: FrameLayout
     private lateinit var miniPlayerView: MiniPlayerView
+    private lateinit var torStatusView: TorStatusView
     private lateinit var repository: RadioRepository
     private val viewModel: RadioViewModel by viewModels()
 
@@ -43,6 +47,13 @@ class MainActivity : AppCompatActivity() {
     private var isServiceBound = false
     private var miniPlayerManuallyClosed = false
     private var lastStationId: Long? = null
+
+    // Tor state listener
+    private val torStateListener: (TorManager.TorState) -> Unit = { state ->
+        runOnUiThread {
+            torStatusView.updateState(state)
+        }
+    }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -87,12 +98,41 @@ class MainActivity : AppCompatActivity() {
         tabLayout = findViewById(R.id.tabLayout)
         miniPlayerContainer = findViewById(R.id.miniPlayerContainer)
 
+        // Setup Tor status indicator in toolbar
+        setupTorStatusView()
+
         setupViewPager()
         setupMiniPlayer()
 
         Intent(this, RadioService::class.java).also { intent ->
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         }
+
+        // Initialize TorManager to detect Orbot status
+        TorManager.initialize(this)
+    }
+
+    private fun setupTorStatusView() {
+        torStatusView = findViewById(R.id.torStatusView)
+
+        // Set compact mode for toolbar (icon + short text)
+        torStatusView.setCompactMode(false)
+
+        // Handle click to show quick control bottom sheet
+        torStatusView.setOnStatusClickListener {
+            showTorQuickControlBottomSheet()
+        }
+
+        // Listen for Tor state changes
+        TorManager.addStateListener(torStateListener)
+
+        // Update initial state
+        torStatusView.updateState(TorManager.state)
+    }
+
+    private fun showTorQuickControlBottomSheet() {
+        val bottomSheet = TorQuickControlBottomSheet.newInstance()
+        bottomSheet.show(supportFragmentManager, TorQuickControlBottomSheet.TAG)
     }
 
     private fun setupMiniPlayer() {
@@ -198,8 +238,17 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Refresh Tor status when app comes to foreground
+        TorManager.requestOrbotStatus(this)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        // Remove Tor state listener
+        TorManager.removeStateListener(torStateListener)
+
         if (isServiceBound) {
             unbindService(serviceConnection)
             isServiceBound = false
