@@ -142,7 +142,7 @@ class RecordingDataSource(
                 var bufferedStream: BufferedOutputStream? = null
                 var currentOutputStream: OutputStream? = null
                 var bytesWrittenSinceFlush = 0
-                val flushThreshold = 128 * 1024 // Flush every 128KB instead of every empty queue
+                val flushThreshold = 256 * 1024 // Flush every 256KB to reduce disk I/O frequency
 
                 while (true) {
                     try {
@@ -157,7 +157,7 @@ class RecordingDataSource(
                             bytesWrittenSinceFlush = 0
                             currentOutputStream = newOutputStream
                             bufferedStream = if (newOutputStream != null) {
-                                BufferedOutputStream(newOutputStream, 128 * 1024) // 128KB buffer
+                                BufferedOutputStream(newOutputStream, 256 * 1024) // 256KB buffer for efficient disk writes
                             } else {
                                 null
                             }
