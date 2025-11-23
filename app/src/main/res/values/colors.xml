@@ -4,4 +4,13 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="surface_overlay">#1A000000</color>
+
+    <!-- Tor status colors -->
+    <color name="tor_connected">#4CAF50</color>
+    <color name="tor_connecting">#FF9800</color>
+    <color name="tor_disconnected">#9E9E9E</color>
+    <color name="tor_error">#F44336</color>
+
+    <!-- Orbot brand color -->
+    <color name="orbot_purple">#8E24AA</color>
 </resources>
