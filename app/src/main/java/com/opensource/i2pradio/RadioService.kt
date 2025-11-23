@@ -409,7 +409,10 @@ class RadioService : Service() {
      */
     private fun startRecording(stationName: String) {
         if (isRecording) return
-        val streamUrl = currentStreamUrl ?: return
+        val streamUrl = currentStreamUrl ?: run {
+            android.util.Log.e("RadioService", "Cannot start recording: no stream URL")
+            return
+        }
 
         currentStationName = stationName
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
@@ -419,10 +422,21 @@ class RadioService : Service() {
         try {
             // Create recording file in app's external files directory (no permission needed)
             val musicDir = getExternalFilesDir("Recordings")
-            if (musicDir != null && !musicDir.exists()) musicDir.mkdirs()
+            if (musicDir == null) {
+                android.util.Log.e("RadioService", "Cannot get external files directory for recording")
+                return
+            }
+            if (!musicDir.exists()) {
+                if (!musicDir.mkdirs()) {
+                    android.util.Log.e("RadioService", "Failed to create recordings directory: $musicDir")
+                    return
+                }
+            }
             recordingFile = File(musicDir, fileName)
+            android.util.Log.d("RadioService", "Recording file path: ${recordingFile?.absolutePath}")
 
-            // Build OkHttp client with same proxy settings as playback
+            // Build a completely separate OkHttp client for recording
+            // This ensures recording network issues cannot affect playback
             val okHttpClient = buildRecordingHttpClient()
 
             // Create request for the stream
@@ -430,6 +444,7 @@ class RadioService : Service() {
                 .url(streamUrl)
                 .header("User-Agent", "I2PRadio/1.0")
                 .header("Icy-MetaData", "0") // Don't need metadata for recording
+                .header("Connection", "keep-alive")
                 .build()
 
             recordingCall = okHttpClient.newCall(request)
@@ -439,48 +454,107 @@ class RadioService : Service() {
             // Start recording on a background thread
             recordingThread = Thread({
                 var response: Response? = null
+                var outputStream: BufferedOutputStream? = null
+                var totalBytesWritten = 0L
+                var lastFlushBytes = 0L
+                val flushInterval = 256 * 1024L // Flush every 256KB for data safety
+
                 try {
-                    android.util.Log.d("RadioService", "Recording started: $fileName")
+                    android.util.Log.d("RadioService", "Recording thread started, connecting to: $streamUrl")
                     response = recordingCall?.execute()
 
-                    if (response?.isSuccessful == true) {
-                        val inputStream = response.body?.byteStream()
-                        recordingOutputStream = BufferedOutputStream(
-                            FileOutputStream(recordingFile),
-                            64 * 1024 // 64KB buffer for efficient writes
-                        )
+                    if (response == null) {
+                        android.util.Log.e("RadioService", "Recording request returned null response")
+                        return@Thread
+                    }
 
-                        val buffer = ByteArray(8192)
-                        var bytesRead = -1
+                    if (!response.isSuccessful) {
+                        android.util.Log.e("RadioService", "Recording request failed with code: ${response.code}")
+                        return@Thread
+                    }
 
-                        while (isRecordingActive.get() &&
-                               inputStream?.read(buffer).also { bytesRead = it ?: -1 } != -1) {
-                            if (bytesRead > 0) {
-                                recordingOutputStream?.write(buffer, 0, bytesRead)
+                    val responseBody = response.body
+                    if (responseBody == null) {
+                        android.util.Log.e("RadioService", "Recording response has no body")
+                        return@Thread
+                    }
+
+                    val inputStream = responseBody.byteStream()
+                    android.util.Log.d("RadioService", "Recording connection established, starting to write: $fileName")
+
+                    outputStream = BufferedOutputStream(
+                        FileOutputStream(recordingFile),
+                        64 * 1024 // 64KB buffer for efficient writes
+                    )
+                    recordingOutputStream = outputStream
+
+                    val buffer = ByteArray(8192)
+
+                    while (isRecordingActive.get()) {
+                        val bytesRead = inputStream.read(buffer)
+                        if (bytesRead == -1) {
+                            android.util.Log.d("RadioService", "Recording stream ended (EOF)")
+                            break
+                        }
+                        if (bytesRead > 0) {
+                            outputStream.write(buffer, 0, bytesRead)
+                            totalBytesWritten += bytesRead
+
+                            // Periodic flush for data safety
+                            if (totalBytesWritten - lastFlushBytes >= flushInterval) {
+                                outputStream.flush()
+                                lastFlushBytes = totalBytesWritten
+                                android.util.Log.d("RadioService", "Recording progress: ${totalBytesWritten / 1024}KB written")
                             }
                         }
+                    }
 
-                        recordingOutputStream?.flush()
-                        android.util.Log.d("RadioService", "Recording completed: $fileName")
+                    // Final flush
+                    outputStream.flush()
+                    android.util.Log.d("RadioService", "Recording completed: $fileName (${totalBytesWritten / 1024}KB)")
+
+                } catch (e: java.io.IOException) {
+                    if (isRecordingActive.get()) {
+                        android.util.Log.e("RadioService", "Recording I/O error: ${e.message}", e)
                     } else {
-                        android.util.Log.e("RadioService", "Recording request failed: ${response?.code}")
+                        android.util.Log.d("RadioService", "Recording stopped by user (${totalBytesWritten / 1024}KB written)")
                     }
                 } catch (e: Exception) {
                     if (isRecordingActive.get()) {
-                        android.util.Log.e("RadioService", "Recording error", e)
+                        android.util.Log.e("RadioService", "Recording error: ${e.message}", e)
                     } else {
                         android.util.Log.d("RadioService", "Recording stopped by user")
                     }
                 } finally {
+                    // Ensure streams are closed properly
                     try {
-                        recordingOutputStream?.close()
+                        outputStream?.flush()
+                    } catch (e: Exception) {
+                        android.util.Log.w("RadioService", "Error flushing recording output", e)
+                    }
+                    try {
+                        outputStream?.close()
+                    } catch (e: Exception) {
+                        android.util.Log.w("RadioService", "Error closing recording output", e)
+                    }
+                    try {
                         response?.close()
                     } catch (e: Exception) {
-                        android.util.Log.e("RadioService", "Error closing recording streams", e)
+                        android.util.Log.w("RadioService", "Error closing recording response", e)
+                    }
+                    recordingOutputStream = null
+
+                    // Log final file status
+                    recordingFile?.let { file ->
+                        if (file.exists()) {
+                            android.util.Log.d("RadioService", "Recording file saved: ${file.absolutePath} (${file.length() / 1024}KB)")
+                        } else {
+                            android.util.Log.e("RadioService", "Recording file not found after recording: ${file.absolutePath}")
+                        }
                     }
                 }
             }, "RecordingThread").apply {
-                priority = Thread.MIN_PRIORITY // Low priority to not affect audio
+                priority = Thread.MIN_PRIORITY // Low priority to not affect audio playback
             }
             recordingThread?.start()
 
@@ -551,21 +625,39 @@ class RadioService : Service() {
 
         android.util.Log.d("RadioService", "Stopping recording...")
 
-        // Signal the recording thread to stop
+        // Signal the recording thread to stop FIRST (before canceling network)
+        // This allows the thread to flush and close the output stream properly
         isRecordingActive.set(false)
+
+        // Give the thread a moment to notice the flag and finish writing
+        Thread.sleep(100)
 
         // Cancel the network call (this will cause the read to throw and exit)
         recordingCall?.cancel()
 
-        // Wait briefly for the thread to finish
+        // Wait for the thread to finish (up to 3 seconds for proper cleanup)
         recordingThread?.let { thread ->
             try {
-                thread.join(1000) // Wait up to 1 second
+                thread.join(3000) // Wait up to 3 seconds for clean shutdown
                 if (thread.isAlive) {
+                    android.util.Log.w("RadioService", "Recording thread still alive, interrupting")
                     thread.interrupt()
+                    thread.join(500) // Brief wait after interrupt
                 }
             } catch (e: InterruptedException) {
                 android.util.Log.w("RadioService", "Interrupted while stopping recording")
+                Thread.currentThread().interrupt()
+            }
+        }
+
+        // Log the recorded file info
+        recordingFile?.let { file ->
+            if (file.exists() && file.length() > 0) {
+                android.util.Log.d("RadioService", "Recording saved: ${file.absolutePath} (${file.length() / 1024}KB)")
+            } else if (file.exists()) {
+                android.util.Log.w("RadioService", "Recording file is empty: ${file.absolutePath}")
+            } else {
+                android.util.Log.e("RadioService", "Recording file does not exist: ${file.absolutePath}")
             }
         }
 
