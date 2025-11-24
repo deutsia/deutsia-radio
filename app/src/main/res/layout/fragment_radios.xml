@@ -5,38 +5,86 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- Radio Stations List - placed first so sort header is drawn on top -->
+    <!-- Radio Stations List - placed first so header is drawn on top -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/radiosRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingTop="56dp"
+        android:paddingTop="112dp"
         android:paddingBottom="100dp"
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-    <!-- Sort Button Header - placed after RecyclerView so it's on top and receives touch events -->
+    <!-- Header with Search and Filter/Sort options -->
     <LinearLayout
-        android:id="@+id/sortHeader"
+        android:id="@+id/headerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:paddingHorizontal="8dp"
-        android:paddingTop="8dp"
+        android:orientation="vertical"
         android:background="?attr/colorSurface"
         android:elevation="2dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/sortButton"
-            style="@style/Widget.Material3.Button.TextButton.Icon"
-            android:layout_width="wrap_content"
+        <!-- Search Bar -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/searchInputLayout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Default"
-            android:textSize="12sp"
-            app:icon="@drawable/ic_sort"
-            app:iconSize="18dp" />
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="8dp"
+            app:startIconDrawable="@drawable/ic_search"
+            app:endIconMode="clear_text"
+            app:boxCornerRadiusTopStart="24dp"
+            app:boxCornerRadiusTopEnd="24dp"
+            app:boxCornerRadiusBottomStart="24dp"
+            app:boxCornerRadiusBottomEnd="24dp"
+            android:hint="@string/search_stations">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/searchInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Sort and Genre Filter Row -->
+        <LinearLayout
+            android:id="@+id/sortHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start"
+            android:paddingHorizontal="4dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <!-- Genre Filter Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/genreFilterButton"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/genre_all"
+                android:textSize="12sp"
+                app:icon="@drawable/ic_filter"
+                app:iconSize="18dp" />
+
+            <!-- Sort Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sortButton"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Default"
+                android:textSize="12sp"
+                app:icon="@drawable/ic_sort"
+                app:iconSize="18dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

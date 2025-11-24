@@ -20,4 +20,12 @@
     <string name="sort_name">Name</string>
     <string name="sort_recent">Recent</string>
     <string name="sort_liked">Liked</string>
+    <string name="sort_genre">Genre</string>
+
+    <!-- Search -->
+    <string name="search_stations">Search stations</string>
+
+    <!-- Genre filter -->
+    <string name="genre_all">All Genres</string>
+    <string name="filter_by_genre">Filter by Genre</string>
 </resources>

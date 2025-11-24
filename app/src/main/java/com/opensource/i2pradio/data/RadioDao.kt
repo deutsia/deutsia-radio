@@ -21,8 +21,37 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations WHERE isLiked = 1 ORDER BY name ASC")
     fun getLikedStations(): LiveData<List<RadioStation>>
 
+    // Sort by genre (alphabetically by genre, then by station name)
+    @Query("SELECT * FROM radio_stations ORDER BY genre ASC, name ASC")
+    fun getAllStationsSortedByGenre(): LiveData<List<RadioStation>>
+
     @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY addedTimestamp DESC")
     fun getStationsByGenre(genre: String): LiveData<List<RadioStation>>
+
+    // Get stations by genre with different sort orders
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, isPreset DESC, addedTimestamp DESC")
+    fun getStationsByGenreDefault(genre: String): LiveData<List<RadioStation>>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, name ASC")
+    fun getStationsByGenreSortedByName(genre: String): LiveData<List<RadioStation>>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, lastPlayedAt DESC")
+    fun getStationsByGenreSortedByRecentlyPlayed(genre: String): LiveData<List<RadioStation>>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre AND isLiked = 1 ORDER BY name ASC")
+    fun getLikedStationsByGenre(genre: String): LiveData<List<RadioStation>>
+
+    // Get all unique genres
+    @Query("SELECT DISTINCT genre FROM radio_stations ORDER BY genre ASC")
+    fun getAllGenres(): LiveData<List<String>>
+
+    // Synchronous version for immediate access
+    @Query("SELECT DISTINCT genre FROM radio_stations ORDER BY genre ASC")
+    suspend fun getAllGenresSync(): List<String>
+
+    // Get all stations synchronously for search filtering
+    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, isPreset DESC, addedTimestamp DESC")
+    suspend fun getAllStationsSync(): List<RadioStation>
 
     @Query("SELECT * FROM radio_stations WHERE id = :id")
     suspend fun getStationById(id: Long): RadioStation?

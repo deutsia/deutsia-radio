@@ -3,12 +3,15 @@ package com.opensource.i2pradio.ui
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -21,6 +24,7 @@ import coil.load
 import coil.request.Disposable
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
@@ -36,12 +40,28 @@ class RadiosFragment : Fragment() {
     private lateinit var emptyStateContainer: View
     private lateinit var fabAddRadio: FloatingActionButton
     private lateinit var sortButton: MaterialButton
+    private lateinit var genreFilterButton: MaterialButton
+    private lateinit var searchInput: TextInputEditText
     private lateinit var adapter: RadioStationAdapter
     private lateinit var repository: RadioRepository
     private val viewModel: RadioViewModel by activityViewModels()
 
     private var currentSortOrder = SortOrder.DEFAULT
+    private var currentGenreFilter: String? = null // null means "All Genres"
+    private var currentSearchQuery: String = ""
     private var currentStationsObserver: LiveData<List<RadioStation>>? = null
+
+    // Cache for search filtering
+    private var allStationsCache: List<RadioStation> = emptyList()
+
+    // Predefined genres list (sorted alphabetically)
+    private val allGenres = listOf(
+        "All Genres", "Alternative", "Ambient", "Blues", "Christian", "Classical",
+        "Comedy", "Country", "Dance", "EDM", "Electronic", "Folk",
+        "Funk", "Gospel", "Hip Hop", "Indie", "Jazz", "K-Pop",
+        "Latin", "Lo-Fi", "Metal", "News", "Oldies", "Pop", "Punk",
+        "R&B", "Reggae", "Rock", "Soul", "Sports", "Talk", "World", "Other"
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,6 +76,8 @@ class RadiosFragment : Fragment() {
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
         fabAddRadio = view.findViewById(R.id.fabAddRadio)
         sortButton = view.findViewById(R.id.sortButton)
+        genreFilterButton = view.findViewById(R.id.genreFilterButton)
+        searchInput = view.findViewById(R.id.searchInput)
 
         adapter = RadioStationAdapter(
             onStationClick = { station -> playStation(station) },
@@ -73,7 +95,14 @@ class RadiosFragment : Fragment() {
         }
         updateSortButtonText()
 
-        // Observe radio stations with current sort order
+        // Load saved genre filter
+        currentGenreFilter = PreferencesHelper.getGenreFilter(requireContext())
+        updateGenreFilterButtonText()
+
+        // Setup search functionality
+        setupSearchFunctionality()
+
+        // Observe radio stations with current sort order and genre filter
         observeStations()
 
         fabAddRadio.setOnClickListener {
@@ -84,6 +113,10 @@ class RadiosFragment : Fragment() {
             showSortDialog()
         }
 
+        genreFilterButton.setOnClickListener {
+            showGenreFilterDialog()
+        }
+
         view.findViewById<MaterialButton>(R.id.emptyStateAddButton).setOnClickListener {
             showAddRadioDialog()
         }
@@ -91,21 +124,62 @@ class RadiosFragment : Fragment() {
         return view
     }
 
+    private fun setupSearchFunctionality() {
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                currentSearchQuery = s?.toString()?.trim() ?: ""
+                filterStations()
+            }
+        })
+
+        searchInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                // Hide keyboard
+                searchInput.clearFocus()
+                true
+            } else {
+                false
+            }
+        }
+    }
+
     private fun observeStations() {
         // Remove old observer
         currentStationsObserver?.removeObservers(viewLifecycleOwner)
 
-        // Get new LiveData based on sort order
-        currentStationsObserver = repository.getStationsSorted(currentSortOrder)
+        // Get new LiveData based on sort order and genre filter
+        currentStationsObserver = if (currentGenreFilter != null) {
+            repository.getStationsByGenreSorted(currentGenreFilter!!, currentSortOrder)
+        } else {
+            repository.getStationsSorted(currentSortOrder)
+        }
+
         currentStationsObserver?.observe(viewLifecycleOwner) { stations ->
-            if (stations.isEmpty()) {
-                recyclerView.visibility = View.GONE
-                emptyStateContainer.visibility = View.VISIBLE
-            } else {
-                recyclerView.visibility = View.VISIBLE
-                emptyStateContainer.visibility = View.GONE
-                adapter.submitList(stations)
+            // Update cache for search filtering
+            allStationsCache = stations
+            filterStations()
+        }
+    }
+
+    private fun filterStations() {
+        val filteredStations = if (currentSearchQuery.isEmpty()) {
+            allStationsCache
+        } else {
+            allStationsCache.filter { station ->
+                station.name.contains(currentSearchQuery, ignoreCase = true) ||
+                station.genre.contains(currentSearchQuery, ignoreCase = true)
             }
+        }
+
+        if (filteredStations.isEmpty()) {
+            recyclerView.visibility = View.GONE
+            emptyStateContainer.visibility = View.VISIBLE
+        } else {
+            recyclerView.visibility = View.VISIBLE
+            emptyStateContainer.visibility = View.GONE
+            adapter.submitList(filteredStations)
         }
     }
 
@@ -114,7 +188,8 @@ class RadiosFragment : Fragment() {
             getString(R.string.sort_default),
             getString(R.string.sort_name),
             getString(R.string.sort_recent),
-            getString(R.string.sort_liked)
+            getString(R.string.sort_liked),
+            getString(R.string.sort_genre)
         )
         val currentIndex = currentSortOrder.ordinal
 
@@ -130,13 +205,62 @@ class RadiosFragment : Fragment() {
             .show()
     }
 
+    private fun showGenreFilterDialog() {
+        // Build the genre list - combine predefined genres with any genres from database
+        CoroutineScope(Dispatchers.Main).launch {
+            val dbGenres = try {
+                repository.getAllGenresSync()
+            } catch (e: Exception) {
+                emptyList()
+            }
+
+            // Merge predefined genres with database genres, keeping alphabetical order
+            val combinedGenres = (allGenres + dbGenres)
+                .distinct()
+                .sortedWith(compareBy {
+                    // "All Genres" first, "Other" last, rest alphabetically
+                    when (it) {
+                        "All Genres" -> "0$it"
+                        "Other" -> "ZZZ$it"
+                        else -> "A$it"
+                    }
+                })
+
+            val currentIndex = if (currentGenreFilter == null) {
+                0 // "All Genres"
+            } else {
+                combinedGenres.indexOf(currentGenreFilter).takeIf { it >= 0 } ?: 0
+            }
+
+            AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.filter_by_genre))
+                .setSingleChoiceItems(combinedGenres.toTypedArray(), currentIndex) { dialog, which ->
+                    val selectedGenre = combinedGenres[which]
+                    currentGenreFilter = if (selectedGenre == "All Genres") null else selectedGenre
+                    PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
+                    updateGenreFilterButtonText()
+                    // Clear search when changing genre filter
+                    currentSearchQuery = ""
+                    searchInput.setText("")
+                    observeStations()
+                    dialog.dismiss()
+                }
+                .show()
+        }
+    }
+
     private fun updateSortButtonText() {
         sortButton.text = when (currentSortOrder) {
             SortOrder.DEFAULT -> getString(R.string.sort_default)
             SortOrder.NAME -> getString(R.string.sort_name)
             SortOrder.RECENTLY_PLAYED -> getString(R.string.sort_recent)
             SortOrder.LIKED -> getString(R.string.sort_liked)
+            SortOrder.GENRE -> getString(R.string.sort_genre)
         }
+    }
+
+    private fun updateGenreFilterButtonText() {
+        genreFilterButton.text = currentGenreFilter ?: getString(R.string.genre_all)
     }
 
     private fun playStation(station: RadioStation) {

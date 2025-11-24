@@ -10,7 +10,8 @@ enum class SortOrder {
     DEFAULT,         // Liked first, then presets, then by added time
     NAME,            // Alphabetical by name
     RECENTLY_PLAYED, // Most recently played first
-    LIKED            // Only liked stations
+    LIKED,           // Only liked stations
+    GENRE            // Sorted by genre alphabetically, then by name
 }
 
 class RadioRepository(context: Context) {
@@ -24,6 +25,31 @@ class RadioRepository(context: Context) {
             SortOrder.NAME -> radioDao.getAllStationsSortedByName()
             SortOrder.RECENTLY_PLAYED -> radioDao.getAllStationsSortedByRecentlyPlayed()
             SortOrder.LIKED -> radioDao.getLikedStations()
+            SortOrder.GENRE -> radioDao.getAllStationsSortedByGenre()
+        }
+    }
+
+    fun getStationsByGenreSorted(genre: String, sortOrder: SortOrder): LiveData<List<RadioStation>> {
+        return when (sortOrder) {
+            SortOrder.DEFAULT -> radioDao.getStationsByGenreDefault(genre)
+            SortOrder.NAME -> radioDao.getStationsByGenreSortedByName(genre)
+            SortOrder.RECENTLY_PLAYED -> radioDao.getStationsByGenreSortedByRecentlyPlayed(genre)
+            SortOrder.LIKED -> radioDao.getLikedStationsByGenre(genre)
+            SortOrder.GENRE -> radioDao.getStationsByGenreDefault(genre) // Same as default when filtered by genre
+        }
+    }
+
+    fun getAllGenres(): LiveData<List<String>> = radioDao.getAllGenres()
+
+    suspend fun getAllGenresSync(): List<String> {
+        return withContext(Dispatchers.IO) {
+            radioDao.getAllGenresSync()
+        }
+    }
+
+    suspend fun getAllStationsSync(): List<RadioStation> {
+        return withContext(Dispatchers.IO) {
+            radioDao.getAllStationsSync()
         }
     }
 

@@ -84,10 +84,13 @@ class AddEditRadioDialog : DialogFragment() {
         // Check if embedded Tor is enabled
         val isEmbeddedTorEnabled = PreferencesHelper.isEmbeddedTorEnabled(requireContext())
 
-        // Setup genre dropdown
+        // Setup genre dropdown - expanded list sorted alphabetically
         val genres = arrayOf(
-            "News", "Music", "Rock", "Pop", "Jazz", "Classical",
-            "Electronic", "Hip Hop", "Talk", "Sports", "Other"
+            "Alternative", "Ambient", "Blues", "Christian", "Classical",
+            "Comedy", "Country", "Dance", "EDM", "Electronic", "Folk",
+            "Funk", "Gospel", "Hip Hop", "Indie", "Jazz", "K-Pop",
+            "Latin", "Lo-Fi", "Metal", "News", "Oldies", "Pop", "Punk",
+            "R&B", "Reggae", "Rock", "Soul", "Sports", "Talk", "World", "Other"
         )
         val genreAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, genres)
         genreInput.setAdapter(genreAdapter)
