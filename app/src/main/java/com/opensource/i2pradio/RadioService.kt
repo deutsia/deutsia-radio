@@ -45,6 +45,10 @@ import com.opensource.i2pradio.ui.PreferencesHelper
 import okhttp3.Call
 import okhttp3.Request
 import okhttp3.Response
+import android.content.ContentValues
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -123,6 +127,7 @@ class RadioService : Service() {
     private var recordingOutputStream: OutputStream? = null
     private val isRecordingActive = AtomicBoolean(false)
     private var recordingFile: File? = null
+    private var recordingMediaStoreUri: Uri? = null  // For Android 10+ MediaStore recordings
 
     // Sleep timer
     private var sleepTimerRunnable: Runnable? = null
@@ -445,23 +450,38 @@ class RadioService : Service() {
 
         android.util.Log.d("RadioService", "Starting recording for: $stationName, URL: $streamUrl")
 
-        // Verify recording directory is accessible (but don't create file yet)
-        val recordingsDir = getExternalFilesDir("Recordings")
-        if (recordingsDir == null) {
-            android.util.Log.e("RadioService", "Cannot get external files directory for recording")
-            broadcastRecordingError("Storage not available")
-            return
+        // Determine MIME type for the format
+        val mimeType = when (format) {
+            "ogg" -> "audio/ogg"
+            "opus" -> "audio/opus"
+            "aac" -> "audio/aac"
+            "flac" -> "audio/flac"
+            "m4a" -> "audio/mp4"
+            else -> "audio/mpeg"
         }
 
-        if (!recordingsDir.exists()) {
-            val created = recordingsDir.mkdirs()
-            android.util.Log.d("RadioService", "Created recordings directory: $created, path: ${recordingsDir.absolutePath}")
-            if (!created && !recordingsDir.exists()) {
-                android.util.Log.e("RadioService", "Failed to create recordings directory")
-                broadcastRecordingError("Cannot create directory")
-                return
+        // For Android 10+ (API 29+), use MediaStore to save to public Music directory
+        // For older versions, use legacy file access
+        val useMediaStore = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        var recordingsDir: File? = null
+
+        if (!useMediaStore) {
+            // Legacy: Use public Music directory for Android 9 and below
+            @Suppress("DEPRECATION")
+            val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+            recordingsDir = File(musicDir, "i2pradio")
+            if (!recordingsDir.exists()) {
+                val created = recordingsDir.mkdirs()
+                android.util.Log.d("RadioService", "Created recordings directory: $created, path: ${recordingsDir.absolutePath}")
+                if (!created && !recordingsDir.exists()) {
+                    android.util.Log.e("RadioService", "Failed to create recordings directory")
+                    broadcastRecordingError("Cannot create directory")
+                    return
+                }
             }
         }
+
+        android.util.Log.d("RadioService", "Recording will use MediaStore: $useMediaStore, format: $format, mimeType: $mimeType")
 
         // Build a COMPLETELY SEPARATE OkHttp client for recording
         // This is a NEW instance, independent from the playback client
@@ -488,6 +508,9 @@ class RadioService : Service() {
         val finalFileName = fileName
         val finalRecordingsDir = recordingsDir
         val finalStreamUrl = streamUrl
+        val finalMimeType = mimeType
+        val finalUseMediaStore = useMediaStore
+        val finalFormat = format
 
         // Start recording on a dedicated background thread
         recordingThread = Thread({
@@ -562,15 +585,59 @@ class RadioService : Service() {
                 }
 
                 // NOW create the file - only after we have a successful connection
-                file = File(finalRecordingsDir, finalFileName)
-                recordingFile = file
-                android.util.Log.d("RadioService", "Recording stream connected, writing to: ${file.absolutePath}")
+                var mediaStoreUri: Uri? = null
+                var filePath: String
 
-                // Open output stream with buffering for efficient writes
-                outputStream = BufferedOutputStream(
-                    FileOutputStream(file),
-                    64 * 1024 // 64KB write buffer
-                )
+                if (finalUseMediaStore) {
+                    // Android 10+: Use MediaStore to save to public Music/i2pradio directory
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.Audio.Media.DISPLAY_NAME, finalFileName)
+                        put(MediaStore.Audio.Media.MIME_TYPE, finalMimeType)
+                        put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/i2pradio")
+                        put(MediaStore.Audio.Media.IS_PENDING, 1)  // Mark as pending while writing
+                    }
+
+                    val resolver = contentResolver
+                    mediaStoreUri = resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+                    if (mediaStoreUri == null) {
+                        android.util.Log.e("RadioService", "Failed to create MediaStore entry")
+                        handler.post {
+                            broadcastRecordingError("Cannot create recording file")
+                            cleanupRecording()
+                        }
+                        return@Thread
+                    }
+
+                    recordingMediaStoreUri = mediaStoreUri
+                    filePath = "Music/i2pradio/$finalFileName"
+                    android.util.Log.d("RadioService", "Recording stream connected, writing to MediaStore: $filePath (URI: $mediaStoreUri)")
+
+                    val rawOutputStream = resolver.openOutputStream(mediaStoreUri)
+                    if (rawOutputStream == null) {
+                        android.util.Log.e("RadioService", "Failed to open MediaStore output stream")
+                        resolver.delete(mediaStoreUri, null, null)
+                        handler.post {
+                            broadcastRecordingError("Cannot open file for writing")
+                            cleanupRecording()
+                        }
+                        return@Thread
+                    }
+
+                    outputStream = BufferedOutputStream(rawOutputStream, 64 * 1024)
+                } else {
+                    // Legacy: Direct file access for Android 9 and below
+                    file = File(finalRecordingsDir!!, finalFileName)
+                    recordingFile = file
+                    filePath = file!!.absolutePath
+                    android.util.Log.d("RadioService", "Recording stream connected, writing to: $filePath")
+
+                    outputStream = BufferedOutputStream(
+                        FileOutputStream(file),
+                        64 * 1024 // 64KB write buffer
+                    )
+                }
+
                 recordingOutputStream = outputStream
 
                 // Update notification now that we're actually recording
@@ -668,20 +735,41 @@ class RadioService : Service() {
 
                 recordingOutputStream = null
 
-                // Log final file info and handle empty files
-                file?.let { f ->
-                    if (f.exists()) {
-                        val sizeKB = f.length() / 1024
-                        if (sizeKB > 0) {
-                            android.util.Log.d("RadioService", "Recording saved: ${f.absolutePath} (${sizeKB}KB)")
-                            // Broadcast success
-                            handler.post { broadcastRecordingComplete(f.absolutePath, totalBytesWritten) }
-                        } else {
-                            android.util.Log.w("RadioService", "Recording file is empty, deleting: ${f.absolutePath}")
-                            f.delete()
+                // Handle recording completion based on whether we used MediaStore or legacy file
+                if (mediaStoreUri != null) {
+                    // Android 10+: Finalize or delete MediaStore entry
+                    val resolver = contentResolver
+                    val sizeKB = totalBytesWritten / 1024
+                    if (sizeKB > 0) {
+                        // Finalize the recording by clearing IS_PENDING flag
+                        val updateValues = ContentValues().apply {
+                            put(MediaStore.Audio.Media.IS_PENDING, 0)
                         }
+                        resolver.update(mediaStoreUri, updateValues, null, null)
+                        android.util.Log.d("RadioService", "Recording saved to MediaStore: $filePath (${sizeKB}KB)")
+                        handler.post { broadcastRecordingComplete(filePath, totalBytesWritten) }
                     } else {
-                        android.util.Log.e("RadioService", "Recording file not found: ${f.absolutePath}")
+                        // Delete empty recording
+                        android.util.Log.w("RadioService", "Recording is empty, deleting MediaStore entry: $filePath")
+                        resolver.delete(mediaStoreUri, null, null)
+                    }
+                    recordingMediaStoreUri = null
+                } else {
+                    // Legacy: Handle file directly
+                    file?.let { f ->
+                        if (f.exists()) {
+                            val sizeKB = f.length() / 1024
+                            if (sizeKB > 0) {
+                                android.util.Log.d("RadioService", "Recording saved: ${f.absolutePath} (${sizeKB}KB)")
+                                // Broadcast success
+                                handler.post { broadcastRecordingComplete(f.absolutePath, totalBytesWritten) }
+                            } else {
+                                android.util.Log.w("RadioService", "Recording file is empty, deleting: ${f.absolutePath}")
+                                f.delete()
+                            }
+                        } else {
+                            android.util.Log.e("RadioService", "Recording file not found: ${f.absolutePath}")
+                        }
                     }
                 }
             }
@@ -882,9 +970,20 @@ class RadioService : Service() {
             android.util.Log.e("RadioService", "Error closing output stream", e)
         }
 
+        // Clean up any pending MediaStore entry (for aborted recordings on Android 10+)
+        recordingMediaStoreUri?.let { uri ->
+            try {
+                contentResolver.delete(uri, null, null)
+                android.util.Log.d("RadioService", "Deleted pending MediaStore entry: $uri")
+            } catch (e: Exception) {
+                android.util.Log.w("RadioService", "Error deleting MediaStore entry: ${e.message}")
+            }
+        }
+
         recordingCall = null
         recordingThread = null
         recordingOutputStream = null
+        recordingMediaStoreUri = null
         isRecording = false
         isRecordingActive.set(false)
     }
