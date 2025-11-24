@@ -95,7 +95,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
 
-    // Broadcast receiver for metadata, stream info, and playback state updates
+    // Broadcast receiver for metadata, stream info, playback state, and recording updates
     private val metadataReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -119,6 +119,19 @@ class NowPlayingFragment : Fragment() {
                     if (isPlaying != viewModel.isPlaying.value) {
                         viewModel.setPlaying(isPlaying)
                     }
+                }
+                RadioService.BROADCAST_RECORDING_ERROR -> {
+                    val errorMessage = intent.getStringExtra(RadioService.EXTRA_ERROR_MESSAGE) ?: "Unknown error"
+                    // Reset recording state in ViewModel
+                    viewModel.onRecordingError()
+                    Toast.makeText(context, "Recording failed: $errorMessage", Toast.LENGTH_LONG).show()
+                }
+                RadioService.BROADCAST_RECORDING_COMPLETE -> {
+                    val filePath = intent.getStringExtra(RadioService.EXTRA_FILE_PATH) ?: ""
+                    val fileSize = intent.getLongExtra(RadioService.EXTRA_FILE_SIZE, 0L)
+                    val sizeKB = fileSize / 1024
+                    val fileName = filePath.substringAfterLast("/")
+                    Toast.makeText(context, "Recording saved: $fileName (${sizeKB}KB)", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -181,11 +194,13 @@ class NowPlayingFragment : Fragment() {
         val serviceIntent = Intent(requireContext(), RadioService::class.java)
         requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-        // Register broadcast receiver for metadata, stream info, and playback state updates
+        // Register broadcast receiver for metadata, stream info, playback state, and recording updates
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_METADATA_CHANGED)
             addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
+            addAction(RadioService.BROADCAST_RECORDING_ERROR)
+            addAction(RadioService.BROADCAST_RECORDING_COMPLETE)
         }
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
 
@@ -411,10 +426,10 @@ class NowPlayingFragment : Fragment() {
             val recordingState = viewModel.recordingState.value
             if (recordingState?.isRecording == true) {
                 viewModel.stopRecording()
-                Toast.makeText(requireContext(), "Recording saved to Music folder", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Stopping recording...", Toast.LENGTH_SHORT).show()
             } else {
                 if (viewModel.startRecording()) {
-                    Toast.makeText(requireContext(), "Recording started", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Starting recording...", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(requireContext(), "No station playing", Toast.LENGTH_SHORT).show()
                 }
