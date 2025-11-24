@@ -123,8 +123,13 @@ class MiniPlayerView @JvmOverloads constructor(
                 error(R.drawable.ic_radio)
             }
         } else {
+            // Force reload to get fresh drawable with current theme colors (Material You)
+            coverImage.setImageDrawable(null)
             coverImage.load(R.drawable.ic_radio) {
                 crossfade(true)
+                // Disable all caching to force fresh drawable with current theme
+                memoryCachePolicy(CachePolicy.DISABLED)
+                diskCachePolicy(CachePolicy.DISABLED)
             }
         }
         // Update the current station's cover art reference
@@ -186,13 +191,18 @@ class MiniPlayerView @JvmOverloads constructor(
             }
         } else {
             // Explicitly clear any cached/loading state and set default drawable
+            // Force reload to get fresh drawable with current theme colors (Material You)
+            coverImage.setImageDrawable(null)
             coverImage.load(R.drawable.ic_radio) {
                 crossfade(true)
+                // Disable all caching to force fresh drawable with current theme
+                memoryCachePolicy(CachePolicy.DISABLED)
+                diskCachePolicy(CachePolicy.DISABLED)
             }
         }
 
-        // Show loading indicator when a new station is set (buffering will start)
-        progressIndicator.visibility = VISIBLE
+        // Don't change progress indicator visibility here - let setBufferingState() handle it
+        // The RadioService will broadcast buffering state which will properly show/hide the indicator
     }
 
     fun setPlayingState(playing: Boolean) {

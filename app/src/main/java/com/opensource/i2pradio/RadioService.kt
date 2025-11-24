@@ -73,6 +73,9 @@ class RadioService : Service() {
     private var reconnectAttempts = 0
     private val maxReconnectAttempts = 10
 
+    // Store OkHttp client for proper cleanup to prevent memory leaks
+    private var currentOkHttpClient: OkHttpClient? = null
+
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: android.media.AudioFocusRequest? = null
     @Volatile private var hasAudioFocus = false
@@ -1373,7 +1376,8 @@ class RadioService : Service() {
             android.util.Log.d("RadioService", "==================================")
 
             // Simple, clean OkHttp client - let ExoPlayer handle buffering
-            val okHttpClient = if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
+            // Store the client for proper cleanup to prevent memory leaks
+            currentOkHttpClient = if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
                 val javaProxyType = when (effectiveProxyType) {
                     ProxyType.TOR -> Proxy.Type.SOCKS
                     ProxyType.I2P -> Proxy.Type.HTTP
@@ -1391,6 +1395,8 @@ class RadioService : Service() {
                     .readTimeout(30, TimeUnit.SECONDS)
                     .build()
             }
+
+            val okHttpClient = currentOkHttpClient!!
 
             // Direct data source - no wrapper, no middleware
             // This is the key simplification: let the stream go directly to ExoPlayer
@@ -1587,6 +1593,22 @@ class RadioService : Service() {
             release()
         }
         player = null
+
+        // Clean up OkHttp client resources to prevent memory leaks
+        currentOkHttpClient?.let { client ->
+            try {
+                // Shutdown dispatcher to stop background threads
+                client.dispatcher.executorService.shutdown()
+                // Evict all connections from the pool
+                client.connectionPool.evictAll()
+                // Close the cache if present
+                client.cache?.close()
+                android.util.Log.d("RadioService", "OkHttp client resources cleaned up")
+            } catch (e: Exception) {
+                android.util.Log.w("RadioService", "Error cleaning up OkHttp client: ${e.message}")
+            }
+        }
+        currentOkHttpClient = null
 
         // Properly abandon audio focus with the correct listener/request
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
