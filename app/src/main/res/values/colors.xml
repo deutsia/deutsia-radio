@@ -13,4 +13,8 @@
 
     <!-- Orbot brand color -->
     <color name="orbot_purple">#8E24AA</color>
+
+    <!-- UI colors -->
+    <color name="color_error">#F44336</color>
+    <color name="color_favorite">#E91E63</color>
 </resources>

@@ -19,11 +19,13 @@ import com.opensource.i2pradio.util.loadSecure
  */
 class BrowseStationsAdapter(
     private val onStationClick: (RadioBrowserStation) -> Unit,
-    private val onAddClick: (RadioBrowserStation) -> Unit
+    private val onAddClick: (RadioBrowserStation) -> Unit,
+    private val onLikeClick: (RadioBrowserStation) -> Unit
 ) : RecyclerView.Adapter<BrowseStationsAdapter.ViewHolder>() {
 
     private var stations = listOf<RadioBrowserStation>()
     private var savedUuids = setOf<String>()
+    private var likedUuids = setOf<String>()
 
     init {
         setHasStableIds(true)
@@ -50,6 +52,20 @@ class BrowseStationsAdapter(
         }
     }
 
+    fun updateLikedUuids(uuids: Set<String>) {
+        val oldLikedUuids = likedUuids
+        likedUuids = uuids
+
+        // Find items that changed liked status and notify
+        stations.forEachIndexed { index, station ->
+            val wasLiked = oldLikedUuids.contains(station.stationuuid)
+            val isLiked = uuids.contains(station.stationuuid)
+            if (wasLiked != isLiked) {
+                notifyItemChanged(index, PAYLOAD_LIKED_STATUS)
+            }
+        }
+    }
+
     override fun getItemId(position: Int): Long {
         return stations[position].stationuuid.hashCode().toLong()
     }
@@ -61,14 +77,25 @@ class BrowseStationsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(stations[position], savedUuids.contains(stations[position].stationuuid))
+        val station = stations[position]
+        holder.bind(
+            station,
+            savedUuids.contains(station.stationuuid),
+            likedUuids.contains(station.stationuuid)
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.contains(PAYLOAD_SAVED_STATUS)) {
-            holder.updateSavedStatus(savedUuids.contains(stations[position].stationuuid))
-        } else {
+        if (payloads.isEmpty()) {
             super.onBindViewHolder(holder, position, payloads)
+            return
+        }
+        val station = stations[position]
+        if (payloads.contains(PAYLOAD_SAVED_STATUS)) {
+            holder.updateSavedStatus(savedUuids.contains(station.stationuuid))
+        }
+        if (payloads.contains(PAYLOAD_LIKED_STATUS)) {
+            holder.updateLikedStatus(likedUuids.contains(station.stationuuid))
         }
     }
 
@@ -79,10 +106,11 @@ class BrowseStationsAdapter(
         private val stationName: TextView = itemView.findViewById(R.id.stationName)
         private val stationInfo: TextView = itemView.findViewById(R.id.stationInfo)
         private val qualityInfo: TextView = itemView.findViewById(R.id.qualityInfo)
+        private val likeButton: MaterialButton = itemView.findViewById(R.id.likeButton)
         private val actionButton: MaterialButton = itemView.findViewById(R.id.actionButton)
         private var imageLoadDisposable: Disposable? = null
 
-        fun bind(station: RadioBrowserStation, isSaved: Boolean) {
+        fun bind(station: RadioBrowserStation, isSaved: Boolean, isLiked: Boolean) {
             stationName.text = station.name
 
             // Build info string: genre + country
@@ -116,8 +144,14 @@ class BrowseStationsAdapter(
                 }
             }
 
-            // Update saved status
+            // Update saved and liked status
             updateSavedStatus(isSaved)
+            updateLikedStatus(isLiked)
+
+            // Like button click listener
+            likeButton.setOnClickListener {
+                onLikeClick(station)
+            }
 
             // Touch feedback animation
             itemView.setOnTouchListener { v, event ->
@@ -166,6 +200,27 @@ class BrowseStationsAdapter(
                 actionButton.alpha = 1f
             }
         }
+
+        fun updateLikedStatus(isLiked: Boolean) {
+            if (isLiked) {
+                likeButton.setIconResource(R.drawable.ic_favorite)
+                likeButton.setIconTintResource(R.color.color_favorite)
+            } else {
+                likeButton.setIconResource(R.drawable.ic_favorite_border)
+                // Reset to default theme color
+                val typedValue = android.util.TypedValue()
+                itemView.context.theme.resolveAttribute(
+                    com.google.android.material.R.attr.colorOnSurfaceVariant,
+                    typedValue,
+                    true
+                )
+                if (typedValue.resourceId != 0) {
+                    likeButton.setIconTintResource(typedValue.resourceId)
+                } else {
+                    likeButton.iconTint = android.content.res.ColorStateList.valueOf(typedValue.data)
+                }
+            }
+        }
     }
 
     private class BrowseStationDiffCallback(
@@ -192,5 +247,6 @@ class BrowseStationsAdapter(
 
     companion object {
         private const val PAYLOAD_SAVED_STATUS = "saved_status"
+        private const val PAYLOAD_LIKED_STATUS = "liked_status"
     }
 }
