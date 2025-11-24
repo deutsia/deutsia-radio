@@ -32,7 +32,6 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.metadata.icy.IcyInfo
-import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +41,7 @@ import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
+import com.opensource.i2pradio.util.SecureImageLoader
 import okhttp3.Call
 import okhttp3.Request
 import okhttp3.Response
@@ -267,13 +267,14 @@ class RadioService : Service() {
         if (!coverArtUri.isNullOrEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val imageLoader = ImageLoader(this@RadioService)
+                    // Use SecureImageLoader to route remote URLs through Tor when Force Tor is enabled
+                    // Local content URIs (file://, content://) bypass the proxy automatically
                     val request = ImageRequest.Builder(this@RadioService)
                         .data(coverArtUri)
                         .allowHardware(false)
                         .build()
 
-                    val result = imageLoader.execute(request)
+                    val result = SecureImageLoader.execute(this@RadioService, request)
                     if (result is SuccessResult) {
                         val bitmap = (result.drawable as? BitmapDrawable)?.bitmap
                         if (bitmap != null) {

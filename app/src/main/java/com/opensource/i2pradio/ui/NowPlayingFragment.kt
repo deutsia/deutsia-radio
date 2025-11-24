@@ -36,6 +36,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import coil.load
 import coil.request.CachePolicy
+import com.opensource.i2pradio.util.loadSecure
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -388,8 +389,9 @@ class NowPlayingFragment : Fragment() {
                 }
 
                 // Handle cover art update properly - switch scaleType based on content
+                // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
                 if (station.coverArtUri != null) {
-                    coverArt.load(station.coverArtUri) {
+                    coverArt.loadSecure(station.coverArtUri) {
                         crossfade(true)
                         memoryCachePolicy(CachePolicy.ENABLED)
                         placeholder(R.drawable.ic_radio)
@@ -817,10 +819,11 @@ class NowPlayingFragment : Fragment() {
 
     /**
      * Update the cover art image with cache invalidation for real-time updates.
+     * Uses loadSecure to route remote URLs through Tor when Force Tor is enabled.
      */
     private fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
-            coverArt.load(coverArtUri) {
+            coverArt.loadSecure(coverArtUri) {
                 crossfade(true)
                 // Force refresh by disabling cache for this request
                 memoryCachePolicy(coil.request.CachePolicy.WRITE_ONLY)
