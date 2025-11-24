@@ -232,21 +232,131 @@ class RadiosFragment : Fragment() {
                 combinedGenres.indexOf(currentGenreFilter).takeIf { it >= 0 } ?: 0
             }
 
-            AlertDialog.Builder(requireContext())
+            // Create custom dialog with search functionality
+            val dialogView = LayoutInflater.from(requireContext()).inflate(
+                android.R.layout.select_dialog_singlechoice, null
+            )
+
+            val dialog = AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.filter_by_genre))
-                .setSingleChoiceItems(combinedGenres.toTypedArray(), currentIndex) { dialog, which ->
-                    val selectedGenre = combinedGenres[which]
-                    currentGenreFilter = if (selectedGenre == "All Genres") null else selectedGenre
-                    PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
-                    updateGenreFilterButtonText()
-                    // Clear search when changing genre filter
-                    currentSearchQuery = ""
-                    searchInput.setText("")
-                    observeStations()
-                    dialog.dismiss()
-                }
-                .show()
+                .setView(createGenreSearchView(combinedGenres, currentIndex))
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+
+            dialog.show()
         }
+    }
+
+    private fun createGenreSearchView(genres: List<String>, selectedIndex: Int): View {
+        val context = requireContext()
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24, 16, 24, 0)
+        }
+
+        // Search input
+        val searchInput = TextInputEditText(context).apply {
+            hint = "Search genres..."
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+            setPadding(16, 16, 16, 16)
+        }
+
+        val searchLayout = com.google.android.material.textfield.TextInputLayout(context).apply {
+            boxBackgroundMode = com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_OUTLINE
+            isHintEnabled = true
+            addView(searchInput)
+        }
+
+        container.addView(searchLayout, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            bottomMargin = 16
+        })
+
+        // RecyclerView for genre list
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0
+            ).apply {
+                weight = 1f
+            }
+        }
+
+        var filteredGenres = genres.toList()
+        val adapter = GenreAdapter(filteredGenres, selectedIndex) { selectedGenre ->
+            currentGenreFilter = if (selectedGenre == "All Genres") null else selectedGenre
+            PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
+            updateGenreFilterButtonText()
+            // Clear search when changing genre filter
+            currentSearchQuery = ""
+            this.searchInput.setText("")
+            observeStations()
+            // Dismiss the dialog
+            (recyclerView.parent?.parent as? android.app.Dialog)?.dismiss()
+        }
+        recyclerView.adapter = adapter
+
+        // Search functionality
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString() ?: ""
+                filteredGenres = if (query.isEmpty()) {
+                    genres
+                } else {
+                    genres.filter { it.contains(query, ignoreCase = true) }
+                }
+                adapter.updateGenres(filteredGenres)
+            }
+        })
+
+        container.addView(recyclerView)
+        return container
+    }
+
+    // Adapter for genre list with search
+    private inner class GenreAdapter(
+        private var genres: List<String>,
+        private val selectedIndex: Int,
+        private val onGenreSelected: (String) -> Unit
+    ) : RecyclerView.Adapter<GenreAdapter.ViewHolder>() {
+
+        private var selectedPosition = selectedIndex
+
+        fun updateGenres(newGenres: List<String>) {
+            genres = newGenres
+            notifyDataSetChanged()
+        }
+
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val textView: TextView = view.findViewById(android.R.id.text1)
+            val radioButton: android.widget.RadioButton = view.findViewById(android.R.id.button1)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(
+                android.R.layout.select_dialog_singlechoice, parent, false
+            )
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val genre = genres[position]
+            holder.textView.text = genre
+            holder.radioButton.isChecked = position == selectedPosition
+
+            holder.itemView.setOnClickListener {
+                selectedPosition = position
+                notifyDataSetChanged()
+                onGenreSelected(genre)
+            }
+        }
+
+        override fun getItemCount() = genres.size
     }
 
     private fun updateSortButtonText() {

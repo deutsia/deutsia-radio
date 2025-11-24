@@ -107,10 +107,11 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Load recently changed stations
+     * Load history (recently changed stations)
+     * TODO: Implement true user browse history tracking (last ~75 stations played from browse)
      */
-    fun loadRecentlyChanged() {
-        _currentCategory.value = BrowseCategory.RECENTLY_CHANGED
+    fun loadHistory() {
+        _currentCategory.value = BrowseCategory.HISTORY
         currentOffset = 0
         _stations.value = emptyList()
         fetchStations()
@@ -291,8 +292,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             when (val result = repository.getCountries()) {
                 is RadioBrowserResult.Success -> {
-                    // Filter to countries with at least 10 stations
-                    _countries.value = result.data.filter { it.stationCount >= 10 }
+                    // Filter to countries with at least 10 stations and sort alphabetically
+                    _countries.value = result.data
+                        .filter { it.stationCount >= 10 }
+                        .sortedBy { it.name }
                 }
                 is RadioBrowserResult.Error -> {
                     // Silently fail - countries are optional
@@ -345,7 +348,9 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 BrowseCategory.TOP_CLICKED -> {
                     repository.getTopClicked(pageSize, currentOffset)
                 }
-                BrowseCategory.RECENTLY_CHANGED -> {
+                BrowseCategory.HISTORY -> {
+                    // Currently shows recently changed stations
+                    // TODO: Replace with user's browse history (last ~75 played from browse)
                     repository.getRecentlyChanged(pageSize, currentOffset)
                 }
                 BrowseCategory.BY_COUNTRY -> {
