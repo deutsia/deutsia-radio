@@ -99,6 +99,14 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Called when a recording error occurs (from service broadcast).
+     * Resets the recording state so the UI can update.
+     */
+    fun onRecordingError() {
+        _recordingState.value = RecordingState(isRecording = false, startTimeMillis = 0L)
+    }
+
+    /**
      * Get the recording elapsed time in milliseconds.
      * Returns 0 if not recording.
      */
