@@ -38,6 +38,10 @@ class SettingsFragment : Fragment() {
     private var torStatusText: TextView? = null
     private var torStatusDetail: TextView? = null
     private var torActionButton: MaterialButton? = null
+    private var forceTorAllSwitch: MaterialSwitch? = null
+    private var forceTorExceptI2pSwitch: MaterialSwitch? = null
+    private var forceTorAllContainer: View? = null
+    private var forceTorExceptI2pContainer: View? = null
 
     // Recording directory UI elements
     private var recordingDirectoryPath: TextView? = null
@@ -101,6 +105,10 @@ class SettingsFragment : Fragment() {
         torStatusText = view.findViewById(R.id.torStatusText)
         torStatusDetail = view.findViewById(R.id.torStatusDetail)
         torActionButton = view.findViewById(R.id.torActionButton)
+        forceTorAllSwitch = view.findViewById(R.id.forceTorAllSwitch)
+        forceTorExceptI2pSwitch = view.findViewById(R.id.forceTorExceptI2pSwitch)
+        forceTorAllContainer = view.findViewById(R.id.forceTorAllContainer)
+        forceTorExceptI2pContainer = view.findViewById(R.id.forceTorExceptI2pContainer)
 
         // Show Material You option only on Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -262,10 +270,23 @@ class SettingsFragment : Fragment() {
 
     private fun setupTorControls() {
         // Initialize switch state
-        embeddedTorSwitch?.isChecked = PreferencesHelper.isEmbeddedTorEnabled(requireContext())
+        val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(requireContext())
+        embeddedTorSwitch?.isChecked = torEnabled
 
         // Show/hide status container based on switch state
-        updateTorContainerVisibility(embeddedTorSwitch?.isChecked == true)
+        updateTorContainerVisibility(torEnabled)
+
+        // IMPORTANT: Initialize TorManager if Tor is already enabled from a previous session
+        // This ensures we detect Orbot's current state when the app restarts
+        if (torEnabled) {
+            TorManager.initialize(requireContext())
+            // Also auto-start Tor if auto-start is enabled
+            if (PreferencesHelper.isAutoStartTorEnabled(requireContext()) &&
+                TorManager.state != TorManager.TorState.CONNECTED &&
+                TorManager.state != TorManager.TorState.STARTING) {
+                TorService.start(requireContext())
+            }
+        }
 
         // Update initial Tor status
         updateTorStatusUI(TorManager.state)
@@ -321,10 +342,99 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
+
+        // Setup Force Tor switches
+        setupForceTorSwitches()
+    }
+
+    private fun setupForceTorSwitches() {
+        // Initialize switch states from preferences
+        forceTorAllSwitch?.isChecked = PreferencesHelper.isForceTorAll(requireContext())
+        forceTorExceptI2pSwitch?.isChecked = PreferencesHelper.isForceTorExceptI2P(requireContext())
+
+        // Update container visibility based on main Tor switch
+        updateForceTorContainersVisibility(embeddedTorSwitch?.isChecked == true)
+
+        // Force Tor All switch handler
+        forceTorAllSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setForceTorAll(requireContext(), isChecked)
+
+            // Update the other switch to maintain mutual exclusivity
+            if (isChecked) {
+                forceTorExceptI2pSwitch?.isChecked = false
+            }
+
+            // Show warning if enabling and Tor is not connected
+            if (isChecked && !TorManager.isConnected()) {
+                Toast.makeText(
+                    requireContext(),
+                    "⚠️ Tor not connected! Streams will fail until Tor connects.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        // Force Tor Except I2P switch handler
+        forceTorExceptI2pSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setForceTorExceptI2P(requireContext(), isChecked)
+
+            // Update the other switch to maintain mutual exclusivity
+            if (isChecked) {
+                forceTorAllSwitch?.isChecked = false
+            }
+
+            // Show warning if enabling and Tor is not connected
+            if (isChecked && !TorManager.isConnected()) {
+                Toast.makeText(
+                    requireContext(),
+                    "⚠️ Tor not connected! Non-I2P streams will fail until Tor connects.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    private fun updateForceTorContainersVisibility(show: Boolean) {
+        forceTorAllContainer?.visibility = if (show) View.VISIBLE else View.GONE
+        forceTorExceptI2pContainer?.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun updateTorContainerVisibility(show: Boolean) {
         torStatusContainer?.visibility = if (show) View.VISIBLE else View.GONE
+        // Also update Force Tor containers visibility
+        updateForceTorContainersVisibility(show)
     }
 
     private fun updateTorStatusUI(state: TorManager.TorState) {

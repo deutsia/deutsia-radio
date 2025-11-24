@@ -19,6 +19,8 @@ object PreferencesHelper {
     private const val KEY_VIRTUALIZER_STRENGTH = "virtualizer_strength"
     private const val KEY_RECORDING_DIRECTORY_URI = "recording_directory_uri"
     private const val KEY_GENRE_FILTER = "genre_filter"
+    private const val KEY_FORCE_TOR_ALL = "force_tor_all"
+    private const val KEY_FORCE_TOR_EXCEPT_I2P = "force_tor_except_i2p"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -195,5 +197,51 @@ object PreferencesHelper {
     fun getGenreFilter(context: Context): String? {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_GENRE_FILTER, null)
+    }
+
+    // Force Tor settings - bulletproof mode for maximum privacy
+    // These are mutually exclusive: only one can be enabled at a time
+
+    /**
+     * Force ALL traffic through Tor - no exceptions, no leaks.
+     * When enabled, all network traffic goes through Tor SOCKS proxy.
+     * If Tor is not connected, network requests will FAIL (no fallback to clearnet).
+     */
+    fun setForceTorAll(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_FORCE_TOR_ALL, enabled)
+            .apply()
+        // If enabling this, disable the other option (mutual exclusivity)
+        if (enabled) {
+            setForceTorExceptI2P(context, false)
+        }
+    }
+
+    fun isForceTorAll(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_FORCE_TOR_ALL, false)
+    }
+
+    /**
+     * Force ALL traffic through Tor EXCEPT I2P traffic.
+     * I2P traffic uses the I2P HTTP proxy directly.
+     * All other traffic (clearnet) goes through Tor SOCKS proxy.
+     * If Tor is not connected, non-I2P requests will FAIL (no fallback).
+     */
+    fun setForceTorExceptI2P(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_FORCE_TOR_EXCEPT_I2P, enabled)
+            .apply()
+        // If enabling this, disable the other option (mutual exclusivity)
+        if (enabled) {
+            setForceTorAll(context, false)
+        }
+    }
+
+    fun isForceTorExceptI2P(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_FORCE_TOR_EXCEPT_I2P, false)
     }
 }
