@@ -1,0 +1,196 @@
+package com.opensource.i2pradio.ui.browse
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
+import coil.request.Disposable
+import com.google.android.material.button.MaterialButton
+import com.opensource.i2pradio.R
+import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
+import com.opensource.i2pradio.util.loadSecure
+
+/**
+ * RecyclerView adapter for displaying RadioBrowser search/browse results.
+ */
+class BrowseStationsAdapter(
+    private val onStationClick: (RadioBrowserStation) -> Unit,
+    private val onAddClick: (RadioBrowserStation) -> Unit
+) : RecyclerView.Adapter<BrowseStationsAdapter.ViewHolder>() {
+
+    private var stations = listOf<RadioBrowserStation>()
+    private var savedUuids = setOf<String>()
+
+    init {
+        setHasStableIds(true)
+    }
+
+    fun submitList(newStations: List<RadioBrowserStation>) {
+        val diffCallback = BrowseStationDiffCallback(stations, newStations)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        stations = newStations
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun updateSavedUuids(uuids: Set<String>) {
+        val oldSavedUuids = savedUuids
+        savedUuids = uuids
+
+        // Find items that changed saved status and notify
+        stations.forEachIndexed { index, station ->
+            val wasSaved = oldSavedUuids.contains(station.stationuuid)
+            val isSaved = uuids.contains(station.stationuuid)
+            if (wasSaved != isSaved) {
+                notifyItemChanged(index, PAYLOAD_SAVED_STATUS)
+            }
+        }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return stations[position].stationuuid.hashCode().toLong()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_browse_station, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(stations[position], savedUuids.contains(stations[position].stationuuid))
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.contains(PAYLOAD_SAVED_STATUS)) {
+            holder.updateSavedStatus(savedUuids.contains(stations[position].stationuuid))
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
+    }
+
+    override fun getItemCount() = stations.size
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val stationIcon: ImageView = itemView.findViewById(R.id.stationIcon)
+        private val stationName: TextView = itemView.findViewById(R.id.stationName)
+        private val stationInfo: TextView = itemView.findViewById(R.id.stationInfo)
+        private val qualityInfo: TextView = itemView.findViewById(R.id.qualityInfo)
+        private val actionButton: MaterialButton = itemView.findViewById(R.id.actionButton)
+        private var imageLoadDisposable: Disposable? = null
+
+        fun bind(station: RadioBrowserStation, isSaved: Boolean) {
+            stationName.text = station.name
+
+            // Build info string: genre + country
+            val infoParts = mutableListOf<String>()
+            val genre = station.getPrimaryGenre()
+            if (genre.isNotEmpty() && genre != "Other") {
+                infoParts.add(genre)
+            }
+            if (station.country.isNotEmpty()) {
+                infoParts.add(station.country)
+            }
+            stationInfo.text = infoParts.joinToString(" • ")
+
+            // Quality info
+            val quality = station.getQualityInfo()
+            if (quality.isNotEmpty()) {
+                qualityInfo.text = quality
+                qualityInfo.visibility = View.VISIBLE
+            } else {
+                qualityInfo.visibility = View.GONE
+            }
+
+            // Load favicon using secure loader (respects Tor settings)
+            imageLoadDisposable?.dispose()
+            stationIcon.setImageResource(R.drawable.ic_radio)
+            if (station.favicon.isNotEmpty()) {
+                imageLoadDisposable = stationIcon.loadSecure(station.favicon) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_radio)
+                    error(R.drawable.ic_radio)
+                }
+            }
+
+            // Update saved status
+            updateSavedStatus(isSaved)
+
+            // Touch feedback animation
+            itemView.setOnTouchListener { v, event ->
+                when (event.action) {
+                    android.view.MotionEvent.ACTION_DOWN -> {
+                        v.animate()
+                            .scaleX(0.97f)
+                            .scaleY(0.97f)
+                            .setDuration(100)
+                            .setInterpolator(DecelerateInterpolator())
+                            .start()
+                    }
+                    android.view.MotionEvent.ACTION_UP,
+                    android.view.MotionEvent.ACTION_CANCEL -> {
+                        v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .setInterpolator(DecelerateInterpolator())
+                            .start()
+                    }
+                }
+                false
+            }
+
+            // Click listeners
+            itemView.setOnClickListener {
+                onStationClick(station)
+            }
+
+            actionButton.setOnClickListener {
+                if (!savedUuids.contains(station.stationuuid)) {
+                    onAddClick(station)
+                }
+            }
+        }
+
+        fun updateSavedStatus(isSaved: Boolean) {
+            if (isSaved) {
+                actionButton.setIconResource(R.drawable.ic_check)
+                actionButton.isEnabled = false
+                actionButton.alpha = 0.6f
+            } else {
+                actionButton.setIconResource(R.drawable.ic_add)
+                actionButton.isEnabled = true
+                actionButton.alpha = 1f
+            }
+        }
+    }
+
+    private class BrowseStationDiffCallback(
+        private val oldList: List<RadioBrowserStation>,
+        private val newList: List<RadioBrowserStation>
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize() = oldList.size
+        override fun getNewListSize() = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].stationuuid == newList[newItemPosition].stationuuid
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val old = oldList[oldItemPosition]
+            val new = newList[newItemPosition]
+            return old.name == new.name &&
+                    old.favicon == new.favicon &&
+                    old.country == new.country &&
+                    old.bitrate == new.bitrate &&
+                    old.codec == new.codec
+        }
+    }
+
+    companion object {
+        private const val PAYLOAD_SAVED_STATUS = "saved_status"
+    }
+}

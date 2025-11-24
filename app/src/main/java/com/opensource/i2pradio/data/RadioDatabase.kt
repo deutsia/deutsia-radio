@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [RadioStation::class], version = 3, exportSchema = false)
+@Database(entities = [RadioStation::class], version = 4, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
     abstract fun radioDao(): RadioDao
 
@@ -42,6 +42,48 @@ abstract class RadioDatabase : RoomDatabase() {
             }
         }
 
+        // Migration from version 3 to 4: Add RadioBrowser integration fields
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add source column - default to USER for existing stations
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN source TEXT NOT NULL DEFAULT 'USER'"
+                )
+                // Add RadioBrowser UUID for deduplication
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN radioBrowserUuid TEXT DEFAULT NULL"
+                )
+                // Add lastVerified timestamp
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN lastVerified INTEGER NOT NULL DEFAULT 0"
+                )
+                // Add cachedAt timestamp
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN cachedAt INTEGER NOT NULL DEFAULT 0"
+                )
+                // Add bitrate
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN bitrate INTEGER NOT NULL DEFAULT 0"
+                )
+                // Add codec
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN codec TEXT NOT NULL DEFAULT ''"
+                )
+                // Add country
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN country TEXT NOT NULL DEFAULT ''"
+                )
+                // Add countryCode
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN countryCode TEXT NOT NULL DEFAULT ''"
+                )
+                // Add homepage
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN homepage TEXT NOT NULL DEFAULT ''"
+                )
+            }
+        }
+
         fun getDatabase(context: Context): RadioDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -49,7 +91,7 @@ abstract class RadioDatabase : RoomDatabase() {
                     RadioDatabase::class.java,
                     "radio_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
                     .build()
                 INSTANCE = instance
