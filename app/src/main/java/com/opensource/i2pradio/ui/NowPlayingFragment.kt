@@ -96,6 +96,27 @@ class NowPlayingFragment : Fragment() {
             val binder = service as RadioService.RadioBinder
             radioService = binder.getService()
             serviceBound = true
+
+            // Sync UI state with service after reconnection (e.g., after Material You toggle)
+            // This ensures buffer bar and other UI elements are properly updated
+            radioService?.let { svc ->
+                val isPlaying = svc.isPlaying()
+                val isBuffering = svc.isBuffering()
+
+                // Update buffering state
+                setBufferingState(isBuffering)
+
+                // Update buffer bar visibility based on playing state
+                updateBufferBarVisibility(isPlaying)
+
+                // Sync ViewModel state if needed
+                if (isPlaying != viewModel.isPlaying.value) {
+                    viewModel.setPlaying(isPlaying)
+                }
+                if (isBuffering != viewModel.isBuffering.value) {
+                    viewModel.setBuffering(isBuffering)
+                }
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -440,6 +461,8 @@ class NowPlayingFragment : Fragment() {
                 // Handle cover art update properly - switch scaleType based on content
                 // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
                 if (station.coverArtUri != null) {
+                    // Set scaleType early to prevent sizing issues during Material You theme changes
+                    coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
                     coverArt.loadSecure(station.coverArtUri) {
                         crossfade(true)
                         memoryCachePolicy(CachePolicy.ENABLED)
@@ -447,7 +470,7 @@ class NowPlayingFragment : Fragment() {
                         error(R.drawable.ic_radio)
                         listener(
                             onSuccess = { _, _ ->
-                                // Real bitmap loaded - use centerCrop for best appearance
+                                // Real bitmap loaded - ensure centerCrop for best appearance
                                 coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
                             },
                             onError = { _, _ ->
@@ -457,10 +480,15 @@ class NowPlayingFragment : Fragment() {
                         )
                     }
                 } else {
-                    // No cover art - use centerInside for vector placeholder
+                    // No cover art - use centerInside for vector placeholder and force reload
                     coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    // Force reload to get fresh drawable with current theme colors (Material You)
+                    coverArt.setImageDrawable(null)
                     coverArt.load(R.drawable.ic_radio) {
                         crossfade(true)
+                        // Disable all caching to force fresh drawable with current theme
+                        memoryCachePolicy(CachePolicy.DISABLED)
+                        diskCachePolicy(CachePolicy.DISABLED)
                     }
                 }
 
