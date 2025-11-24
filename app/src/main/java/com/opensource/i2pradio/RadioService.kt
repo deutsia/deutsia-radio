@@ -182,6 +182,7 @@ class RadioService : Service() {
         const val BROADCAST_PLAYBACK_TIME_UPDATE = "com.opensource.i2pradio.PLAYBACK_TIME_UPDATE"
         const val EXTRA_PLAYBACK_ELAPSED_MS = "playback_elapsed_ms"
         const val EXTRA_BUFFERED_POSITION_MS = "buffered_position_ms"
+        const val EXTRA_CURRENT_POSITION_MS = "current_position_ms"
     }
 
     inner class RadioBinder : Binder() {
@@ -1488,10 +1489,12 @@ class RadioService : Service() {
         } else 0L
 
         val bufferedPositionMs = player?.bufferedPosition ?: 0L
+        val currentPositionMs = player?.currentPosition ?: 0L
 
         val intent = Intent(BROADCAST_PLAYBACK_TIME_UPDATE).apply {
             putExtra(EXTRA_PLAYBACK_ELAPSED_MS, elapsedMs)
             putExtra(EXTRA_BUFFERED_POSITION_MS, bufferedPositionMs)
+            putExtra(EXTRA_CURRENT_POSITION_MS, currentPositionMs)
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }

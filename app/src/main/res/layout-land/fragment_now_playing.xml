@@ -47,12 +47,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Recording Indicator - positioned below like button with breathing room -->
+    <!-- Recording Indicator - positioned directly below the like button -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordingIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:visibility="gone"
         app:cardBackgroundColor="?attr/colorErrorContainer"
         app:cardCornerRadius="16dp"
@@ -211,7 +211,7 @@
             app:layout_constraintTop_toBottomOf="@id/nowPlayingInfoContainer"
             app:layout_constraintWidth_max="280dp">
 
-            <!-- Record Button (Left) - Tertiary container for consistency with volume -->
+            <!-- Record Button (Left) - Primary container for Material You consistency -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/recordButton"
                 android:layout_width="wrap_content"
@@ -222,8 +222,8 @@
                 app:fabSize="auto"
                 app:fabCustomSize="56dp"
                 app:maxImageSize="24dp"
-                app:tint="?attr/colorOnTertiaryContainer"
-                app:backgroundTint="?attr/colorTertiaryContainer"
+                app:tint="?attr/colorOnPrimaryContainer"
+                app:backgroundTint="?attr/colorPrimaryContainer"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                 app:elevation="2dp"
                 app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
@@ -248,7 +248,7 @@
                 app:layout_constraintStart_toEndOf="@id/recordButton"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Volume Button (Right) - Tertiary container for consistency with record -->
+            <!-- Volume Button (Right) - Primary container for Material You consistency -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/volumeButton"
                 android:layout_width="wrap_content"
@@ -259,8 +259,8 @@
                 app:fabSize="auto"
                 app:fabCustomSize="56dp"
                 app:maxImageSize="24dp"
-                app:backgroundTint="?attr/colorTertiaryContainer"
-                app:tint="?attr/colorOnTertiaryContainer"
+                app:backgroundTint="?attr/colorPrimaryContainer"
+                app:tint="?attr/colorOnPrimaryContainer"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                 app:elevation="2dp"
                 app:layout_constraintBottom_toBottomOf="@id/playPauseButton"

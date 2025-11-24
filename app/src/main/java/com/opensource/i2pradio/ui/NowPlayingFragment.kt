@@ -158,7 +158,9 @@ class NowPlayingFragment : Fragment() {
                 }
                 RadioService.BROADCAST_PLAYBACK_TIME_UPDATE -> {
                     val elapsedMs = intent.getLongExtra(RadioService.EXTRA_PLAYBACK_ELAPSED_MS, 0L)
-                    updatePlaybackTime(elapsedMs)
+                    val bufferedPositionMs = intent.getLongExtra(RadioService.EXTRA_BUFFERED_POSITION_MS, 0L)
+                    val currentPositionMs = intent.getLongExtra(RadioService.EXTRA_CURRENT_POSITION_MS, 0L)
+                    updatePlaybackTime(elapsedMs, bufferedPositionMs, currentPositionMs)
                 }
             }
         }
@@ -173,8 +175,6 @@ class NowPlayingFragment : Fragment() {
         }
     }
 
-    // Pulsing animation for recording button
-    private var recordingPulseAnimator: AnimatorSet? = null
 
     // Recording timer runnable - uses ViewModel state for elapsed time calculation
     private val recordingUpdateRunnable = object : Runnable {
@@ -511,9 +511,6 @@ class NowPlayingFragment : Fragment() {
                 com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorErrorContainer, android.graphics.Color.RED)
             )
 
-            // Start pulsing animation on recording button
-            startRecordingPulseAnimation()
-
             // Show recording indicator with animation
             recordingIndicator?.apply {
                 visibility = View.VISIBLE
@@ -534,18 +531,15 @@ class NowPlayingFragment : Fragment() {
             recordingHandler.removeCallbacks(recordingUpdateRunnable)
             recordingHandler.post(recordingUpdateRunnable)
         } else {
-            // Stop pulsing animation
-            stopRecordingPulseAnimation()
-
-            // Restore record icon with tertiary container color (consistent with volume button)
+            // Restore record icon with primary container color (consistent with volume and play/pause button)
             recordButton.setImageResource(R.drawable.ic_fiber_manual_record)
             // Get colors from the current theme context to reflect theme changes properly
             val ctx = requireContext()
             recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnTertiaryContainer, android.graphics.Color.WHITE)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnPrimaryContainer, android.graphics.Color.WHITE)
             )
             recordButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorTertiaryContainer, android.graphics.Color.BLUE)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorPrimaryContainer, android.graphics.Color.BLUE)
             )
 
             // Stop blinking animation
@@ -560,36 +554,7 @@ class NowPlayingFragment : Fragment() {
         }
     }
 
-    /**
-     * Start a pulsing scale animation on the recording button
-     */
-    private fun startRecordingPulseAnimation() {
-        stopRecordingPulseAnimation()
-
-        val scaleX = ObjectAnimator.ofFloat(recordButton, "scaleX", 1f, 1.15f, 1f).apply {
-            duration = 800
-            repeatCount = ValueAnimator.INFINITE
-        }
-        val scaleY = ObjectAnimator.ofFloat(recordButton, "scaleY", 1f, 1.15f, 1f).apply {
-            duration = 800
-            repeatCount = ValueAnimator.INFINITE
-        }
-
-        recordingPulseAnimator = AnimatorSet().apply {
-            playTogether(scaleX, scaleY)
-            start()
-        }
-    }
-
-    /**
-     * Stop the pulsing animation and reset scale
-     */
-    private fun stopRecordingPulseAnimation() {
-        recordingPulseAnimator?.cancel()
-        recordingPulseAnimator = null
-        recordButton.scaleX = 1f
-        recordButton.scaleY = 1f
-    }
+    // Recording pulse animation removed - no longer used
 
     /**
      * Toggle mute state - only affects radio stream, not system-wide
@@ -786,7 +751,6 @@ class NowPlayingFragment : Fragment() {
         super.onDestroyView()
         recordingHandler.removeCallbacks(recordingUpdateRunnable)
         recordingDot?.clearAnimation()
-        stopRecordingPulseAnimation()
         previousPlayingState = null
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(metadataReceiver)
         if (serviceBound) {
@@ -881,10 +845,11 @@ class NowPlayingFragment : Fragment() {
     }
 
     /**
-     * Update the playback elapsed time display.
+     * Update the playback elapsed time display and buffer health indicator.
      * Format: MM:SS for times under an hour, HH:MM:SS for longer times.
+     * Buffer health shows how much audio is buffered ahead (max 15s = 100%).
      */
-    private fun updatePlaybackTime(elapsedMs: Long) {
+    private fun updatePlaybackTime(elapsedMs: Long, bufferedPositionMs: Long, currentPositionMs: Long) {
         val totalSeconds = elapsedMs / 1000
         val hours = totalSeconds / 3600
         val minutes = (totalSeconds % 3600) / 60
@@ -897,12 +862,15 @@ class NowPlayingFragment : Fragment() {
         }
         playbackElapsedTime?.text = timeString
 
-        // Update progress bar - for live radio, show a subtle animation
-        // We use a pulsing effect since there's no seekable duration
+        // Update progress bar with actual buffer health
+        // Buffer health = how much audio is buffered ahead of current position
+        // Max buffer target is 15 seconds (15000ms) based on ExoPlayer settings
         bufferProgressBar?.let { bar ->
-            // Animate progress for visual feedback (cycles 0-100 every ~10 seconds)
-            val progress = ((totalSeconds % 10) * 10).toInt()
-            bar.setProgressCompat(progress, true)
+            val bufferAheadMs = bufferedPositionMs - currentPositionMs
+            // Calculate percentage (0-100) based on 15 second max buffer
+            val maxBufferMs = 15_000L
+            val bufferPercent = ((bufferAheadMs.coerceIn(0, maxBufferMs) * 100) / maxBufferMs).toInt()
+            bar.setProgressCompat(bufferPercent, true)
         }
     }
 
