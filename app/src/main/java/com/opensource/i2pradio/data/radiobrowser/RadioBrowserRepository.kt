@@ -129,6 +129,51 @@ class RadioBrowserRepository(context: Context) {
     }
 
     /**
+     * Get station info by RadioBrowser UUID (including isLiked status)
+     */
+    suspend fun getStationInfoByUuid(radioBrowserUuid: String): RadioStation? {
+        return withContext(Dispatchers.IO) {
+            radioDao.getStationByRadioBrowserUuid(radioBrowserUuid)
+        }
+    }
+
+    /**
+     * Toggle like status for a station by its RadioBrowser UUID
+     */
+    suspend fun toggleLikeByUuid(radioBrowserUuid: String) {
+        withContext(Dispatchers.IO) {
+            val station = radioDao.getStationByRadioBrowserUuid(radioBrowserUuid)
+            if (station != null) {
+                radioDao.toggleLike(station.id)
+            }
+        }
+    }
+
+    /**
+     * Save a RadioBrowser station as liked (saves and sets isLiked=true)
+     */
+    suspend fun saveStationAsLiked(station: RadioBrowserStation): Long? {
+        return withContext(Dispatchers.IO) {
+            // Check if already saved
+            val existing = radioDao.getStationByRadioBrowserUuid(station.stationuuid)
+            if (existing != null) {
+                // If exists but not liked, toggle like
+                if (!existing.isLiked) {
+                    radioDao.toggleLike(existing.id)
+                }
+                Log.d(TAG, "Station already saved, toggled like: ${station.name}")
+                return@withContext existing.id
+            }
+
+            // Save new station with isLiked = true
+            val radioStation = convertToRadioStation(station, asUserStation = true).copy(isLiked = true)
+            val id = radioDao.insertStation(radioStation)
+            Log.d(TAG, "Saved and liked station: ${station.name} with ID: $id")
+            id
+        }
+    }
+
+    /**
      * Save a RadioBrowser station to user's library.
      * Converts it to the app's RadioStation format.
      *

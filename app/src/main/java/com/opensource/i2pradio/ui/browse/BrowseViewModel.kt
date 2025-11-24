@@ -72,6 +72,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     private val _savedStationUuids = MutableLiveData<Set<String>>(emptySet())
     val savedStationUuids: LiveData<Set<String>> = _savedStationUuids
 
+    // Track liked station UUIDs for UI state
+    private val _likedStationUuids = MutableLiveData<Set<String>>(emptySet())
+    val likedStationUuids: LiveData<Set<String>> = _likedStationUuids
+
     // Current search/fetch job for cancellation
     private var currentJob: Job? = null
 
@@ -200,6 +204,59 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Like a station (saves it and marks it as liked)
+     * Returns the station ID if successful
+     */
+    fun likeStation(station: RadioBrowserStation): Long? {
+        var resultId: Long? = null
+        viewModelScope.launch {
+            val id = repository.saveStationAsLiked(station)
+            if (id != null) {
+                resultId = id
+                // Update both saved and liked UUIDs sets
+                val savedCurrent = _savedStationUuids.value.orEmpty().toMutableSet()
+                savedCurrent.add(station.stationuuid)
+                _savedStationUuids.value = savedCurrent
+
+                val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
+                likedCurrent.add(station.stationuuid)
+                _likedStationUuids.value = likedCurrent
+            }
+        }
+        return resultId
+    }
+
+    /**
+     * Toggle like status for a station
+     */
+    fun toggleLike(station: RadioBrowserStation) {
+        val uuid = station.stationuuid
+        val isCurrentlyLiked = _likedStationUuids.value.orEmpty().contains(uuid)
+
+        viewModelScope.launch {
+            if (isCurrentlyLiked) {
+                // Unlike: toggle the like status in the database
+                repository.toggleLikeByUuid(uuid)
+                val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
+                likedCurrent.remove(uuid)
+                _likedStationUuids.value = likedCurrent
+            } else {
+                // Like: save and mark as liked
+                val id = repository.saveStationAsLiked(station)
+                if (id != null) {
+                    val savedCurrent = _savedStationUuids.value.orEmpty().toMutableSet()
+                    savedCurrent.add(uuid)
+                    _savedStationUuids.value = savedCurrent
+
+                    val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
+                    likedCurrent.add(uuid)
+                    _likedStationUuids.value = likedCurrent
+                }
+            }
+        }
+    }
+
+    /**
      * Mark a station as saved (for UI state)
      */
     fun markAsSaved(uuid: String) {
@@ -231,10 +288,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      */
     private fun loadTags() {
         viewModelScope.launch {
-            when (val result = repository.getTags(100)) {
+            when (val result = repository.getTags(200)) {
                 is RadioBrowserResult.Success -> {
-                    // Filter to tags with at least 50 stations
-                    _tags.value = result.data.filter { it.stationCount >= 50 }
+                    // Filter to tags with at least 10 stations (lowered threshold for better coverage)
+                    _tags.value = result.data.filter { it.stationCount >= 10 }
                 }
                 is RadioBrowserResult.Error -> {
                     // Silently fail - tags are optional
@@ -291,7 +348,23 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 BrowseCategory.SEARCH -> {
                     val query = _searchQuery.value
                     if (!query.isNullOrBlank()) {
-                        repository.searchByName(query, pageSize, currentOffset)
+                        // Search by name first
+                        val nameResult = repository.searchByName(query, pageSize, currentOffset)
+
+                        // If searching on first page, also search by tag and combine results
+                        if (currentOffset == 0 && nameResult is RadioBrowserResult.Success) {
+                            val tagResult = repository.getByTag(query, pageSize / 2, 0)
+                            if (tagResult is RadioBrowserResult.Success) {
+                                // Combine results, removing duplicates
+                                val combined = (nameResult.data + tagResult.data)
+                                    .distinctBy { it.stationuuid }
+                                RadioBrowserResult.Success(combined)
+                            } else {
+                                nameResult
+                            }
+                        } else {
+                            nameResult
+                        }
                     } else {
                         RadioBrowserResult.Error("Empty search query")
                     }
@@ -327,19 +400,27 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Check saved status for a list of stations
+     * Check saved and liked status for a list of stations
      */
     private suspend fun checkSavedStatus(stations: List<RadioBrowserStation>) {
         val savedUuids = mutableSetOf<String>()
         savedUuids.addAll(_savedStationUuids.value.orEmpty())
 
+        val likedUuids = mutableSetOf<String>()
+        likedUuids.addAll(_likedStationUuids.value.orEmpty())
+
         for (station in stations) {
-            if (repository.isStationSaved(station.stationuuid)) {
+            val stationInfo = repository.getStationInfoByUuid(station.stationuuid)
+            if (stationInfo != null) {
                 savedUuids.add(station.stationuuid)
+                if (stationInfo.isLiked) {
+                    likedUuids.add(station.stationuuid)
+                }
             }
         }
 
         _savedStationUuids.value = savedUuids
+        _likedStationUuids.value = likedUuids
     }
 
     override fun onCleared() {

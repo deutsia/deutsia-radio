@@ -89,7 +89,8 @@ class BrowseStationsFragment : Fragment() {
     private fun setupRecyclerView() {
         adapter = BrowseStationsAdapter(
             onStationClick = { station -> playStation(station) },
-            onAddClick = { station -> saveStation(station) }
+            onAddClick = { station -> saveStation(station) },
+            onLikeClick = { station -> likeStation(station) }
         )
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -124,6 +125,7 @@ class BrowseStationsFragment : Fragment() {
                     } else if (query.isEmpty()) {
                         // Reset to top voted when search is cleared
                         chipTopVoted.isChecked = true
+                        clearOtherChips(chipTopVoted)
                         viewModel.loadTopVoted()
                     }
                 }
@@ -147,26 +149,47 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun setupChips() {
-        chipTopVoted.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                clearSearch()
-                viewModel.loadTopVoted()
+        // Use click listeners instead of checked change listeners
+        // This is more reliable with ChipGroup single selection
+        chipTopVoted.setOnClickListener {
+            if (!chipTopVoted.isChecked) {
+                chipTopVoted.isChecked = true
             }
+            clearOtherChips(chipTopVoted)
+            clearSearch()
+            viewModel.loadTopVoted()
         }
 
-        chipPopular.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                clearSearch()
-                viewModel.loadTopClicked()
+        chipPopular.setOnClickListener {
+            if (!chipPopular.isChecked) {
+                chipPopular.isChecked = true
             }
+            clearOtherChips(chipPopular)
+            clearSearch()
+            viewModel.loadTopClicked()
         }
 
-        chipRecent.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                clearSearch()
-                viewModel.loadRecentlyChanged()
+        chipRecent.setOnClickListener {
+            if (!chipRecent.isChecked) {
+                chipRecent.isChecked = true
             }
+            clearOtherChips(chipRecent)
+            clearSearch()
+            viewModel.loadRecentlyChanged()
         }
+    }
+
+    private fun clearOtherChips(except: Chip) {
+        if (except != chipTopVoted) chipTopVoted.isChecked = false
+        if (except != chipPopular) chipPopular.isChecked = false
+        if (except != chipRecent) chipRecent.isChecked = false
+    }
+
+    private fun selectTopVotedChip() {
+        chipTopVoted.isChecked = true
+        clearOtherChips(chipTopVoted)
+        clearSearch()
+        viewModel.loadTopVoted()
     }
 
     private fun setupFilters() {
@@ -213,6 +236,10 @@ class BrowseStationsFragment : Fragment() {
 
         viewModel.savedStationUuids.observe(viewLifecycleOwner) { uuids ->
             adapter.updateSavedUuids(uuids)
+        }
+
+        viewModel.likedStationUuids.observe(viewLifecycleOwner) { uuids ->
+            adapter.updateLikedUuids(uuids)
         }
 
         viewModel.selectedCountry.observe(viewLifecycleOwner) { country ->
@@ -272,6 +299,10 @@ class BrowseStationsFragment : Fragment() {
         ).show()
     }
 
+    private fun likeStation(station: RadioBrowserStation) {
+        viewModel.toggleLike(station)
+    }
+
     private fun showCountryFilterDialog() {
         val countries = viewModel.countries.value ?: return
         if (countries.isEmpty()) {
@@ -287,7 +318,7 @@ class BrowseStationsFragment : Fragment() {
             .setItems(countryNames.toTypedArray()) { _, which ->
                 if (which == 0) {
                     viewModel.filterByCountry(null)
-                    chipTopVoted.isChecked = true
+                    selectTopVotedChip()
                 } else {
                     viewModel.filterByCountry(countries[which - 1])
                     clearChipSelection()
@@ -312,7 +343,7 @@ class BrowseStationsFragment : Fragment() {
             .setItems(tagNames.toTypedArray()) { _, which ->
                 if (which == 0) {
                     viewModel.filterByTag(null)
-                    chipTopVoted.isChecked = true
+                    selectTopVotedChip()
                 } else {
                     viewModel.filterByTag(tags[which - 1])
                     clearChipSelection()
