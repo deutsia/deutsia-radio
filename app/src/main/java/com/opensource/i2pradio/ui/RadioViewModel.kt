@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.ui.PreferencesHelper
 
 /**
  * Recording state to track the current recording status.
@@ -44,11 +45,56 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val coverArtUpdate: LiveData<CoverArtUpdate?> = _coverArtUpdate
 
     fun setCurrentStation(station: RadioStation?) {
+        val previousStation = _currentStation.value
         _currentStation.value = station
+
         // Stop recording if station is cleared
         if (station == null && _recordingState.value?.isRecording == true) {
             stopRecording()
+            return
         }
+
+        // Check if we should stop recording when switching to a different station
+        if (_recordingState.value?.isRecording == true && station != null && previousStation != null) {
+            // Check if this is actually a different station (by URL since browse stations may have id=0)
+            val isDifferentStation = if (station.id != 0L && previousStation.id != 0L) {
+                station.id != previousStation.id
+            } else {
+                station.streamUrl != previousStation.streamUrl
+            }
+
+            if (isDifferentStation) {
+                val app = getApplication<Application>()
+                val recordAcrossStations = PreferencesHelper.isRecordAcrossStationsEnabled(app)
+                val recordAllStations = PreferencesHelper.isRecordAllStationsEnabled(app)
+
+                if (recordAllStations) {
+                    // Switch the recording to the new stream (continue same file)
+                    switchRecordingToStation(station)
+                } else if (!recordAcrossStations) {
+                    // Stop and save recording when switching stations
+                    stopRecording()
+                }
+                // If recordAcrossStations is true but recordAllStations is false,
+                // recording continues on the original stream (no action needed)
+            }
+        }
+    }
+
+    /**
+     * Switch the recording to a new station's stream (for "Record All Stations" feature).
+     * The recording continues in the same file with content from the new stream.
+     */
+    private fun switchRecordingToStation(station: RadioStation) {
+        val intent = Intent(getApplication(), RadioService::class.java).apply {
+            action = RadioService.ACTION_SWITCH_RECORDING_STREAM
+            putExtra("stream_url", station.streamUrl)
+            putExtra("station_name", station.name)
+            putExtra("proxy_host", station.proxyHost ?: "")
+            putExtra("proxy_port", station.proxyPort)
+            putExtra("proxy_type", station.getProxyTypeEnum().name)
+        }
+        getApplication<Application>().startService(intent)
     }
 
     fun setPlaying(playing: Boolean) {

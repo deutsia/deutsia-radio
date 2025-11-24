@@ -51,6 +51,9 @@ class SettingsFragment : Fragment() {
     // Recording directory UI elements
     private var recordingDirectoryPath: TextView? = null
     private var recordingDirectoryButton: MaterialButton? = null
+    private var recordAcrossStationsSwitch: MaterialSwitch? = null
+    private var recordAllStationsContainer: View? = null
+    private var recordAllStationsSwitch: MaterialSwitch? = null
 
     // Import/Export UI elements
     private var importStationsButton: MaterialButton? = null
@@ -206,6 +209,67 @@ class SettingsFragment : Fragment() {
         updateRecordingDirectoryDisplay()
         recordingDirectoryButton?.setOnClickListener {
             showRecordingDirectoryDialog()
+        }
+
+        // Record across stations setting
+        recordAcrossStationsSwitch = view.findViewById(R.id.recordAcrossStationsSwitch)
+        recordAllStationsContainer = view.findViewById(R.id.recordAllStationsContainer)
+        recordAllStationsSwitch = view.findViewById(R.id.recordAllStationsSwitch)
+
+        // Initialize state
+        val recordAcrossEnabled = PreferencesHelper.isRecordAcrossStationsEnabled(requireContext())
+        val recordAllEnabled = PreferencesHelper.isRecordAllStationsEnabled(requireContext())
+        recordAcrossStationsSwitch?.isChecked = recordAcrossEnabled
+        recordAllStationsSwitch?.isChecked = recordAllEnabled
+        recordAllStationsContainer?.visibility = if (recordAcrossEnabled) View.VISIBLE else View.GONE
+
+        recordAcrossStationsSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setRecordAcrossStations(requireContext(), isChecked)
+
+            // Show/hide the "Record All Stations" sub-option
+            recordAllStationsContainer?.visibility = if (isChecked) View.VISIBLE else View.GONE
+
+            // If disabling record across stations, also disable record all stations
+            if (!isChecked && recordAllStationsSwitch?.isChecked == true) {
+                recordAllStationsSwitch?.isChecked = false
+                PreferencesHelper.setRecordAllStations(requireContext(), false)
+            }
+        }
+
+        recordAllStationsSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setRecordAllStations(requireContext(), isChecked)
         }
 
         // Import/Export stations
@@ -365,6 +429,13 @@ class SettingsFragment : Fragment() {
             } else {
                 // Stop Tor when disabled
                 TorService.stop(requireContext())
+
+                // IMPORTANT: Reset Force Tor preferences when Tor integration is disabled
+                // This prevents the app from thinking Tor is required when it's not available
+                PreferencesHelper.setForceTorAll(requireContext(), false)
+                PreferencesHelper.setForceTorExceptI2P(requireContext(), false)
+                forceTorAllSwitch?.isChecked = false
+                forceTorExceptI2pSwitch?.isChecked = false
             }
         }
 

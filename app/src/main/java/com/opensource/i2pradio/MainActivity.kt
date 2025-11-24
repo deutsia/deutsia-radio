@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     private var isServiceBound = false
     private var miniPlayerManuallyClosed = false
     private var lastStationId: Long? = null
+    private var lastStationUrl: String? = null  // Use URL to detect station changes for unsaved stations
 
     // Tor state listener
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
@@ -180,13 +181,23 @@ class MainActivity : AppCompatActivity() {
                 miniPlayerContainer.visibility = View.GONE
                 miniPlayerManuallyClosed = false
                 lastStationId = null
+                lastStationUrl = null
             } else {
                 // Check if this is a new station (user clicked a new radio)
-                val isNewStation = lastStationId != station.id
+                // Use both ID and URL to detect changes - this handles unsaved browse stations
+                // which all have id=0 but different URLs
+                val isNewStation = if (station.id != 0L) {
+                    lastStationId != station.id
+                } else {
+                    // For unsaved stations (id=0), compare by stream URL
+                    lastStationUrl != station.streamUrl
+                }
+
                 if (isNewStation) {
                     // Reset the manually closed flag when a new station is selected
                     miniPlayerManuallyClosed = false
                     lastStationId = station.id
+                    lastStationUrl = station.streamUrl
 
                     // Only show mini player if not manually closed
                     if (!miniPlayerManuallyClosed) {
