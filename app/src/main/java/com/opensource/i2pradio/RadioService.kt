@@ -522,6 +522,8 @@ class RadioService : Service() {
             val flushInterval = 64 * 1024L // Flush every 64KB for data safety
             val logInterval = 10_000L // Log every 10 seconds
             var file: File? = null
+            var mediaStoreUri: Uri? = null
+            var filePath: String? = null
             var connectionRetries = 0
             val maxConnectionRetries = 3
 
@@ -585,9 +587,6 @@ class RadioService : Service() {
                 }
 
                 // NOW create the file - only after we have a successful connection
-                var mediaStoreUri: Uri? = null
-                var filePath: String
-
                 if (finalUseMediaStore) {
                     // Android 10+: Use MediaStore to save to public Music/i2pradio directory
                     val contentValues = ContentValues().apply {
@@ -676,7 +675,7 @@ class RadioService : Service() {
                             // Periodic logging (not too frequent)
                             val now = System.currentTimeMillis()
                             if (now - lastLogTime >= logInterval) {
-                                android.util.Log.d("RadioService", "Recording: ${totalBytesWritten / 1024}KB written to ${file.name}")
+                                android.util.Log.d("RadioService", "Recording: ${totalBytesWritten / 1024}KB written to ${filePath ?: file?.name ?: "unknown"}")
                                 lastLogTime = now
                             }
                         } catch (e: java.io.IOException) {
@@ -747,7 +746,8 @@ class RadioService : Service() {
                         }
                         resolver.update(mediaStoreUri, updateValues, null, null)
                         android.util.Log.d("RadioService", "Recording saved to MediaStore: $filePath (${sizeKB}KB)")
-                        handler.post { broadcastRecordingComplete(filePath, totalBytesWritten) }
+                        val savedPath = filePath ?: "Music/i2pradio/unknown"
+                        handler.post { broadcastRecordingComplete(savedPath, totalBytesWritten) }
                     } else {
                         // Delete empty recording
                         android.util.Log.w("RadioService", "Recording is empty, deleting MediaStore entry: $filePath")
