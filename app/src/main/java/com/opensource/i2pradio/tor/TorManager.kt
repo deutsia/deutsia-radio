@@ -128,7 +128,13 @@ object TorManager {
             stateListeners.toList().forEach { it(newState) }
         }
 
+        // Enhanced logging for debugging Tor connectivity
+        Log.d(TAG, "===== TOR STATE CHANGE =====")
         Log.d(TAG, "Tor state changed: $oldState -> $newState")
+        Log.d(TAG, "SOCKS proxy: $_socksHost:$_socksPort")
+        Log.d(TAG, "HTTP proxy port: $_httpPort")
+        Log.d(TAG, "Is connected: ${isConnected()}")
+        Log.d(TAG, "============================")
     }
 
     private fun startHealthCheck() {
@@ -151,12 +157,18 @@ object TorManager {
 
     private fun checkConnectionHealth() {
         Thread {
+            Log.d(TAG, "===== TOR HEALTH CHECK =====")
+            Log.d(TAG, "Checking SOCKS proxy at $_socksHost:$_socksPort")
             try {
                 val socket = java.net.Socket()
                 socket.connect(java.net.InetSocketAddress(_socksHost, _socksPort), 2000)
                 socket.close()
                 // Connection is healthy, no state change needed
+                Log.d(TAG, "Health check PASSED - Tor SOCKS proxy is responsive")
+                Log.d(TAG, "============================")
             } catch (e: Exception) {
+                Log.w(TAG, "Health check FAILED: ${e.message}")
+                Log.d(TAG, "============================")
                 Handler(Looper.getMainLooper()).post {
                     if (_state == TorState.CONNECTED) {
                         Log.w(TAG, "Connection health check failed: ${e.message}")

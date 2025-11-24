@@ -899,6 +899,14 @@ class RadioService : Service() {
         val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
         val isI2PStream = currentProxyType == ProxyType.I2P || currentStreamUrl?.contains(".i2p") == true
 
+        // RECORDING NETWORK ROUTING LOG
+        android.util.Log.d("RadioService", "===== RECORDING CONNECTION REQUEST =====")
+        android.util.Log.d("RadioService", "Recording URL: $currentStreamUrl")
+        android.util.Log.d("RadioService", "Force Tor All: $forceTorAll")
+        android.util.Log.d("RadioService", "Force Tor Except I2P: $forceTorExceptI2P")
+        android.util.Log.d("RadioService", "Is I2P stream: $isI2PStream")
+        android.util.Log.d("RadioService", "Tor connected: ${TorManager.isConnected()}")
+
         val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
             // FORCE TOR ALL: Everything goes through Tor, no exceptions
             forceTorAll && TorManager.isConnected() -> {
@@ -930,6 +938,16 @@ class RadioService : Service() {
             }
             else -> Triple("", 0, ProxyType.NONE)
         }
+
+        // LOG RECORDING ROUTING DECISION
+        android.util.Log.d("RadioService", "===== RECORDING ROUTING DECISION =====")
+        android.util.Log.d("RadioService", "Recording proxy: $effectiveProxyHost:$effectiveProxyPort (${effectiveProxyType.name})")
+        when (effectiveProxyType) {
+            ProxyType.TOR -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through TOR SOCKS proxy")
+            ProxyType.I2P -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through I2P HTTP proxy")
+            ProxyType.NONE -> android.util.Log.w("RadioService", "RECORDING ROUTING: DIRECT - No proxy!")
+        }
+        android.util.Log.d("RadioService", "======================================")
 
         // Create a completely new connection pool for recording
         // This ensures recording uses separate TCP connections from playback
@@ -1108,6 +1126,16 @@ class RadioService : Service() {
             val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
             val isI2PStream = proxyType == ProxyType.I2P || streamUrl.contains(".i2p")
 
+            // NETWORK ROUTING LOG - For debugging Tor/leak detection
+            android.util.Log.d("RadioService", "===== STREAM CONNECTION REQUEST =====")
+            android.util.Log.d("RadioService", "Stream URL: $streamUrl")
+            android.util.Log.d("RadioService", "Requested proxy: $proxyHost:$proxyPort (${proxyType.name})")
+            android.util.Log.d("RadioService", "Force Tor All: $forceTorAll")
+            android.util.Log.d("RadioService", "Force Tor Except I2P: $forceTorExceptI2P")
+            android.util.Log.d("RadioService", "Is I2P stream: $isI2PStream")
+            android.util.Log.d("RadioService", "Tor connected: ${TorManager.isConnected()}")
+            android.util.Log.d("RadioService", "Tor SOCKS: ${TorManager.getProxyHost()}:${TorManager.getProxyPort()}")
+
             // BULLETPROOF: If Force Tor All is enabled, Tor MUST be connected or we fail
             if (forceTorAll && !TorManager.isConnected()) {
                 android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
@@ -1197,6 +1225,16 @@ class RadioService : Service() {
                 // Direct connection (only if Force Tor modes are disabled)
                 else -> Triple("", 0, ProxyType.NONE)
             }
+
+            // LOG FINAL ROUTING DECISION - Critical for leak detection
+            android.util.Log.d("RadioService", "===== FINAL ROUTING DECISION =====")
+            android.util.Log.d("RadioService", "Effective proxy: $effectiveProxyHost:$effectiveProxyPort (${effectiveProxyType.name})")
+            when (effectiveProxyType) {
+                ProxyType.TOR -> android.util.Log.d("RadioService", "ROUTING: Traffic will go through TOR SOCKS proxy")
+                ProxyType.I2P -> android.util.Log.d("RadioService", "ROUTING: Traffic will go through I2P HTTP proxy")
+                ProxyType.NONE -> android.util.Log.w("RadioService", "ROUTING: DIRECT CONNECTION - No proxy! (potential leak if unintended)")
+            }
+            android.util.Log.d("RadioService", "==================================")
 
             // Simple, clean OkHttp client - let ExoPlayer handle buffering
             val okHttpClient = if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {

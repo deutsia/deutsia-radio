@@ -283,12 +283,12 @@
                             android:text="Force Tor Over Everything"
                             android:textSize="16sp"
                             android:textStyle="bold"
-                            android:textColor="?attr/colorError" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="BULLETPROOF: ALL traffic through Tor. Zero leaks. Fails if Tor disconnected."
+                            android:text="Route all streams through Tor. Won't connect without Tor."
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -324,12 +324,12 @@
                             android:text="Force Tor Except I2P"
                             android:textSize="16sp"
                             android:textStyle="bold"
-                            android:textColor="?attr/colorError" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="All traffic via Tor EXCEPT I2P streams (use I2P proxy directly). Zero clearnet leaks."
+                            android:text="Route clearnet through Tor, I2P streams direct to I2P proxy."
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -347,56 +347,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access to connection controls.\n\n⚠️ Force Tor modes are STRICT: if Tor is disconnected, streams will fail rather than leak to clearnet."
+                    android:text="Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable."
                     android:textSize="12sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:lineSpacingExtra="2dp" />
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- About Section -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainer">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="About"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorPrimary"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="I2P Radio Player is an open-source radio streaming app with full I2P network support. Stream your favorite stations from both the clearnet and the I2P network with beautiful Material You design."
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:lineSpacingExtra="4dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/githubButton"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="View on GitHub"
-                    app:icon="@drawable/ic_github" />
 
             </LinearLayout>
 
@@ -557,6 +511,52 @@
                         app:iconSize="18dp" />
 
                 </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- About Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="About"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="I2P Radio Player is an open-source radio streaming app with full I2P network support. Stream your favorite stations from both the clearnet and the I2P network with beautiful Material You design."
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:lineSpacingExtra="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/githubButton"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="View on GitHub"
+                    app:icon="@drawable/ic_github" />
 
             </LinearLayout>
 
