@@ -16,6 +16,9 @@ import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -77,8 +80,8 @@ class NowPlayingFragment : Fragment() {
     private var bufferProgressBar: com.google.android.material.progressindicator.LinearProgressIndicator? = null
     private var liveIndicator: TextView? = null
 
-    // Volume control state
-    private var savedVolume: Int = 0
+    // Volume control state (0.0 to 1.0 for player volume)
+    private var savedVolume: Float = 1f
     private var isMuted: Boolean = false
 
     // Service binding for equalizer
@@ -169,6 +172,9 @@ class NowPlayingFragment : Fragment() {
             repeatCount = Animation.INFINITE
         }
     }
+
+    // Pulsing animation for recording button
+    private var recordingPulseAnimator: AnimatorSet? = null
 
     // Recording timer runnable - uses ViewModel state for elapsed time calculation
     private val recordingUpdateRunnable = object : Runnable {
@@ -265,9 +271,7 @@ class NowPlayingFragment : Fragment() {
         // Enable marquee for metadata text
         metadataText.isSelected = true
 
-        // Initialize volume state - check if currently muted
-        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-        isMuted = currentVolume == 0
+        // Initialize volume state - will be synced when service connects
         updateVolumeButtonIcon()
 
         // Volume button tap toggles mute
@@ -498,14 +502,17 @@ class NowPlayingFragment : Fragment() {
             recordButton.setImageResource(R.drawable.ic_stop_record)
             // Get colors from the current theme context to reflect theme changes properly
             val ctx = requireContext()
-            // Change icon tint to white for contrast
+            // Change icon tint to white for contrast on error background
             recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnError, android.graphics.Color.WHITE)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnErrorContainer, android.graphics.Color.WHITE)
             )
             // Change FAB background to error container (red) for recording state
             recordButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
                 com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorErrorContainer, android.graphics.Color.RED)
             )
+
+            // Start pulsing animation on recording button
+            startRecordingPulseAnimation()
 
             // Show recording indicator with animation
             recordingIndicator?.apply {
@@ -527,16 +534,18 @@ class NowPlayingFragment : Fragment() {
             recordingHandler.removeCallbacks(recordingUpdateRunnable)
             recordingHandler.post(recordingUpdateRunnable)
         } else {
-            // Restore record icon with default blue/primary color
+            // Stop pulsing animation
+            stopRecordingPulseAnimation()
+
+            // Restore record icon with tertiary container color (consistent with volume button)
             recordButton.setImageResource(R.drawable.ic_fiber_manual_record)
             // Get colors from the current theme context to reflect theme changes properly
-            // Using requireContext() ensures we get colors from the recreated activity's theme
             val ctx = requireContext()
             recordButton.imageTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnPrimaryContainer, android.graphics.Color.WHITE)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnTertiaryContainer, android.graphics.Color.WHITE)
             )
             recordButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorPrimaryContainer, android.graphics.Color.BLUE)
+                com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorTertiaryContainer, android.graphics.Color.BLUE)
             )
 
             // Stop blinking animation
@@ -552,21 +561,51 @@ class NowPlayingFragment : Fragment() {
     }
 
     /**
-     * Toggle mute state
+     * Start a pulsing scale animation on the recording button
+     */
+    private fun startRecordingPulseAnimation() {
+        stopRecordingPulseAnimation()
+
+        val scaleX = ObjectAnimator.ofFloat(recordButton, "scaleX", 1f, 1.15f, 1f).apply {
+            duration = 800
+            repeatCount = ValueAnimator.INFINITE
+        }
+        val scaleY = ObjectAnimator.ofFloat(recordButton, "scaleY", 1f, 1.15f, 1f).apply {
+            duration = 800
+            repeatCount = ValueAnimator.INFINITE
+        }
+
+        recordingPulseAnimator = AnimatorSet().apply {
+            playTogether(scaleX, scaleY)
+            start()
+        }
+    }
+
+    /**
+     * Stop the pulsing animation and reset scale
+     */
+    private fun stopRecordingPulseAnimation() {
+        recordingPulseAnimator?.cancel()
+        recordingPulseAnimator = null
+        recordButton.scaleX = 1f
+        recordButton.scaleY = 1f
+    }
+
+    /**
+     * Toggle mute state - only affects radio stream, not system-wide
      */
     private fun toggleMute() {
-        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        val currentVolume = radioService?.getPlayerVolume() ?: 1f
 
-        if (isMuted || currentVolume == 0) {
-            // Unmute - restore previous volume or set to 50%
-            val restoreVolume = if (savedVolume > 0) savedVolume else maxVolume / 2
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, restoreVolume, 0)
+        if (isMuted || currentVolume == 0f) {
+            // Unmute - restore previous volume or set to 100%
+            val restoreVolume = if (savedVolume > 0f) savedVolume else 1f
+            radioService?.setPlayerVolume(restoreVolume)
             isMuted = false
         } else {
             // Mute - save current volume and set to 0
             savedVolume = currentVolume
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0)
+            radioService?.setPlayerVolume(0f)
             isMuted = true
         }
         updateVolumeButtonIcon()
@@ -576,7 +615,8 @@ class NowPlayingFragment : Fragment() {
      * Update the volume button icon based on mute state
      */
     private fun updateVolumeButtonIcon() {
-        val iconRes = if (isMuted || audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0) {
+        val playerVolume = radioService?.getPlayerVolume() ?: 1f
+        val iconRes = if (isMuted || playerVolume == 0f) {
             R.drawable.ic_volume_off
         } else {
             R.drawable.ic_volume
@@ -587,12 +627,13 @@ class NowPlayingFragment : Fragment() {
     /**
      * Shows a Material 3 BottomSheet with a vertical volume slider.
      * Long-press on volume button opens this.
+     * Controls only the radio stream volume, not system-wide.
      */
     private fun showVolumeBottomSheet() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
 
-        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        // Player volume is 0.0 to 1.0
+        val currentVolume = radioService?.getPlayerVolume() ?: 1f
 
         // Create the content view programmatically with vertical slider
         val container = LinearLayout(requireContext()).apply {
@@ -602,7 +643,7 @@ class NowPlayingFragment : Fragment() {
 
             // Title
             val title = TextView(requireContext()).apply {
-                text = "Volume"
+                text = "Radio Volume"
                 textSize = 20f
                 setTextColor(com.google.android.material.color.MaterialColors.getColor(
                     this, com.google.android.material.R.attr.colorOnSurface))
@@ -610,9 +651,26 @@ class NowPlayingFragment : Fragment() {
             }
             addView(title)
 
+            // Subtitle explaining this is radio-only
+            val subtitle = TextView(requireContext()).apply {
+                text = "Adjusts radio stream only"
+                textSize = 12f
+                setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                    this, com.google.android.material.R.attr.colorOnSurfaceVariant))
+                gravity = android.view.Gravity.CENTER
+                alpha = 0.7f
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = 4
+                }
+            }
+            addView(subtitle)
+
             // Volume icon at top
             val volumeIcon = ImageView(requireContext()).apply {
-                val iconRes = if (currentVolume == 0) R.drawable.ic_volume_off else R.drawable.ic_volume
+                val iconRes = if (currentVolume == 0f) R.drawable.ic_volume_off else R.drawable.ic_volume
                 setImageResource(iconRes)
                 imageTintList = android.content.res.ColorStateList.valueOf(
                     com.google.android.material.color.MaterialColors.getColor(
@@ -634,8 +692,8 @@ class NowPlayingFragment : Fragment() {
 
             val slider = Slider(requireContext()).apply {
                 valueFrom = 0f
-                valueTo = maxVolume.toFloat()
-                value = currentVolume.toFloat()
+                valueTo = 100f  // Use 0-100 for easier percentage display
+                value = currentVolume * 100f
                 stepSize = 1f
 
                 // Rotate to make it vertical
@@ -650,12 +708,13 @@ class NowPlayingFragment : Fragment() {
 
                 addOnChangeListener { _, value, fromUser ->
                     if (fromUser) {
-                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value.toInt(), 0)
+                        val playerVolume = value / 100f
+                        radioService?.setPlayerVolume(playerVolume)
                         // Update mute state and icon
-                        isMuted = value.toInt() == 0
+                        isMuted = playerVolume == 0f
                         updateVolumeButtonIcon()
                         // Update icon in dialog
-                        val newIconRes = if (value.toInt() == 0) R.drawable.ic_volume_off else R.drawable.ic_volume
+                        val newIconRes = if (playerVolume == 0f) R.drawable.ic_volume_off else R.drawable.ic_volume
                         volumeIcon.setImageResource(newIconRes)
                     }
                 }
@@ -665,7 +724,7 @@ class NowPlayingFragment : Fragment() {
 
             // Percentage text
             val percentText = TextView(requireContext()).apply {
-                text = "${(currentVolume * 100 / maxVolume)}%"
+                text = "${(currentVolume * 100).toInt()}%"
                 textSize = 16f
                 setTextColor(com.google.android.material.color.MaterialColors.getColor(
                     this, com.google.android.material.R.attr.colorOnSurfaceVariant))
@@ -681,7 +740,7 @@ class NowPlayingFragment : Fragment() {
 
             // Update percentage when slider changes
             slider.addOnChangeListener { _, value, _ ->
-                percentText.text = "${(value.toInt() * 100 / maxVolume)}%"
+                percentText.text = "${value.toInt()}%"
             }
         }
 
@@ -727,6 +786,7 @@ class NowPlayingFragment : Fragment() {
         super.onDestroyView()
         recordingHandler.removeCallbacks(recordingUpdateRunnable)
         recordingDot?.clearAnimation()
+        stopRecordingPulseAnimation()
         previousPlayingState = null
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(metadataReceiver)
         if (serviceBound) {
