@@ -93,6 +93,7 @@ class BrowseStationsFragment : Fragment() {
         adapter = BrowseStationsAdapter(
             onStationClick = { station -> playStation(station) },
             onAddClick = { station -> saveStation(station) },
+            onRemoveClick = { station -> removeStation(station) },
             onLikeClick = { station -> likeStation(station) }
         )
         recyclerView.adapter = adapter
@@ -300,6 +301,15 @@ class BrowseStationsFragment : Fragment() {
         Toast.makeText(
             requireContext(),
             getString(R.string.station_saved, station.name),
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun removeStation(station: RadioBrowserStation) {
+        viewModel.removeStation(station)
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.station_removed, station.name),
             Toast.LENGTH_SHORT
         ).show()
     }
