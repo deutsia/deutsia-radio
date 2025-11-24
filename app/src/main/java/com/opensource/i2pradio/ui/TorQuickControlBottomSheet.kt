@@ -161,8 +161,19 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     private fun showConnectedState() {
         statusIcon.setImageResource(R.drawable.ic_tor_on)
         statusIcon.alpha = 1f
-        statusTitle.text = "Connected to Tor"
-        statusSubtitle.text = "Your connection is private and anonymous"
+
+        // Check if force Tor mode is enabled
+        val isForceTorEnabled = PreferencesHelper.isForceTorAll(requireContext()) ||
+                                PreferencesHelper.isForceTorExceptI2P(requireContext())
+
+        if (isForceTorEnabled) {
+            statusTitle.text = "Connected to Tor (Force Mode)"
+            statusSubtitle.text = "Disconnect via Orbot or disable Force Tor in settings"
+        } else {
+            statusTitle.text = "Connected to Tor"
+            statusSubtitle.text = "Your connection is private and anonymous"
+        }
+
         connectionProgress.visibility = View.GONE
         orbotInfoCard.visibility = View.GONE
 
@@ -188,7 +199,9 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
 
         primaryActionButton.text = "Disconnect"
         primaryActionButton.setIconResource(R.drawable.ic_tor_off)
-        primaryActionButton.isEnabled = true
+        // Disable disconnect button if force Tor mode is enabled
+        primaryActionButton.isEnabled = !isForceTorEnabled
+        primaryActionButton.alpha = if (isForceTorEnabled) 0.5f else 1.0f
         primaryActionButton.visibility = View.VISIBLE
 
         secondaryActionButton.text = "Open Orbot"

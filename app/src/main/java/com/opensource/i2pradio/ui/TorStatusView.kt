@@ -69,13 +69,26 @@ class TorStatusView @JvmOverloads constructor(
     fun updateState(state: TorManager.TorState) {
         stopAnimations()
 
+        // Check if force Tor mode is enabled - if so, we should show connected state
+        // even during transient disconnections to prevent UI glitches
+        val isForceTorEnabled = PreferencesHelper.isForceTorAll(context) ||
+                                PreferencesHelper.isForceTorExceptI2P(context)
+
         when (state) {
             TorManager.TorState.STOPPED -> {
-                statusIcon.setImageResource(R.drawable.ic_tor_off)
-                statusIcon.alpha = 0.5f
-                statusText.text = "Tor Off"
-                statusText.setTextColor(context.getColor(R.color.tor_disconnected))
-                contentDescription = "Tor is disconnected. Tap to connect."
+                // If force Tor is enabled and we have a proxy port, assume connected
+                if (isForceTorEnabled && TorManager.isConnected()) {
+                    showConnectedStateForForceTor()
+                } else if (isForceTorEnabled) {
+                    // Force Tor is enabled but not connected - show warning
+                    showForceTorWarning()
+                } else {
+                    statusIcon.setImageResource(R.drawable.ic_tor_off)
+                    statusIcon.alpha = 0.5f
+                    statusText.text = "Tor Off"
+                    statusText.setTextColor(context.getColor(R.color.tor_disconnected))
+                    contentDescription = "Tor is disconnected. Tap to connect."
+                }
             }
             TorManager.TorState.STARTING -> {
                 statusIcon.setImageResource(R.drawable.ic_tor_connecting)
@@ -94,21 +107,52 @@ class TorStatusView @JvmOverloads constructor(
                 showConnectedAnimation()
             }
             TorManager.TorState.ERROR -> {
-                statusIcon.setImageResource(R.drawable.ic_tor_error)
-                statusIcon.alpha = 1f
-                statusText.text = "Tor Error"
-                statusText.setTextColor(context.getColor(R.color.tor_error))
-                contentDescription = "Tor connection failed. Tap to retry."
-                showErrorAnimation()
+                // If force Tor is enabled, show a more severe warning
+                if (isForceTorEnabled) {
+                    showForceTorWarning()
+                } else {
+                    statusIcon.setImageResource(R.drawable.ic_tor_error)
+                    statusIcon.alpha = 1f
+                    statusText.text = "Tor Error"
+                    statusText.setTextColor(context.getColor(R.color.tor_error))
+                    contentDescription = "Tor connection failed. Tap to retry."
+                    showErrorAnimation()
+                }
             }
             TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                statusIcon.setImageResource(R.drawable.ic_tor_off)
-                statusIcon.alpha = 0.5f
-                statusText.text = "Install Orbot"
-                statusText.setTextColor(context.getColor(R.color.tor_disconnected))
-                contentDescription = "Orbot is not installed. Tap to install."
+                // If force Tor is enabled but Orbot says not installed, check if proxy is accessible
+                // This prevents UI glitches during activity recreation
+                if (isForceTorEnabled && TorManager.isConnected()) {
+                    showConnectedStateForForceTor()
+                } else if (isForceTorEnabled) {
+                    showForceTorWarning()
+                } else {
+                    statusIcon.setImageResource(R.drawable.ic_tor_off)
+                    statusIcon.alpha = 0.5f
+                    statusText.text = "Install Orbot"
+                    statusText.setTextColor(context.getColor(R.color.tor_disconnected))
+                    contentDescription = "Orbot is not installed. Tap to install."
+                }
             }
         }
+    }
+
+    private fun showConnectedStateForForceTor() {
+        statusIcon.setImageResource(R.drawable.ic_tor_on)
+        statusIcon.alpha = 1f
+        statusText.text = "Tor Connected"
+        statusText.setTextColor(context.getColor(R.color.tor_connected))
+        contentDescription = "Tor is connected (Force Mode). Tap to view details."
+        showConnectedAnimation()
+    }
+
+    private fun showForceTorWarning() {
+        statusIcon.setImageResource(R.drawable.ic_tor_error)
+        statusIcon.alpha = 1f
+        statusText.text = "Leak Warning"
+        statusText.setTextColor(context.getColor(R.color.tor_error))
+        contentDescription = "Force Tor is enabled but not connected. Privacy may be compromised."
+        showErrorAnimation()
     }
 
     private fun startConnectingAnimation() {
