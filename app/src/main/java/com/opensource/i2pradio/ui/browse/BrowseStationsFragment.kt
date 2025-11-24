@@ -269,7 +269,7 @@ class BrowseStationsFragment : Fragment() {
     private fun clearChipSelection() {
         chipTopVoted.isChecked = false
         chipPopular.isChecked = false
-        chipRecent.isChecked = false
+        chipHistory.isChecked = false
     }
 
     private fun clearSearch() {
