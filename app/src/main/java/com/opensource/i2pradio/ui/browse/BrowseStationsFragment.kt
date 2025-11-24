@@ -44,7 +44,7 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var searchInput: TextInputEditText
     private lateinit var chipTopVoted: Chip
     private lateinit var chipPopular: Chip
-    private lateinit var chipRecent: Chip
+    private lateinit var chipHistory: Chip
     private lateinit var countryFilterButton: MaterialButton
     private lateinit var genreFilterButton: MaterialButton
     private lateinit var adapter: BrowseStationsAdapter
@@ -75,7 +75,7 @@ class BrowseStationsFragment : Fragment() {
         searchInput = view.findViewById(R.id.searchInput)
         chipTopVoted = view.findViewById(R.id.chipTopVoted)
         chipPopular = view.findViewById(R.id.chipPopular)
-        chipRecent = view.findViewById(R.id.chipRecent)
+        chipHistory = view.findViewById(R.id.chipHistory)
         countryFilterButton = view.findViewById(R.id.countryFilterButton)
         genreFilterButton = view.findViewById(R.id.genreFilterButton)
 
@@ -174,20 +174,20 @@ class BrowseStationsFragment : Fragment() {
             viewModel.loadTopClicked()
         }
 
-        chipRecent.setOnClickListener {
-            if (!chipRecent.isChecked) {
-                chipRecent.isChecked = true
+        chipHistory.setOnClickListener {
+            if (!chipHistory.isChecked) {
+                chipHistory.isChecked = true
             }
-            clearOtherChips(chipRecent)
+            clearOtherChips(chipHistory)
             clearSearch()
-            viewModel.loadRecentlyChanged()
+            viewModel.loadHistory()
         }
     }
 
     private fun clearOtherChips(except: Chip) {
         if (except != chipTopVoted) chipTopVoted.isChecked = false
         if (except != chipPopular) chipPopular.isChecked = false
-        if (except != chipRecent) chipRecent.isChecked = false
+        if (except != chipHistory) chipHistory.isChecked = false
     }
 
     private fun selectTopVotedChip() {

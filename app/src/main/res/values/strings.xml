@@ -34,7 +34,7 @@
     <string name="search_radio_browser">Search thousands of stations…</string>
     <string name="browse_top_voted">Top Voted</string>
     <string name="browse_popular">Popular</string>
-    <string name="browse_recent">Recent</string>
+    <string name="browse_history">History</string>
     <string name="browse_no_results">No Stations Found</string>
     <string name="browse_no_results_hint">Try a different search or filter</string>
     <string name="filter_country">Country</string>
