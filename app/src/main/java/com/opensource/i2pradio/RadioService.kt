@@ -76,6 +76,10 @@ class RadioService : Service() {
     // Store OkHttp client for proper cleanup to prevent memory leaks
     private var currentOkHttpClient: OkHttpClient? = null
 
+    // Flag to track when we're switching between streams
+    // Prevents old player's IDLE state from clearing buffering animation during stream switch
+    private var isStartingNewStream = false
+
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: android.media.AudioFocusRequest? = null
     @Volatile private var hasAudioFocus = false
@@ -1278,6 +1282,7 @@ class RadioService : Service() {
             // BULLETPROOF: If Force Tor All is enabled, Tor MUST be connected or we fail
             if (forceTorAll && !TorManager.isConnected()) {
                 android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
+                isStartingNewStream = false  // Reset flag on early return
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
                 return
@@ -1286,6 +1291,7 @@ class RadioService : Service() {
             // BULLETPROOF: If Force Tor Except I2P is enabled and this is NOT an I2P stream, Tor MUST be connected
             if (forceTorExceptI2P && !isI2PStream && !TorManager.isConnected()) {
                 android.util.Log.e("RadioService", "FORCE TOR (except I2P): Tor not connected - BLOCKING non-I2P stream")
+                isStartingNewStream = false  // Reset flag on early return
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
                 return
@@ -1317,12 +1323,16 @@ class RadioService : Service() {
 
             if (focusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 android.util.Log.w("RadioService", "Failed to gain audio focus")
+                isStartingNewStream = false  // Reset flag on early return
                 // Broadcast failure to UI so it can update the play button state
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification("Audio focus denied"))
                 return
             }
             hasAudioFocus = true
+
+            // Set flag to prevent old player's IDLE state from clearing buffering animation
+            isStartingNewStream = true
 
             stopStream()
 
@@ -1433,6 +1443,10 @@ class RadioService : Service() {
                 prepare()
                 playWhenReady = true
 
+                // Reset flag now that new player is set up
+                // The new player's state changes will handle buffering broadcasts from now on
+                isStartingNewStream = false
+
                 addListener(object : Player.Listener {
                     override fun onPlayerError(error: PlaybackException) {
                         android.util.Log.e("RadioService", "Playback error: ${error.message}")
@@ -1480,7 +1494,11 @@ class RadioService : Service() {
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
-                                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                                // Don't clear buffering state if we're switching to a new stream
+                                // (the old player going IDLE shouldn't affect new stream's loading animation)
+                                if (!isStartingNewStream) {
+                                    broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                                }
                             }
                         }
                     }
@@ -1531,6 +1549,7 @@ class RadioService : Service() {
 
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Error playing stream", e)
+            isStartingNewStream = false  // Reset flag on exception
             // Broadcast failure to UI
             broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
             scheduleReconnect()
