@@ -18,6 +18,7 @@ object PreferencesHelper {
     private const val KEY_BASS_BOOST_STRENGTH = "bass_boost_strength"
     private const val KEY_VIRTUALIZER_STRENGTH = "virtualizer_strength"
     private const val KEY_RECORDING_DIRECTORY_URI = "recording_directory_uri"
+    private const val KEY_GENRE_FILTER = "genre_filter"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -181,5 +182,18 @@ object PreferencesHelper {
     fun getRecordingDirectoryUri(context: Context): String? {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_RECORDING_DIRECTORY_URI, null)
+    }
+
+    // Genre filter preferences (null = All Genres)
+    fun setGenreFilter(context: Context, genre: String?) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_GENRE_FILTER, genre)
+            .apply()
+    }
+
+    fun getGenreFilter(context: Context): String? {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_GENRE_FILTER, null)
     }
 }
