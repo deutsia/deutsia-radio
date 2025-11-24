@@ -1553,6 +1553,19 @@ class RadioService : Service() {
     fun getEqualizerManager(): EqualizerManager? = equalizerManager
 
     /**
+     * Set the player volume (0.0 to 1.0)
+     * This only affects the radio stream, not system-wide audio
+     */
+    fun setPlayerVolume(volume: Float) {
+        player?.volume = volume.coerceIn(0f, 1f)
+    }
+
+    /**
+     * Get the current player volume (0.0 to 1.0)
+     */
+    fun getPlayerVolume(): Float = player?.volume ?: 1f
+
+    /**
      * Broadcast audio session open to allow equalizer apps to attach.
      * This follows the standard Android audio effect protocol.
      */
