@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import coil.load
 import coil.request.CachePolicy
+import com.opensource.i2pradio.util.loadSecure
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -109,10 +110,11 @@ class MiniPlayerView @JvmOverloads constructor(
 
     /**
      * Update cover art with cache invalidation for real-time updates.
+     * Uses loadSecure to route remote URLs through Tor when Force Tor is enabled.
      */
     fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
-            coverImage.load(coverArtUri) {
+            coverImage.loadSecure(coverArtUri) {
                 crossfade(true)
                 // Force refresh by disabling cache for this request
                 memoryCachePolicy(CachePolicy.WRITE_ONLY)
@@ -175,8 +177,9 @@ class MiniPlayerView @JvmOverloads constructor(
         updateLikeState(station.isLiked)
 
         // Handle cover art update properly - clear old image when switching stations
+        // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
         if (station.coverArtUri != null) {
-            coverImage.load(station.coverArtUri) {
+            coverImage.loadSecure(station.coverArtUri) {
                 crossfade(true)
                 placeholder(R.drawable.ic_radio)
                 error(R.drawable.ic_radio)

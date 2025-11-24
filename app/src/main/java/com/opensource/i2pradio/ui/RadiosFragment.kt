@@ -20,8 +20,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import coil.request.Disposable
+import com.opensource.i2pradio.util.loadSecure
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
@@ -393,8 +393,9 @@ class RadioStationAdapter(
             imageLoadDisposable?.dispose()
             coverArt.setImageResource(R.drawable.ic_radio)
 
+            // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
             if (station.coverArtUri != null) {
-                imageLoadDisposable = coverArt.load(station.coverArtUri) {
+                imageLoadDisposable = coverArt.loadSecure(station.coverArtUri) {
                     crossfade(true)
                     placeholder(R.drawable.ic_radio)
                     error(R.drawable.ic_radio)

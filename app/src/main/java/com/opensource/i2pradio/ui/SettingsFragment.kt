@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,8 +25,14 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
+import com.opensource.i2pradio.util.StationImportExport
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
 
@@ -46,6 +51,33 @@ class SettingsFragment : Fragment() {
     // Recording directory UI elements
     private var recordingDirectoryPath: TextView? = null
     private var recordingDirectoryButton: MaterialButton? = null
+
+    // Import/Export UI elements
+    private var importStationsButton: MaterialButton? = null
+    private var exportStationsButton: MaterialButton? = null
+    private lateinit var repository: RadioRepository
+
+    // Import file picker launcher
+    private val importFileLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let { selectedUri ->
+            importStationsFromUri(selectedUri)
+        }
+    }
+
+    // Export file creator launcher
+    private var pendingExportFormat: StationImportExport.FileFormat? = null
+    private val exportFileLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("*/*")
+    ) { uri ->
+        uri?.let { selectedUri ->
+            pendingExportFormat?.let { format ->
+                exportStationsToUri(selectedUri, format)
+            }
+        }
+        pendingExportFormat = null
+    }
 
     // Directory picker launcher
     private val directoryPickerLauncher = registerForActivityResult(
@@ -174,6 +206,17 @@ class SettingsFragment : Fragment() {
         updateRecordingDirectoryDisplay()
         recordingDirectoryButton?.setOnClickListener {
             showRecordingDirectoryDialog()
+        }
+
+        // Import/Export stations
+        repository = RadioRepository(requireContext())
+        importStationsButton = view.findViewById(R.id.importStationsButton)
+        exportStationsButton = view.findViewById(R.id.exportStationsButton)
+        importStationsButton?.setOnClickListener {
+            showImportDialog()
+        }
+        exportStationsButton?.setOnClickListener {
+            showExportDialog()
         }
 
         // Setup Tor controls
@@ -562,5 +605,168 @@ class SettingsFragment : Fragment() {
                 dialog.dismiss()
             }
             .show()
+    }
+
+    // ==================== Import/Export Functions ====================
+
+    private fun showImportDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Import Stations")
+            .setMessage("Select a file to import radio stations from.\n\nSupported formats:\n• CSV\n• JSON\n• M3U playlist\n• PLS playlist")
+            .setPositiveButton("Select File") { _, _ ->
+                importFileLauncher.launch(arrayOf(
+                    "text/csv",
+                    "text/comma-separated-values",
+                    "application/json",
+                    "audio/x-mpegurl",
+                    "audio/mpegurl",
+                    "audio/x-scpls",
+                    "*/*"
+                ))
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showExportDialog() {
+        val formats = StationImportExport.FileFormat.values()
+        val formatNames = formats.map { it.displayName }.toTypedArray()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Export Stations")
+            .setItems(formatNames) { _, which ->
+                val format = formats[which]
+                pendingExportFormat = format
+                val filename = "i2pradio_stations.${format.extension}"
+                exportFileLauncher.launch(filename)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun importStationsFromUri(uri: Uri) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val result = StationImportExport.importFromUri(requireContext(), uri)
+
+                withContext(Dispatchers.Main) {
+                    if (result.stations.isEmpty()) {
+                        val errorMsg = if (result.errors.isNotEmpty()) {
+                            result.errors.joinToString("\n")
+                        } else {
+                            "No stations found in the file"
+                        }
+                        AlertDialog.Builder(requireContext())
+                            .setTitle("Import Failed")
+                            .setMessage(errorMsg)
+                            .setPositiveButton("OK", null)
+                            .show()
+                        return@withContext
+                    }
+
+                    // Show confirmation dialog
+                    val formatName = result.format?.displayName ?: "Unknown"
+                    val message = buildString {
+                        append("Found ${result.stations.size} station(s) in $formatName format.\n\n")
+                        if (result.errors.isNotEmpty()) {
+                            append("Warnings:\n")
+                            result.errors.take(3).forEach { append("• $it\n") }
+                            if (result.errors.size > 3) {
+                                append("• ...and ${result.errors.size - 3} more\n")
+                            }
+                            append("\n")
+                        }
+                        append("Do you want to import these stations?")
+                    }
+
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Import Stations")
+                        .setMessage(message)
+                        .setPositiveButton("Import") { _, _ ->
+                            performImport(result.stations)
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Import error: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun performImport(stations: List<com.opensource.i2pradio.data.RadioStation>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            var imported = 0
+            for (station in stations) {
+                try {
+                    repository.insertStation(station)
+                    imported++
+                } catch (e: Exception) {
+                    // Skip duplicate or invalid stations
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    requireContext(),
+                    "Imported $imported station(s)",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun exportStationsToUri(uri: Uri, format: StationImportExport.FileFormat) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val stations = repository.getAllStationsSync()
+
+                if (stations.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            requireContext(),
+                            "No stations to export",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    return@launch
+                }
+
+                requireContext().contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    when (format) {
+                        StationImportExport.FileFormat.CSV ->
+                            StationImportExport.exportToCsv(stations, outputStream)
+                        StationImportExport.FileFormat.JSON ->
+                            StationImportExport.exportToJson(stations, outputStream)
+                        StationImportExport.FileFormat.M3U ->
+                            StationImportExport.exportToM3u(stations, outputStream)
+                        StationImportExport.FileFormat.PLS ->
+                            StationImportExport.exportToPls(stations, outputStream)
+                    }
+                }
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Exported ${stations.size} station(s) to ${format.displayName}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Export error: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 }

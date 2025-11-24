@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import coil.load
+import com.opensource.i2pradio.util.loadSecure
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
@@ -233,7 +234,9 @@ class AddEditRadioDialog : DialogFragment() {
     }
 
     private fun updateImagePreview(uri: String) {
-        coverArtPreview?.load(uri) {
+        // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
+        // Local content URIs (file://, content://) bypass the proxy automatically
+        coverArtPreview?.loadSecure(uri) {
             crossfade(true)
             error(R.drawable.ic_radio)
         }
