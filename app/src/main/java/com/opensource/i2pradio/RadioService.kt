@@ -890,9 +890,36 @@ class RadioService : Service() {
      * Build a COMPLETELY SEPARATE OkHttp client for recording.
      * This client has its own connection pool, dispatcher, and settings
      * to ensure it cannot interfere with the playback OkHttp client.
+     *
+     * BULLETPROOF: This method also enforces Force Tor settings for recording traffic.
      */
     private fun buildRecordingHttpClient(): OkHttpClient {
+        // Check Force Tor settings - bulletproof mode for recording too
+        val forceTorAll = PreferencesHelper.isForceTorAll(this)
+        val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
+        val isI2PStream = currentProxyType == ProxyType.I2P || currentStreamUrl?.contains(".i2p") == true
+
         val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
+            // FORCE TOR ALL: Everything goes through Tor, no exceptions
+            forceTorAll && TorManager.isConnected() -> {
+                android.util.Log.d("RadioService", "FORCE TOR ALL (recording): Routing through Tor")
+                Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+            }
+            // FORCE TOR EXCEPT I2P: I2P streams use I2P proxy, everything else through Tor
+            forceTorExceptI2P && isI2PStream -> {
+                if (currentProxyHost?.isNotEmpty() == true && currentProxyType == ProxyType.I2P) {
+                    android.util.Log.d("RadioService", "FORCE TOR (except I2P) recording: Using I2P proxy")
+                    Triple(currentProxyHost!!, currentProxyPort, ProxyType.I2P)
+                } else {
+                    android.util.Log.d("RadioService", "FORCE TOR (except I2P) recording: Using default I2P proxy")
+                    Triple("127.0.0.1", 4444, ProxyType.I2P)
+                }
+            }
+            forceTorExceptI2P && !isI2PStream && TorManager.isConnected() -> {
+                android.util.Log.d("RadioService", "FORCE TOR (except I2P) recording: Routing through Tor")
+                Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+            }
+            // Standard proxy logic when Force Tor is disabled
             currentProxyType == ProxyType.TOR &&
             PreferencesHelper.isEmbeddedTorEnabled(this) &&
             TorManager.isConnected() -> {
@@ -1076,6 +1103,27 @@ class RadioService : Service() {
 
     private fun playStream(streamUrl: String, proxyHost: String, proxyPort: Int, proxyType: ProxyType = ProxyType.NONE) {
         try {
+            // Check Force Tor settings FIRST - bulletproof mode
+            val forceTorAll = PreferencesHelper.isForceTorAll(this)
+            val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
+            val isI2PStream = proxyType == ProxyType.I2P || streamUrl.contains(".i2p")
+
+            // BULLETPROOF: If Force Tor All is enabled, Tor MUST be connected or we fail
+            if (forceTorAll && !TorManager.isConnected()) {
+                android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
+                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
+                return
+            }
+
+            // BULLETPROOF: If Force Tor Except I2P is enabled and this is NOT an I2P stream, Tor MUST be connected
+            if (forceTorExceptI2P && !isI2PStream && !TorManager.isConnected()) {
+                android.util.Log.e("RadioService", "FORCE TOR (except I2P): Tor not connected - BLOCKING non-I2P stream")
+                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
+                return
+            }
+
             // Request audio focus with proper listener to handle interruptions
             val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // Use AudioFocusRequest for API 26+
@@ -1111,11 +1159,30 @@ class RadioService : Service() {
 
             stopStream()
 
-            // Determine proxy configuration
-            // Priority: 1. Embedded Tor (if enabled and connected for Tor streams)
-            //           2. Manual proxy configuration
-            //           3. Direct connection
+            // Determine proxy configuration with Force Tor enforcement
+            // BULLETPROOF: Force Tor settings override normal proxy logic
             val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
+                // FORCE TOR ALL: Everything goes through Tor, no exceptions
+                forceTorAll && TorManager.isConnected() -> {
+                    android.util.Log.d("RadioService", "FORCE TOR ALL: Routing ALL traffic through Tor")
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
+                // FORCE TOR EXCEPT I2P: I2P streams use I2P proxy, everything else through Tor
+                forceTorExceptI2P && isI2PStream -> {
+                    // I2P stream - use I2P proxy if provided, otherwise use default I2P settings
+                    if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) {
+                        android.util.Log.d("RadioService", "FORCE TOR (except I2P): Using I2P proxy for .i2p stream")
+                        Triple(proxyHost, proxyPort, ProxyType.I2P)
+                    } else {
+                        // Default I2P proxy settings
+                        android.util.Log.d("RadioService", "FORCE TOR (except I2P): Using default I2P proxy (127.0.0.1:4444)")
+                        Triple("127.0.0.1", 4444, ProxyType.I2P)
+                    }
+                }
+                forceTorExceptI2P && !isI2PStream && TorManager.isConnected() -> {
+                    android.util.Log.d("RadioService", "FORCE TOR (except I2P): Routing non-I2P stream through Tor")
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
                 // Use embedded Tor for Tor streams if enabled and connected
                 proxyType == ProxyType.TOR &&
                 PreferencesHelper.isEmbeddedTorEnabled(this) &&
@@ -1127,7 +1194,7 @@ class RadioService : Service() {
                 proxyHost.isNotEmpty() && proxyType != ProxyType.NONE -> {
                     Triple(proxyHost, proxyPort, proxyType)
                 }
-                // Direct connection
+                // Direct connection (only if Force Tor modes are disabled)
                 else -> Triple("", 0, ProxyType.NONE)
             }
 

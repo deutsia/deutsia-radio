@@ -260,12 +260,94 @@
 
                 </LinearLayout>
 
+                <!-- Force Tor Over Everything -->
+                <LinearLayout
+                    android:id="@+id/forceTorAllContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="8dp"
+                    android:layout_marginTop="16dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Force Tor Over Everything"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorError" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BULLETPROOF: ALL traffic through Tor. Zero leaks. Fails if Tor disconnected."
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/forceTorAllSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <!-- Force Tor Except I2P -->
+                <LinearLayout
+                    android:id="@+id/forceTorExceptI2pContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Force Tor Except I2P"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorError" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="All traffic via Tor EXCEPT I2P streams (use I2P proxy directly). Zero clearnet leaks."
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/forceTorExceptI2pSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
                 <!-- Tor Info -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access to connection controls."
+                    android:layout_marginTop="16dp"
+                    android:text="Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access to connection controls.\n\n⚠️ Force Tor modes are STRICT: if Tor is disconnected, streams will fail rather than leak to clearnet."
                     android:textSize="12sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:lineSpacingExtra="2dp" />
