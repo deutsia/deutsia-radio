@@ -263,15 +263,27 @@ class NowPlayingFragment : Fragment() {
                             val radioBrowserStation = com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation(
                                 stationuuid = station.radioBrowserUuid,
                                 name = station.name,
-                                url_resolved = station.streamUrl,
+                                url = station.streamUrl,
+                                urlResolved = station.streamUrl,
+                                homepage = station.homepage ?: "",
                                 favicon = station.coverArtUri ?: "",
                                 tags = station.genre,
                                 country = station.country ?: "",
                                 countrycode = station.countryCode ?: "",
+                                state = "",
+                                language = "",
+                                languagecodes = "",
+                                votes = 0,
+                                lastchangetime = "",
                                 codec = station.codec ?: "",
                                 bitrate = station.bitrate,
-                                homepage = station.homepage ?: "",
-                                lastcheckok = 1
+                                hls = false,
+                                lastcheckok = true,
+                                clickcount = 0,
+                                clicktrend = 0,
+                                sslError = false,
+                                geoLat = null,
+                                geoLong = null
                             )
                             radioBrowserRepository.saveStationAsLiked(radioBrowserStation)
                         }
