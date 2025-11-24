@@ -50,15 +50,16 @@ class RadioBrowserClient(private val context: Context) {
     private fun buildHttpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
 
+        val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
         val forceTorAll = PreferencesHelper.isForceTorAll(context)
         val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(context)
-        val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
         val torConnected = TorManager.isConnected()
 
         Log.d(TAG, "Building HTTP client - ForceTorAll: $forceTorAll, ForceTorExceptI2P: $forceTorExceptI2P, TorEnabled: $torEnabled, TorConnected: $torConnected")
 
-        // Route through Tor if Force Tor is enabled and Tor is connected
-        if ((forceTorAll || forceTorExceptI2P) && torConnected) {
+        // Only apply Force Tor settings if Tor integration itself is enabled
+        // Route through Tor if Force Tor is enabled, Tor integration is enabled, and Tor is connected
+        if (torEnabled && (forceTorAll || forceTorExceptI2P) && torConnected) {
             val socksHost = TorManager.getProxyHost()
             val socksPort = TorManager.getProxyPort()
 
@@ -432,8 +433,18 @@ class RadioBrowserClient(private val context: Context) {
     /**
      * Check if Force Tor is enabled but Tor is not connected
      * (used to warn users before making API calls)
+     *
+     * IMPORTANT: Force Tor settings only matter if Tor integration itself is enabled.
+     * If Tor integration is disabled, Force Tor settings should be ignored.
      */
     fun isTorRequiredButNotConnected(): Boolean {
+        // First check if Tor integration is even enabled
+        val torIntegrationEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
+        if (!torIntegrationEnabled) {
+            // If Tor integration is disabled, Force Tor settings don't apply
+            return false
+        }
+
         val forceTorAll = PreferencesHelper.isForceTorAll(context)
         val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(context)
         val torConnected = TorManager.isConnected()

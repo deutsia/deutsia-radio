@@ -21,6 +21,7 @@ object PreferencesHelper {
     private const val KEY_GENRE_FILTER = "genre_filter"
     private const val KEY_FORCE_TOR_ALL = "force_tor_all"
     private const val KEY_FORCE_TOR_EXCEPT_I2P = "force_tor_except_i2p"
+    private const val KEY_RECORD_ACROSS_STATIONS = "record_across_stations"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -243,5 +244,30 @@ object PreferencesHelper {
     fun isForceTorExceptI2P(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_FORCE_TOR_EXCEPT_I2P, false)
+    }
+
+    // Record across stations setting
+    // When disabled (default), switching stations while recording will stop and save the current recording
+    // When enabled, recording continues across station switches (records the original stream)
+
+    /**
+     * Set whether recording should continue when switching to a different station.
+     * When disabled (default), switching stations stops and saves the current recording.
+     * When enabled, recording continues on the original stream even when playback switches.
+     */
+    fun setRecordAcrossStations(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_RECORD_ACROSS_STATIONS, enabled)
+            .apply()
+    }
+
+    /**
+     * Check if recording should continue when switching stations.
+     * Default: false (recording stops when switching stations)
+     */
+    fun isRecordAcrossStationsEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_RECORD_ACROSS_STATIONS, false)
     }
 }

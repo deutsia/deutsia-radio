@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.ui.PreferencesHelper
 
 /**
  * Recording state to track the current recording status.
@@ -44,10 +45,32 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     val coverArtUpdate: LiveData<CoverArtUpdate?> = _coverArtUpdate
 
     fun setCurrentStation(station: RadioStation?) {
+        val previousStation = _currentStation.value
         _currentStation.value = station
+
         // Stop recording if station is cleared
         if (station == null && _recordingState.value?.isRecording == true) {
             stopRecording()
+            return
+        }
+
+        // Check if we should stop recording when switching to a different station
+        if (_recordingState.value?.isRecording == true && station != null && previousStation != null) {
+            // Check if this is actually a different station (by URL since browse stations may have id=0)
+            val isDifferentStation = if (station.id != 0L && previousStation.id != 0L) {
+                station.id != previousStation.id
+            } else {
+                station.streamUrl != previousStation.streamUrl
+            }
+
+            if (isDifferentStation) {
+                // Check the "Record Across Stations" setting
+                val recordAcrossStations = PreferencesHelper.isRecordAcrossStationsEnabled(getApplication())
+                if (!recordAcrossStations) {
+                    // Stop and save recording when switching stations
+                    stopRecording()
+                }
+            }
         }
     }
 

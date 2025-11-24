@@ -51,6 +51,7 @@ class SettingsFragment : Fragment() {
     // Recording directory UI elements
     private var recordingDirectoryPath: TextView? = null
     private var recordingDirectoryButton: MaterialButton? = null
+    private var recordAcrossStationsSwitch: MaterialSwitch? = null
 
     // Import/Export UI elements
     private var importStationsButton: MaterialButton? = null
@@ -206,6 +207,29 @@ class SettingsFragment : Fragment() {
         updateRecordingDirectoryDisplay()
         recordingDirectoryButton?.setOnClickListener {
             showRecordingDirectoryDialog()
+        }
+
+        // Record across stations setting
+        recordAcrossStationsSwitch = view.findViewById(R.id.recordAcrossStationsSwitch)
+        recordAcrossStationsSwitch?.isChecked = PreferencesHelper.isRecordAcrossStationsEnabled(requireContext())
+        recordAcrossStationsSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setRecordAcrossStations(requireContext(), isChecked)
         }
 
         // Import/Export stations
@@ -365,6 +389,13 @@ class SettingsFragment : Fragment() {
             } else {
                 // Stop Tor when disabled
                 TorService.stop(requireContext())
+
+                // IMPORTANT: Reset Force Tor preferences when Tor integration is disabled
+                // This prevents the app from thinking Tor is required when it's not available
+                PreferencesHelper.setForceTorAll(requireContext(), false)
+                PreferencesHelper.setForceTorExceptI2P(requireContext(), false)
+                forceTorAllSwitch?.isChecked = false
+                forceTorExceptI2pSwitch?.isChecked = false
             }
         }
 
