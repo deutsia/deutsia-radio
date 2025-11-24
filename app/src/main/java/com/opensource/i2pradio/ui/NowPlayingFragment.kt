@@ -71,6 +71,10 @@ class NowPlayingFragment : Fragment() {
     private var recordingTimeText: TextView? = null
     private lateinit var equalizerButton: MaterialButton
 
+    // Volume control state
+    private var savedVolume: Int = 0
+    private var isMuted: Boolean = false
+
     // Service binding for equalizer
     private var radioService: RadioService? = null
     private var serviceBound = false
@@ -233,9 +237,20 @@ class NowPlayingFragment : Fragment() {
         // Enable marquee for metadata text
         metadataText.isSelected = true
 
-        // Volume button click shows volume bottom sheet
+        // Initialize volume state - check if currently muted
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        isMuted = currentVolume == 0
+        updateVolumeButtonIcon()
+
+        // Volume button tap toggles mute
         volumeButton.setOnClickListener {
+            toggleMute()
+        }
+
+        // Volume button long press opens volume slider
+        volumeButton.setOnLongClickListener {
             showVolumeBottomSheet()
+            true
         }
 
         // Back button
@@ -509,8 +524,41 @@ class NowPlayingFragment : Fragment() {
     }
 
     /**
-     * Shows a Material 3 BottomSheet with a volume slider.
-     * Better UX than an AlertDialog for volume control.
+     * Toggle mute state
+     */
+    private fun toggleMute() {
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+
+        if (isMuted || currentVolume == 0) {
+            // Unmute - restore previous volume or set to 50%
+            val restoreVolume = if (savedVolume > 0) savedVolume else maxVolume / 2
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, restoreVolume, 0)
+            isMuted = false
+        } else {
+            // Mute - save current volume and set to 0
+            savedVolume = currentVolume
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0)
+            isMuted = true
+        }
+        updateVolumeButtonIcon()
+    }
+
+    /**
+     * Update the volume button icon based on mute state
+     */
+    private fun updateVolumeButtonIcon() {
+        val iconRes = if (isMuted || audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0) {
+            R.drawable.ic_volume_off
+        } else {
+            R.drawable.ic_volume
+        }
+        volumeButton.setImageResource(iconRes)
+    }
+
+    /**
+     * Shows a Material 3 BottomSheet with a vertical volume slider.
+     * Long-press on volume button opens this.
      */
     private fun showVolumeBottomSheet() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
@@ -518,9 +566,10 @@ class NowPlayingFragment : Fragment() {
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
-        // Create the content view programmatically
+        // Create the content view programmatically with vertical slider
         val container = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
+            gravity = android.view.Gravity.CENTER_HORIZONTAL
             setPadding(48, 32, 48, 48)
 
             // Title
@@ -529,41 +578,83 @@ class NowPlayingFragment : Fragment() {
                 textSize = 20f
                 setTextColor(com.google.android.material.color.MaterialColors.getColor(
                     this, com.google.android.material.R.attr.colorOnSurface))
-                setPadding(16, 0, 0, 24)
+                gravity = android.view.Gravity.CENTER
             }
             addView(title)
 
-            // Volume slider
+            // Volume icon at top
+            val volumeIcon = ImageView(requireContext()).apply {
+                val iconRes = if (currentVolume == 0) R.drawable.ic_volume_off else R.drawable.ic_volume
+                setImageResource(iconRes)
+                imageTintList = android.content.res.ColorStateList.valueOf(
+                    com.google.android.material.color.MaterialColors.getColor(
+                        this, com.google.android.material.R.attr.colorOnSurfaceVariant))
+                layoutParams = LinearLayout.LayoutParams(64, 64).apply {
+                    topMargin = 24
+                    bottomMargin = 16
+                }
+            }
+            addView(volumeIcon)
+
+            // Vertical volume slider using rotated horizontal slider
+            val sliderContainer = android.widget.FrameLayout(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    350  // Fixed height for the vertical slider area
+                )
+            }
+
             val slider = Slider(requireContext()).apply {
                 valueFrom = 0f
                 valueTo = maxVolume.toFloat()
                 value = currentVolume.toFloat()
                 stepSize = 1f
 
+                // Rotate to make it vertical
+                rotation = 270f
+
+                layoutParams = android.widget.FrameLayout.LayoutParams(
+                    350,  // This becomes the "height" of the vertical slider
+                    android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    gravity = android.view.Gravity.CENTER
+                }
+
                 addOnChangeListener { _, value, fromUser ->
                     if (fromUser) {
                         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, value.toInt(), 0)
+                        // Update mute state and icon
+                        isMuted = value.toInt() == 0
+                        updateVolumeButtonIcon()
+                        // Update icon in dialog
+                        val newIconRes = if (value.toInt() == 0) R.drawable.ic_volume_off else R.drawable.ic_volume
+                        volumeIcon.setImageResource(newIconRes)
                     }
                 }
             }
-            addView(slider)
+            sliderContainer.addView(slider)
+            addView(sliderContainer)
 
-            // Volume icon row
-            val iconRow = LinearLayout(requireContext()).apply {
-                orientation = LinearLayout.HORIZONTAL
-                setPadding(0, 8, 0, 0)
-                gravity = android.view.Gravity.CENTER_HORIZONTAL
-
-                val volumeIcon = ImageView(requireContext()).apply {
-                    setImageResource(R.drawable.ic_volume)
-                    imageTintList = android.content.res.ColorStateList.valueOf(
-                        com.google.android.material.color.MaterialColors.getColor(
-                            this, com.google.android.material.R.attr.colorOnSurfaceVariant))
-                    layoutParams = LinearLayout.LayoutParams(48, 48)
+            // Percentage text
+            val percentText = TextView(requireContext()).apply {
+                text = "${(currentVolume * 100 / maxVolume)}%"
+                textSize = 16f
+                setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                    this, com.google.android.material.R.attr.colorOnSurfaceVariant))
+                gravity = android.view.Gravity.CENTER
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = 8
                 }
-                addView(volumeIcon)
             }
-            addView(iconRow)
+            addView(percentText)
+
+            // Update percentage when slider changes
+            slider.addOnChangeListener { _, value, _ ->
+                percentText.text = "${(value.toInt() * 100 / maxVolume)}%"
+            }
         }
 
         bottomSheetDialog.setContentView(container)
