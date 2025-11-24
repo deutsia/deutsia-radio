@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -28,6 +29,7 @@ import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
 import com.opensource.i2pradio.ui.RadioViewModel
+import kotlinx.coroutines.launch
 
 /**
  * Fragment for browsing and searching RadioBrowser stations.
@@ -53,6 +55,7 @@ class BrowseStationsFragment : Fragment() {
 
     private var searchDebounceRunnable: Runnable? = null
     private val searchDebounceDelay = 500L
+    private var isManualSearchClear = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -122,12 +125,13 @@ class BrowseStationsFragment : Fragment() {
                     if (query.length >= 2) {
                         viewModel.search(query)
                         clearChipSelection()
-                    } else if (query.isEmpty()) {
-                        // Reset to top voted when search is cleared
+                    } else if (query.isEmpty() && !isManualSearchClear) {
+                        // Reset to top voted when search is cleared (but not when manually cleared by chip clicks)
                         chipTopVoted.isChecked = true
                         clearOtherChips(chipTopVoted)
                         viewModel.loadTopVoted()
                     }
+                    isManualSearchClear = false
                 }
                 searchInput.postDelayed(searchDebounceRunnable!!, searchDebounceDelay)
             }
@@ -269,6 +273,7 @@ class BrowseStationsFragment : Fragment() {
 
     private fun clearSearch() {
         searchDebounceRunnable?.let { searchInput.removeCallbacks(it) }
+        isManualSearchClear = true
         searchInput.setText("")
     }
 
@@ -301,6 +306,18 @@ class BrowseStationsFragment : Fragment() {
 
     private fun likeStation(station: RadioBrowserStation) {
         viewModel.toggleLike(station)
+        // If this station is currently playing, update RadioViewModel to sync miniplayer/Now Playing
+        radioViewModel.getCurrentStation()?.let { currentStation ->
+            if (currentStation.radioBrowserUuid == station.stationuuid) {
+                // Check the updated like state from the database
+                lifecycleScope.launch {
+                    val updatedStation = repository.getStationInfoByUuid(station.stationuuid)
+                    updatedStation?.let {
+                        radioViewModel.updateCurrentStationLikeState(it.isLiked)
+                    }
+                }
+            }
+        }
     }
 
     private fun showCountryFilterDialog() {
