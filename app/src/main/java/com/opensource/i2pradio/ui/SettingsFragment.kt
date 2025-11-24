@@ -3,7 +3,6 @@ package com.opensource.i2pradio.ui
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.media.audiofx.AudioEffect
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -155,10 +154,10 @@ class SettingsFragment : Fragment() {
             showSleepTimerDialog(sleepTimerButton)
         }
 
-        // Equalizer button - opens system/external equalizer
+        // Equalizer button - opens built-in equalizer
         val equalizerButton = view.findViewById<MaterialButton>(R.id.equalizerButton)
         equalizerButton.setOnClickListener {
-            openSystemEqualizer()
+            openBuiltInEqualizer()
         }
 
         // Recording directory
@@ -180,26 +179,29 @@ class SettingsFragment : Fragment() {
     }
 
     /**
-     * Opens the system equalizer or external equalizer app (like Wavelet).
-     * This is the same approach used by Auxio and other music players.
+     * Opens the built-in equalizer bottom sheet.
+     * Can be opened even without an active audio session - settings will be applied when playback starts.
      */
-    private fun openSystemEqualizer() {
+    private fun openBuiltInEqualizer() {
+        val equalizerManager = radioService?.getEqualizerManager()
         val audioSessionId = radioService?.getAudioSessionId() ?: 0
-        if (audioSessionId == 0) {
-            Toast.makeText(requireContext(), "Start playing a station first", Toast.LENGTH_SHORT).show()
-            return
-        }
 
-        val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
-            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
-            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, requireContext().packageName)
-            putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
-        }
+        if (equalizerManager != null) {
+            // If we have an audio session, initialize the equalizer
+            if (audioSessionId != 0 && !equalizerManager.isInitialized()) {
+                equalizerManager.initialize(audioSessionId)
+            }
 
-        if (intent.resolveActivity(requireContext().packageManager) != null) {
-            startActivity(intent)
+            // Show the equalizer bottom sheet
+            val bottomSheet = EqualizerBottomSheet.newInstance(equalizerManager)
+            bottomSheet.show(parentFragmentManager, EqualizerBottomSheet.TAG)
         } else {
-            Toast.makeText(requireContext(), "No equalizer app found. Install an equalizer like Wavelet.", Toast.LENGTH_LONG).show()
+            // No service bound - create a temporary equalizer manager for settings preview
+            val tempEqualizerManager = com.opensource.i2pradio.audio.EqualizerManager(requireContext())
+            // Initialize with session 0 for preview mode (settings only, no audio effect)
+            tempEqualizerManager.initializeForPreview()
+            val bottomSheet = EqualizerBottomSheet.newInstance(tempEqualizerManager)
+            bottomSheet.show(parentFragmentManager, EqualizerBottomSheet.TAG)
         }
     }
 

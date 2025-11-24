@@ -139,6 +139,11 @@ class RadioService : Service() {
     private var currentBitrate: Int = 0
     private var currentCodec: String? = null
 
+    // Playback time tracking
+    private var playbackStartTimeMillis: Long = 0L
+    private var playbackTimeUpdateRunnable: Runnable? = null
+    private val playbackTimeUpdateInterval = 1000L // Update every second
+
     // Built-in equalizer manager
     private var equalizerManager: EqualizerManager? = null
 
@@ -167,6 +172,16 @@ class RadioService : Service() {
         const val EXTRA_ERROR_MESSAGE = "error_message"
         const val EXTRA_FILE_PATH = "file_path"
         const val EXTRA_FILE_SIZE = "file_size"
+
+        // Cover art update broadcast
+        const val BROADCAST_COVER_ART_CHANGED = "com.opensource.i2pradio.COVER_ART_CHANGED"
+        const val EXTRA_COVER_ART_URI = "cover_art_uri"
+        const val EXTRA_STATION_ID = "station_id"
+
+        // Playback time tracking
+        const val BROADCAST_PLAYBACK_TIME_UPDATE = "com.opensource.i2pradio.PLAYBACK_TIME_UPDATE"
+        const val EXTRA_PLAYBACK_ELAPSED_MS = "playback_elapsed_ms"
+        const val EXTRA_BUFFERED_POSITION_MS = "buffered_position_ms"
     }
 
     inner class RadioBinder : Binder() {
@@ -1196,6 +1211,8 @@ class RadioService : Service() {
                                 }
                                 // Extract stream info when ready
                                 extractStreamInfo()
+                                // Start playback time updates for buffer bar
+                                startPlaybackTimeUpdates()
                                 // Broadcast to UI that we're no longer buffering
                                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = true)
                                 android.util.Log.d("RadioService", "Stream playing successfully")
@@ -1224,9 +1241,23 @@ class RadioService : Service() {
                         if (isPlaying) {
                             updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
                             cancelSessionDeactivation()
+                            // Resume playback time updates if we have a start time
+                            if (playbackStartTimeMillis > 0 && playbackTimeUpdateRunnable == null) {
+                                playbackTimeUpdateRunnable = object : Runnable {
+                                    override fun run() {
+                                        if (player?.isPlaying == true) {
+                                            broadcastPlaybackTimeUpdate()
+                                            handler.postDelayed(this, playbackTimeUpdateInterval)
+                                        }
+                                    }
+                                }
+                                handler.post(playbackTimeUpdateRunnable!!)
+                            }
                         } else if (player?.playbackState == Player.STATE_READY) {
-                            // Player is paused but ready
+                            // Player is paused but ready - stop time updates but keep start time
                             updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                            playbackTimeUpdateRunnable?.let { handler.removeCallbacks(it) }
+                            playbackTimeUpdateRunnable = null
                         }
                     }
 
@@ -1289,6 +1320,9 @@ class RadioService : Service() {
     }
 
     private fun stopStream() {
+        // Stop playback time updates first
+        stopPlaybackTimeUpdates()
+
         handler.removeCallbacksAndMessages(null)
 
         // Broadcast audio session close before releasing player
@@ -1428,6 +1462,70 @@ class RadioService : Service() {
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
+
+    /**
+     * Broadcast cover art change to UI for real-time updates
+     */
+    fun broadcastCoverArtChanged(coverArtUri: String?, stationId: Long = -1L) {
+        currentCoverArtUri = coverArtUri
+        val intent = Intent(BROADCAST_COVER_ART_CHANGED).apply {
+            putExtra(EXTRA_COVER_ART_URI, coverArtUri)
+            putExtra(EXTRA_STATION_ID, stationId)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        android.util.Log.d("RadioService", "Broadcast cover art changed: $coverArtUri")
+
+        // Also update the media session with new cover art
+        updateMediaMetadata(currentStationName, coverArtUri)
+    }
+
+    /**
+     * Broadcast playback time update for buffer bar UI
+     */
+    private fun broadcastPlaybackTimeUpdate() {
+        val elapsedMs = if (playbackStartTimeMillis > 0) {
+            System.currentTimeMillis() - playbackStartTimeMillis
+        } else 0L
+
+        val bufferedPositionMs = player?.bufferedPosition ?: 0L
+
+        val intent = Intent(BROADCAST_PLAYBACK_TIME_UPDATE).apply {
+            putExtra(EXTRA_PLAYBACK_ELAPSED_MS, elapsedMs)
+            putExtra(EXTRA_BUFFERED_POSITION_MS, bufferedPositionMs)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    /**
+     * Start periodic playback time updates
+     */
+    private fun startPlaybackTimeUpdates() {
+        stopPlaybackTimeUpdates()
+        playbackStartTimeMillis = System.currentTimeMillis()
+        playbackTimeUpdateRunnable = object : Runnable {
+            override fun run() {
+                if (player?.isPlaying == true) {
+                    broadcastPlaybackTimeUpdate()
+                    handler.postDelayed(this, playbackTimeUpdateInterval)
+                }
+            }
+        }
+        handler.post(playbackTimeUpdateRunnable!!)
+    }
+
+    /**
+     * Stop periodic playback time updates
+     */
+    private fun stopPlaybackTimeUpdates() {
+        playbackTimeUpdateRunnable?.let { handler.removeCallbacks(it) }
+        playbackTimeUpdateRunnable = null
+        playbackStartTimeMillis = 0L
+    }
+
+    /**
+     * Get current cover art URI
+     */
+    fun getCurrentCoverArtUri(): String? = currentCoverArtUri
 
     /**
      * Get current metadata (for UI binding)
