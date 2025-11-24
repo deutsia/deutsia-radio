@@ -1,0 +1,234 @@
+package com.opensource.i2pradio.data.radiobrowser
+
+import android.content.Context
+import android.util.Log
+import com.opensource.i2pradio.data.RadioDao
+import com.opensource.i2pradio.data.RadioDatabase
+import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.data.StationSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/**
+ * Repository for RadioBrowser data with local caching support.
+ *
+ * Handles:
+ * - Fetching stations from RadioBrowser API
+ * - Caching results in local database
+ * - Converting between RadioBrowser and app station formats
+ * - Deduplication when saving discovered stations
+ */
+class RadioBrowserRepository(context: Context) {
+
+    companion object {
+        private const val TAG = "RadioBrowserRepository"
+
+        // Cache TTL: 7 days for cached RadioBrowser stations
+        private const val CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000L
+    }
+
+    private val radioDao: RadioDao = RadioDatabase.getDatabase(context).radioDao()
+    private val apiClient: RadioBrowserClient = RadioBrowserClient(context)
+
+    /**
+     * Search for stations by name
+     */
+    suspend fun searchByName(
+        query: String,
+        limit: Int = 50,
+        offset: Int = 0
+    ): RadioBrowserResult<List<RadioBrowserStation>> {
+        return apiClient.searchByName(query, limit, offset)
+    }
+
+    /**
+     * Search stations with filters
+     */
+    suspend fun searchStations(
+        name: String? = null,
+        tag: String? = null,
+        country: String? = null,
+        countrycode: String? = null,
+        limit: Int = 50,
+        offset: Int = 0
+    ): RadioBrowserResult<List<RadioBrowserStation>> {
+        return apiClient.searchStations(
+            name = name,
+            tag = tag,
+            country = country,
+            countrycode = countrycode,
+            limit = limit,
+            offset = offset
+        )
+    }
+
+    /**
+     * Get top voted stations
+     */
+    suspend fun getTopVoted(limit: Int = 50, offset: Int = 0): RadioBrowserResult<List<RadioBrowserStation>> {
+        return apiClient.getTopVoted(limit, offset)
+    }
+
+    /**
+     * Get top clicked (popular) stations
+     */
+    suspend fun getTopClicked(limit: Int = 50, offset: Int = 0): RadioBrowserResult<List<RadioBrowserStation>> {
+        return apiClient.getTopClicked(limit, offset)
+    }
+
+    /**
+     * Get recently changed stations
+     */
+    suspend fun getRecentlyChanged(limit: Int = 50, offset: Int = 0): RadioBrowserResult<List<RadioBrowserStation>> {
+        return apiClient.getRecentlyChanged(limit, offset)
+    }
+
+    /**
+     * Get stations by country code
+     */
+    suspend fun getByCountryCode(
+        countryCode: String,
+        limit: Int = 50,
+        offset: Int = 0
+    ): RadioBrowserResult<List<RadioBrowserStation>> {
+        return apiClient.getByCountryCode(countryCode, limit, offset)
+    }
+
+    /**
+     * Get stations by tag/genre
+     */
+    suspend fun getByTag(
+        tag: String,
+        limit: Int = 50,
+        offset: Int = 0
+    ): RadioBrowserResult<List<RadioBrowserStation>> {
+        return apiClient.getByTag(tag, limit, offset)
+    }
+
+    /**
+     * Get list of countries
+     */
+    suspend fun getCountries(): RadioBrowserResult<List<CountryInfo>> {
+        return apiClient.getCountries()
+    }
+
+    /**
+     * Get list of tags
+     */
+    suspend fun getTags(limit: Int = 100): RadioBrowserResult<List<TagInfo>> {
+        return apiClient.getTags(limit)
+    }
+
+    /**
+     * Check if a RadioBrowser station is already saved to user's library
+     */
+    suspend fun isStationSaved(radioBrowserUuid: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            radioDao.countByRadioBrowserUuid(radioBrowserUuid) > 0
+        }
+    }
+
+    /**
+     * Save a RadioBrowser station to user's library.
+     * Converts it to the app's RadioStation format.
+     *
+     * @param station The RadioBrowser station to save
+     * @param asUserStation If true, saves as USER source (user explicitly saved it)
+     * @return The saved station's ID, or null if already exists
+     */
+    suspend fun saveStation(
+        station: RadioBrowserStation,
+        asUserStation: Boolean = true
+    ): Long? {
+        return withContext(Dispatchers.IO) {
+            // Check if already saved
+            val existing = radioDao.getStationByRadioBrowserUuid(station.stationuuid)
+            if (existing != null) {
+                Log.d(TAG, "Station already saved: ${station.name}")
+                return@withContext existing.id
+            }
+
+            val radioStation = convertToRadioStation(station, asUserStation)
+            val id = radioDao.insertStation(radioStation)
+            Log.d(TAG, "Saved station: ${station.name} with ID: $id")
+            id
+        }
+    }
+
+    /**
+     * Convert a RadioBrowserStation to the app's RadioStation format
+     */
+    fun convertToRadioStation(
+        station: RadioBrowserStation,
+        asUserStation: Boolean = false
+    ): RadioStation {
+        val now = System.currentTimeMillis()
+        return RadioStation(
+            name = station.name,
+            streamUrl = station.getStreamUrl(),
+            genre = station.getPrimaryGenre(),
+            coverArtUri = station.favicon.takeIf { it.isNotEmpty() },
+            source = if (asUserStation) StationSource.USER.name else StationSource.RADIOBROWSER.name,
+            radioBrowserUuid = station.stationuuid,
+            cachedAt = now,
+            lastVerified = if (station.lastcheckok) now else 0L,
+            bitrate = station.bitrate,
+            codec = station.codec,
+            country = station.country,
+            countryCode = station.countrycode,
+            homepage = station.homepage,
+            addedTimestamp = now,
+            // Default proxy settings - stations from RadioBrowser are clearnet
+            useProxy = false,
+            proxyHost = "",
+            proxyPort = 0
+        )
+    }
+
+    /**
+     * Cache a list of stations from RadioBrowser (for offline browsing)
+     */
+    suspend fun cacheStations(stations: List<RadioBrowserStation>) {
+        withContext(Dispatchers.IO) {
+            val radioStations = stations.map { convertToRadioStation(it, asUserStation = false) }
+            radioDao.insertStations(radioStations)
+            Log.d(TAG, "Cached ${stations.size} stations")
+        }
+    }
+
+    /**
+     * Clean up stale cached stations (older than CACHE_TTL)
+     */
+    suspend fun cleanupStaleCache() {
+        withContext(Dispatchers.IO) {
+            val cutoff = System.currentTimeMillis() - CACHE_TTL_MS
+            radioDao.deleteStaleCachedStations(cutoff)
+            Log.d(TAG, "Cleaned up stale cached stations older than $cutoff")
+        }
+    }
+
+    /**
+     * Get cached stations by country (for offline browsing)
+     */
+    suspend fun getCachedStationsByCountry(countryCode: String): List<RadioStation> {
+        return withContext(Dispatchers.IO) {
+            radioDao.getCachedStationsByCountry(countryCode)
+        }
+    }
+
+    /**
+     * Check if Force Tor is required but not connected
+     */
+    fun isTorRequiredButNotConnected(): Boolean {
+        return apiClient.isTorRequiredButNotConnected()
+    }
+
+    /**
+     * Update last verified timestamp for a station
+     */
+    suspend fun markStationVerified(stationId: Long) {
+        withContext(Dispatchers.IO) {
+            radioDao.updateLastVerified(stationId, System.currentTimeMillis())
+        }
+    }
+}

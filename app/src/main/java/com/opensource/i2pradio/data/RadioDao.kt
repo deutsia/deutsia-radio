@@ -75,4 +75,38 @@ interface RadioDao {
     // Update last played timestamp
     @Query("UPDATE radio_stations SET lastPlayedAt = :timestamp WHERE id = :id")
     suspend fun updateLastPlayedAt(id: Long, timestamp: Long)
+
+    // ==================== RadioBrowser Integration ====================
+
+    // Get station by RadioBrowser UUID (for deduplication)
+    @Query("SELECT * FROM radio_stations WHERE radioBrowserUuid = :uuid LIMIT 1")
+    suspend fun getStationByRadioBrowserUuid(uuid: String): RadioStation?
+
+    // Check if a RadioBrowser station is already saved
+    @Query("SELECT COUNT(*) FROM radio_stations WHERE radioBrowserUuid = :uuid")
+    suspend fun countByRadioBrowserUuid(uuid: String): Int
+
+    // Get all stations from RadioBrowser source
+    @Query("SELECT * FROM radio_stations WHERE source = 'RADIOBROWSER' ORDER BY cachedAt DESC")
+    fun getRadioBrowserStations(): LiveData<List<RadioStation>>
+
+    // Get cached stations by country
+    @Query("SELECT * FROM radio_stations WHERE source = 'RADIOBROWSER' AND countryCode = :countryCode ORDER BY name ASC")
+    suspend fun getCachedStationsByCountry(countryCode: String): List<RadioStation>
+
+    // Delete stale cached stations (older than given timestamp)
+    @Query("DELETE FROM radio_stations WHERE source = 'RADIOBROWSER' AND isLiked = 0 AND cachedAt < :olderThan")
+    suspend fun deleteStaleCachedStations(olderThan: Long)
+
+    // Get stations by source
+    @Query("SELECT * FROM radio_stations WHERE source = :source ORDER BY name ASC")
+    suspend fun getStationsBySource(source: String): List<RadioStation>
+
+    // Insert multiple stations at once
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStations(stations: List<RadioStation>)
+
+    // Update cached station's verification timestamp
+    @Query("UPDATE radio_stations SET lastVerified = :timestamp WHERE id = :id")
+    suspend fun updateLastVerified(id: Long, timestamp: Long)
 }

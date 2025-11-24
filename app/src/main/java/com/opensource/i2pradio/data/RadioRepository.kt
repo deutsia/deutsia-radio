@@ -98,8 +98,8 @@ class RadioRepository(context: Context) {
                 return@withContext
             }
 
-            // Add preset stations
-            DefaultStations.getPresetStations().forEach { station ->
+            // Add preset stations from bundled JSON
+            DefaultStations.getPresetStations(context).forEach { station ->
                 radioDao.insertStation(station)
             }
 

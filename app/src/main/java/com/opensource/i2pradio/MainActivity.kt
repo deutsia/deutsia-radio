@@ -32,6 +32,7 @@ import com.opensource.i2pradio.ui.RadioViewModel
 import com.opensource.i2pradio.ui.RadiosFragment
 import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
 import com.opensource.i2pradio.ui.TorStatusView
+import com.opensource.i2pradio.ui.browse.BrowseStationsFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -218,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
         // Click mini-player to go to Now Playing tab
         miniPlayerView.setOnMiniPlayerClickListener {
-            viewPager.currentItem = 1  // Switch to Now Playing tab
+            viewPager.currentItem = 2  // Switch to Now Playing tab (index 2 now)
         }
 
         // Play/pause toggle - update ViewModel to sync state and trigger animation
@@ -276,9 +277,10 @@ class MainActivity : AppCompatActivity() {
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> "Radio Stations"
-                1 -> "Now Playing"
-                2 -> "Settings"
+                0 -> getString(R.string.tab_radios)
+                1 -> getString(R.string.tab_browse)
+                2 -> getString(R.string.tab_now_playing)
+                3 -> getString(R.string.tab_settings)
                 else -> ""
             }
         }.attach()
@@ -287,7 +289,7 @@ class MainActivity : AppCompatActivity() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                if (position == 1) {
+                if (position == 2) {
                     // On Now Playing tab - keep mini player hidden
                     miniPlayerView.hideForNowPlaying()
                     miniPlayerContainer.visibility = View.INVISIBLE
@@ -327,13 +329,14 @@ class MainActivity : AppCompatActivity() {
     private inner class ViewPagerAdapter(activity: AppCompatActivity) :
         FragmentStateAdapter(activity) {
 
-        override fun getItemCount(): Int = 3
+        override fun getItemCount(): Int = 4
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> RadiosFragment()
-                1 -> NowPlayingFragment()
-                2 -> SettingsFragment()  // We'll create this next!
+                1 -> BrowseStationsFragment()
+                2 -> NowPlayingFragment()
+                3 -> SettingsFragment()
                 else -> RadiosFragment()  // Fallback
             }
         }

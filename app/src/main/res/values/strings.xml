@@ -28,4 +28,23 @@
     <!-- Genre filter -->
     <string name="genre_all">All Genres</string>
     <string name="filter_by_genre">Filter by Genre</string>
+
+    <!-- Browse/Discover Stations -->
+    <string name="tab_browse">Browse</string>
+    <string name="search_radio_browser">Search thousands of stations…</string>
+    <string name="browse_top_voted">Top Voted</string>
+    <string name="browse_popular">Popular</string>
+    <string name="browse_recent">Recent</string>
+    <string name="browse_no_results">No Stations Found</string>
+    <string name="browse_no_results_hint">Try a different search or filter</string>
+    <string name="filter_country">Country</string>
+    <string name="filter_genre">Genre</string>
+    <string name="filter_all_countries">All Countries</string>
+    <string name="filter_all_genres">All Genres</string>
+    <string name="select_country">Select Country</string>
+    <string name="select_genre">Select Genre</string>
+    <string name="loading_countries">Loading countries…</string>
+    <string name="loading_genres">Loading genres…</string>
+    <string name="station_saved">%s added to library</string>
+    <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
 </resources>
