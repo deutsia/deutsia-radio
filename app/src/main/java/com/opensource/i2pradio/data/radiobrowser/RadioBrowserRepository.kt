@@ -276,4 +276,22 @@ class RadioBrowserRepository(context: Context) {
             radioDao.updateLastVerified(stationId, System.currentTimeMillis())
         }
     }
+
+    /**
+     * Delete a station by its RadioBrowser UUID
+     * @return true if station was found and deleted, false otherwise
+     */
+    suspend fun deleteStationByUuid(radioBrowserUuid: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            val station = radioDao.getStationByRadioBrowserUuid(radioBrowserUuid)
+            if (station != null) {
+                radioDao.deleteStation(station)
+                Log.d(TAG, "Deleted station: ${station.name}")
+                true
+            } else {
+                Log.d(TAG, "Station not found for deletion: $radioBrowserUuid")
+                false
+            }
+        }
+    }
 }

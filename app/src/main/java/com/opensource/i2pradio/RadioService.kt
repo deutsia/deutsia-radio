@@ -1818,6 +1818,16 @@ class RadioService : Service() {
     fun getPlayerVolume(): Float = player?.volume ?: 1f
 
     /**
+     * Check if the player is currently playing
+     */
+    fun isPlaying(): Boolean = player?.isPlaying == true
+
+    /**
+     * Check if the player is currently buffering
+     */
+    fun isBuffering(): Boolean = player?.playbackState == Player.STATE_BUFFERING
+
+    /**
      * Broadcast audio session open to allow equalizer apps to attach.
      * This follows the standard Android audio effect protocol.
      */

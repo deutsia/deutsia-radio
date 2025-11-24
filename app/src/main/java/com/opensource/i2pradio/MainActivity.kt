@@ -87,6 +87,13 @@ class MainActivity : AppCompatActivity() {
             val binder = service as RadioService.RadioBinder
             radioService = binder.getService()
             isServiceBound = true
+
+            // After reconnecting, update ViewModel with current playback state
+            // This ensures UI is synchronized after activity recreation (e.g., Material You toggle)
+            radioService?.let { service ->
+                viewModel.setPlaying(service.isPlaying())
+                viewModel.setBuffering(service.isBuffering())
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {

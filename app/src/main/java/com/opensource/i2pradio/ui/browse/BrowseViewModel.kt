@@ -266,6 +266,25 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Remove a station from user's library
+     */
+    fun removeStation(station: RadioBrowserStation) {
+        viewModelScope.launch {
+            val deleted = repository.deleteStationByUuid(station.stationuuid)
+            if (deleted) {
+                // Update saved and liked UUIDs sets
+                val savedCurrent = _savedStationUuids.value.orEmpty().toMutableSet()
+                savedCurrent.remove(station.stationuuid)
+                _savedStationUuids.value = savedCurrent
+
+                val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
+                likedCurrent.remove(station.stationuuid)
+                _likedStationUuids.value = likedCurrent
+            }
+        }
+    }
+
+    /**
      * Load countries list
      */
     private fun loadCountries() {

@@ -20,6 +20,7 @@ import com.opensource.i2pradio.util.loadSecure
 class BrowseStationsAdapter(
     private val onStationClick: (RadioBrowserStation) -> Unit,
     private val onAddClick: (RadioBrowserStation) -> Unit,
+    private val onRemoveClick: (RadioBrowserStation) -> Unit,
     private val onLikeClick: (RadioBrowserStation) -> Unit
 ) : RecyclerView.Adapter<BrowseStationsAdapter.ViewHolder>() {
 
@@ -183,22 +184,18 @@ class BrowseStationsAdapter(
             }
 
             actionButton.setOnClickListener {
-                if (!savedUuids.contains(station.stationuuid)) {
+                if (savedUuids.contains(station.stationuuid)) {
+                    onRemoveClick(station)
+                } else {
                     onAddClick(station)
                 }
             }
         }
 
         fun updateSavedStatus(isSaved: Boolean) {
-            if (isSaved) {
-                actionButton.setIconResource(R.drawable.ic_check)
-                actionButton.isEnabled = false
-                actionButton.alpha = 0.6f
-            } else {
-                actionButton.setIconResource(R.drawable.ic_add)
-                actionButton.isEnabled = true
-                actionButton.alpha = 1f
-            }
+            actionButton.setIconResource(if (isSaved) R.drawable.ic_check else R.drawable.ic_add)
+            actionButton.isEnabled = true
+            actionButton.alpha = 1f
         }
 
         fun updateLikedStatus(isLiked: Boolean) {
