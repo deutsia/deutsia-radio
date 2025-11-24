@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +18,10 @@ import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
@@ -36,6 +39,26 @@ class SettingsFragment : Fragment() {
     private var torStatusText: TextView? = null
     private var torStatusDetail: TextView? = null
     private var torActionButton: MaterialButton? = null
+
+    // Recording directory UI elements
+    private var recordingDirectoryPath: TextView? = null
+    private var recordingDirectoryButton: MaterialButton? = null
+
+    // Directory picker launcher
+    private val directoryPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let { selectedUri ->
+            // Take persistable permission so we can access this directory after app restarts
+            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            requireContext().contentResolver.takePersistableUriPermission(selectedUri, takeFlags)
+
+            // Save the URI
+            PreferencesHelper.setRecordingDirectoryUri(requireContext(), selectedUri.toString())
+            updateRecordingDirectoryDisplay()
+            Toast.makeText(requireContext(), "Recording directory updated", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     // Service binding for equalizer
     private var radioService: RadioService? = null
@@ -136,6 +159,14 @@ class SettingsFragment : Fragment() {
         val equalizerButton = view.findViewById<MaterialButton>(R.id.equalizerButton)
         equalizerButton.setOnClickListener {
             openSystemEqualizer()
+        }
+
+        // Recording directory
+        recordingDirectoryPath = view.findViewById(R.id.recordingDirectoryPath)
+        recordingDirectoryButton = view.findViewById(R.id.recordingDirectoryButton)
+        updateRecordingDirectoryDisplay()
+        recordingDirectoryButton?.setOnClickListener {
+            showRecordingDirectoryDialog()
         }
 
         // Setup Tor controls
@@ -332,6 +363,58 @@ class SettingsFragment : Fragment() {
                 torActionButton?.isEnabled = true
             }
         }
+    }
+
+    private fun updateRecordingDirectoryDisplay() {
+        val savedUri = PreferencesHelper.getRecordingDirectoryUri(requireContext())
+        if (savedUri != null) {
+            try {
+                val uri = Uri.parse(savedUri)
+                val docFile = DocumentFile.fromTreeUri(requireContext(), uri)
+                val displayName = docFile?.name ?: "Custom folder"
+                recordingDirectoryPath?.text = displayName
+                recordingDirectoryButton?.text = "Change"
+            } catch (e: Exception) {
+                recordingDirectoryPath?.text = "Default (Music/i2pradio)"
+                recordingDirectoryButton?.text = "Change"
+            }
+        } else {
+            recordingDirectoryPath?.text = "Default (Music/i2pradio)"
+            recordingDirectoryButton?.text = "Change"
+        }
+    }
+
+    private fun showRecordingDirectoryDialog() {
+        val options = mutableListOf("Default (Music/i2pradio)", "Choose custom folder...")
+        val savedUri = PreferencesHelper.getRecordingDirectoryUri(requireContext())
+        if (savedUri != null) {
+            options.add(1, "Clear custom folder")
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Recording Directory")
+            .setItems(options.toTypedArray()) { dialog, which ->
+                when {
+                    which == 0 -> {
+                        // Default
+                        PreferencesHelper.setRecordingDirectoryUri(requireContext(), null)
+                        updateRecordingDirectoryDisplay()
+                        Toast.makeText(requireContext(), "Using default directory", Toast.LENGTH_SHORT).show()
+                    }
+                    savedUri != null && which == 1 -> {
+                        // Clear custom folder
+                        PreferencesHelper.setRecordingDirectoryUri(requireContext(), null)
+                        updateRecordingDirectoryDisplay()
+                        Toast.makeText(requireContext(), "Using default directory", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        // Choose custom folder
+                        directoryPickerLauncher.launch(null)
+                    }
+                }
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun updateThemeButtonText(button: MaterialButton) {

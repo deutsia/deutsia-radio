@@ -102,30 +102,42 @@ class EqualizerManager(private val context: Context) {
             }
 
             // Initialize Bass Boost
+            // Note: strengthSupported can return false on some devices even when the effect works
+            // So we try to enable and use the effect regardless, and only mark as unsupported
+            // if instantiation fails entirely
             try {
                 bassBoost = BassBoost(0, audioSessionId).apply {
-                    this@EqualizerManager.isBassBoostSupported = strengthSupported
-                    if (strengthSupported) {
-                        enabled = PreferencesHelper.isEqualizerEnabled(context)
+                    // Mark as supported if we could instantiate it
+                    this@EqualizerManager.isBassBoostSupported = true
+                    // Always try to enable and set strength, regardless of strengthSupported
+                    enabled = PreferencesHelper.isEqualizerEnabled(context)
+                    try {
                         setStrength(PreferencesHelper.getBassBoostStrength(context))
+                    } catch (e: Exception) {
+                        Log.w(TAG, "BassBoost setStrength failed: ${e.message}")
                     }
                 }
-                Log.d(TAG, "BassBoost initialized, supported: $isBassBoostSupported")
+                Log.d(TAG, "BassBoost initialized, strengthSupported=${bassBoost?.strengthSupported}")
             } catch (e: Exception) {
                 Log.w(TAG, "BassBoost not available", e)
                 isBassBoostSupported = false
             }
 
             // Initialize Virtualizer (Surround Sound)
+            // Same approach: try to use it regardless of strengthSupported
             try {
                 virtualizer = Virtualizer(0, audioSessionId).apply {
-                    this@EqualizerManager.isVirtualizerSupported = strengthSupported
-                    if (strengthSupported) {
-                        enabled = PreferencesHelper.isEqualizerEnabled(context)
+                    // Mark as supported if we could instantiate it
+                    this@EqualizerManager.isVirtualizerSupported = true
+                    // Always try to enable and set strength, regardless of strengthSupported
+                    enabled = PreferencesHelper.isEqualizerEnabled(context)
+                    try {
                         setStrength(PreferencesHelper.getVirtualizerStrength(context))
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Virtualizer setStrength failed: ${e.message}")
                     }
                 }
-                Log.d(TAG, "Virtualizer initialized, supported: $isVirtualizerSupported")
+                Log.d(TAG, "Virtualizer initialized, strengthSupported=${virtualizer?.strengthSupported}")
             } catch (e: Exception) {
                 Log.w(TAG, "Virtualizer not available", e)
                 isVirtualizerSupported = false
@@ -371,9 +383,12 @@ class EqualizerManager(private val context: Context) {
      * Set bass boost strength (0-1000)
      */
     fun setBassBoostStrength(strength: Short) {
-        if (!isBassBoostSupported) return
         bassBoost?.let { bb ->
             try {
+                // Ensure the effect is enabled when setting strength
+                if (!bb.enabled && strength > 0) {
+                    bb.enabled = true
+                }
                 bb.setStrength(strength)
                 PreferencesHelper.setBassBoostStrength(context, strength)
                 Log.d(TAG, "Bass boost strength set to: $strength")
@@ -400,9 +415,12 @@ class EqualizerManager(private val context: Context) {
      * Set virtualizer strength (0-1000)
      */
     fun setVirtualizerStrength(strength: Short) {
-        if (!isVirtualizerSupported) return
         virtualizer?.let { virt ->
             try {
+                // Ensure the effect is enabled when setting strength
+                if (!virt.enabled && strength > 0) {
+                    virt.enabled = true
+                }
                 virt.setStrength(strength)
                 PreferencesHelper.setVirtualizerStrength(context, strength)
                 Log.d(TAG, "Virtualizer strength set to: $strength")

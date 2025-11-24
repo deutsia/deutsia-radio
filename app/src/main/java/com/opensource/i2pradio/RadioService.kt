@@ -49,6 +49,7 @@ import android.content.ContentValues
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.documentfile.provider.DocumentFile
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -460,12 +461,17 @@ class RadioService : Service() {
             else -> "audio/mpeg"
         }
 
+        // Check for custom recording directory first
+        val customDirUri = PreferencesHelper.getRecordingDirectoryUri(this)
+        val useCustomDir = customDirUri != null
+
         // For Android 10+ (API 29+), use MediaStore to save to public Music directory
         // For older versions, use legacy file access
-        val useMediaStore = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        // Custom directory overrides both
+        val useMediaStore = !useCustomDir && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         var recordingsDir: File? = null
 
-        if (!useMediaStore) {
+        if (!useCustomDir && !useMediaStore) {
             // Legacy: Use public Music directory for Android 9 and below
             @Suppress("DEPRECATION")
             val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
@@ -481,7 +487,7 @@ class RadioService : Service() {
             }
         }
 
-        android.util.Log.d("RadioService", "Recording will use MediaStore: $useMediaStore, format: $format, mimeType: $mimeType")
+        android.util.Log.d("RadioService", "Recording will use custom dir: $useCustomDir, MediaStore: $useMediaStore, format: $format, mimeType: $mimeType")
 
         // Build a COMPLETELY SEPARATE OkHttp client for recording
         // This is a NEW instance, independent from the playback client
@@ -510,6 +516,8 @@ class RadioService : Service() {
         val finalStreamUrl = streamUrl
         val finalMimeType = mimeType
         val finalUseMediaStore = useMediaStore
+        val finalUseCustomDir = useCustomDir
+        val finalCustomDirUri = customDirUri
         val finalFormat = format
 
         // Start recording on a dedicated background thread
@@ -587,7 +595,54 @@ class RadioService : Service() {
                 }
 
                 // NOW create the file - only after we have a successful connection
-                if (finalUseMediaStore) {
+                if (finalUseCustomDir && finalCustomDirUri != null) {
+                    // Custom directory: Use Storage Access Framework
+                    try {
+                        val treeUri = Uri.parse(finalCustomDirUri)
+                        val docFile = DocumentFile.fromTreeUri(this@RadioService, treeUri)
+                        if (docFile == null || !docFile.canWrite()) {
+                            android.util.Log.e("RadioService", "Cannot write to custom directory")
+                            handler.post {
+                                broadcastRecordingError("Cannot write to selected directory")
+                                cleanupRecording()
+                            }
+                            return@Thread
+                        }
+
+                        val newFile = docFile.createFile(finalMimeType, finalFileName.substringBeforeLast("."))
+                        if (newFile == null) {
+                            android.util.Log.e("RadioService", "Failed to create file in custom directory")
+                            handler.post {
+                                broadcastRecordingError("Cannot create recording file")
+                                cleanupRecording()
+                            }
+                            return@Thread
+                        }
+
+                        filePath = newFile.name ?: finalFileName
+                        android.util.Log.d("RadioService", "Recording stream connected, writing to custom dir: $filePath")
+
+                        val rawOutputStream = contentResolver.openOutputStream(newFile.uri)
+                        if (rawOutputStream == null) {
+                            android.util.Log.e("RadioService", "Failed to open custom directory output stream")
+                            newFile.delete()
+                            handler.post {
+                                broadcastRecordingError("Cannot open file for writing")
+                                cleanupRecording()
+                            }
+                            return@Thread
+                        }
+
+                        outputStream = BufferedOutputStream(rawOutputStream, 64 * 1024)
+                    } catch (e: Exception) {
+                        android.util.Log.e("RadioService", "Custom directory error: ${e.message}", e)
+                        handler.post {
+                            broadcastRecordingError("Directory access error: ${e.message}")
+                            cleanupRecording()
+                        }
+                        return@Thread
+                    }
+                } else if (finalUseMediaStore) {
                     // Android 10+: Use MediaStore to save to public Music/i2pradio directory
                     val contentValues = ContentValues().apply {
                         put(MediaStore.Audio.Media.DISPLAY_NAME, finalFileName)
@@ -734,7 +789,7 @@ class RadioService : Service() {
 
                 recordingOutputStream = null
 
-                // Handle recording completion based on whether we used MediaStore or legacy file
+                // Handle recording completion based on storage method
                 if (mediaStoreUri != null) {
                     // Android 10+: Finalize or delete MediaStore entry
                     val resolver = contentResolver
@@ -754,7 +809,7 @@ class RadioService : Service() {
                         resolver.delete(mediaStoreUri, null, null)
                     }
                     recordingMediaStoreUri = null
-                } else {
+                } else if (file != null) {
                     // Legacy: Handle file directly
                     file?.let { f ->
                         if (f.exists()) {
@@ -770,6 +825,15 @@ class RadioService : Service() {
                         } else {
                             android.util.Log.e("RadioService", "Recording file not found: ${f.absolutePath}")
                         }
+                    }
+                } else if (finalUseCustomDir && filePath != null) {
+                    // Custom directory: File was created via SAF, just broadcast completion
+                    val sizeKB = totalBytesWritten / 1024
+                    if (sizeKB > 0) {
+                        android.util.Log.d("RadioService", "Recording saved to custom dir: $filePath (${sizeKB}KB)")
+                        handler.post { broadcastRecordingComplete(filePath!!, totalBytesWritten) }
+                    } else {
+                        android.util.Log.w("RadioService", "Recording is empty: $filePath")
                     }
                 }
             }

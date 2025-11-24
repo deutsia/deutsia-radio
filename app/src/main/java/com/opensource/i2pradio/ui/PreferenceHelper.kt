@@ -17,6 +17,7 @@ object PreferencesHelper {
     private const val KEY_EQUALIZER_BANDS = "equalizer_bands"
     private const val KEY_BASS_BOOST_STRENGTH = "bass_boost_strength"
     private const val KEY_VIRTUALIZER_STRENGTH = "virtualizer_strength"
+    private const val KEY_RECORDING_DIRECTORY_URI = "recording_directory_uri"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -167,5 +168,18 @@ object PreferencesHelper {
     fun getVirtualizerStrength(context: Context): Short {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getInt(KEY_VIRTUALIZER_STRENGTH, 0).toShort()
+    }
+
+    // Recording directory preferences
+    fun setRecordingDirectoryUri(context: Context, uri: String?) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_RECORDING_DIRECTORY_URI, uri)
+            .apply()
+    }
+
+    fun getRecordingDirectoryUri(context: Context): String? {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_RECORDING_DIRECTORY_URI, null)
     }
 }
