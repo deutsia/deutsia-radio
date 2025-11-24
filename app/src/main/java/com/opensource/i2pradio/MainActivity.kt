@@ -24,6 +24,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.opensource.i2pradio.data.RadioRepository
+import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.MiniPlayerView
 import com.opensource.i2pradio.ui.NowPlayingFragment
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var miniPlayerView: MiniPlayerView
     private lateinit var torStatusView: TorStatusView
     private lateinit var repository: RadioRepository
+    private lateinit var radioBrowserRepository: RadioBrowserRepository
     private val viewModel: RadioViewModel by viewModels()
 
     private var radioService: RadioService? = null
@@ -111,6 +113,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         repository = RadioRepository(this)
+        radioBrowserRepository = RadioBrowserRepository(this)
 
         CoroutineScope(Dispatchers.IO).launch {
             repository.initializePresetStations(this@MainActivity)  // Pass context
@@ -256,15 +259,48 @@ class MainActivity : AppCompatActivity() {
         // Like button toggles liked state in database
         miniPlayerView.setOnLikeToggleListener { station ->
             CoroutineScope(Dispatchers.IO).launch {
-                repository.toggleLike(station.id)
-                // Refresh the station to update UI
-                val updatedStation = repository.getStationById(station.id)
-                CoroutineScope(Dispatchers.Main).launch {
-                    updatedStation?.let {
-                        // Update the like state in miniplayer without triggering station change animations
-                        miniPlayerView.updateLikeState(it.isLiked)
-                        // Update the ViewModel station's like state without triggering full refresh
-                        viewModel.updateCurrentStationLikeState(it.isLiked)
+                // Check if this is a global radio (has radioBrowserUuid)
+                if (!station.radioBrowserUuid.isNullOrEmpty()) {
+                    // For global radios, use RadioBrowserRepository which handles unsaved stations
+                    val stationInfo = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
+                    if (stationInfo != null && stationInfo.isLiked) {
+                        // Station exists and is liked - unlike it
+                        radioBrowserRepository.toggleLikeByUuid(station.radioBrowserUuid)
+                    } else {
+                        // Station doesn't exist or not liked - save and like it
+                        // Convert to RadioBrowserStation format for saving
+                        val radioBrowserStation = com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation(
+                            stationuuid = station.radioBrowserUuid,
+                            name = station.name,
+                            url_resolved = station.streamUrl,
+                            favicon = station.coverArtUri ?: "",
+                            tags = station.genre,
+                            country = station.country ?: "",
+                            countrycode = station.countryCode ?: "",
+                            codec = station.codec ?: "",
+                            bitrate = station.bitrate,
+                            homepage = station.homepage ?: "",
+                            lastcheckok = 1
+                        )
+                        radioBrowserRepository.saveStationAsLiked(radioBrowserStation)
+                    }
+                    // Refresh station to get updated like state
+                    val updatedStation = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        updatedStation?.let {
+                            miniPlayerView.updateLikeState(it.isLiked)
+                            viewModel.updateCurrentStationLikeState(it.isLiked)
+                        }
+                    }
+                } else {
+                    // For non-global radios (user stations, bundled stations), use regular toggle
+                    repository.toggleLike(station.id)
+                    val updatedStation = repository.getStationById(station.id)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        updatedStation?.let {
+                            miniPlayerView.updateLikeState(it.isLiked)
+                            viewModel.updateCurrentStationLikeState(it.isLiked)
+                        }
                     }
                 }
             }

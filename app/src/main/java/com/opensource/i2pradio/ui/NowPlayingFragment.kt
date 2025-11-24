@@ -48,6 +48,7 @@ import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
+import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,6 +56,7 @@ import kotlinx.coroutines.launch
 class NowPlayingFragment : Fragment() {
     private val viewModel: RadioViewModel by activityViewModels()
     private lateinit var repository: RadioRepository
+    private lateinit var radioBrowserRepository: RadioBrowserRepository
 
     private lateinit var rootContainer: ConstraintLayout
     private lateinit var coverArt: ImageView
@@ -199,6 +201,7 @@ class NowPlayingFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_now_playing, container, false)
 
         repository = RadioRepository(requireContext())
+        radioBrowserRepository = RadioBrowserRepository(requireContext())
 
         rootContainer = view.findViewById(R.id.rootContainer)
         coverArt = view.findViewById(R.id.nowPlayingCoverArt)
@@ -247,14 +250,48 @@ class NowPlayingFragment : Fragment() {
         likeButton.setOnClickListener {
             viewModel.getCurrentStation()?.let { station ->
                 CoroutineScope(Dispatchers.IO).launch {
-                    repository.toggleLike(station.id)
-                    // Refresh the station to update UI
-                    val updatedStation = repository.getStationById(station.id)
-                    CoroutineScope(Dispatchers.Main).launch {
-                        updatedStation?.let {
-                            // Update like state without triggering full station change animations
-                            viewModel.updateCurrentStationLikeState(it.isLiked)
-                            updateLikeButton(it.isLiked)
+                    // Check if this is a global radio (has radioBrowserUuid)
+                    if (!station.radioBrowserUuid.isNullOrEmpty()) {
+                        // For global radios, use RadioBrowserRepository which handles unsaved stations
+                        val stationInfo = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
+                        if (stationInfo != null && stationInfo.isLiked) {
+                            // Station exists and is liked - unlike it
+                            radioBrowserRepository.toggleLikeByUuid(station.radioBrowserUuid)
+                        } else {
+                            // Station doesn't exist or not liked - save and like it
+                            // Convert to RadioBrowserStation format for saving
+                            val radioBrowserStation = com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation(
+                                stationuuid = station.radioBrowserUuid,
+                                name = station.name,
+                                url_resolved = station.streamUrl,
+                                favicon = station.coverArtUri ?: "",
+                                tags = station.genre,
+                                country = station.country ?: "",
+                                countrycode = station.countryCode ?: "",
+                                codec = station.codec ?: "",
+                                bitrate = station.bitrate,
+                                homepage = station.homepage ?: "",
+                                lastcheckok = 1
+                            )
+                            radioBrowserRepository.saveStationAsLiked(radioBrowserStation)
+                        }
+                        // Refresh station to get updated like state
+                        val updatedStation = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            updatedStation?.let {
+                                viewModel.updateCurrentStationLikeState(it.isLiked)
+                                updateLikeButton(it.isLiked)
+                            }
+                        }
+                    } else {
+                        // For non-global radios (user stations, bundled stations), use regular toggle
+                        repository.toggleLike(station.id)
+                        val updatedStation = repository.getStationById(station.id)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            updatedStation?.let {
+                                viewModel.updateCurrentStationLikeState(it.isLiked)
+                                updateLikeButton(it.isLiked)
+                            }
                         }
                     }
                 }
