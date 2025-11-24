@@ -64,14 +64,37 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             if (isDifferentStation) {
-                // Check the "Record Across Stations" setting
-                val recordAcrossStations = PreferencesHelper.isRecordAcrossStationsEnabled(getApplication())
-                if (!recordAcrossStations) {
+                val app = getApplication<Application>()
+                val recordAcrossStations = PreferencesHelper.isRecordAcrossStationsEnabled(app)
+                val recordAllStations = PreferencesHelper.isRecordAllStationsEnabled(app)
+
+                if (recordAllStations) {
+                    // Switch the recording to the new stream (continue same file)
+                    switchRecordingToStation(station)
+                } else if (!recordAcrossStations) {
                     // Stop and save recording when switching stations
                     stopRecording()
                 }
+                // If recordAcrossStations is true but recordAllStations is false,
+                // recording continues on the original stream (no action needed)
             }
         }
+    }
+
+    /**
+     * Switch the recording to a new station's stream (for "Record All Stations" feature).
+     * The recording continues in the same file with content from the new stream.
+     */
+    private fun switchRecordingToStation(station: RadioStation) {
+        val intent = Intent(getApplication(), RadioService::class.java).apply {
+            action = RadioService.ACTION_SWITCH_RECORDING_STREAM
+            putExtra("stream_url", station.streamUrl)
+            putExtra("station_name", station.name)
+            putExtra("proxy_host", station.proxyHost ?: "")
+            putExtra("proxy_port", station.proxyPort)
+            putExtra("proxy_type", station.getProxyTypeEnum().name)
+        }
+        getApplication<Application>().startService(intent)
     }
 
     fun setPlaying(playing: Boolean) {

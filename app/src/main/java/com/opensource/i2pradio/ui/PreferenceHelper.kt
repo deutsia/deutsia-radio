@@ -22,6 +22,7 @@ object PreferencesHelper {
     private const val KEY_FORCE_TOR_ALL = "force_tor_all"
     private const val KEY_FORCE_TOR_EXCEPT_I2P = "force_tor_except_i2p"
     private const val KEY_RECORD_ACROSS_STATIONS = "record_across_stations"
+    private const val KEY_RECORD_ALL_STATIONS = "record_all_stations"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -269,5 +270,34 @@ object PreferencesHelper {
     fun isRecordAcrossStationsEnabled(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_RECORD_ACROSS_STATIONS, false)
+    }
+
+    // Record All Stations setting
+    // When enabled, recording switches to the new station's stream when you switch stations
+    // All audio from different stations is recorded into the same file
+
+    /**
+     * Set whether recording should switch to new station streams.
+     * When enabled, switching stations makes the recording fetch the new stream,
+     * continuing the same recording file with content from multiple stations.
+     */
+    fun setRecordAllStations(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_RECORD_ALL_STATIONS, enabled)
+            .apply()
+        // If enabling this, also enable record across stations (required)
+        if (enabled) {
+            setRecordAcrossStations(context, true)
+        }
+    }
+
+    /**
+     * Check if recording should switch to new station streams.
+     * Default: false (recording stays on original stream)
+     */
+    fun isRecordAllStationsEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_RECORD_ALL_STATIONS, false)
     }
 }
