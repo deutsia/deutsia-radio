@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import coil.load
+import coil.request.CachePolicy
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -104,6 +105,28 @@ class MiniPlayerView @JvmOverloads constructor(
                 }
             )
         }
+    }
+
+    /**
+     * Update cover art with cache invalidation for real-time updates.
+     */
+    fun updateCoverArt(coverArtUri: String?) {
+        if (coverArtUri != null) {
+            coverImage.load(coverArtUri) {
+                crossfade(true)
+                // Force refresh by disabling cache for this request
+                memoryCachePolicy(CachePolicy.WRITE_ONLY)
+                diskCachePolicy(CachePolicy.WRITE_ONLY)
+                placeholder(R.drawable.ic_radio)
+                error(R.drawable.ic_radio)
+            }
+        } else {
+            coverImage.load(R.drawable.ic_radio) {
+                crossfade(true)
+            }
+        }
+        // Update the current station's cover art reference
+        currentStation = currentStation?.copy(coverArtUri = coverArtUri)
     }
 
     fun setStation(station: RadioStation?) {

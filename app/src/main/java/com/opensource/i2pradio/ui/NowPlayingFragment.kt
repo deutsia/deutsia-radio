@@ -71,6 +71,12 @@ class NowPlayingFragment : Fragment() {
     private var recordingTimeText: TextView? = null
     private lateinit var equalizerButton: MaterialButton
 
+    // Buffer bar UI elements
+    private var bufferBarContainer: View? = null
+    private var playbackElapsedTime: TextView? = null
+    private var bufferProgressBar: com.google.android.material.progressindicator.LinearProgressIndicator? = null
+    private var liveIndicator: TextView? = null
+
     // Volume control state
     private var savedVolume: Int = 0
     private var isMuted: Boolean = false
@@ -99,7 +105,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
 
-    // Broadcast receiver for metadata, stream info, playback state, and recording updates
+    // Broadcast receiver for metadata, stream info, playback state, recording updates, cover art, and time updates
     private val metadataReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -123,6 +129,8 @@ class NowPlayingFragment : Fragment() {
                     if (isPlaying != viewModel.isPlaying.value) {
                         viewModel.setPlaying(isPlaying)
                     }
+                    // Show/hide buffer bar based on playing state
+                    updateBufferBarVisibility(isPlaying)
                 }
                 RadioService.BROADCAST_RECORDING_ERROR -> {
                     val errorMessage = intent.getStringExtra(RadioService.EXTRA_ERROR_MESSAGE) ?: "Unknown error"
@@ -136,6 +144,18 @@ class NowPlayingFragment : Fragment() {
                     val sizeKB = fileSize / 1024
                     val fileName = filePath.substringAfterLast("/")
                     Toast.makeText(context, "Recording saved: $fileName (${sizeKB}KB)", Toast.LENGTH_LONG).show()
+                }
+                RadioService.BROADCAST_COVER_ART_CHANGED -> {
+                    val coverArtUri = intent.getStringExtra(RadioService.EXTRA_COVER_ART_URI)
+                    val stationId = intent.getLongExtra(RadioService.EXTRA_STATION_ID, -1L)
+                    // Update cover art immediately
+                    updateCoverArt(coverArtUri)
+                    // Also notify ViewModel for other observers
+                    viewModel.updateCoverArt(coverArtUri, stationId)
+                }
+                RadioService.BROADCAST_PLAYBACK_TIME_UPDATE -> {
+                    val elapsedMs = intent.getLongExtra(RadioService.EXTRA_PLAYBACK_ELAPSED_MS, 0L)
+                    updatePlaybackTime(elapsedMs)
                 }
             }
         }
@@ -191,6 +211,12 @@ class NowPlayingFragment : Fragment() {
         recordingTimeText = view.findViewById(R.id.recordingTime)
         equalizerButton = view.findViewById(R.id.equalizerButton)
 
+        // Buffer bar UI elements
+        bufferBarContainer = view.findViewById(R.id.bufferBarContainer)
+        playbackElapsedTime = view.findViewById(R.id.playbackElapsedTime)
+        bufferProgressBar = view.findViewById(R.id.bufferProgressBar)
+        liveIndicator = view.findViewById(R.id.liveIndicator)
+
         // Initialize audio manager and volume control
         audioManager = requireContext().getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
 
@@ -198,13 +224,15 @@ class NowPlayingFragment : Fragment() {
         val serviceIntent = Intent(requireContext(), RadioService::class.java)
         requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-        // Register broadcast receiver for metadata, stream info, playback state, and recording updates
+        // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, and time
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_METADATA_CHANGED)
             addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
             addAction(RadioService.BROADCAST_RECORDING_ERROR)
             addAction(RadioService.BROADCAST_RECORDING_COMPLETE)
+            addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
+            addAction(RadioService.BROADCAST_PLAYBACK_TIME_UPDATE)
         }
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
 
@@ -760,6 +788,78 @@ class NowPlayingFragment : Fragment() {
         } else if (codec.isNotBlank() && codec != "Unknown") {
             streamInfoText.text = codec
             streamInfoText.visibility = View.VISIBLE
+        }
+    }
+
+    /**
+     * Update the cover art image with cache invalidation for real-time updates.
+     */
+    private fun updateCoverArt(coverArtUri: String?) {
+        if (coverArtUri != null) {
+            coverArt.load(coverArtUri) {
+                crossfade(true)
+                // Force refresh by disabling cache for this request
+                memoryCachePolicy(coil.request.CachePolicy.WRITE_ONLY)
+                diskCachePolicy(coil.request.CachePolicy.WRITE_ONLY)
+                placeholder(R.drawable.ic_radio)
+                error(R.drawable.ic_radio)
+                listener(
+                    onSuccess = { _, _ ->
+                        coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
+                    },
+                    onError = { _, _ ->
+                        coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    }
+                )
+            }
+        } else {
+            coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            coverArt.load(R.drawable.ic_radio) {
+                crossfade(true)
+            }
+        }
+    }
+
+    /**
+     * Update the playback elapsed time display.
+     * Format: MM:SS for times under an hour, HH:MM:SS for longer times.
+     */
+    private fun updatePlaybackTime(elapsedMs: Long) {
+        val totalSeconds = elapsedMs / 1000
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+
+        val timeString = if (hours > 0) {
+            String.format("%d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            String.format("%02d:%02d", minutes, seconds)
+        }
+        playbackElapsedTime?.text = timeString
+
+        // Update progress bar - for live radio, show a subtle animation
+        // We use a pulsing effect since there's no seekable duration
+        bufferProgressBar?.let { bar ->
+            // Animate progress for visual feedback (cycles 0-100 every ~10 seconds)
+            val progress = ((totalSeconds % 10) * 10).toInt()
+            bar.setProgressCompat(progress, true)
+        }
+    }
+
+    /**
+     * Show or hide the buffer bar based on playback state.
+     */
+    private fun updateBufferBarVisibility(isPlaying: Boolean) {
+        if (isPlaying && viewModel.getCurrentStation() != null) {
+            if (bufferBarContainer?.visibility != View.VISIBLE) {
+                bufferBarContainer?.alpha = 0f
+                bufferBarContainer?.visibility = View.VISIBLE
+                bufferBarContainer?.animate()?.alpha(1f)?.setDuration(200)?.start()
+            }
+        } else {
+            bufferBarContainer?.animate()?.alpha(0f)?.setDuration(200)?.withEndAction {
+                bufferBarContainer?.visibility = View.GONE
+            }?.start()
         }
     }
 

@@ -153,6 +153,72 @@
 
     </LinearLayout>
 
+    <!-- Buffer/Progress Bar Section -->
+    <LinearLayout
+        android:id="@+id/bufferBarContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nowPlayingInfoContainer"
+        app:layout_constraintBottom_toTopOf="@id/nowPlayingControlsContainer">
+
+        <!-- Time and Buffer Progress -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="4dp">
+
+            <!-- Elapsed Time -->
+            <TextView
+                android:id="@+id/playbackElapsedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <!-- Spacer -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Live indicator -->
+            <TextView
+                android:id="@+id/liveIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LIVE"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorError"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <!-- Progress Bar -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/bufferProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:indicatorColor="?attr/colorPrimary"
+            app:trackColor="?attr/colorSurfaceContainerHighest"
+            app:trackCornerRadius="2dp"
+            app:trackThickness="4dp"
+            android:indeterminate="false"
+            android:progress="0"
+            android:max="100" />
+
+    </LinearLayout>
+
     <!-- Playback Controls - Grouped tightly in center for tablet/foldable support -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/nowPlayingControlsContainer"
@@ -162,7 +228,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nowPlayingInfoContainer"
+        app:layout_constraintTop_toBottomOf="@id/bufferBarContainer"
         app:layout_constraintWidth_max="320dp">
 
         <!-- Record Button (Left) - Default blue, changes to red when recording -->

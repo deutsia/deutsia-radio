@@ -156,29 +156,69 @@ class EqualizerManager(private val context: Context) {
     /**
      * Check if equalizer is initialized and ready
      */
-    fun isInitialized(): Boolean = equalizer != null
+    fun isInitialized(): Boolean = equalizer != null || isPreviewMode
+
+    // Preview mode flag - allows UI to show without active audio session
+    private var isPreviewMode: Boolean = false
+
+    /**
+     * Initialize for preview mode - shows UI with saved settings but no audio effect.
+     * Settings configured in preview mode are saved and applied when playback starts.
+     */
+    fun initializeForPreview() {
+        isPreviewMode = true
+
+        // Set default band level range for preview (typical Android values)
+        bandLevelRange = shortArrayOf(-1500, 1500)
+        numberOfBands = FIXED_BAND_COUNT.toShort()
+
+        // Create preset names for UI
+        presetNames = listOf("Custom", "Flat", "Bass Boost", "Treble Boost", "Rock", "Pop", "Classical", "Jazz")
+
+        // Use fixed frequencies as center frequencies for preview
+        centerFrequencies = FIXED_BAND_FREQUENCIES
+
+        // Default band mapping (1:1 for preview)
+        fixedToNativeBandMap = IntArray(FIXED_BAND_COUNT) { it }
+
+        // Restore saved band levels for preview
+        val bandsString = PreferencesHelper.getEqualizerBands(context)
+        if (bandsString != null) {
+            val levels = bandsString.split(",").mapNotNull { it.toShortOrNull() }
+            levels.forEachIndexed { index, level ->
+                if (index < FIXED_BAND_COUNT) {
+                    fixedBandLevels[index] = level
+                }
+            }
+        }
+
+        // Mark bass boost and virtualizer as available for preview
+        isBassBoostSupported = true
+        isVirtualizerSupported = true
+
+        Log.d(TAG, "Initialized in preview mode - settings will be applied when playback starts")
+    }
 
     /**
      * Check if equalizer is enabled
      */
-    fun isEnabled(): Boolean = equalizer?.enabled ?: false
+    fun isEnabled(): Boolean = equalizer?.enabled ?: PreferencesHelper.isEqualizerEnabled(context)
 
     /**
      * Enable or disable the equalizer and audio effects
      */
     fun setEnabled(enabled: Boolean) {
+        // Always save the preference (even in preview mode)
+        PreferencesHelper.setEqualizerEnabled(context, enabled)
+        Log.d(TAG, "Equalizer enabled: $enabled (preview: $isPreviewMode)")
+
+        // Apply to equalizer if active (not in preview mode)
         equalizer?.let { eq ->
             eq.enabled = enabled
-            PreferencesHelper.setEqualizerEnabled(context, enabled)
-            Log.d(TAG, "Equalizer enabled: $enabled")
         }
-        // Also enable/disable bass boost and virtualizer
-        if (isBassBoostSupported) {
-            bassBoost?.enabled = enabled
-        }
-        if (isVirtualizerSupported) {
-            virtualizer?.enabled = enabled
-        }
+        // Also enable/disable bass boost and virtualizer if active
+        bassBoost?.enabled = enabled
+        virtualizer?.enabled = enabled
     }
 
     /**
@@ -196,16 +236,15 @@ class EqualizerManager(private val context: Context) {
     fun setBandLevel(band: Short, level: Short) {
         if (band < 0 || band >= FIXED_BAND_COUNT) return
 
+        // Store the level for this fixed band (always, even in preview mode)
+        fixedBandLevels[band.toInt()] = level
+        saveFixedBandLevels()
+
+        // Apply to equalizer if active (not in preview mode)
         equalizer?.let { eq ->
             try {
-                // Store the level for this fixed band
-                fixedBandLevels[band.toInt()] = level
-
-                // Apply to the mapped native band
                 val nativeBand = fixedToNativeBandMap[band.toInt()]
                 eq.setBandLevel(nativeBand.toShort(), level)
-
-                saveFixedBandLevels()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to set band level", e)
             }
@@ -291,18 +330,32 @@ class EqualizerManager(private val context: Context) {
      * Reset all bands to flat (0 dB)
      */
     fun resetToFlat() {
+        // Reset fixed band levels (always, even in preview mode)
+        for (i in 0 until FIXED_BAND_COUNT) {
+            fixedBandLevels[i] = 0
+        }
+        saveFixedBandLevels()
+
+        // Reset bass boost and virtualizer strength
+        PreferencesHelper.setBassBoostStrength(context, 0)
+        PreferencesHelper.setVirtualizerStrength(context, 0)
+
+        // Apply to equalizer if active
         equalizer?.let { eq ->
-            // Reset all native bands
             for (band in 0 until numberOfBands) {
                 eq.setBandLevel(band.toShort(), 0)
             }
-            // Reset fixed band levels
-            for (i in 0 until FIXED_BAND_COUNT) {
-                fixedBandLevels[i] = 0
-            }
-            saveFixedBandLevels()
-            Log.d(TAG, "Reset to flat")
         }
+
+        // Apply to bass boost and virtualizer if active
+        try {
+            bassBoost?.setStrength(0)
+            virtualizer?.setStrength(0)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error resetting effects: ${e.message}")
+        }
+
+        Log.d(TAG, "Reset to flat")
     }
 
     /**
@@ -373,9 +426,9 @@ class EqualizerManager(private val context: Context) {
      */
     fun getBassBoostStrength(): Short {
         return try {
-            bassBoost?.roundedStrength ?: 0
+            bassBoost?.roundedStrength ?: PreferencesHelper.getBassBoostStrength(context)
         } catch (e: Exception) {
-            0
+            PreferencesHelper.getBassBoostStrength(context)
         }
     }
 
@@ -383,15 +436,17 @@ class EqualizerManager(private val context: Context) {
      * Set bass boost strength (0-1000)
      */
     fun setBassBoostStrength(strength: Short) {
+        // Always save preference (even in preview mode)
+        PreferencesHelper.setBassBoostStrength(context, strength)
+        Log.d(TAG, "Bass boost strength set to: $strength (preview: $isPreviewMode)")
+
+        // Apply to bass boost if active
         bassBoost?.let { bb ->
             try {
-                // Ensure the effect is enabled when setting strength
                 if (!bb.enabled && strength > 0) {
                     bb.enabled = true
                 }
                 bb.setStrength(strength)
-                PreferencesHelper.setBassBoostStrength(context, strength)
-                Log.d(TAG, "Bass boost strength set to: $strength")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to set bass boost strength", e)
             }
@@ -405,9 +460,9 @@ class EqualizerManager(private val context: Context) {
      */
     fun getVirtualizerStrength(): Short {
         return try {
-            virtualizer?.roundedStrength ?: 0
+            virtualizer?.roundedStrength ?: PreferencesHelper.getVirtualizerStrength(context)
         } catch (e: Exception) {
-            0
+            PreferencesHelper.getVirtualizerStrength(context)
         }
     }
 
@@ -415,15 +470,17 @@ class EqualizerManager(private val context: Context) {
      * Set virtualizer strength (0-1000)
      */
     fun setVirtualizerStrength(strength: Short) {
+        // Always save preference (even in preview mode)
+        PreferencesHelper.setVirtualizerStrength(context, strength)
+        Log.d(TAG, "Virtualizer strength set to: $strength (preview: $isPreviewMode)")
+
+        // Apply to virtualizer if active
         virtualizer?.let { virt ->
             try {
-                // Ensure the effect is enabled when setting strength
                 if (!virt.enabled && strength > 0) {
                     virt.enabled = true
                 }
                 virt.setStrength(strength)
-                PreferencesHelper.setVirtualizerStrength(context, strength)
-                Log.d(TAG, "Virtualizer strength set to: $strength")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to set virtualizer strength", e)
             }

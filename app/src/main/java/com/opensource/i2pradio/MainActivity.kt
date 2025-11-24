@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Broadcast receiver for playback state changes
+    // Broadcast receiver for playback state and cover art changes
     private val playbackStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -67,6 +67,12 @@ class MainActivity : AppCompatActivity() {
                     val isPlaying = intent.getBooleanExtra(RadioService.EXTRA_IS_PLAYING, false)
                     viewModel.setBuffering(isBuffering)
                     viewModel.setPlaying(isPlaying)
+                }
+                RadioService.BROADCAST_COVER_ART_CHANGED -> {
+                    val coverArtUri = intent.getStringExtra(RadioService.EXTRA_COVER_ART_URI)
+                    val stationId = intent.getLongExtra(RadioService.EXTRA_STATION_ID, -1L)
+                    // Update ViewModel which will trigger MiniPlayer update
+                    viewModel.updateCoverArt(coverArtUri, stationId)
                 }
             }
         }
@@ -130,8 +136,11 @@ class MainActivity : AppCompatActivity() {
             TorManager.initialize(this)
         }
 
-        // Register broadcast receiver for playback state changes
-        val filter = IntentFilter(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
+        // Register broadcast receiver for playback state and cover art changes
+        val filter = IntentFilter().apply {
+            addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
+            addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
+        }
         LocalBroadcastManager.getInstance(this).registerReceiver(playbackStateReceiver, filter)
     }
 
@@ -198,6 +207,13 @@ class MainActivity : AppCompatActivity() {
         // Observe buffering state to show/hide loading indicator
         viewModel.isBuffering.observe(this) { isBuffering ->
             miniPlayerView.setBufferingState(isBuffering)
+        }
+
+        // Observe cover art updates for real-time updates
+        viewModel.coverArtUpdate.observe(this) { update ->
+            update?.let {
+                miniPlayerView.updateCoverArt(it.coverArtUri)
+            }
         }
 
         // Click mini-player to go to Now Playing tab

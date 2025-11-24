@@ -17,6 +17,15 @@ data class RecordingState(
     val startTimeMillis: Long = 0L
 )
 
+/**
+ * Cover art update event - triggers UI refresh with cache invalidation
+ */
+data class CoverArtUpdate(
+    val coverArtUri: String?,
+    val stationId: Long = -1L,
+    val timestamp: Long = System.currentTimeMillis() // For cache invalidation
+)
+
 class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _currentStation = MutableLiveData<RadioStation?>()
     val currentStation: LiveData<RadioStation?> = _currentStation
@@ -29,6 +38,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _recordingState = MutableLiveData(RecordingState())
     val recordingState: LiveData<RecordingState> = _recordingState
+
+    // Cover art update event for real-time updates across all UI components
+    private val _coverArtUpdate = MutableLiveData<CoverArtUpdate?>()
+    val coverArtUpdate: LiveData<CoverArtUpdate?> = _coverArtUpdate
 
     fun setCurrentStation(station: RadioStation?) {
         _currentStation.value = station
@@ -57,6 +70,28 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             // Create a copy with updated like state
             _currentStation.value = station.copy(isLiked = isLiked)
         }
+    }
+
+    /**
+     * Update the cover art for the current station and notify all observers.
+     * This triggers real-time updates across miniplayer, now playing, and station list.
+     */
+    fun updateCoverArt(coverArtUri: String?, stationId: Long = -1L) {
+        // Update the current station's cover art if it matches
+        _currentStation.value?.let { station ->
+            if (stationId == -1L || station.id == stationId) {
+                _currentStation.value = station.copy(coverArtUri = coverArtUri)
+            }
+        }
+        // Trigger cover art update event for all observers
+        _coverArtUpdate.value = CoverArtUpdate(coverArtUri, stationId)
+    }
+
+    /**
+     * Clear the cover art update event after it has been handled.
+     */
+    fun clearCoverArtUpdate() {
+        _coverArtUpdate.value = null
     }
 
     /**
