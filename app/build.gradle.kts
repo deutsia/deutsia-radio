@@ -67,6 +67,9 @@ dependencies {
     // ViewPager2 for tabs
     implementation("androidx.viewpager2:viewpager2:1.0.0")
 
+    // SwipeRefreshLayout for pull-to-refresh
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
