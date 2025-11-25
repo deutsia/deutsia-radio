@@ -848,9 +848,7 @@ class RadioStationAdapter(
             )
 
             // Apply stroke for clear selection indicator
-            cardView.strokeWidth = itemView.resources.getDimensionPixelSize(
-                com.google.android.material.R.dimen.material_emphasis_medium
-            ).coerceAtLeast(3) // Ensure at least 3dp
+            cardView.strokeWidth = (2 * itemView.resources.displayMetrics.density).toInt() // 2dp stroke
             cardView.strokeColor = primaryColor
 
             // Apply subtle background tint using primaryContainer color
