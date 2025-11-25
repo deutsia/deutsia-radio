@@ -815,7 +815,7 @@ class SettingsFragment : Fragment() {
     private fun updateColorSchemeButtonText(button: MaterialButton) {
         val currentScheme = PreferencesHelper.getColorScheme(requireContext())
         button.text = when (currentScheme) {
-            "red" -> "Red"
+            "peach" -> "Peach"
             "green" -> "Green"
             "purple" -> "Purple"
             "orange" -> "Orange"
@@ -824,8 +824,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showColorSchemeDialog(colorSchemeButton: MaterialButton) {
-        val schemes = arrayOf("Blue (Default)", "Red", "Green", "Purple", "Orange")
-        val schemeValues = arrayOf("default", "red", "green", "purple", "orange")
+        val schemes = arrayOf("Blue (Default)", "Peach", "Green", "Purple", "Orange")
+        val schemeValues = arrayOf("default", "peach", "green", "purple", "orange")
         val currentScheme = PreferencesHelper.getColorScheme(requireContext())
         val selectedIndex = schemeValues.indexOf(currentScheme).coerceAtLeast(0)
 

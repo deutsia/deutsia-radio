@@ -37,16 +37,16 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_dark_surfaceContainerHighest</item>
     </style>
 
-    <!-- Red Color Scheme Theme - Dark -->
-    <style name="Theme.I2PRadio.Red" parent="Base.Theme.I2PRadio">
-        <item name="colorPrimary">@color/md_theme_red_dark_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_red_dark_onPrimary</item>
-        <item name="colorPrimaryContainer">@color/md_theme_red_dark_primaryContainer</item>
-        <item name="colorOnPrimaryContainer">@color/md_theme_red_dark_onPrimaryContainer</item>
-        <item name="colorSecondary">@color/md_theme_red_dark_secondary</item>
-        <item name="colorOnSecondary">@color/md_theme_red_dark_onSecondary</item>
-        <item name="colorSecondaryContainer">@color/md_theme_red_dark_secondaryContainer</item>
-        <item name="colorOnSecondaryContainer">@color/md_theme_red_dark_onSecondaryContainer</item>
+    <!-- Peach Color Scheme Theme - Dark -->
+    <style name="Theme.I2PRadio.Peach" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_peach_dark_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_peach_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_peach_dark_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_peach_dark_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_peach_dark_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_peach_dark_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_peach_dark_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_peach_dark_onSecondaryContainer</item>
     </style>
 
     <!-- Green Color Scheme Theme - Dark -->
