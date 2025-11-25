@@ -1,72 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
 
-    <!-- Radio icon with color for app launcher -->
-
-    <!-- Main radio body -->
+    <!-- Layer 1: The Cream Background -->
     <path
-        android:fillColor="#2C3E50"
-        android:pathData="M30,45c0,-2.76 2.24,-5 5,-5h38c2.76,0 5,2.24 5,5v25c0,2.76 -2.24,5 -5,5H35c-2.76,0 -5,-2.24 -5,-5V45z"/>
+        android:fillColor="#F4F0E6"
+        android:pathData="M0,0h24v24h-24z"/>
 
-    <!-- Radio dial/speaker circle (cutout) -->
+    <!-- Layer 2: The Antenna (Stick) -->
+    <!-- Adjusted to extend further (to x=19) while maintaining the exact slope -->
     <path
-        android:fillColor="#34495E"
-        android:pathData="M54,57.5m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0"/>
-
-    <!-- Inner speaker circle -->
-    <path
-        android:fillColor="#E74C3C"
-        android:pathData="M54,57.5m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
-
-    <!-- Radio tuner line -->
-    <path
-        android:fillColor="#ECF0F1"
-        android:pathData="M36,48h36v3h-36z"/>
-
-    <!-- Tuner indicator -->
-    <path
-        android:fillColor="#E74C3C"
-        android:pathData="M52,46h4v7h-4z"/>
-
-    <!-- Antenna -->
-    <path
-        android:pathData="M40,40L30,26"
-        android:strokeWidth="3"
-        android:strokeColor="#95A5A6"
+        android:fillColor="#00000000"
+        android:strokeColor="#1D1D1D"
+        android:strokeWidth="1.5"
         android:strokeLineCap="round"
-        android:fillColor="#00000000"/>
+        android:pathData="M13,9 L19,4.8"/>
 
-    <!-- Antenna tip -->
+    <!-- Layer 3: The Antenna (Ball Tip) -->
+    <!-- Center calculated at (20, 4.1) to be perfectly inline with the stick's angle -->
+    <!-- Radius increased slightly to 1.3 for better proportion -->
     <path
-        android:fillColor="#E74C3C"
-        android:pathData="M30,26m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"/>
+        android:fillColor="#1D1D1D"
+        android:pathData="M20,4.1 m-1.3,0 a1.3,1.3 0 1,1 2.6,0 a1.3,1.3 0 1,1 -2.6,0"/>
 
-    <!-- Signal wave 1 (small) -->
+    <!-- Layer 4: The Main Radio Body -->
     <path
-        android:pathData="M24,34c-3,-3 -3,-8 0,-11"
-        android:strokeWidth="2"
-        android:strokeColor="#3498DB"
+        android:fillColor="#1D1D1D"
+        android:pathData="M7,9h10c1.66,0 3,1.34 3,3v5c0,1.66 -1.34,3 -3,3h-10c-1.66,0 -3,-1.34 -3,-3v-5c0,-1.66 1.34,-3 3,-3z"/>
+
+    <!-- Layer 5: The Speaker (Circle Cutout) -->
+    <path
+        android:fillColor="#F4F0E6"
+        android:pathData="M15,14.5m-2.8,0a2.8,2.8 0 1,1 5.6,0a2.8,2.8 0 1,1 -5.6,0"/>
+
+    <!-- Layer 6: The Speaker Grill (Lines) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#F4F0E6"
+        android:strokeWidth="1.4"
         android:strokeLineCap="round"
-        android:fillColor="#00000000"/>
-
-    <!-- Signal wave 2 (medium) -->
-    <path
-        android:pathData="M19,38c-5,-5 -5,-14 0,-19"
-        android:strokeWidth="2"
-        android:strokeColor="#3498DB"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"/>
-
-    <!-- Signal wave 3 (large) -->
-    <path
-        android:pathData="M14,42c-7,-7 -7,-20 0,-27"
-        android:strokeWidth="2"
-        android:strokeColor="#3498DB"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"/>
-
+        android:pathData="M6.5,12.5h3.5 M6.5,14.5h3.5 M6.5,16.5h3.5"/>
 </vector>
