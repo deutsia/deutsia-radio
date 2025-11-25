@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Radio icon with color for app launcher -->
+
+    <!-- Main radio body -->
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M30,45c0,-2.76 2.24,-5 5,-5h38c2.76,0 5,2.24 5,5v25c0,2.76 -2.24,5 -5,5H35c-2.76,0 -5,-2.24 -5,-5V45z"/>
+
+    <!-- Radio dial/speaker circle (cutout) -->
+    <path
+        android:fillColor="#34495E"
+        android:pathData="M54,57.5m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0"/>
+
+    <!-- Inner speaker circle -->
+    <path
+        android:fillColor="#E74C3C"
+        android:pathData="M54,57.5m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+
+    <!-- Radio tuner line -->
+    <path
+        android:fillColor="#ECF0F1"
+        android:pathData="M36,48h36v3h-36z"/>
+
+    <!-- Tuner indicator -->
+    <path
+        android:fillColor="#E74C3C"
+        android:pathData="M52,46h4v7h-4z"/>
+
+    <!-- Antenna -->
+    <path
+        android:pathData="M40,40L30,26"
+        android:strokeWidth="3"
+        android:strokeColor="#95A5A6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Antenna tip -->
+    <path
+        android:fillColor="#E74C3C"
+        android:pathData="M30,26m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"/>
+
+    <!-- Signal wave 1 (small) -->
+    <path
+        android:pathData="M24,34c-3,-3 -3,-8 0,-11"
+        android:strokeWidth="2"
+        android:strokeColor="#3498DB"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Signal wave 2 (medium) -->
+    <path
+        android:pathData="M19,38c-5,-5 -5,-14 0,-19"
+        android:strokeWidth="2"
+        android:strokeColor="#3498DB"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Signal wave 3 (large) -->
+    <path
+        android:pathData="M14,42c-7,-7 -7,-20 0,-27"
+        android:strokeWidth="2"
+        android:strokeColor="#3498DB"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+</vector>
