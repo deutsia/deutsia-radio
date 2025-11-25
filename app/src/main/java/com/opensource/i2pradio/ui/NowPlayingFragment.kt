@@ -334,6 +334,20 @@ class NowPlayingFragment : Fragment() {
                             updatedStation?.let {
                                 viewModel.updateCurrentStationLikeState(it.isLiked)
                                 updateLikeButton(it.isLiked)
+                                // Show toast message
+                                if (it.isLiked) {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.station_saved, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.station_removed, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     } else {
@@ -344,6 +358,20 @@ class NowPlayingFragment : Fragment() {
                             updatedStation?.let {
                                 viewModel.updateCurrentStationLikeState(it.isLiked)
                                 updateLikeButton(it.isLiked)
+                                // Show toast message
+                                if (it.isLiked) {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.station_saved, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.station_removed, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     }
