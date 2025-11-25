@@ -87,36 +87,33 @@ class RadioService : Service() {
 
     // Audio focus change listener to handle interruptions gracefully
     // This prevents static/scratches when other apps briefly request audio focus
+    // Note: ExoPlayer now handles audio focus automatically, but this listener
+    // provides additional logging and ensures proper cleanup on permanent loss
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
         when (focusChange) {
             AudioManager.AUDIOFOCUS_GAIN -> {
-                // Regained focus - resume playback at normal volume
+                // Regained focus - ExoPlayer handles this automatically
                 hasAudioFocus = true
-                player?.let { exoPlayer ->
-                    exoPlayer.volume = 1.0f
-                    if (exoPlayer.playbackState == Player.STATE_READY && !exoPlayer.isPlaying) {
-                        exoPlayer.play()
-                    }
-                }
-                android.util.Log.d("RadioService", "Audio focus gained")
+                android.util.Log.d("RadioService", "Audio focus gained - ExoPlayer handling playback")
             }
             AudioManager.AUDIOFOCUS_LOSS -> {
-                // Permanent loss - stop playback
+                // Permanent loss (e.g., Spotify, YouTube starts) - stop playback entirely
+                // ExoPlayer pauses automatically, but we should clean up properly
                 hasAudioFocus = false
-                player?.pause()
-                android.util.Log.d("RadioService", "Audio focus lost permanently")
+                android.util.Log.d("RadioService", "Audio focus lost permanently - stopping playback")
+                // Post to handler to avoid blocking the audio focus callback
+                handler.post {
+                    stopStream()
+                }
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                // Temporary loss (e.g., phone call) - pause playback
+                // Temporary loss (e.g., phone call, notification) - ExoPlayer pauses automatically
                 hasAudioFocus = false
-                player?.pause()
-                android.util.Log.d("RadioService", "Audio focus lost transiently")
+                android.util.Log.d("RadioService", "Audio focus lost transiently - ExoPlayer handling pause")
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
-                // Can duck - lower volume instead of pausing
-                // This prevents audio artifacts from constant pause/resume
-                player?.volume = 0.2f
-                android.util.Log.d("RadioService", "Audio focus ducking")
+                // Can duck - ExoPlayer handles volume reduction automatically
+                android.util.Log.d("RadioService", "Audio focus ducking - ExoPlayer handling volume")
             }
         }
     }
@@ -1436,7 +1433,7 @@ class RadioService : Service() {
             // Use ExoPlayer's default renderers and audio sink - they're highly optimized
             player = ExoPlayer.Builder(this)
                 .setLoadControl(loadControl)
-                .setAudioAttributes(audioAttributes, false)
+                .setAudioAttributes(audioAttributes, true)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)

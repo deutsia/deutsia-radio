@@ -68,6 +68,9 @@ interface RadioDao {
     @Query("DELETE FROM radio_stations WHERE id = :id")
     suspend fun deleteStationById(id: Long)
 
+    @Query("DELETE FROM radio_stations WHERE id IN (:ids)")
+    suspend fun deleteStationsByIds(ids: List<Long>)
+
     // Toggle like status
     @Query("UPDATE radio_stations SET isLiked = NOT isLiked WHERE id = :id")
     suspend fun toggleLike(id: Long)

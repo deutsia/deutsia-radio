@@ -6,12 +6,16 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.core.content.ContextCompat
+import android.view.ActionMode
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.Toast
 import android.widget.LinearLayout
@@ -58,6 +62,9 @@ class LibraryFragment : Fragment() {
     // Cache for search filtering
     private var allStationsCache: List<RadioStation> = emptyList()
 
+    // Selection mode
+    private var actionMode: ActionMode? = null
+
     // Predefined genres list (sorted alphabetically)
     private val allGenres = listOf(
         "All Genres", "Alternative", "Ambient", "Blues", "Christian", "Classical",
@@ -86,7 +93,9 @@ class LibraryFragment : Fragment() {
         adapter = RadioStationAdapter(
             onStationClick = { station -> playStation(station) },
             onMenuClick = { station, anchor -> showStationMenu(station, anchor) },
-            onLikeClick = { station -> toggleLike(station) }
+            onLikeClick = { station -> toggleLike(station) },
+            onLongPress = { station -> startSelectionMode(station) },
+            onSelectionChanged = { updateActionModeTitle() }
         )
         recyclerView.adapter = adapter
 
@@ -493,16 +502,114 @@ class LibraryFragment : Fragment() {
 
         fabAddRadio.layoutParams = layoutParams
     }
+
+    /**
+     * Starts selection mode when user long-presses a station
+     */
+    private fun startSelectionMode(station: RadioStation) {
+        adapter.enterSelectionMode(station.id)
+        actionMode = requireActivity().startActionMode(actionModeCallback)
+        updateActionModeTitle()
+    }
+
+    /**
+     * Updates the ActionMode title to show selection count
+     */
+    private fun updateActionModeTitle() {
+        val count = adapter.getSelectionCount()
+        actionMode?.title = "$count selected"
+    }
+
+    /**
+     * ActionMode callback for selection mode
+     */
+    private val actionModeCallback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            mode.menuInflater.inflate(R.menu.selection_menu, menu)
+            // Hide FAB during selection mode
+            fabAddRadio.hide()
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+            return when (item.itemId) {
+                R.id.action_select_all -> {
+                    adapter.selectAll()
+                    updateActionModeTitle()
+                    true
+                }
+                R.id.action_delete -> {
+                    showDeleteConfirmationDialog()
+                    true
+                }
+                else -> false
+            }
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode) {
+            adapter.exitSelectionMode()
+            actionMode = null
+            // Show FAB again
+            fabAddRadio.show()
+        }
+    }
+
+    /**
+     * Shows confirmation dialog before deleting selected stations
+     */
+    private fun showDeleteConfirmationDialog() {
+        val selectedCount = adapter.getSelectionCount()
+        if (selectedCount == 0) {
+            actionMode?.finish()
+            return
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delete stations")
+            .setMessage("Are you sure you want to delete $selectedCount station${if (selectedCount > 1) "s" else ""}?")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteSelectedStations()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    /**
+     * Deletes the selected stations
+     */
+    private fun deleteSelectedStations() {
+        val selectedIds = adapter.getSelectedStationIds()
+        lifecycleScope.launch(Dispatchers.IO) {
+            repository.deleteStationsByIds(selectedIds)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    requireContext(),
+                    "Deleted ${selectedIds.size} station${if (selectedIds.size > 1) "s" else ""}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                actionMode?.finish()
+            }
+        }
+    }
 }
 
-// Updated Adapter with DiffUtil and stable IDs to prevent cover art duplication
+// Updated Adapter with DiffUtil, stable IDs, and selection mode support
 class RadioStationAdapter(
     private val onStationClick: (RadioStation) -> Unit,
     private val onMenuClick: (RadioStation, View) -> Unit,
-    private val onLikeClick: (RadioStation) -> Unit
+    private val onLikeClick: (RadioStation) -> Unit,
+    private val onLongPress: (RadioStation) -> Unit,
+    private val onSelectionChanged: () -> Unit
 ) : RecyclerView.Adapter<RadioStationAdapter.ViewHolder>() {
 
     private var stations = listOf<RadioStation>()
+    private val selectedStations = mutableSetOf<Long>()
+    var isSelectionMode = false
+        private set
 
     init {
         setHasStableIds(true)
@@ -529,12 +636,47 @@ class RadioStationAdapter(
 
     override fun getItemCount() = stations.size
 
+    // Selection mode methods
+    fun enterSelectionMode(initialStationId: Long) {
+        isSelectionMode = true
+        selectedStations.clear()
+        selectedStations.add(initialStationId)
+        notifyDataSetChanged()
+    }
+
+    fun exitSelectionMode() {
+        isSelectionMode = false
+        selectedStations.clear()
+        notifyDataSetChanged()
+    }
+
+    fun toggleSelection(stationId: Long) {
+        if (selectedStations.contains(stationId)) {
+            selectedStations.remove(stationId)
+        } else {
+            selectedStations.add(stationId)
+        }
+        notifyItemChanged(stations.indexOfFirst { it.id == stationId })
+        onSelectionChanged()
+    }
+
+    fun selectAll() {
+        selectedStations.clear()
+        selectedStations.addAll(stations.map { it.id })
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedStationIds(): List<Long> = selectedStations.toList()
+
+    fun getSelectionCount(): Int = selectedStations.size
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val coverArt: ImageView = itemView.findViewById(R.id.coverArtImage)
         private val stationName: TextView = itemView.findViewById(R.id.stationNameText)
         private val genreText: TextView = itemView.findViewById(R.id.genreText)
         private val menuButton: MaterialButton = itemView.findViewById(R.id.menuButton)
         private val likeButton: MaterialButton = itemView.findViewById(R.id.likeButton)
+        private val selectionCheckBox: CheckBox = itemView.findViewById(R.id.selectionCheckBox)
         private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioStation) {
@@ -566,6 +708,18 @@ class RadioStationAdapter(
                 }
             }
 
+            // Selection mode UI
+            if (isSelectionMode) {
+                selectionCheckBox.visibility = View.VISIBLE
+                selectionCheckBox.isChecked = selectedStations.contains(station.id)
+                menuButton.visibility = View.GONE
+                likeButton.visibility = View.GONE
+            } else {
+                selectionCheckBox.visibility = View.GONE
+                menuButton.visibility = View.VISIBLE
+                likeButton.visibility = View.VISIBLE
+            }
+
             // Touch animation for press feedback
             itemView.setOnTouchListener { v, event ->
                 when (event.action) {
@@ -589,8 +743,23 @@ class RadioStationAdapter(
                 false
             }
 
+            // Handle clicks based on mode
             itemView.setOnClickListener {
-                onStationClick(station)
+                if (isSelectionMode) {
+                    toggleSelection(station.id)
+                } else {
+                    onStationClick(station)
+                }
+            }
+
+            // Long press to enter selection mode
+            itemView.setOnLongClickListener {
+                if (!isSelectionMode) {
+                    onLongPress(station)
+                    true
+                } else {
+                    false
+                }
             }
 
             menuButton.setOnClickListener {
@@ -599,6 +768,11 @@ class RadioStationAdapter(
 
             likeButton.setOnClickListener {
                 onLikeClick(station)
+            }
+
+            // Checkbox click also toggles selection
+            selectionCheckBox.setOnClickListener {
+                toggleSelection(station.id)
             }
         }
 
