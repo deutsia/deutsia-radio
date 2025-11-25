@@ -17,7 +17,7 @@
         android:name=".I2PRadioApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="I2P Radio"
+        android:label="deutsia radio"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.I2PRadio"

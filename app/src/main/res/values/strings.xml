@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">I2P Radio</string>
+    <string name="app_name">deutsia radio</string>
     <string name="tab_radios">Library</string>
     <string name="tab_now_playing">Now Playing</string>
     <string name="tab_settings">Settings</string>
