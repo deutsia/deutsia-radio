@@ -232,11 +232,18 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
         viewModelScope.launch {
             if (isCurrentlyLiked) {
-                // Unlike: toggle the like status in the database
-                repository.toggleLikeByUuid(uuid)
-                val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
-                likedCurrent.remove(uuid)
-                _likedStationUuids.value = likedCurrent
+                // Unlike: remove the station from library entirely
+                val deleted = repository.deleteStationByUuid(uuid)
+                if (deleted) {
+                    // Update both saved and liked UUIDs sets
+                    val savedCurrent = _savedStationUuids.value.orEmpty().toMutableSet()
+                    savedCurrent.remove(uuid)
+                    _savedStationUuids.value = savedCurrent
+
+                    val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
+                    likedCurrent.remove(uuid)
+                    _likedStationUuids.value = likedCurrent
+                }
             } else {
                 // Like: save and mark as liked
                 val id = repository.saveStationAsLiked(station)
