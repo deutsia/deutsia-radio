@@ -99,10 +99,12 @@ object TorManager {
     private val healthCheckHandler = Handler(Looper.getMainLooper())
     private var healthCheckRunnable: Runnable? = null
 
-    fun addStateListener(listener: (TorState) -> Unit) {
+    fun addStateListener(listener: (TorState) -> Unit, notifyImmediately: Boolean = true) {
         stateListeners.add(listener)
-        // Immediately notify of current state
-        listener(_state)
+        // Immediately notify of current state (unless suppressed during initialization)
+        if (notifyImmediately) {
+            listener(_state)
+        }
     }
 
     fun removeStateListener(listener: (TorState) -> Unit) {
@@ -396,6 +398,15 @@ object TorManager {
     fun initialize(context: Context) {
         // Register receiver first (even if Orbot check fails, the socket check will run)
         registerOrbotStatusReceiver(context, null)
+
+        // CRITICAL FIX: Skip status request if we're already connected and stable.
+        // This prevents UI oscillations during activity recreation (theme changes, Material You toggles).
+        // TorManager is a singleton, so state persists across activity recreations.
+        // The periodic health checks (every 30s) will detect if connection is lost.
+        if (_state == TorState.CONNECTED && _socksPort > 0) {
+            Log.d(TAG, "Already connected to Tor - skipping redundant status check during initialization")
+            return
+        }
 
         // Request current status from Orbot - this includes a socket check
         // which is more reliable than PackageManager during activity recreation

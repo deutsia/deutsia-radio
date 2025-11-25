@@ -419,7 +419,10 @@ class SettingsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        TorManager.addStateListener(torStateListener)
+        // CRITICAL FIX: Don't notify immediately when adding listener during activity recreation.
+        // The initial state is already set up in setupTorControls() with proper debouncing.
+        // Immediate notification would cancel that debouncing and cause UI flickering.
+        TorManager.addStateListener(torStateListener, notifyImmediately = false)
 
         // Register preference change listener to sync Tor switch with preference updates
         requireContext().getSharedPreferences("DeutsiaRadioPrefs", Context.MODE_PRIVATE)
