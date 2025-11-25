@@ -229,6 +229,9 @@ object TorManager {
         // Check if Orbot is installed
         if (!isOrbotInstalled(context)) {
             Log.w(TAG, "Orbot is not installed")
+            // CRITICAL: Clear port state when transitioning to ORBOT_NOT_INSTALLED
+            _socksPort = -1
+            _httpPort = -1
             _errorMessage = "Orbot is not installed. Please install Orbot to use Tor."
             notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
             onComplete?.invoke(false)
@@ -396,16 +399,24 @@ object TorManager {
      * Call this when the app starts to detect if Orbot is already running.
      */
     fun initialize(context: Context) {
-        if (!isOrbotInstalled(context)) {
-            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
-            return
-        }
-
-        // Register receiver first
+        // Register receiver first (even if Orbot check fails, the socket check will run)
         registerOrbotStatusReceiver(context, null)
 
-        // Request current status from Orbot
+        // Request current status from Orbot - this includes a socket check
+        // which is more reliable than PackageManager during activity recreation
         requestOrbotStatus(context)
+
+        // Only mark as not installed if BOTH the package check fails AND
+        // we're currently in a non-connected state. This prevents false positives
+        // during activity recreation when PackageManager might be slow to respond
+        // but Tor is actually running.
+        if (!isOrbotInstalled(context) && _state != TorState.CONNECTED) {
+            // CRITICAL: Clear port state when transitioning to ORBOT_NOT_INSTALLED
+            // to prevent UI showing leak warnings while ports are still set
+            _socksPort = -1
+            _httpPort = -1
+            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
+        }
     }
 
     /**
