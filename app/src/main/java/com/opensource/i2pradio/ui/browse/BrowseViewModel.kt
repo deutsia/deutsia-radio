@@ -451,8 +451,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-        _savedStationUuids.value = savedUuids
-        _likedStationUuids.value = likedUuids
+        _savedStationUuids.postValue(savedUuids)
+        _likedStationUuids.postValue(likedUuids)
     }
 
     /**
