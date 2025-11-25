@@ -20,6 +20,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,9 +35,9 @@ import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.SortOrder
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LibraryFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
@@ -210,7 +211,7 @@ class LibraryFragment : Fragment() {
 
     private fun showGenreFilterDialog() {
         // Build the genre list - combine predefined genres with any genres from database
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch(Dispatchers.Main) {
             val dbGenres = try {
                 repository.getAllGenresSync()
             } catch (e: Exception) {
@@ -348,6 +349,9 @@ class LibraryFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            // Add bounds check to prevent IndexOutOfBoundsException during concurrent modification
+            if (position >= genres.size) return
+
             val genre = genres[position]
             holder.textView?.text = genre
             holder.radioButton?.isChecked = position == selectedPosition
@@ -381,7 +385,7 @@ class LibraryFragment : Fragment() {
         viewModel.setBuffering(true)  // Show buffering state while connecting
 
         // Update last played timestamp
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             repository.updateLastPlayedAt(station.id)
         }
 
@@ -405,11 +409,11 @@ class LibraryFragment : Fragment() {
     }
 
     private fun toggleLike(station: RadioStation) {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             repository.toggleLike(station.id)
             // Also update ViewModel if this is the currently playing station
             val updatedStation = repository.getStationById(station.id)
-            CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.Main) {
                 updatedStation?.let {
                     // Update current station's like state in ViewModel if it matches
                     if (viewModel.getCurrentStation()?.id == it.id) {
@@ -440,7 +444,7 @@ class LibraryFragment : Fragment() {
                     true
                 }
                 R.id.action_delete -> {
-                    CoroutineScope(Dispatchers.IO).launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         repository.deleteStation(station)
                     }
                     true

@@ -65,6 +65,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class RadioService : Service() {
     private var player: ExoPlayer? = null
     private val binder = RadioBinder()
+    @Volatile
     private var currentStreamUrl: String? = null
     private var currentProxyHost: String? = null
     private var currentProxyPort: Int = 4444
@@ -346,8 +347,10 @@ class RadioService : Service() {
         sessionDeactivateRunnable = Runnable {
             deactivateMediaSession()
         }
-        sessionDeactivateHandler.postDelayed(sessionDeactivateRunnable!!, SESSION_DEACTIVATE_DELAY)
-        android.util.Log.d("RadioService", "Scheduled MediaSession deactivation in ${SESSION_DEACTIVATE_DELAY / 1000}s")
+        sessionDeactivateRunnable?.let { runnable ->
+            sessionDeactivateHandler.postDelayed(runnable, SESSION_DEACTIVATE_DELAY)
+            android.util.Log.d("RadioService", "Scheduled MediaSession deactivation in ${SESSION_DEACTIVATE_DELAY / 1000}s")
+        }
     }
 
     /**

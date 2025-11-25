@@ -33,6 +33,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import coil.load
 import coil.request.CachePolicy
@@ -49,9 +50,9 @@ import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NowPlayingFragment : Fragment() {
     private val viewModel: RadioViewModel by activityViewModels()
@@ -74,6 +75,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var bufferingIndicator: CircularProgressIndicator
     private var recordingIndicator: MaterialCardView? = null
     private var recordingDot: View? = null
+    private var volumeBottomSheet: BottomSheetDialog? = null
     private var recordingTimeText: TextView? = null
     private lateinit var equalizerButton: MaterialButton
 
@@ -288,7 +290,7 @@ class NowPlayingFragment : Fragment() {
         // Like button click handler
         likeButton.setOnClickListener {
             viewModel.getCurrentStation()?.let { station ->
-                CoroutineScope(Dispatchers.IO).launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     // Check if this is a global radio (has radioBrowserUuid)
                     if (!station.radioBrowserUuid.isNullOrEmpty()) {
                         // For global radios, use RadioBrowserRepository which handles unsaved stations
@@ -328,7 +330,7 @@ class NowPlayingFragment : Fragment() {
                         }
                         // Refresh station to get updated like state
                         val updatedStation = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
-                        CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.Main) {
                             updatedStation?.let {
                                 viewModel.updateCurrentStationLikeState(it.isLiked)
                                 updateLikeButton(it.isLiked)
@@ -338,7 +340,7 @@ class NowPlayingFragment : Fragment() {
                         // For non-global radios (user stations, bundled stations), use regular toggle
                         repository.toggleLike(station.id)
                         val updatedStation = repository.getStationById(station.id)
-                        CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.Main) {
                             updatedStation?.let {
                                 viewModel.updateCurrentStationLikeState(it.isLiked)
                                 updateLikeButton(it.isLiked)
@@ -690,6 +692,8 @@ class NowPlayingFragment : Fragment() {
      * Controls only the radio stream volume, not system-wide.
      */
     private fun showVolumeBottomSheet() {
+        // Dismiss previous bottom sheet if it exists
+        volumeBottomSheet?.dismiss()
         val bottomSheetDialog = BottomSheetDialog(requireContext())
 
         // Player volume is 0.0 to 1.0
@@ -805,6 +809,7 @@ class NowPlayingFragment : Fragment() {
         }
 
         bottomSheetDialog.setContentView(container)
+        volumeBottomSheet = bottomSheetDialog
         bottomSheetDialog.show()
     }
 
@@ -848,6 +853,11 @@ class NowPlayingFragment : Fragment() {
         recordingDot?.clearAnimation()
         previousPlayingState = null
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(metadataReceiver)
+
+        // Clean up bottom sheet to prevent window leaks
+        volumeBottomSheet?.dismiss()
+        volumeBottomSheet = null
+
         if (serviceBound) {
             requireContext().unbindService(serviceConnection)
             serviceBound = false

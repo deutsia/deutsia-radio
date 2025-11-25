@@ -17,6 +17,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.color.DynamicColors
@@ -35,9 +36,9 @@ import com.opensource.i2pradio.ui.LibraryFragment
 import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
 import com.opensource.i2pradio.ui.TorStatusView
 import com.opensource.i2pradio.ui.browse.BrowseStationsFragment
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
@@ -123,7 +124,7 @@ class MainActivity : AppCompatActivity() {
         repository = RadioRepository(this)
         radioBrowserRepository = RadioBrowserRepository(this)
 
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             repository.initializePresetStations(this@MainActivity)  // Pass context
         }
 
@@ -266,7 +267,7 @@ class MainActivity : AppCompatActivity() {
 
         // Like button toggles liked state in database
         miniPlayerView.setOnLikeToggleListener { station ->
-            CoroutineScope(Dispatchers.IO).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 // Check if this is a global radio (has radioBrowserUuid)
                 if (!station.radioBrowserUuid.isNullOrEmpty()) {
                     // For global radios, use RadioBrowserRepository which handles unsaved stations
@@ -306,7 +307,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     // Refresh station to get updated like state
                     val updatedStation = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
-                    CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.Main) {
                         updatedStation?.let {
                             miniPlayerView.updateLikeState(it.isLiked)
                             viewModel.updateCurrentStationLikeState(it.isLiked)
@@ -324,7 +325,7 @@ class MainActivity : AppCompatActivity() {
                     // For non-global radios (user stations, bundled stations), use regular toggle
                     repository.toggleLike(station.id)
                     val updatedStation = repository.getStationById(station.id)
-                    CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.Main) {
                         updatedStation?.let {
                             miniPlayerView.updateLikeState(it.isLiked)
                             viewModel.updateCurrentStationLikeState(it.isLiked)
