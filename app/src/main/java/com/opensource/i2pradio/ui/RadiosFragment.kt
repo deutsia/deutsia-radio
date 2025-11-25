@@ -335,8 +335,8 @@ class RadiosFragment : Fragment() {
         }
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val textView: TextView = view.findViewById(android.R.id.text1)
-            val radioButton: android.widget.RadioButton = view.findViewById(R.id.radio_button)
+            val textView: TextView? = view.findViewById(android.R.id.text1)
+            val radioButton: android.widget.RadioButton? = view.findViewById(R.id.radio_button)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -348,8 +348,8 @@ class RadiosFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val genre = genres[position]
-            holder.textView.text = genre
-            holder.radioButton.isChecked = position == selectedPosition
+            holder.textView?.text = genre
+            holder.radioButton?.isChecked = position == selectedPosition
 
             holder.itemView.setOnClickListener {
                 selectedPosition = position
