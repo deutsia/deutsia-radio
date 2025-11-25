@@ -5,9 +5,9 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- Radio Stations List - placed first so header is drawn on top -->
+    <!-- Library List - placed first so header is drawn on top -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/radiosRecyclerView"
+        android:id="@+id/libraryRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"

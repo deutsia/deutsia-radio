@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Manager for Tor connectivity using Orbot (the official Tor client for Android).
@@ -87,8 +88,8 @@ object TorManager {
     private var _connectionStartTime: Long = 0
     val connectionDuration: Long get() = if (_state == TorState.CONNECTED) System.currentTimeMillis() - _connectionStartTime else 0
 
-    // Listeners for state changes
-    private val stateListeners = mutableListOf<(TorState) -> Unit>()
+    // Listeners for state changes (thread-safe)
+    private val stateListeners = CopyOnWriteArrayList<(TorState) -> Unit>()
 
     // Broadcast receiver for Orbot status updates
     private var orbotStatusReceiver: BroadcastReceiver? = null
@@ -99,17 +100,13 @@ object TorManager {
     private var healthCheckRunnable: Runnable? = null
 
     fun addStateListener(listener: (TorState) -> Unit) {
-        synchronized(stateListeners) {
-            stateListeners.add(listener)
-        }
+        stateListeners.add(listener)
         // Immediately notify of current state
         listener(_state)
     }
 
     fun removeStateListener(listener: (TorState) -> Unit) {
-        synchronized(stateListeners) {
-            stateListeners.remove(listener)
-        }
+        stateListeners.remove(listener)
     }
 
     private fun notifyStateChange(newState: TorState) {
@@ -124,9 +121,7 @@ object TorManager {
             stopHealthCheck()
         }
 
-        synchronized(stateListeners) {
-            stateListeners.toList().forEach { it(newState) }
-        }
+        stateListeners.forEach { it(newState) }
 
         // Enhanced logging for debugging Tor connectivity
         Log.d(TAG, "===== TOR STATE CHANGE =====")

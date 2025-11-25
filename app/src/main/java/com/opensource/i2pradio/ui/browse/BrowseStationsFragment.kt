@@ -316,13 +316,21 @@ class BrowseStationsFragment : Fragment() {
 
     private fun likeStation(station: RadioBrowserStation) {
         viewModel.toggleLike(station)
-        // If this station is currently playing, update RadioViewModel to sync miniplayer/Now Playing
-        radioViewModel.getCurrentStation()?.let { currentStation ->
-            if (currentStation.radioBrowserUuid == station.stationuuid) {
-                // Check the updated like state from the database
-                lifecycleScope.launch {
-                    val updatedStation = repository.getStationInfoByUuid(station.stationuuid)
-                    updatedStation?.let {
+        // Check the updated like state from the database and show toast
+        lifecycleScope.launch {
+            val updatedStation = repository.getStationInfoByUuid(station.stationuuid)
+            updatedStation?.let {
+                // Show toast message when station is liked
+                if (it.isLiked) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.station_saved, station.name),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                // If this station is currently playing, update RadioViewModel to sync miniplayer/Now Playing
+                radioViewModel.getCurrentStation()?.let { currentStation ->
+                    if (currentStation.radioBrowserUuid == station.stationuuid) {
                         radioViewModel.updateCurrentStationLikeState(it.isLiked)
                     }
                 }

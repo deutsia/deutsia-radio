@@ -13,12 +13,14 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import android.widget.Toast
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,11 +35,11 @@ import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.SortOrder
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class RadiosFragment : Fragment() {
+class LibraryFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyStateContainer: View
     private lateinit var fabAddRadio: FloatingActionButton
@@ -70,11 +72,11 @@ class RadiosFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_radios, container, false)
+        val view = inflater.inflate(R.layout.fragment_library, container, false)
 
         repository = RadioRepository(requireContext())
 
-        recyclerView = view.findViewById(R.id.radiosRecyclerView)
+        recyclerView = view.findViewById(R.id.libraryRecyclerView)
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
         fabAddRadio = view.findViewById(R.id.fabAddRadio)
         sortButton = view.findViewById(R.id.sortButton)
@@ -209,7 +211,7 @@ class RadiosFragment : Fragment() {
 
     private fun showGenreFilterDialog() {
         // Build the genre list - combine predefined genres with any genres from database
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch(Dispatchers.Main) {
             val dbGenres = try {
                 repository.getAllGenresSync()
             } catch (e: Exception) {
@@ -347,6 +349,9 @@ class RadiosFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            // Add bounds check to prevent IndexOutOfBoundsException during concurrent modification
+            if (position >= genres.size) return
+
             val genre = genres[position]
             holder.textView?.text = genre
             holder.radioButton?.isChecked = position == selectedPosition
@@ -380,7 +385,7 @@ class RadiosFragment : Fragment() {
         viewModel.setBuffering(true)  // Show buffering state while connecting
 
         // Update last played timestamp
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             repository.updateLastPlayedAt(station.id)
         }
 
@@ -404,15 +409,23 @@ class RadiosFragment : Fragment() {
     }
 
     private fun toggleLike(station: RadioStation) {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             repository.toggleLike(station.id)
             // Also update ViewModel if this is the currently playing station
             val updatedStation = repository.getStationById(station.id)
-            CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.Main) {
                 updatedStation?.let {
                     // Update current station's like state in ViewModel if it matches
                     if (viewModel.getCurrentStation()?.id == it.id) {
                         viewModel.updateCurrentStationLikeState(it.isLiked)
+                    }
+                    // Show toast message when station is liked
+                    if (it.isLiked) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_saved, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -431,7 +444,7 @@ class RadiosFragment : Fragment() {
                     true
                 }
                 R.id.action_delete -> {
-                    CoroutineScope(Dispatchers.IO).launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         repository.deleteStation(station)
                     }
                     true

@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">I2P Radio</string>
-    <string name="tab_radios">Stations</string>
+    <string name="tab_radios">Library</string>
     <string name="tab_now_playing">Now Playing</string>
     <string name="tab_settings">Settings</string>
 
@@ -23,7 +23,7 @@
     <string name="sort_genre">Genre</string>
 
     <!-- Search -->
-    <string name="search_stations">Search stations</string>
+    <string name="search_stations">Search library</string>
 
     <!-- Genre filter -->
     <string name="genre_all">All Genres</string>

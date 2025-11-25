@@ -126,6 +126,9 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    // General-purpose handler for UI operations
+    private val uiHandler = Handler(Looper.getMainLooper())
+
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
         // Debounce UI updates to prevent flickering during rapid state transitions
         // Cancel any pending update and schedule a new one after a short delay
@@ -184,7 +187,7 @@ class SettingsFragment : Fragment() {
 
                 PreferencesHelper.setMaterialYouEnabled(requireContext(), isChecked)
                 // Delay recreate to allow the animation to complete
-                Handler(Looper.getMainLooper()).postDelayed({
+                uiHandler.postDelayed({
                     activity?.recreate()
                 }, 300)
             }
@@ -388,6 +391,9 @@ class SettingsFragment : Fragment() {
         // Clean up debounce handler to prevent memory leaks
         torUiUpdateHandler.removeCallbacks(torUiUpdateRunnable)
         pendingTorState = null
+
+        // Clean up general UI handler
+        uiHandler.removeCallbacksAndMessages(null)
 
         if (serviceBound) {
             requireContext().unbindService(serviceConnection)
