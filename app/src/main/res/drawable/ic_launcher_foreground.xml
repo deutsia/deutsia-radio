@@ -1,46 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
 
-    <!-- Layer 1: The Cream Background -->
+    <!--
+    Scaled and centered design for adaptive icon
+    Original 24x24 design scaled by 2.75x and offset by 21dp to center in 108dp canvas
+    This ensures proper appearance in the adaptive icon safe zone
+    -->
+
+    <!-- Layer 1: The Cream Background (full canvas) -->
     <path
         android:fillColor="#F4F0E6"
-        android:pathData="M0,0h24v24h-24z"/>
+        android:pathData="M0,0h108v108h-108z"/>
 
     <!-- Layer 2: The Antenna (Stick) -->
-    <!-- Adjusted to extend further (to x=19) while maintaining the exact slope -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#1D1D1D"
-        android:strokeWidth="1.5"
+        android:strokeWidth="4.125"
         android:strokeLineCap="round"
-        android:pathData="M13,9 L19,4.8"/>
+        android:pathData="M56.75,45.75 L73.25,34.2"/>
 
     <!-- Layer 3: The Antenna (Ball Tip) -->
-    <!-- Center calculated at (20, 4.1) to be perfectly inline with the stick's angle -->
-    <!-- Radius increased slightly to 1.3 for better proportion -->
     <path
         android:fillColor="#1D1D1D"
-        android:pathData="M20,4.1 m-1.3,0 a1.3,1.3 0 1,1 2.6,0 a1.3,1.3 0 1,1 -2.6,0"/>
+        android:pathData="M76,32.275 m-3.575,0 a3.575,3.575 0 1,1 7.15,0 a3.575,3.575 0 1,1 -7.15,0"/>
 
     <!-- Layer 4: The Main Radio Body -->
     <path
         android:fillColor="#1D1D1D"
-        android:pathData="M7,9h10c1.66,0 3,1.34 3,3v5c0,1.66 -1.34,3 -3,3h-10c-1.66,0 -3,-1.34 -3,-3v-5c0,-1.66 1.34,-3 3,-3z"/>
+        android:pathData="M40.25,45.75 h27.5 c4.565,0 8.25,3.685 8.25,8.25 v13.75 c0,4.565 -3.685,8.25 -8.25,8.25 h-27.5 c-4.565,0 -8.25,-3.685 -8.25,-8.25 v-13.75 c0,-4.565 3.685,-8.25 8.25,-8.25 z"/>
 
     <!-- Layer 5: The Speaker (Circle Cutout) -->
     <path
         android:fillColor="#F4F0E6"
-        android:pathData="M15,14.5m-2.8,0a2.8,2.8 0 1,1 5.6,0a2.8,2.8 0 1,1 -5.6,0"/>
+        android:pathData="M62.25,60.875 m-7.7,0 a7.7,7.7 0 1,1 15.4,0 a7.7,7.7 0 1,1 -15.4,0"/>
 
     <!-- Layer 6: The Speaker Grill (Lines) -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#F4F0E6"
-        android:strokeWidth="1.4"
+        android:strokeWidth="3.85"
         android:strokeLineCap="round"
-        android:pathData="M6.5,12.5h3.5 M6.5,14.5h3.5 M6.5,16.5h3.5"/>
+        android:pathData="M38.875,55.375 h9.625 M38.875,60.875 h9.625 M38.875,66.375 h9.625"/>
+
 </vector>
