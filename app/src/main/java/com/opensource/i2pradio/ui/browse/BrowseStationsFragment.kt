@@ -279,6 +279,11 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun playStation(station: RadioBrowserStation) {
+        // Add to browse history
+        lifecycleScope.launch {
+            repository.addToBrowseHistory(station)
+        }
+
         // Convert to RadioStation and play
         val radioStation = repository.convertToRadioStation(station)
         radioViewModel.setCurrentStation(radioStation)

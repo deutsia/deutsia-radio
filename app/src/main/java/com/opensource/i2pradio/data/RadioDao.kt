@@ -113,4 +113,38 @@ interface RadioDao {
     // Get multiple stations by RadioBrowser UUIDs (batch query to avoid N+1 problem)
     @Query("SELECT * FROM radio_stations WHERE radioBrowserUuid IN (:uuids)")
     suspend fun getStationsByRadioBrowserUuids(uuids: List<String>): List<RadioStation>
+
+    // ==================== Browse History ====================
+
+    // Get browse history, ordered by most recent first, limited to 75 items
+    @Query("SELECT * FROM browse_history ORDER BY visitedAt DESC LIMIT 75")
+    suspend fun getBrowseHistory(): List<BrowseHistory>
+
+    // Insert a browse history entry
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBrowseHistory(browseHistory: BrowseHistory): Long
+
+    // Delete old browse history entries to keep only the most recent 75
+    // This query finds the 75th most recent visitedAt timestamp and deletes everything older
+    @Query("""
+        DELETE FROM browse_history
+        WHERE visitedAt < (
+            SELECT visitedAt FROM browse_history
+            ORDER BY visitedAt DESC
+            LIMIT 1 OFFSET 74
+        )
+    """)
+    suspend fun deleteOldBrowseHistory()
+
+    // Check if a station is already in browse history
+    @Query("SELECT COUNT(*) FROM browse_history WHERE radioBrowserUuid = :uuid")
+    suspend fun countBrowseHistoryByUuid(uuid: String): Int
+
+    // Update the visitedAt timestamp for an existing browse history entry
+    @Query("UPDATE browse_history SET visitedAt = :timestamp WHERE radioBrowserUuid = :uuid")
+    suspend fun updateBrowseHistoryTimestamp(uuid: String, timestamp: Long)
+
+    // Clear all browse history
+    @Query("DELETE FROM browse_history")
+    suspend fun clearBrowseHistory()
 }

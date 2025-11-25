@@ -107,8 +107,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Load history (recently changed stations)
-     * TODO: Implement true user browse history tracking (last ~75 stations played from browse)
+     * Load history (last 75 stations played from browse)
      */
     fun loadHistory() {
         _currentCategory.value = BrowseCategory.HISTORY
@@ -346,9 +345,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                     repository.getTopClicked(pageSize, currentOffset)
                 }
                 BrowseCategory.HISTORY -> {
-                    // Currently shows recently changed stations
-                    // TODO: Replace with user's browse history (last ~75 played from browse)
-                    repository.getRecentlyChanged(pageSize, currentOffset)
+                    // Show user's browse history (last 75 played from browse)
+                    repository.getBrowseHistory()
                 }
                 BrowseCategory.BY_COUNTRY -> {
                     val country = _selectedCountry.value
