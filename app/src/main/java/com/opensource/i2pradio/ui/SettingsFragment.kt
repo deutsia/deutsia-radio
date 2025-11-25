@@ -115,10 +115,26 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private val torStateListener: (TorManager.TorState) -> Unit = { state ->
-        activity?.runOnUiThread {
+    // Debouncing mechanism for Tor state updates to prevent UI flickering
+    // during rapid state transitions (e.g., when Material You is toggled)
+    private val torUiUpdateHandler = Handler(Looper.getMainLooper())
+    private var pendingTorState: TorManager.TorState? = null
+    private val torUiUpdateRunnable = Runnable {
+        pendingTorState?.let { state ->
             updateTorStatusUI(state)
+            pendingTorState = null
         }
+    }
+
+    private val torStateListener: (TorManager.TorState) -> Unit = { state ->
+        // Debounce UI updates to prevent flickering during rapid state transitions
+        // Cancel any pending update and schedule a new one after a short delay
+        torUiUpdateHandler.removeCallbacks(torUiUpdateRunnable)
+        pendingTorState = state
+
+        // Use a short delay (200ms) to allow rapid transitions to settle
+        // before updating the UI, while still feeling responsive to the user
+        torUiUpdateHandler.postDelayed(torUiUpdateRunnable, 200)
     }
 
     override fun onCreateView(
@@ -369,6 +385,10 @@ class SettingsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Clean up debounce handler to prevent memory leaks
+        torUiUpdateHandler.removeCallbacks(torUiUpdateRunnable)
+        pendingTorState = null
+
         if (serviceBound) {
             requireContext().unbindService(serviceConnection)
             serviceBound = false
@@ -462,14 +482,10 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupForceTorSwitches() {
-        // Initialize switch states from preferences
-        forceTorAllSwitch?.isChecked = PreferencesHelper.isForceTorAll(requireContext())
-        forceTorExceptI2pSwitch?.isChecked = PreferencesHelper.isForceTorExceptI2P(requireContext())
+        // Flag to prevent warnings during initialization
+        var isInitializing = true
 
-        // Update container visibility based on main Tor switch
-        updateForceTorContainersVisibility(embeddedTorSwitch?.isChecked == true)
-
-        // Force Tor All switch handler
+        // Force Tor All switch handler - set BEFORE initializing state
         forceTorAllSwitch?.setOnCheckedChangeListener { switch, isChecked ->
             // Animate the switch
             switch.animate()
@@ -495,7 +511,8 @@ class SettingsFragment : Fragment() {
             }
 
             // Show warning if enabling and Tor is not connected
-            if (isChecked && !TorManager.isConnected()) {
+            // Skip warning during initialization to prevent flickering when Material You is toggled
+            if (isChecked && !TorManager.isConnected() && !isInitializing) {
                 Toast.makeText(
                     requireContext(),
                     "⚠️ Tor not connected! Streams will fail until Tor connects.",
@@ -504,7 +521,7 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        // Force Tor Except I2P switch handler
+        // Force Tor Except I2P switch handler - set BEFORE initializing state
         forceTorExceptI2pSwitch?.setOnCheckedChangeListener { switch, isChecked ->
             // Animate the switch
             switch.animate()
@@ -530,7 +547,8 @@ class SettingsFragment : Fragment() {
             }
 
             // Show warning if enabling and Tor is not connected
-            if (isChecked && !TorManager.isConnected()) {
+            // Skip warning during initialization to prevent flickering when Material You is toggled
+            if (isChecked && !TorManager.isConnected() && !isInitializing) {
                 Toast.makeText(
                     requireContext(),
                     "⚠️ Tor not connected! Non-I2P streams will fail until Tor connects.",
@@ -538,6 +556,16 @@ class SettingsFragment : Fragment() {
                 ).show()
             }
         }
+
+        // Initialize switch states from preferences AFTER setting up listeners
+        forceTorAllSwitch?.isChecked = PreferencesHelper.isForceTorAll(requireContext())
+        forceTorExceptI2pSwitch?.isChecked = PreferencesHelper.isForceTorExceptI2P(requireContext())
+
+        // Update container visibility based on main Tor switch
+        updateForceTorContainersVisibility(embeddedTorSwitch?.isChecked == true)
+
+        // Mark initialization as complete to enable warnings for user interactions
+        isInitializing = false
     }
 
     private fun updateForceTorContainersVisibility(show: Boolean) {
