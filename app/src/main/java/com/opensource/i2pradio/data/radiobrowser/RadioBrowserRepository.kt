@@ -138,6 +138,22 @@ class RadioBrowserRepository(context: Context) {
     }
 
     /**
+     * Get station info for multiple RadioBrowser UUIDs at once (batch query)
+     * Returns a map of UUID -> RadioStation for efficient lookup
+     */
+    suspend fun getStationInfoByUuids(radioBrowserUuids: List<String>): Map<String, RadioStation> {
+        return withContext(Dispatchers.IO) {
+            if (radioBrowserUuids.isEmpty()) {
+                return@withContext emptyMap()
+            }
+            val stations = radioDao.getStationsByRadioBrowserUuids(radioBrowserUuids)
+            // Filter out stations with null or empty UUIDs to avoid key collisions
+            stations.filter { !it.radioBrowserUuid.isNullOrEmpty() }
+                .associateBy { it.radioBrowserUuid!! }
+        }
+    }
+
+    /**
      * Toggle like status for a station by its RadioBrowser UUID
      */
     suspend fun toggleLikeByUuid(radioBrowserUuid: String) {

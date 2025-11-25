@@ -29,7 +29,7 @@ import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 import com.opensource.i2pradio.util.StationImportExport
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -785,11 +785,16 @@ class SettingsFragment : Fragment() {
     }
 
     private fun importStationsFromUri(uri: Uri) {
-        CoroutineScope(Dispatchers.IO).launch {
+        // Capture context early to avoid crashes if Fragment is destroyed during async operation
+        val context = requireContext()
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val result = StationImportExport.importFromUri(requireContext(), uri)
+                val result = StationImportExport.importFromUri(context, uri)
 
                 withContext(Dispatchers.Main) {
+                    // Check if Fragment is still attached before showing UI
+                    if (!isAdded) return@withContext
+
                     if (result.stations.isEmpty()) {
                         val errorMsg = if (result.errors.isNotEmpty()) {
                             result.errors.joinToString("\n")
@@ -830,6 +835,9 @@ class SettingsFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    // Check if Fragment is still attached before showing UI
+                    if (!isAdded) return@withContext
+
                     Toast.makeText(
                         requireContext(),
                         "Import error: ${e.message}",
@@ -841,7 +849,9 @@ class SettingsFragment : Fragment() {
     }
 
     private fun performImport(stations: List<com.opensource.i2pradio.data.RadioStation>) {
-        CoroutineScope(Dispatchers.IO).launch {
+        // Capture context early to avoid crashes if Fragment is destroyed during async operation
+        val context = requireContext()
+        lifecycleScope.launch(Dispatchers.IO) {
             var imported = 0
             for (station in stations) {
                 try {
@@ -853,8 +863,11 @@ class SettingsFragment : Fragment() {
             }
 
             withContext(Dispatchers.Main) {
+                // Check if Fragment is still attached before showing UI
+                if (!isAdded) return@withContext
+
                 Toast.makeText(
-                    requireContext(),
+                    context,
                     "Imported $imported station(s)",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -863,14 +876,19 @@ class SettingsFragment : Fragment() {
     }
 
     private fun exportStationsToUri(uri: Uri, format: StationImportExport.FileFormat) {
-        CoroutineScope(Dispatchers.IO).launch {
+        // Capture context early to avoid crashes if Fragment is destroyed during async operation
+        val context = requireContext()
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val stations = repository.getAllStationsSync()
 
                 if (stations.isEmpty()) {
                     withContext(Dispatchers.Main) {
+                        // Check if Fragment is still attached before showing UI
+                        if (!isAdded) return@withContext
+
                         Toast.makeText(
-                            requireContext(),
+                            context,
                             "No stations to export",
                             Toast.LENGTH_SHORT
                         ).show()
@@ -878,7 +896,7 @@ class SettingsFragment : Fragment() {
                     return@launch
                 }
 
-                requireContext().contentResolver.openOutputStream(uri)?.use { outputStream ->
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                     when (format) {
                         StationImportExport.FileFormat.CSV ->
                             StationImportExport.exportToCsv(stations, outputStream)
@@ -892,16 +910,22 @@ class SettingsFragment : Fragment() {
                 }
 
                 withContext(Dispatchers.Main) {
+                    // Check if Fragment is still attached before showing UI
+                    if (!isAdded) return@withContext
+
                     Toast.makeText(
-                        requireContext(),
+                        context,
                         "Exported ${stations.size} station(s) to ${format.displayName}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    // Check if Fragment is still attached before showing UI
+                    if (!isAdded) return@withContext
+
                     Toast.makeText(
-                        requireContext(),
+                        context,
                         "Export error: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
