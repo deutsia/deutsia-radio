@@ -114,6 +114,7 @@ class MiniPlayerView @JvmOverloads constructor(
      */
     fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
+            coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
             coverImage.loadSecure(coverArtUri) {
                 crossfade(true)
                 // Force refresh by disabling cache for this request
@@ -121,8 +122,20 @@ class MiniPlayerView @JvmOverloads constructor(
                 diskCachePolicy(CachePolicy.WRITE_ONLY)
                 placeholder(R.drawable.ic_radio)
                 error(R.drawable.ic_radio)
+                listener(
+                    onSuccess = { _, _ ->
+                        // Real bitmap loaded - ensure centerCrop for best appearance
+                        coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
+                    },
+                    onError = { _, _ ->
+                        // Error loading - use centerInside for vector placeholder
+                        coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    }
+                )
             }
         } else {
+            // No cover art - use centerInside for vector placeholder
+            coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
             // Force reload to get fresh drawable with current theme colors (Material You)
             coverImage.setImageDrawable(null)
             coverImage.load(R.drawable.ic_radio) {
@@ -184,12 +197,25 @@ class MiniPlayerView @JvmOverloads constructor(
         // Handle cover art update properly - clear old image when switching stations
         // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
         if (station.coverArtUri != null) {
+            coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
             coverImage.loadSecure(station.coverArtUri) {
                 crossfade(true)
                 placeholder(R.drawable.ic_radio)
                 error(R.drawable.ic_radio)
+                listener(
+                    onSuccess = { _, _ ->
+                        // Real bitmap loaded - ensure centerCrop for best appearance
+                        coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
+                    },
+                    onError = { _, _ ->
+                        // Error loading - use centerInside for vector placeholder
+                        coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    }
+                )
             }
         } else {
+            // No cover art - use centerInside for vector placeholder
+            coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
             // Explicitly clear any cached/loading state and set default drawable
             // Force reload to get fresh drawable with current theme colors (Material You)
             coverImage.setImageDrawable(null)
