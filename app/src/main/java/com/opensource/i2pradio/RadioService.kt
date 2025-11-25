@@ -1600,6 +1600,13 @@ class RadioService : Service() {
         reconnectRunnable?.let { handler.removeCallbacks(it) }
         reconnectRunnable = null
 
+        // Clear metadata, bitrate, and codec when stopping stream
+        // This prevents stale metadata from appearing when switching stations
+        // or when the UI is recreated (e.g., Material You toggle)
+        currentMetadata = null
+        currentBitrate = 0
+        currentCodec = null
+
         // Broadcast audio session close before releasing player
         player?.audioSessionId?.let { sessionId ->
             if (sessionId != 0) {
