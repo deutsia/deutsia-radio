@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import android.widget.Toast
 import android.widget.FrameLayout
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.activity.viewModels
@@ -30,7 +31,7 @@ import com.opensource.i2pradio.ui.MiniPlayerView
 import com.opensource.i2pradio.ui.NowPlayingFragment
 import com.opensource.i2pradio.ui.PreferencesHelper
 import com.opensource.i2pradio.ui.RadioViewModel
-import com.opensource.i2pradio.ui.RadiosFragment
+import com.opensource.i2pradio.ui.LibraryFragment
 import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
 import com.opensource.i2pradio.ui.TorStatusView
 import com.opensource.i2pradio.ui.browse.BrowseStationsFragment
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
             isServiceBound = false
         }
     }
-    fun switchToRadiosTab() {
+    fun switchToLibraryTab() {
         viewPager.currentItem = 0
     }
 
@@ -309,6 +310,14 @@ class MainActivity : AppCompatActivity() {
                         updatedStation?.let {
                             miniPlayerView.updateLikeState(it.isLiked)
                             viewModel.updateCurrentStationLikeState(it.isLiked)
+                            // Show toast message when station is liked
+                            if (it.isLiked) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    getString(R.string.station_saved, station.name),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
                 } else {
@@ -319,6 +328,14 @@ class MainActivity : AppCompatActivity() {
                         updatedStation?.let {
                             miniPlayerView.updateLikeState(it.isLiked)
                             viewModel.updateCurrentStationLikeState(it.isLiked)
+                            // Show toast message when station is liked
+                            if (it.isLiked) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    getString(R.string.station_saved, station.name),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
                 }
@@ -399,11 +416,11 @@ class MainActivity : AppCompatActivity() {
 
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                0 -> RadiosFragment()
+                0 -> LibraryFragment()
                 1 -> BrowseStationsFragment()
                 2 -> NowPlayingFragment()
                 3 -> SettingsFragment()
-                else -> RadiosFragment()  // Fallback
+                else -> LibraryFragment()  // Fallback
             }
         }
     }

@@ -377,7 +377,7 @@ class NowPlayingFragment : Fragment() {
         // Back button
         val backButton = view.findViewById<MaterialButton>(R.id.backButton)
         backButton.setOnClickListener {
-            (activity as? MainActivity)?.switchToRadiosTab()
+            (activity as? MainActivity)?.switchToLibraryTab()
         }
 
         // Get references to containers

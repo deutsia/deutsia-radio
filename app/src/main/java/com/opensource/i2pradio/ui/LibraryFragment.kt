@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import android.widget.Toast
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -37,7 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class RadiosFragment : Fragment() {
+class LibraryFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyStateContainer: View
     private lateinit var fabAddRadio: FloatingActionButton
@@ -70,11 +71,11 @@ class RadiosFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_radios, container, false)
+        val view = inflater.inflate(R.layout.fragment_library, container, false)
 
         repository = RadioRepository(requireContext())
 
-        recyclerView = view.findViewById(R.id.radiosRecyclerView)
+        recyclerView = view.findViewById(R.id.libraryRecyclerView)
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
         fabAddRadio = view.findViewById(R.id.fabAddRadio)
         sortButton = view.findViewById(R.id.sortButton)
@@ -413,6 +414,14 @@ class RadiosFragment : Fragment() {
                     // Update current station's like state in ViewModel if it matches
                     if (viewModel.getCurrentStation()?.id == it.id) {
                         viewModel.updateCurrentStationLikeState(it.isLiked)
+                    }
+                    // Show toast message when station is liked
+                    if (it.isLiked) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_saved, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
