@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [RadioStation::class], version = 4, exportSchema = false)
+@Database(entities = [RadioStation::class, BrowseHistory::class], version = 5, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
     abstract fun radioDao(): RadioDao
 
@@ -84,6 +84,33 @@ abstract class RadioDatabase : RoomDatabase() {
             }
         }
 
+        // Migration from version 4 to 5: Add browse_history table
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Create browse_history table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS browse_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        radioBrowserUuid TEXT NOT NULL,
+                        visitedAt INTEGER NOT NULL,
+                        stationName TEXT NOT NULL,
+                        streamUrl TEXT NOT NULL,
+                        coverArtUri TEXT,
+                        country TEXT NOT NULL DEFAULT '',
+                        genre TEXT NOT NULL DEFAULT ''
+                    )
+                """)
+                // Create index on radioBrowserUuid for faster lookups
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_browse_history_uuid ON browse_history(radioBrowserUuid)"
+                )
+                // Create index on visitedAt for faster ordering
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_browse_history_visitedAt ON browse_history(visitedAt DESC)"
+                )
+            }
+        }
+
         fun getDatabase(context: Context): RadioDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -91,7 +118,7 @@ abstract class RadioDatabase : RoomDatabase() {
                     RadioDatabase::class.java,
                     "radio_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
                     .build()
                 INSTANCE = instance

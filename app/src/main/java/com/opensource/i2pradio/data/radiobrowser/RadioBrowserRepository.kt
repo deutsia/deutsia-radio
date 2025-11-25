@@ -2,6 +2,7 @@ package com.opensource.i2pradio.data.radiobrowser
 
 import android.content.Context
 import android.util.Log
+import com.opensource.i2pradio.data.BrowseHistory
 import com.opensource.i2pradio.data.RadioDao
 import com.opensource.i2pradio.data.RadioDatabase
 import com.opensource.i2pradio.data.RadioStation
@@ -308,6 +309,93 @@ class RadioBrowserRepository(context: Context) {
                 Log.d(TAG, "Station not found for deletion: $radioBrowserUuid")
                 false
             }
+        }
+    }
+
+    /**
+     * Get browse history (last 75 visited stations from browse)
+     * Returns the list as RadioBrowserStation objects for display
+     */
+    suspend fun getBrowseHistory(): RadioBrowserResult<List<RadioBrowserStation>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val history = radioDao.getBrowseHistory()
+                // Convert BrowseHistory entries to RadioBrowserStation for consistent display
+                val stations = history.map { entry ->
+                    RadioBrowserStation(
+                        stationuuid = entry.radioBrowserUuid,
+                        name = entry.stationName,
+                        url = entry.streamUrl,
+                        url_resolved = entry.streamUrl,
+                        favicon = entry.coverArtUri ?: "",
+                        tags = entry.genre,
+                        country = entry.country,
+                        countrycode = "",
+                        codec = "",
+                        bitrate = 0,
+                        homepage = "",
+                        votes = 0,
+                        clickcount = 0,
+                        clicktrend = 0,
+                        lastcheckok = true,
+                        lastchangetime = "",
+                        lastchangetime_iso8601 = "",
+                        lastchecktime = "",
+                        lastchecktime_iso8601 = ""
+                    )
+                }
+                RadioBrowserResult.Success(stations)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching browse history", e)
+                RadioBrowserResult.Error("Failed to load browse history: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Add a station to browse history
+     * If the station already exists in history, updates its timestamp to make it most recent
+     */
+    suspend fun addToBrowseHistory(station: RadioBrowserStation) {
+        withContext(Dispatchers.IO) {
+            try {
+                val timestamp = System.currentTimeMillis()
+                val existingCount = radioDao.countBrowseHistoryByUuid(station.stationuuid)
+
+                if (existingCount > 0) {
+                    // Update existing entry's timestamp
+                    radioDao.updateBrowseHistoryTimestamp(station.stationuuid, timestamp)
+                    Log.d(TAG, "Updated browse history timestamp for: ${station.name}")
+                } else {
+                    // Insert new entry
+                    val browseHistory = BrowseHistory(
+                        radioBrowserUuid = station.stationuuid,
+                        visitedAt = timestamp,
+                        stationName = station.name,
+                        streamUrl = station.getStreamUrl(),
+                        coverArtUri = station.favicon.takeIf { it.isNotEmpty() },
+                        country = station.country,
+                        genre = station.getPrimaryGenre()
+                    )
+                    radioDao.insertBrowseHistory(browseHistory)
+                    Log.d(TAG, "Added to browse history: ${station.name}")
+
+                    // Clean up old entries to keep only 75 most recent
+                    radioDao.deleteOldBrowseHistory()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error adding to browse history", e)
+            }
+        }
+    }
+
+    /**
+     * Clear all browse history
+     */
+    suspend fun clearBrowseHistory() {
+        withContext(Dispatchers.IO) {
+            radioDao.clearBrowseHistory()
+            Log.d(TAG, "Cleared all browse history")
         }
     }
 }
