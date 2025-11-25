@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Red Color Scheme - Light Theme -->
+    <color name="md_theme_red_light_primary">#C00000</color>
+    <color name="md_theme_red_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_red_light_primaryContainer">#FFDAD4</color>
+    <color name="md_theme_red_light_onPrimaryContainer">#410000</color>
+    <color name="md_theme_red_light_secondary">#775651</color>
+    <color name="md_theme_red_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_red_light_secondaryContainer">#FFDAD4</color>
+    <color name="md_theme_red_light_onSecondaryContainer">#2C1512</color>
+
+    <!-- Red Color Scheme - Dark Theme -->
+    <color name="md_theme_red_dark_primary">#FFB4A9</color>
+    <color name="md_theme_red_dark_onPrimary">#690100</color>
+    <color name="md_theme_red_dark_primaryContainer">#930100</color>
+    <color name="md_theme_red_dark_onPrimaryContainer">#FFDAD4</color>
+    <color name="md_theme_red_dark_secondary">#E7BDB6</color>
+    <color name="md_theme_red_dark_onSecondary">#442925</color>
+    <color name="md_theme_red_dark_secondaryContainer">#5D3F3B</color>
+    <color name="md_theme_red_dark_onSecondaryContainer">#FFDAD4</color>
+</resources>

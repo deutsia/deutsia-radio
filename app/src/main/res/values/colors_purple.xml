@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Purple Color Scheme - Light Theme -->
+    <color name="md_theme_purple_light_primary">#6B4FA0</color>
+    <color name="md_theme_purple_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_purple_light_primaryContainer">#EADDFF</color>
+    <color name="md_theme_purple_light_onPrimaryContainer">#23005C</color>
+    <color name="md_theme_purple_light_secondary">#625B71</color>
+    <color name="md_theme_purple_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_purple_light_secondaryContainer">#E8DEF8</color>
+    <color name="md_theme_purple_light_onSecondaryContainer">#1E192B</color>
+
+    <!-- Purple Color Scheme - Dark Theme -->
+    <color name="md_theme_purple_dark_primary">#D0BCFF</color>
+    <color name="md_theme_purple_dark_onPrimary">#381E72</color>
+    <color name="md_theme_purple_dark_primaryContainer">#4F378A</color>
+    <color name="md_theme_purple_dark_onPrimaryContainer">#EADDFF</color>
+    <color name="md_theme_purple_dark_secondary">#CCC2DC</color>
+    <color name="md_theme_purple_dark_onSecondary">#332D41</color>
+    <color name="md_theme_purple_dark_secondaryContainer">#4A4458</color>
+    <color name="md_theme_purple_dark_onSecondaryContainer">#E8DEF8</color>
+</resources>

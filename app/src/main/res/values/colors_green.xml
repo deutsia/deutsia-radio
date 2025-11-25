@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Green Color Scheme - Light Theme -->
+    <color name="md_theme_green_light_primary">#006E26</color>
+    <color name="md_theme_green_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_green_light_primaryContainer">#96F990</color>
+    <color name="md_theme_green_light_onPrimaryContainer">#002106</color>
+    <color name="md_theme_green_light_secondary">#526350</color>
+    <color name="md_theme_green_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_green_light_secondaryContainer">#D4E8D0</color>
+    <color name="md_theme_green_light_onSecondaryContainer">#101F11</color>
+
+    <!-- Green Color Scheme - Dark Theme -->
+    <color name="md_theme_green_dark_primary">#7BDC76</color>
+    <color name="md_theme_green_dark_onPrimary">#00390F</color>
+    <color name="md_theme_green_dark_primaryContainer">#00531A</color>
+    <color name="md_theme_green_dark_onPrimaryContainer">#96F990</color>
+    <color name="md_theme_green_dark_secondary">#B9CCB5</color>
+    <color name="md_theme_green_dark_onSecondary">#243425</color>
+    <color name="md_theme_green_dark_secondaryContainer">#3A4B3A</color>
+    <color name="md_theme_green_dark_onSecondaryContainer">#D4E8D0</color>
+</resources>

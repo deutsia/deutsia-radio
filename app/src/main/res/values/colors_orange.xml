@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Orange Color Scheme - Light Theme -->
+    <color name="md_theme_orange_light_primary">#C45500</color>
+    <color name="md_theme_orange_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_orange_light_primaryContainer">#FFDBC9</color>
+    <color name="md_theme_orange_light_onPrimaryContainer">#2F1500</color>
+    <color name="md_theme_orange_light_secondary">#77574A</color>
+    <color name="md_theme_orange_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_orange_light_secondaryContainer">#FFDBC9</color>
+    <color name="md_theme_orange_light_onSecondaryContainer">#2C160C</color>
+
+    <!-- Orange Color Scheme - Dark Theme -->
+    <color name="md_theme_orange_dark_primary">#FFB68E</color>
+    <color name="md_theme_orange_dark_onPrimary">#552100</color>
+    <color name="md_theme_orange_dark_primaryContainer">#793200</color>
+    <color name="md_theme_orange_dark_onPrimaryContainer">#FFDBC9</color>
+    <color name="md_theme_orange_dark_secondary">#E7BDB0</color>
+    <color name="md_theme_orange_dark_onSecondary">#442B1E</color>
+    <color name="md_theme_orange_dark_secondaryContainer">#5D4034</color>
+    <color name="md_theme_orange_dark_onSecondaryContainer">#FFDBC9</color>
+</resources>
