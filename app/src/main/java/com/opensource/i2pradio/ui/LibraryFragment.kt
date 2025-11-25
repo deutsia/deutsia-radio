@@ -746,15 +746,24 @@ class RadioStationAdapter(
             }
 
             // Selection mode UI
+            val isSelected = selectedStations.contains(station.id)
             if (isSelectionMode) {
                 selectionCheckBox.visibility = View.VISIBLE
-                selectionCheckBox.isChecked = selectedStations.contains(station.id)
+                selectionCheckBox.isChecked = isSelected
                 menuButton.visibility = View.GONE
                 likeButton.visibility = View.GONE
+
+                // Apply highlighting to selected items
+                if (isSelected) {
+                    applySelectionHighlight()
+                } else {
+                    removeSelectionHighlight()
+                }
             } else {
                 selectionCheckBox.visibility = View.GONE
                 menuButton.visibility = View.VISIBLE
                 likeButton.visibility = View.VISIBLE
+                removeSelectionHighlight()
             }
 
             // Touch animation for press feedback
@@ -825,6 +834,41 @@ class RadioStationAdapter(
                     )
                 )
             }
+        }
+
+        private fun applySelectionHighlight() {
+            val cardView = itemView as com.google.android.material.card.MaterialCardView
+            val primaryColor = com.google.android.material.color.MaterialColors.getColor(
+                itemView,
+                com.google.android.material.R.attr.colorPrimary
+            )
+            val primaryContainerColor = com.google.android.material.color.MaterialColors.getColor(
+                itemView,
+                com.google.android.material.R.attr.colorPrimaryContainer
+            )
+
+            // Apply stroke for clear selection indicator
+            cardView.strokeWidth = itemView.resources.getDimensionPixelSize(
+                com.google.android.material.R.dimen.material_emphasis_medium
+            ).coerceAtLeast(3) // Ensure at least 3dp
+            cardView.strokeColor = primaryColor
+
+            // Apply subtle background tint using primaryContainer color
+            cardView.setCardBackgroundColor(primaryContainerColor)
+        }
+
+        private fun removeSelectionHighlight() {
+            val cardView = itemView as com.google.android.material.card.MaterialCardView
+            val defaultBackgroundColor = com.google.android.material.color.MaterialColors.getColor(
+                itemView,
+                com.google.android.material.R.attr.colorSurfaceContainerLow
+            )
+
+            // Remove stroke
+            cardView.strokeWidth = 0
+
+            // Restore default background
+            cardView.setCardBackgroundColor(defaultBackgroundColor)
         }
     }
 
