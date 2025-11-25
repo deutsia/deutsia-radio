@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -131,6 +132,23 @@ class SettingsFragment : Fragment() {
 
     // General-purpose handler for UI operations
     private val uiHandler = Handler(Looper.getMainLooper())
+
+    // Preference change listener to sync the Tor switch with preference updates from other sources
+    private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "embedded_tor_enabled") {
+            // Update the switch to match the preference value
+            // This ensures sync when the toolbar button changes the preference
+            val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(requireContext())
+            if (embeddedTorSwitch?.isChecked != torEnabled) {
+                // Temporarily remove listener to prevent infinite loop
+                embeddedTorSwitch?.setOnCheckedChangeListener(null)
+                embeddedTorSwitch?.isChecked = torEnabled
+                // Re-attach listener after update
+                setupTorSwitchListener()
+            }
+            updateTorContainerVisibility(torEnabled)
+        }
+    }
 
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
         // Debounce UI updates to prevent flickering during rapid state transitions
@@ -402,11 +420,19 @@ class SettingsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         TorManager.addStateListener(torStateListener)
+
+        // Register preference change listener to sync Tor switch with preference updates
+        requireContext().getSharedPreferences("DeutsiaRadioPrefs", Context.MODE_PRIVATE)
+            .registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     override fun onPause() {
         super.onPause()
         TorManager.removeStateListener(torStateListener)
+
+        // Unregister preference change listener
+        requireContext().getSharedPreferences("DeutsiaRadioPrefs", Context.MODE_PRIVATE)
+            .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     override fun onDestroyView() {
@@ -450,6 +476,32 @@ class SettingsFragment : Fragment() {
         pendingTorState = TorManager.state
         torUiUpdateHandler.postDelayed(torUiUpdateRunnable, 200)
 
+        // Setup switch toggle listener
+        setupTorSwitchListener()
+
+        // Handle action button
+        torActionButton?.setOnClickListener {
+            when (TorManager.state) {
+                TorManager.TorState.STOPPED, TorManager.TorState.ERROR -> {
+                    TorService.start(requireContext())
+                }
+                TorManager.TorState.CONNECTED -> {
+                    TorService.stop(requireContext())
+                }
+                TorManager.TorState.STARTING -> {
+                    // Do nothing while starting
+                }
+                TorManager.TorState.ORBOT_NOT_INSTALLED -> {
+                    TorManager.openOrbotInstallPage(requireContext())
+                }
+            }
+        }
+
+        // Setup Force Tor switches
+        setupForceTorSwitches()
+    }
+
+    private fun setupTorSwitchListener() {
         // Handle switch toggle
         embeddedTorSwitch?.setOnCheckedChangeListener { switch, isChecked ->
             // Animate the switch
@@ -490,27 +542,6 @@ class SettingsFragment : Fragment() {
                 forceTorExceptI2pSwitch?.isChecked = false
             }
         }
-
-        // Handle action button
-        torActionButton?.setOnClickListener {
-            when (TorManager.state) {
-                TorManager.TorState.STOPPED, TorManager.TorState.ERROR -> {
-                    TorService.start(requireContext())
-                }
-                TorManager.TorState.CONNECTED -> {
-                    TorService.stop(requireContext())
-                }
-                TorManager.TorState.STARTING -> {
-                    // Do nothing while starting
-                }
-                TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                    TorManager.openOrbotInstallPage(requireContext())
-                }
-            }
-        }
-
-        // Setup Force Tor switches
-        setupForceTorSwitches()
     }
 
     private fun setupForceTorSwitches() {

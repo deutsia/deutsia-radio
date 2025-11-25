@@ -454,6 +454,19 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _likedStationUuids.value = likedUuids
     }
 
+    /**
+     * Refresh liked and saved station UUIDs from the database.
+     * Called when like state changes from other views to keep UI in sync.
+     */
+    fun refreshLikedAndSavedUuids() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentStations = _stations.value ?: emptyList()
+            if (currentStations.isNotEmpty()) {
+                checkSavedStatus(currentStations)
+            }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         currentJob?.cancel()

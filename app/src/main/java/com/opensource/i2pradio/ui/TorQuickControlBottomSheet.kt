@@ -271,6 +271,8 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
                 TorService.start(requireContext())
             }
             TorManager.TorState.CONNECTED -> {
+                // Disable Tor in preferences and stop
+                PreferencesHelper.setEmbeddedTorEnabled(requireContext(), false)
                 TorService.stop(requireContext())
             }
             TorManager.TorState.STARTING -> {
@@ -285,7 +287,8 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     private fun handleSecondaryAction() {
         when (TorManager.state) {
             TorManager.TorState.STARTING -> {
-                // Cancel connecting
+                // Cancel connecting - also disable preference
+                PreferencesHelper.setEmbeddedTorEnabled(requireContext(), false)
                 TorService.stop(requireContext())
             }
             else -> {
