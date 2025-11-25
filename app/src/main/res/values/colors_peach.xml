@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Peach Color Scheme - Light Theme -->
+    <color name="md_theme_peach_light_primary">#FF9E80</color>
+    <color name="md_theme_peach_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_peach_light_primaryContainer">#FFDAD4</color>
+    <color name="md_theme_peach_light_onPrimaryContainer">#5F1A00</color>
+    <color name="md_theme_peach_light_secondary">#FF8A65</color>
+    <color name="md_theme_peach_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_peach_light_secondaryContainer">#FFDAD4</color>
+    <color name="md_theme_peach_light_onSecondaryContainer">#2C1512</color>
+
+    <!-- Peach Color Scheme - Dark Theme -->
+    <color name="md_theme_peach_dark_primary">#FFB4A9</color>
+    <color name="md_theme_peach_dark_onPrimary">#690100</color>
+    <color name="md_theme_peach_dark_primaryContainer">#930100</color>
+    <color name="md_theme_peach_dark_onPrimaryContainer">#FFDAD4</color>
+    <color name="md_theme_peach_dark_secondary">#E7BDB6</color>
+    <color name="md_theme_peach_dark_onSecondary">#442925</color>
+    <color name="md_theme_peach_dark_secondaryContainer">#5D3F3B</color>
+    <color name="md_theme_peach_dark_onSecondaryContainer">#FFDAD4</color>
+</resources>

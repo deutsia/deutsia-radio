@@ -320,28 +320,58 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun likeStation(station: RadioBrowserStation) {
-        // Check current like state before toggling
+        // Check current like and saved state before toggling
         val wasLiked = viewModel.likedStationUuids.value?.contains(station.stationuuid) ?: false
+        val wasSaved = viewModel.savedStationUuids.value?.contains(station.stationuuid) ?: false
 
         viewModel.toggleLike(station)
 
         // Show appropriate toast based on the action performed
         lifecycleScope.launch {
             val updatedStation = repository.getStationInfoByUuid(station.stationuuid)
-            if (updatedStation != null && updatedStation.isLiked) {
-                // Station was added to library and liked
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.station_saved, station.name),
-                    Toast.LENGTH_SHORT
-                ).show()
+
+            if (!wasLiked) {
+                // Station was just liked/hearted
+                if (!wasSaved) {
+                    // Station wasn't in library before - now added
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.station_saved, station.name),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    // Station was already in library, just marked as favorite
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.station_added_to_favorites, station.name),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             } else {
-                // Station was removed from library (updatedStation is null or not liked)
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.station_removed, station.name),
-                    Toast.LENGTH_SHORT
-                ).show()
+                // Station was just unliked/unhearted
+                // Check if it was a quick toggle or a long-time favorite
+                val stationAge = if (updatedStation != null) {
+                    System.currentTimeMillis() - updatedStation.addedTimestamp
+                } else {
+                    0L
+                }
+
+                val fiveMinutesInMillis = 5 * 60 * 1000
+                if (stationAge > fiveMinutesInMillis) {
+                    // Was a favorite for more than 5 minutes
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.station_removed_from_favorites, station.name),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    // Quick toggle or recently added
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.station_removed, station.name),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
 
             // If this station is currently playing, update RadioViewModel to sync miniplayer/Now Playing

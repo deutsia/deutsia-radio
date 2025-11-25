@@ -47,5 +47,7 @@
     <string name="loading_genres">Loading genres…</string>
     <string name="station_saved">%s added to library</string>
     <string name="station_removed">%s removed from library</string>
+    <string name="station_added_to_favorites">%s added to favorites</string>
+    <string name="station_removed_from_favorites">%s removed from favorites</string>
     <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
 </resources>

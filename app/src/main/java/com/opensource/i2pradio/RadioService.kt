@@ -521,7 +521,7 @@ class RadioService : Service() {
             // Legacy: Use public Music directory for Android 9 and below
             @Suppress("DEPRECATION")
             val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-            recordingsDir = File(musicDir, "i2pradio")
+            recordingsDir = File(musicDir, "deutsia radio")
             if (!recordingsDir.exists()) {
                 val created = recordingsDir.mkdirs()
                 android.util.Log.d("RadioService", "Created recordings directory: $created, path: ${recordingsDir.absolutePath}")
@@ -689,11 +689,11 @@ class RadioService : Service() {
                         return@Thread
                     }
                 } else if (finalUseMediaStore) {
-                    // Android 10+: Use MediaStore to save to public Music/i2pradio directory
+                    // Android 10+: Use MediaStore to save to public Music/deutsia radio directory
                     val contentValues = ContentValues().apply {
                         put(MediaStore.Audio.Media.DISPLAY_NAME, finalFileName)
                         put(MediaStore.Audio.Media.MIME_TYPE, finalMimeType)
-                        put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/i2pradio")
+                        put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/deutsia radio")
                         put(MediaStore.Audio.Media.IS_PENDING, 1)  // Mark as pending while writing
                     }
 

@@ -303,12 +303,12 @@ object PreferencesHelper {
     }
 
     // Color Scheme preferences
-    // Available schemes: "default", "red", "green", "purple", "orange"
+    // Available schemes: "default", "peach", "green", "purple", "orange"
     // Each scheme has light/dark mode variants that work independently from Material You
 
     /**
      * Set the color scheme.
-     * Available values: "default", "red", "green", "purple", "orange"
+     * Available values: "default", "peach", "green", "purple", "orange"
      * Default: "default" (blue theme)
      */
     fun setColorScheme(context: Context, scheme: String) {
@@ -320,7 +320,7 @@ object PreferencesHelper {
 
     /**
      * Get the selected color scheme.
-     * Returns: "default", "red", "green", "purple", or "orange"
+     * Returns: "default", "peach", "green", "purple", or "orange"
      * Default: "default"
      */
     fun getColorScheme(context: Context): String {
