@@ -126,7 +126,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/filter_genre"
                 android:textSize="12sp"
-                app:icon="@drawable/ic_filter"
+                app:icon="@drawable/ic_menu"
                 app:iconSize="18dp" />
 
         </LinearLayout>

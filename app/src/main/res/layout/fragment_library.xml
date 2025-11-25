@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/genre_all"
                 android:textSize="12sp"
-                app:icon="@drawable/ic_filter"
+                app:icon="@drawable/ic_menu"
                 app:iconSize="18dp" />
 
             <!-- Sort Button -->
