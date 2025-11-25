@@ -394,22 +394,16 @@ object TorManager {
     /**
      * Initialize and check for Orbot status.
      * Call this when the app starts to detect if Orbot is already running.
+     *
+     * CRITICAL: This ALWAYS performs a socket check to ensure instantaneous leak detection.
+     * UI components handle rapid state transitions via debouncing.
      */
     fun initialize(context: Context) {
         // Register receiver first (even if Orbot check fails, the socket check will run)
         registerOrbotStatusReceiver(context, null)
 
-        // CRITICAL FIX: Skip status request if we're already connected and stable.
-        // This prevents UI oscillations during activity recreation (theme changes, Material You toggles).
-        // TorManager is a singleton, so state persists across activity recreations.
-        // The periodic health checks (every 30s) will detect if connection is lost.
-        if (_state == TorState.CONNECTED && _socksPort > 0) {
-            Log.d(TAG, "Already connected to Tor - skipping redundant status check during initialization")
-            return
-        }
-
         // Request current status from Orbot - this includes a socket check
-        // which is more reliable than PackageManager during activity recreation
+        // which provides INSTANT leak detection (socket check completes in ~1-100ms)
         requestOrbotStatus(context)
 
         // Only mark as not installed if BOTH the package check fails AND
