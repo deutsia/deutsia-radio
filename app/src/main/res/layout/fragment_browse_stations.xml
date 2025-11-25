@@ -116,7 +116,7 @@
                 android:text="@string/filter_country"
                 android:textSize="12sp"
                 app:icon="@drawable/ic_location"
-                app:iconSize="18dp" />
+                app:iconSize="24dp" />
 
             <!-- Genre/Tag Filter -->
             <com.google.android.material.button.MaterialButton
@@ -127,7 +127,7 @@
                 android:text="@string/filter_genre"
                 android:textSize="12sp"
                 app:icon="@drawable/ic_menu"
-                app:iconSize="18dp" />
+                app:iconSize="24dp" />
 
         </LinearLayout>
 

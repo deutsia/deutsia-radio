@@ -16,17 +16,17 @@
     <string name="equalizer_surround_sound">Surround Sound</string>
 
     <!-- Sort options -->
-    <string name="sort_default">≡ Default</string>
+    <string name="sort_default">Default</string>
     <string name="sort_name">Name</string>
     <string name="sort_recent">Recent</string>
     <string name="sort_liked">Liked</string>
-    <string name="sort_genre">≡ Genre</string>
+    <string name="sort_genre">Genre</string>
 
     <!-- Search -->
     <string name="search_stations">Search library</string>
 
     <!-- Genre filter -->
-    <string name="genre_all">≡ All Genres</string>
+    <string name="genre_all">All Genres</string>
     <string name="filter_by_genre">Filter by Genre</string>
 
     <!-- Browse/Discover Stations -->
@@ -38,9 +38,9 @@
     <string name="browse_no_results">No Stations Found</string>
     <string name="browse_no_results_hint">Try a different search or filter</string>
     <string name="filter_country">Country</string>
-    <string name="filter_genre">≡ Genre</string>
+    <string name="filter_genre">Genre</string>
     <string name="filter_all_countries">All Countries</string>
-    <string name="filter_all_genres">≡ All Genres</string>
+    <string name="filter_all_genres">All Genres</string>
     <string name="select_country">Select Country</string>
     <string name="select_genre">Select Genre</string>
     <string name="loading_countries">Loading countries…</string>
