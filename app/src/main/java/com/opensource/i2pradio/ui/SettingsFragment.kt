@@ -127,7 +127,7 @@ class SettingsFragment : Fragment() {
     private var lastTorStateChangeTime: Long = 0
     private var lastDisplayedTorState: TorManager.TorState? = null
 
-    private val torUiUpdateRunnable = Runnable {
+    private val torUiUpdateRunnable: Runnable = Runnable {
         pendingTorState?.let { state ->
             // Only update UI if this state has been stable for minimum duration
             val stateAge = System.currentTimeMillis() - lastTorStateChangeTime
