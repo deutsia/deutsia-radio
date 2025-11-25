@@ -510,6 +510,13 @@ class SettingsFragment : Fragment() {
                 forceTorExceptI2pSwitch?.isChecked = false
             }
 
+            // SECURITY: Stop any currently playing stream when proxy settings change
+            // The stream was routed using the OLD settings and must be stopped immediately
+            // to prevent privacy leaks (e.g., I2P stream continuing when user forces Tor)
+            if (!isInitializing) {
+                stopCurrentStream()
+            }
+
             // Show warning if enabling and Tor is not connected
             // Skip warning during initialization to prevent flickering when Material You is toggled
             if (isChecked && !TorManager.isConnected() && !isInitializing) {
@@ -546,6 +553,13 @@ class SettingsFragment : Fragment() {
                 forceTorAllSwitch?.isChecked = false
             }
 
+            // SECURITY: Stop any currently playing stream when proxy settings change
+            // The stream was routed using the OLD settings and must be stopped immediately
+            // to prevent privacy leaks (e.g., clearnet stream continuing when user forces Tor)
+            if (!isInitializing) {
+                stopCurrentStream()
+            }
+
             // Show warning if enabling and Tor is not connected
             // Skip warning during initialization to prevent flickering when Material You is toggled
             if (isChecked && !TorManager.isConnected() && !isInitializing) {
@@ -566,6 +580,24 @@ class SettingsFragment : Fragment() {
 
         // Mark initialization as complete to enable warnings for user interactions
         isInitializing = false
+    }
+
+    /**
+     * Stops the current stream when proxy routing settings change.
+     * This is CRITICAL for privacy/security: when the user changes how traffic is routed,
+     * any existing stream is using the OLD routing settings and must be stopped immediately.
+     *
+     * Example privacy leak prevented:
+     * - User is playing an I2P radio with "Force Tor Except I2P" (going through I2P proxy)
+     * - User switches to "Force Tor All" (should go through Tor SOCKS)
+     * - Without stopping, the I2P stream keeps playing through I2P proxy, violating user's intent
+     */
+    private fun stopCurrentStream() {
+        val stopIntent = Intent(requireContext(), RadioService::class.java).apply {
+            action = RadioService.ACTION_STOP
+        }
+        requireContext().startService(stopIntent)
+        android.util.Log.d("SettingsFragment", "Stopped current stream due to proxy routing settings change")
     }
 
     private fun updateForceTorContainersVisibility(show: Boolean) {
