@@ -191,6 +191,7 @@ class MainActivity : AppCompatActivity() {
                 // Station cleared - hide mini player
                 miniPlayerView.setStation(null)
                 miniPlayerContainer.visibility = View.GONE
+                viewModel.setMiniPlayerVisible(false)
                 miniPlayerManuallyClosed = false
                 lastStationId = null
                 lastStationUrl = null
@@ -215,6 +216,7 @@ class MainActivity : AppCompatActivity() {
                     if (!miniPlayerManuallyClosed) {
                         miniPlayerView.setStation(station)
                         miniPlayerContainer.visibility = View.VISIBLE
+                        viewModel.setMiniPlayerVisible(true)
                     }
                 } else {
                     // Same station, just update like state without animations
@@ -263,6 +265,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.setPlaying(false)
             miniPlayerView.setStation(null)
             miniPlayerContainer.visibility = View.GONE
+            viewModel.setMiniPlayerVisible(false)
         }
 
         // Like button toggles liked state in database
@@ -389,11 +392,15 @@ class MainActivity : AppCompatActivity() {
                     // On Now Playing tab - keep mini player hidden
                     miniPlayerView.hideForNowPlaying()
                     miniPlayerContainer.visibility = View.INVISIBLE
+                    viewModel.setMiniPlayerVisible(false)
                 } else {
                     // On other tabs - show mini player if station is playing
                     if (viewModel.currentStation.value != null && !miniPlayerManuallyClosed) {
                         miniPlayerContainer.visibility = View.VISIBLE
                         miniPlayerView.showWithAnimation()
+                        viewModel.setMiniPlayerVisible(true)
+                    } else {
+                        viewModel.setMiniPlayerVisible(false)
                     }
                 }
             }
