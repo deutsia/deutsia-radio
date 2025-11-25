@@ -23,6 +23,7 @@ object PreferencesHelper {
     private const val KEY_FORCE_TOR_EXCEPT_I2P = "force_tor_except_i2p"
     private const val KEY_RECORD_ACROSS_STATIONS = "record_across_stations"
     private const val KEY_RECORD_ALL_STATIONS = "record_all_stations"
+    private const val KEY_COLOR_SCHEME = "color_scheme"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -299,5 +300,31 @@ object PreferencesHelper {
     fun isRecordAllStationsEnabled(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_RECORD_ALL_STATIONS, false)
+    }
+
+    // Color Scheme preferences
+    // Available schemes: "default", "red", "green", "purple", "orange"
+    // Each scheme has light/dark mode variants that work independently from Material You
+
+    /**
+     * Set the color scheme.
+     * Available values: "default", "red", "green", "purple", "orange"
+     * Default: "default" (blue theme)
+     */
+    fun setColorScheme(context: Context, scheme: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_COLOR_SCHEME, scheme)
+            .apply()
+    }
+
+    /**
+     * Get the selected color scheme.
+     * Returns: "default", "red", "green", "purple", or "orange"
+     * Default: "default"
+     */
+    fun getColorScheme(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_COLOR_SCHEME, "default") ?: "default"
     }
 }
