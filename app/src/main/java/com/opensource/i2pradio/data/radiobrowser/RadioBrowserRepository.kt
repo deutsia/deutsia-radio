@@ -326,11 +326,14 @@ class RadioBrowserRepository(context: Context) {
                         stationuuid = entry.radioBrowserUuid,
                         name = entry.stationName,
                         url = entry.streamUrl,
-                        url_resolved = entry.streamUrl,
+                        urlResolved = entry.streamUrl,
                         favicon = entry.coverArtUri ?: "",
                         tags = entry.genre,
                         country = entry.country,
                         countrycode = "",
+                        state = "",
+                        language = "",
+                        languagecodes = "",
                         codec = "",
                         bitrate = 0,
                         homepage = "",
@@ -339,9 +342,10 @@ class RadioBrowserRepository(context: Context) {
                         clicktrend = 0,
                         lastcheckok = true,
                         lastchangetime = "",
-                        lastchangetime_iso8601 = "",
-                        lastchecktime = "",
-                        lastchecktime_iso8601 = ""
+                        hls = false,
+                        sslError = false,
+                        geoLat = null,
+                        geoLong = null
                     )
                 }
                 RadioBrowserResult.Success(stations)
