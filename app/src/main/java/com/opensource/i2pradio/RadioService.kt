@@ -710,7 +710,7 @@ class RadioService : Service() {
                     }
 
                     recordingMediaStoreUri = mediaStoreUri
-                    filePath = "Music/i2pradio/$finalFileName"
+                    filePath = "Music/deutsia_radio/$finalFileName"
                     android.util.Log.d("RadioService", "Recording stream connected, writing to MediaStore: $filePath (URI: $mediaStoreUri)")
 
                     val rawOutputStream = resolver.openOutputStream(mediaStoreUri)
