@@ -311,11 +311,17 @@ class MainActivity : AppCompatActivity() {
                         updatedStation?.let {
                             miniPlayerView.updateLikeState(it.isLiked)
                             viewModel.updateCurrentStationLikeState(it.isLiked)
-                            // Show toast message when station is liked
+                            // Show toast message for both like and unlike
                             if (it.isLiked) {
                                 Toast.makeText(
                                     this@MainActivity,
                                     getString(R.string.station_saved, station.name),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    getString(R.string.station_removed, station.name),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -329,11 +335,17 @@ class MainActivity : AppCompatActivity() {
                         updatedStation?.let {
                             miniPlayerView.updateLikeState(it.isLiked)
                             viewModel.updateCurrentStationLikeState(it.isLiked)
-                            // Show toast message when station is liked
+                            // Show toast message for both like and unlike
                             if (it.isLiked) {
                                 Toast.makeText(
                                     this@MainActivity,
                                     getString(R.string.station_saved, station.name),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    getString(R.string.station_removed, station.name),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }

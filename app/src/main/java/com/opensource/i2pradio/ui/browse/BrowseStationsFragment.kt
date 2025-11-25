@@ -320,11 +320,17 @@ class BrowseStationsFragment : Fragment() {
         lifecycleScope.launch {
             val updatedStation = repository.getStationInfoByUuid(station.stationuuid)
             updatedStation?.let {
-                // Show toast message when station is liked
+                // Show toast message for both like and unlike
                 if (it.isLiked) {
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.station_saved, station.name),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.station_removed, station.name),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
