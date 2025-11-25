@@ -109,18 +109,22 @@ class NowPlayingFragment : Fragment() {
                 // Update buffer bar visibility based on playing state
                 updateBufferBarVisibility(isPlaying)
 
-                // Restore metadata if available
-                val metadata = svc.getCurrentMetadata()
-                if (!metadata.isNullOrBlank()) {
-                    metadataText.text = metadata
-                    metadataText.visibility = View.VISIBLE
-                }
+                // Only restore metadata if we're currently playing
+                // This prevents stale metadata from previous stations appearing
+                // when the activity is recreated (e.g., Material You toggle)
+                if (isPlaying) {
+                    val metadata = svc.getCurrentMetadata()
+                    if (!metadata.isNullOrBlank()) {
+                        metadataText.text = metadata
+                        metadataText.visibility = View.VISIBLE
+                    }
 
-                // Restore stream info if available
-                val bitrate = svc.getCurrentBitrate()
-                val codec = svc.getCurrentCodec()
-                if (bitrate > 0 || (!codec.isNullOrBlank() && codec != "Unknown")) {
-                    updateStreamInfo(bitrate, codec ?: "Unknown")
+                    // Restore stream info if available
+                    val bitrate = svc.getCurrentBitrate()
+                    val codec = svc.getCurrentCodec()
+                    if (bitrate > 0 || (!codec.isNullOrBlank() && codec != "Unknown")) {
+                        updateStreamInfo(bitrate, codec ?: "Unknown")
+                    }
                 }
 
                 // Sync ViewModel state if needed

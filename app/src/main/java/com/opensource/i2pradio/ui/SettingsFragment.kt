@@ -415,8 +415,11 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        // Update initial Tor status
-        updateTorStatusUI(TorManager.state)
+        // Update initial Tor status using the debounced path to prevent flickering
+        // during rapid state transitions (e.g., Material You toggle activity recreation)
+        // This ensures the UI only updates once instead of twice (here + listener firing)
+        pendingTorState = TorManager.state
+        torUiUpdateHandler.postDelayed(torUiUpdateRunnable, 200)
 
         // Handle switch toggle
         embeddedTorSwitch?.setOnCheckedChangeListener { switch, isChecked ->
