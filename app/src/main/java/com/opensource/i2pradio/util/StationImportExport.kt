@@ -84,7 +84,7 @@ object StationImportExport {
 
         val rootObj = JSONObject().apply {
             put("version", 1)
-            put("app", "I2P Radio")
+            put("app", "deutsia radio")
             put("stations", jsonArray)
         }
 
@@ -99,7 +99,7 @@ object StationImportExport {
     fun exportToM3u(stations: List<RadioStation>, outputStream: OutputStream) {
         outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
             writer.write("#EXTM3U\n")
-            writer.write("# I2P Radio Station Export\n\n")
+            writer.write("# deutsia radio Station Export\n\n")
 
             for (station in stations) {
                 // Extended M3U info: #EXTINF:duration,title

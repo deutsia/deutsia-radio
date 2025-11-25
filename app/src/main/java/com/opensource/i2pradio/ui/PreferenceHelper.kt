@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 
 object PreferencesHelper {
-    private const val PREFS_NAME = "I2PRadioPrefs"
+    private const val PREFS_NAME = "DeutsiaRadioPrefs"
     private const val KEY_THEME_MODE = "theme_mode"
     private const val KEY_PRESETS_INITIALIZED = "presets_initialized"
     private const val KEY_MATERIAL_YOU_ENABLED = "material_you_enabled"

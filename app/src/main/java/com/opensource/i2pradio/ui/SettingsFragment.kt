@@ -1,6 +1,9 @@
 package com.opensource.i2pradio.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri
@@ -207,6 +210,17 @@ class SettingsFragment : Fragment() {
         githubButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/deutsia/i2pradio"))
             startActivity(intent)
+        }
+
+        // Copy Monero address button
+        val copyMoneroButton = view.findViewById<MaterialButton>(R.id.copyMoneroButton)
+        copyMoneroButton.setOnClickListener {
+            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Monero Address", "83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN")
+            clipboard.setPrimaryClip(clip)
+
+            // Show a toast to confirm
+            Toast.makeText(requireContext(), "Address copied to clipboard", Toast.LENGTH_SHORT).show()
         }
 
         // Sleep timer button

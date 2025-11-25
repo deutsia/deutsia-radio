@@ -174,7 +174,7 @@ class RadioService : Service() {
         const val ACTION_SWITCH_RECORDING_STREAM = "com.opensource.i2pradio.SWITCH_RECORDING_STREAM"
         const val ACTION_SET_SLEEP_TIMER = "com.opensource.i2pradio.SET_SLEEP_TIMER"
         const val ACTION_CANCEL_SLEEP_TIMER = "com.opensource.i2pradio.CANCEL_SLEEP_TIMER"
-        const val CHANNEL_ID = "I2PRadioChannel"
+        const val CHANNEL_ID = "DeutsiaRadioChannel"
         const val NOTIFICATION_ID = 1
 
         // Broadcast actions for metadata updates
@@ -218,7 +218,7 @@ class RadioService : Service() {
 
     private fun initializeMediaSession() {
         // Create MediaSession for Now Playing card on TV
-        mediaSession = MediaSessionCompat(this, "I2PRadioSession").apply {
+        mediaSession = MediaSessionCompat(this, "DeutsiaRadioSession").apply {
             // Set session activity - opens app when Now Playing card is selected
             val sessionActivityIntent = Intent(this@RadioService, MainActivity::class.java)
             val sessionActivityPendingIntent = PendingIntent.getActivity(
@@ -279,8 +279,8 @@ class RadioService : Service() {
         val metadataBuilder = MediaMetadataCompat.Builder()
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
             .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, stationName)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "I2P Radio")
-            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "I2P Radio")
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "deutsia radio")
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "deutsia radio")
 
         // Load cover art if available
         if (!coverArtUri.isNullOrEmpty()) {
@@ -545,7 +545,7 @@ class RadioService : Service() {
         // Create request for the stream - using separate connection
         val request = Request.Builder()
             .url(streamUrl)
-            .header("User-Agent", "I2PRadio-Recorder/1.0") // Different user agent to distinguish
+            .header("User-Agent", "DeutsiaRadio-Recorder/1.0") // Different user agent to distinguish
             .header("Icy-MetaData", "0") // Don't need metadata for recording
             .header("Accept", "*/*")
             .header("Connection", "keep-alive")
@@ -794,7 +794,7 @@ class RadioService : Service() {
                                     val newRecordingClient = buildRecordingHttpClient()
                                     val newRequest = Request.Builder()
                                         .url(newStreamUrl)
-                                        .header("User-Agent", "I2PRadio-Recorder/1.0")
+                                        .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
                                         .header("Icy-MetaData", "0")
                                         .header("Accept", "*/*")
                                         .header("Connection", "keep-alive")
@@ -1414,7 +1414,7 @@ class RadioService : Service() {
             // Direct data source - no wrapper, no middleware
             // This is the key simplification: let the stream go directly to ExoPlayer
             val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
-                .setUserAgent("I2PRadio/1.0")
+                .setUserAgent("DeutsiaRadio/1.0")
 
             // Simple load control - trust ExoPlayer's defaults with minor tuning
             // Key insight: smaller buffers = less latency = fewer sync issues
@@ -1656,7 +1656,7 @@ class RadioService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "I2P Radio Playback",
+                "deutsia radio Playback",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "Shows radio playback status"

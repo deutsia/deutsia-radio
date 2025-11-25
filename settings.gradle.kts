@@ -20,6 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "I2P Radio Player"
+rootProject.name = "deutsia radio"
 include(":app")
  
