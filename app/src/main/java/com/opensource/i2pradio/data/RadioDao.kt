@@ -109,4 +109,8 @@ interface RadioDao {
     // Update cached station's verification timestamp
     @Query("UPDATE radio_stations SET lastVerified = :timestamp WHERE id = :id")
     suspend fun updateLastVerified(id: Long, timestamp: Long)
+
+    // Get multiple stations by RadioBrowser UUIDs (batch query to avoid N+1 problem)
+    @Query("SELECT * FROM radio_stations WHERE radioBrowserUuid IN (:uuids)")
+    suspend fun getStationsByRadioBrowserUuids(uuids: List<String>): List<RadioStation>
 }

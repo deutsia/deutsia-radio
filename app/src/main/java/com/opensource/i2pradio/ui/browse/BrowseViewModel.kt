@@ -206,14 +206,12 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
     /**
      * Like a station (saves it and marks it as liked)
-     * Returns the station ID if successful
+     * Note: This is fire-and-forget. Use toggleLike() if you need synchronous behavior.
      */
-    fun likeStation(station: RadioBrowserStation): Long? {
-        var resultId: Long? = null
+    fun likeStation(station: RadioBrowserStation) {
         viewModelScope.launch {
             val id = repository.saveStationAsLiked(station)
             if (id != null) {
-                resultId = id
                 // Update both saved and liked UUIDs sets
                 val savedCurrent = _savedStationUuids.value.orEmpty().toMutableSet()
                 savedCurrent.add(station.stationuuid)
@@ -224,7 +222,6 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 _likedStationUuids.value = likedCurrent
             }
         }
-        return resultId
     }
 
     /**
@@ -425,6 +422,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
     /**
      * Check saved and liked status for a list of stations
+     * Uses batch query to avoid N+1 query problem
      */
     private suspend fun checkSavedStatus(stations: List<RadioBrowserStation>) {
         val savedUuids = mutableSetOf<String>()
@@ -433,8 +431,12 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         val likedUuids = mutableSetOf<String>()
         likedUuids.addAll(_likedStationUuids.value.orEmpty())
 
+        // Batch query: get all station info at once instead of one-by-one
+        val uuids = stations.map { it.stationuuid }
+        val stationInfoMap = repository.getStationInfoByUuids(uuids)
+
         for (station in stations) {
-            val stationInfo = repository.getStationInfoByUuid(station.stationuuid)
+            val stationInfo = stationInfoMap[station.stationuuid]
             if (stationInfo != null) {
                 savedUuids.add(station.stationuuid)
                 if (stationInfo.isLiked) {
