@@ -60,7 +60,7 @@ class LibraryFragment : Fragment() {
 
     // Predefined genres list (sorted alphabetically)
     private val allGenres = listOf(
-        "≡ All Genres", "Alternative", "Ambient", "Blues", "Christian", "Classical",
+        "All Genres", "Alternative", "Ambient", "Blues", "Christian", "Classical",
         "Comedy", "Country", "Dance", "EDM", "Electronic", "Folk",
         "Funk", "Gospel", "Hip Hop", "Indie", "Jazz", "K-Pop",
         "Latin", "Lo-Fi", "Metal", "News", "Oldies", "Pop", "Punk",
@@ -222,9 +222,9 @@ class LibraryFragment : Fragment() {
             val combinedGenres = (allGenres + dbGenres)
                 .distinct()
                 .sortedWith(compareBy {
-                    // "≡ All Genres" first, "Other" last, rest alphabetically
+                    // "All Genres" first, "Other" last, rest alphabetically
                     when (it) {
-                        "≡ All Genres" -> "0$it"
+                        "All Genres" -> "0$it"
                         "Other" -> "ZZZ$it"
                         else -> "A$it"
                     }
@@ -291,7 +291,7 @@ class LibraryFragment : Fragment() {
 
         var filteredGenres = genres.toList()
         val adapter = GenreAdapter(filteredGenres, selectedIndex) { selectedGenre ->
-            currentGenreFilter = if (selectedGenre == "≡ All Genres") null else selectedGenre
+            currentGenreFilter = if (selectedGenre == "All Genres") null else selectedGenre
             PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
             updateGenreFilterButtonText()
             // Clear search when changing genre filter
@@ -374,6 +374,12 @@ class LibraryFragment : Fragment() {
             SortOrder.LIKED -> getString(R.string.sort_liked)
             SortOrder.GENRE -> getString(R.string.sort_genre)
         }
+
+        // Use hamburger icon for Default and Genre, sort icon for others
+        sortButton.setIconResource(when (currentSortOrder) {
+            SortOrder.DEFAULT, SortOrder.GENRE -> R.drawable.ic_menu
+            else -> R.drawable.ic_sort
+        })
     }
 
     private fun updateGenreFilterButtonText() {
