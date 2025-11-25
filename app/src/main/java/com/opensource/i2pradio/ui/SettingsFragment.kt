@@ -621,13 +621,26 @@ class SettingsFragment : Fragment() {
     }
 
     private fun updateTorStatusUI(state: TorManager.TorState) {
+        // Check if force Tor mode is enabled - if so, we should show connected state
+        // even during transient disconnections to prevent UI glitches
+        val isForceTorEnabled = PreferencesHelper.isForceTorAll(requireContext()) ||
+                                PreferencesHelper.isForceTorExceptI2P(requireContext())
+
         when (state) {
             TorManager.TorState.STOPPED -> {
-                torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
-                torStatusText?.text = "Disconnected"
-                torStatusDetail?.text = "Tor is not running"
-                torActionButton?.text = "Start"
-                torActionButton?.isEnabled = true
+                // If force Tor is enabled and we have a proxy port, assume connected
+                if (isForceTorEnabled && TorManager.isConnected()) {
+                    showConnectedStateForForceTor()
+                } else if (isForceTorEnabled) {
+                    // Force Tor is enabled but not connected - show warning
+                    showForceTorWarning()
+                } else {
+                    torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
+                    torStatusText?.text = "Disconnected"
+                    torStatusDetail?.text = "Tor is not running"
+                    torActionButton?.text = "Start"
+                    torActionButton?.isEnabled = true
+                }
             }
             TorManager.TorState.STARTING -> {
                 torStatusIcon?.setImageResource(R.drawable.ic_tor_connecting)
@@ -644,20 +657,49 @@ class SettingsFragment : Fragment() {
                 torActionButton?.isEnabled = true
             }
             TorManager.TorState.ERROR -> {
-                torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
-                torStatusText?.text = "Connection Failed"
-                torStatusDetail?.text = TorManager.errorMessage ?: "Unknown error"
-                torActionButton?.text = "Retry"
-                torActionButton?.isEnabled = true
+                // If force Tor is enabled, show a more severe warning
+                if (isForceTorEnabled) {
+                    showForceTorWarning()
+                } else {
+                    torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
+                    torStatusText?.text = "Connection Failed"
+                    torStatusDetail?.text = TorManager.errorMessage ?: "Unknown error"
+                    torActionButton?.text = "Retry"
+                    torActionButton?.isEnabled = true
+                }
             }
             TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
-                torStatusText?.text = "Orbot Required"
-                torStatusDetail?.text = "Please install Orbot to use Tor"
-                torActionButton?.text = "Install Orbot"
-                torActionButton?.isEnabled = true
+                // If force Tor is enabled but Orbot says not installed, check if proxy is accessible
+                // This prevents UI glitches during activity recreation
+                if (isForceTorEnabled && TorManager.isConnected()) {
+                    showConnectedStateForForceTor()
+                } else if (isForceTorEnabled) {
+                    showForceTorWarning()
+                } else {
+                    torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
+                    torStatusText?.text = "Orbot Required"
+                    torStatusDetail?.text = "Please install Orbot to use Tor"
+                    torActionButton?.text = "Install Orbot"
+                    torActionButton?.isEnabled = true
+                }
             }
         }
+    }
+
+    private fun showConnectedStateForForceTor() {
+        torStatusIcon?.setImageResource(R.drawable.ic_tor_on)
+        torStatusText?.text = "Connected"
+        torStatusDetail?.text = "SOCKS port: ${TorManager.socksPort}"
+        torActionButton?.text = "Stop"
+        torActionButton?.isEnabled = true
+    }
+
+    private fun showForceTorWarning() {
+        torStatusIcon?.setImageResource(R.drawable.ic_tor_error)
+        torStatusText?.text = "Connection Failed"
+        torStatusDetail?.text = "Force Tor is enabled but not connected"
+        torActionButton?.text = "Retry"
+        torActionButton?.isEnabled = true
     }
 
     private fun updateRecordingDirectoryDisplay() {
