@@ -125,6 +125,11 @@ class LibraryFragment : Fragment() {
             showAddRadioDialog()
         }
 
+        // Observe miniplayer visibility to adjust FAB margin dynamically
+        viewModel.isMiniPlayerVisible.observe(viewLifecycleOwner) { isVisible ->
+            adjustFabMarginForMiniPlayer(isVisible)
+        }
+
         return view
     }
 
@@ -465,6 +470,28 @@ class LibraryFragment : Fragment() {
             }
         }
         popup.show()
+    }
+
+    /**
+     * Adjusts the FAB bottom margin based on miniplayer visibility.
+     * When miniplayer is visible, adds extra margin to prevent overlap.
+     */
+    private fun adjustFabMarginForMiniPlayer(isMiniPlayerVisible: Boolean) {
+        val layoutParams = fabAddRadio.layoutParams as ViewGroup.MarginLayoutParams
+        val density = resources.displayMetrics.density
+
+        // Base margin: 24dp
+        // Miniplayer height with margins: ~100dp
+        val baseMargin = (24 * density).toInt()
+        val miniPlayerHeight = (100 * density).toInt()
+
+        layoutParams.bottomMargin = if (isMiniPlayerVisible) {
+            baseMargin + miniPlayerHeight  // 124dp total when miniplayer is visible
+        } else {
+            baseMargin  // 24dp when miniplayer is hidden
+        }
+
+        fabAddRadio.layoutParams = layoutParams
     }
 }
 

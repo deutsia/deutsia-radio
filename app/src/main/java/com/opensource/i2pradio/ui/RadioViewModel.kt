@@ -44,6 +44,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     private val _coverArtUpdate = MutableLiveData<CoverArtUpdate?>()
     val coverArtUpdate: LiveData<CoverArtUpdate?> = _coverArtUpdate
 
+    // Miniplayer visibility state for UI components that need to adjust when miniplayer shows/hides
+    private val _isMiniPlayerVisible = MutableLiveData<Boolean>(false)
+    val isMiniPlayerVisible: LiveData<Boolean> = _isMiniPlayerVisible
+
     fun setCurrentStation(station: RadioStation?) {
         val previousStation = _currentStation.value
         _currentStation.value = station
@@ -103,6 +107,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setBuffering(buffering: Boolean) {
         _isBuffering.value = buffering
+    }
+
+    fun setMiniPlayerVisible(visible: Boolean) {
+        _isMiniPlayerVisible.value = visible
     }
 
     fun getCurrentStation(): RadioStation? = _currentStation.value
