@@ -30,13 +30,13 @@
 
     <!-- The Speaker (Circle Cutout) -->
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="#00000000"
         android:pathData="M62.25,60.875 m-7.7,0 a7.7,7.7 0 1,1 15.4,0 a7.7,7.7 0 1,1 -15.4,0"/>
 
     <!-- The Speaker Grill (Lines) -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
+        android:strokeColor="#00000000"
         android:strokeWidth="3.85"
         android:strokeLineCap="round"
         android:pathData="M38.875,55.375 h9.625 M38.875,60.875 h9.625 M38.875,66.375 h9.625"/>
