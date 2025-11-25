@@ -99,10 +99,12 @@ object TorManager {
     private val healthCheckHandler = Handler(Looper.getMainLooper())
     private var healthCheckRunnable: Runnable? = null
 
-    fun addStateListener(listener: (TorState) -> Unit) {
+    fun addStateListener(listener: (TorState) -> Unit, notifyImmediately: Boolean = true) {
         stateListeners.add(listener)
-        // Immediately notify of current state
-        listener(_state)
+        // Immediately notify of current state (unless suppressed during initialization)
+        if (notifyImmediately) {
+            listener(_state)
+        }
     }
 
     fun removeStateListener(listener: (TorState) -> Unit) {
@@ -392,13 +394,16 @@ object TorManager {
     /**
      * Initialize and check for Orbot status.
      * Call this when the app starts to detect if Orbot is already running.
+     *
+     * CRITICAL: This ALWAYS performs a socket check to ensure instantaneous leak detection.
+     * UI components handle rapid state transitions via debouncing.
      */
     fun initialize(context: Context) {
         // Register receiver first (even if Orbot check fails, the socket check will run)
         registerOrbotStatusReceiver(context, null)
 
         // Request current status from Orbot - this includes a socket check
-        // which is more reliable than PackageManager during activity recreation
+        // which provides INSTANT leak detection (socket check completes in ~1-100ms)
         requestOrbotStatus(context)
 
         // Only mark as not installed if BOTH the package check fails AND

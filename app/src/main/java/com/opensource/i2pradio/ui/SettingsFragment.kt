@@ -119,14 +119,47 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    // Debouncing mechanism for Tor state updates to prevent UI flickering
-    // during rapid state transitions (e.g., when Material You is toggled)
+    // SMART debouncing mechanism for Tor state updates
+    // Filters out rapid oscillations (< 100ms) during activity recreation
+    // while preserving INSTANT leak warnings for real disconnections
     private val torUiUpdateHandler = Handler(Looper.getMainLooper())
     private var pendingTorState: TorManager.TorState? = null
+    private var lastTorStateChangeTime: Long = 0
+    private var lastDisplayedTorState: TorManager.TorState? = null
+
     private val torUiUpdateRunnable = Runnable {
         pendingTorState?.let { state ->
-            updateTorStatusUI(state)
-            pendingTorState = null
+            // Only update UI if this state has been stable for minimum duration
+            val stateAge = System.currentTimeMillis() - lastTorStateChangeTime
+
+            // CRITICAL: For disconnected states, verify they've persisted for 100ms
+            // This filters out millisecond-level oscillations during activity recreation
+            // while still showing real disconnections within 100ms
+            when (state) {
+                TorManager.TorState.STOPPED,
+                TorManager.TorState.ERROR,
+                TorManager.TorState.ORBOT_NOT_INSTALLED -> {
+                    if (stateAge >= 100 || lastDisplayedTorState == state) {
+                        // State has persisted for 100ms OR we're already showing it
+                        // This is a REAL disconnection - update UI immediately
+                        updateTorStatusUI(state)
+                        lastDisplayedTorState = state
+                        pendingTorState = null
+                    } else {
+                        // State changed recently - wait a bit longer to confirm
+                        // Re-check in 50ms to see if it stabilizes
+                        torUiUpdateHandler.postDelayed(torUiUpdateRunnable, 50)
+                    }
+                }
+                TorManager.TorState.CONNECTED,
+                TorManager.TorState.STARTING -> {
+                    // CONNECTED/STARTING states - update immediately
+                    // No need to wait since these are positive states
+                    updateTorStatusUI(state)
+                    lastDisplayedTorState = state
+                    pendingTorState = null
+                }
+            }
         }
     }
 
@@ -151,14 +184,22 @@ class SettingsFragment : Fragment() {
     }
 
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
-        // Debounce UI updates to prevent flickering during rapid state transitions
-        // Cancel any pending update and schedule a new one after a short delay
+        // Record timestamp of this state change for smart debouncing
+        lastTorStateChangeTime = System.currentTimeMillis()
+
+        // Cancel any pending update and schedule a new one
         torUiUpdateHandler.removeCallbacks(torUiUpdateRunnable)
         pendingTorState = state
 
-        // Use a short delay (200ms) to allow rapid transitions to settle
-        // before updating the UI, while still feeling responsive to the user
-        torUiUpdateHandler.postDelayed(torUiUpdateRunnable, 200)
+        // SMART DEBOUNCING: Start checking immediately for CONNECTED,
+        // but wait 100ms for disconnected states to confirm they're real
+        val initialDelay = when (state) {
+            TorManager.TorState.CONNECTED,
+            TorManager.TorState.STARTING -> 0L  // Update immediately
+            else -> 100L  // Wait 100ms to filter oscillations
+        }
+
+        torUiUpdateHandler.postDelayed(torUiUpdateRunnable, initialDelay)
     }
 
     override fun onCreateView(
@@ -419,7 +460,10 @@ class SettingsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        TorManager.addStateListener(torStateListener)
+        // CRITICAL FIX: Don't notify immediately when adding listener during activity recreation.
+        // The initial state is already set up in setupTorControls() with proper debouncing.
+        // Immediate notification would cancel that debouncing and cause UI flickering.
+        TorManager.addStateListener(torStateListener, notifyImmediately = false)
 
         // Register preference change listener to sync Tor switch with preference updates
         requireContext().getSharedPreferences("DeutsiaRadioPrefs", Context.MODE_PRIVATE)
@@ -470,11 +514,18 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        // Update initial Tor status using the debounced path to prevent flickering
+        // Update initial Tor status using smart debouncing to prevent flickering
         // during rapid state transitions (e.g., Material You toggle activity recreation)
-        // This ensures the UI only updates once instead of twice (here + listener firing)
+        lastTorStateChangeTime = System.currentTimeMillis()
         pendingTorState = TorManager.state
-        torUiUpdateHandler.postDelayed(torUiUpdateRunnable, 200)
+
+        // Use smart debouncing: immediate for CONNECTED, 100ms filter for disconnected states
+        val initialDelay = when (TorManager.state) {
+            TorManager.TorState.CONNECTED,
+            TorManager.TorState.STARTING -> 0L
+            else -> 100L
+        }
+        torUiUpdateHandler.postDelayed(torUiUpdateRunnable, initialDelay)
 
         // Setup switch toggle listener
         setupTorSwitchListener()
