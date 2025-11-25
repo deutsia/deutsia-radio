@@ -98,7 +98,7 @@ class NowPlayingFragment : Fragment() {
             serviceBound = true
 
             // Sync UI state with service after reconnection (e.g., after Material You toggle)
-            // This ensures buffer bar and other UI elements are properly updated
+            // This ensures buffer bar, metadata, and other UI elements are properly updated
             radioService?.let { svc ->
                 val isPlaying = svc.isPlaying()
                 val isBuffering = svc.isBuffering()
@@ -108,6 +108,20 @@ class NowPlayingFragment : Fragment() {
 
                 // Update buffer bar visibility based on playing state
                 updateBufferBarVisibility(isPlaying)
+
+                // Restore metadata if available
+                val metadata = svc.getCurrentMetadata()
+                if (!metadata.isNullOrBlank()) {
+                    metadataText.text = metadata
+                    metadataText.visibility = View.VISIBLE
+                }
+
+                // Restore stream info if available
+                val bitrate = svc.getCurrentBitrate()
+                val codec = svc.getCurrentCodec()
+                if (bitrate > 0 || (!codec.isNullOrBlank() && codec != "Unknown")) {
+                    updateStreamInfo(bitrate, codec ?: "Unknown")
+                }
 
                 // Sync ViewModel state if needed
                 if (isPlaying != viewModel.isPlaying.value) {
@@ -491,8 +505,6 @@ class NowPlayingFragment : Fragment() {
                         diskCachePolicy(CachePolicy.DISABLED)
                     }
                 }
-
-                metadataText.visibility = View.GONE
             }
         }
 

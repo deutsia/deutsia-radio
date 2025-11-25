@@ -336,12 +336,12 @@ class RadiosFragment : Fragment() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val textView: TextView = view.findViewById(android.R.id.text1)
-            val radioButton: android.widget.RadioButton = view.findViewById(android.R.id.button1)
+            val radioButton: android.widget.RadioButton = view.findViewById(R.id.radio_button)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(
-                android.R.layout.select_dialog_singlechoice, parent, false
+                R.layout.item_genre_choice, parent, false
             )
             return ViewHolder(view)
         }
