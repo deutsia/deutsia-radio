@@ -41,7 +41,7 @@ object StationImportExport {
      * Export stations to CSV format
      */
     fun exportToCsv(stations: List<RadioStation>, outputStream: OutputStream) {
-        outputStream.bufferedWriter().use { writer ->
+        outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
             // Header row
             writer.write("name,url,proxyType,proxyHost,proxyPort,genre,coverArtUri,isLiked\n")
 
@@ -88,7 +88,7 @@ object StationImportExport {
             put("stations", jsonArray)
         }
 
-        outputStream.bufferedWriter().use { writer ->
+        outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
             writer.write(rootObj.toString(2))
         }
     }
@@ -97,7 +97,7 @@ object StationImportExport {
      * Export stations to M3U format
      */
     fun exportToM3u(stations: List<RadioStation>, outputStream: OutputStream) {
-        outputStream.bufferedWriter().use { writer ->
+        outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
             writer.write("#EXTM3U\n")
             writer.write("# I2P Radio Station Export\n\n")
 
@@ -137,7 +137,7 @@ object StationImportExport {
      * Export stations to PLS format
      */
     fun exportToPls(stations: List<RadioStation>, outputStream: OutputStream) {
-        outputStream.bufferedWriter().use { writer ->
+        outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
             writer.write("[playlist]\n")
             writer.write("NumberOfEntries=${stations.size}\n\n")
 
@@ -186,7 +186,7 @@ object StationImportExport {
         // Try to detect format from content
         val content = try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).readText()
+                BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8)).readText()
             } ?: return ImportResult(emptyList(), listOf("Could not open file"), null)
         } catch (e: Exception) {
             return ImportResult(emptyList(), listOf("Error reading file: ${e.message}"), null)
