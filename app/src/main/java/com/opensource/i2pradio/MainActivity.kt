@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Broadcast receiver for playback state and cover art changes
+    // Broadcast receiver for playback state, cover art, and like state changes
     private val playbackStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -79,6 +79,25 @@ class MainActivity : AppCompatActivity() {
                     val stationId = intent.getLongExtra(RadioService.EXTRA_STATION_ID, -1L)
                     // Update ViewModel which will trigger MiniPlayer update
                     viewModel.updateCoverArt(coverArtUri, stationId)
+                }
+                BROADCAST_LIKE_STATE_CHANGED -> {
+                    val isLiked = intent.getBooleanExtra(EXTRA_IS_LIKED, false)
+                    val stationId = intent.getLongExtra(EXTRA_STATION_ID, -1L)
+                    val radioBrowserUuid = intent.getStringExtra(EXTRA_RADIO_BROWSER_UUID)
+
+                    // Update the current station's like state if it matches
+                    viewModel.getCurrentStation()?.let { currentStation ->
+                        val isCurrentStation = if (!radioBrowserUuid.isNullOrEmpty()) {
+                            currentStation.radioBrowserUuid == radioBrowserUuid
+                        } else {
+                            currentStation.id == stationId
+                        }
+
+                        if (isCurrentStation) {
+                            viewModel.updateCurrentStationLikeState(isLiked)
+                            miniPlayerView.updateLikeState(isLiked)
+                        }
+                    }
                 }
             }
         }
@@ -169,6 +188,7 @@ class MainActivity : AppCompatActivity() {
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
+            addAction(BROADCAST_LIKE_STATE_CHANGED)
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(playbackStateReceiver, filter)
     }
@@ -329,6 +349,15 @@ class MainActivity : AppCompatActivity() {
                         updatedStation?.let {
                             miniPlayerView.updateLikeState(it.isLiked)
                             viewModel.updateCurrentStationLikeState(it.isLiked)
+
+                            // Broadcast like state change to all views
+                            val broadcastIntent = Intent(BROADCAST_LIKE_STATE_CHANGED).apply {
+                                putExtra(EXTRA_IS_LIKED, it.isLiked)
+                                putExtra(EXTRA_STATION_ID, it.id)
+                                putExtra(EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
+                            }
+                            LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(broadcastIntent)
+
                             // Show toast message for both like and unlike
                             if (it.isLiked) {
                                 Toast.makeText(
@@ -353,6 +382,15 @@ class MainActivity : AppCompatActivity() {
                         updatedStation?.let {
                             miniPlayerView.updateLikeState(it.isLiked)
                             viewModel.updateCurrentStationLikeState(it.isLiked)
+
+                            // Broadcast like state change to all views
+                            val broadcastIntent = Intent(BROADCAST_LIKE_STATE_CHANGED).apply {
+                                putExtra(EXTRA_IS_LIKED, it.isLiked)
+                                putExtra(EXTRA_STATION_ID, it.id)
+                                putExtra(EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
+                            }
+                            LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(broadcastIntent)
+
                             // Show toast message for both like and unlike
                             if (it.isLiked) {
                                 Toast.makeText(
@@ -442,6 +480,14 @@ class MainActivity : AppCompatActivity() {
             unbindService(serviceConnection)
             isServiceBound = false
         }
+    }
+
+    companion object {
+        // Broadcast action for like state changes
+        const val BROADCAST_LIKE_STATE_CHANGED = "com.opensource.i2pradio.LIKE_STATE_CHANGED"
+        const val EXTRA_STATION_ID = "station_id"
+        const val EXTRA_RADIO_BROWSER_UUID = "radio_browser_uuid"
+        const val EXTRA_IS_LIKED = "is_liked"
     }
 
     private inner class ViewPagerAdapter(activity: AppCompatActivity) :

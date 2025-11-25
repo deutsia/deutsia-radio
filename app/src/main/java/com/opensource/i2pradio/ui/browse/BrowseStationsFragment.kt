@@ -1,7 +1,10 @@
 package com.opensource.i2pradio.ui.browse
 
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -24,6 +28,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
+import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
@@ -56,6 +61,16 @@ class BrowseStationsFragment : Fragment() {
     private var searchDebounceRunnable: Runnable? = null
     private val searchDebounceDelay = 500L
     private var isManualSearchClear = false
+
+    // Broadcast receiver for like state changes from other views
+    private val likeStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == MainActivity.BROADCAST_LIKE_STATE_CHANGED) {
+                // Refresh the liked UUIDs to update the UI
+                viewModel.refreshLikedAndSavedUuids()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -380,6 +395,14 @@ class BrowseStationsFragment : Fragment() {
                     radioViewModel.updateCurrentStationLikeState(updatedStation?.isLiked ?: false)
                 }
             }
+
+            // Broadcast like state change to all views
+            val broadcastIntent = Intent(MainActivity.BROADCAST_LIKE_STATE_CHANGED).apply {
+                putExtra(MainActivity.EXTRA_IS_LIKED, updatedStation?.isLiked ?: false)
+                putExtra(MainActivity.EXTRA_STATION_ID, updatedStation?.id ?: -1L)
+                putExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID, station.stationuuid)
+            }
+            LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
         }
     }
 
@@ -431,6 +454,19 @@ class BrowseStationsFragment : Fragment() {
                 }
             }
             .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Register broadcast receiver for like state changes
+        val filter = IntentFilter(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(likeStateReceiver, filter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Unregister broadcast receiver
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(likeStateReceiver)
     }
 
     override fun onDestroyView() {

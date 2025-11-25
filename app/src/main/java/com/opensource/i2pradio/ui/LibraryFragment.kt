@@ -1,11 +1,15 @@
 package com.opensource.i2pradio.ui
 
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
@@ -33,6 +37,7 @@ import com.opensource.i2pradio.util.loadSecure
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
+import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
@@ -64,6 +69,16 @@ class LibraryFragment : Fragment() {
 
     // Selection mode
     private var actionMode: ActionMode? = null
+
+    // Broadcast receiver for like state changes from other views
+    private val likeStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == MainActivity.BROADCAST_LIKE_STATE_CHANGED) {
+                // Refresh the adapter to update like icons
+                adapter.notifyDataSetChanged()
+            }
+        }
+    }
 
     // Predefined genres list (sorted alphabetically)
     private val allGenres = listOf(
@@ -439,6 +454,15 @@ class LibraryFragment : Fragment() {
                     if (viewModel.getCurrentStation()?.id == it.id) {
                         viewModel.updateCurrentStationLikeState(it.isLiked)
                     }
+
+                    // Broadcast like state change to all views
+                    val broadcastIntent = Intent(MainActivity.BROADCAST_LIKE_STATE_CHANGED).apply {
+                        putExtra(MainActivity.EXTRA_IS_LIKED, it.isLiked)
+                        putExtra(MainActivity.EXTRA_STATION_ID, it.id)
+                        putExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID, it.radioBrowserUuid)
+                    }
+                    LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
+
                     // Show toast message for both like and unlike
                     if (it.isLiked) {
                         Toast.makeText(
@@ -594,6 +618,19 @@ class LibraryFragment : Fragment() {
                 actionMode?.finish()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Register broadcast receiver for like state changes
+        val filter = IntentFilter(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(likeStateReceiver, filter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Unregister broadcast receiver
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(likeStateReceiver)
     }
 }
 

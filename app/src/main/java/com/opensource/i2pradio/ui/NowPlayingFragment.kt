@@ -334,6 +334,15 @@ class NowPlayingFragment : Fragment() {
                             updatedStation?.let {
                                 viewModel.updateCurrentStationLikeState(it.isLiked)
                                 updateLikeButton(it.isLiked)
+
+                                // Broadcast like state change to all views
+                                val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_LIKE_STATE_CHANGED).apply {
+                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_IS_LIKED, it.isLiked)
+                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_STATION_ID, it.id)
+                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
+                                }
+                                LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
+
                                 // Show toast message
                                 if (it.isLiked) {
                                     Toast.makeText(
@@ -358,6 +367,15 @@ class NowPlayingFragment : Fragment() {
                             updatedStation?.let {
                                 viewModel.updateCurrentStationLikeState(it.isLiked)
                                 updateLikeButton(it.isLiked)
+
+                                // Broadcast like state change to all views
+                                val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_LIKE_STATE_CHANGED).apply {
+                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_IS_LIKED, it.isLiked)
+                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_STATION_ID, it.id)
+                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
+                                }
+                                LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
+
                                 // Show toast message
                                 if (it.isLiked) {
                                     Toast.makeText(
