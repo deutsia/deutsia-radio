@@ -288,10 +288,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             when (val result = repository.getCountries()) {
                 is RadioBrowserResult.Success -> {
-                    // Filter to countries with at least 10 stations and sort alphabetically
-                    _countries.value = result.data
-                        .filter { it.stationCount >= 10 }
-                        .sortedBy { it.name }
+                    // Sort alphabetically, show all countries regardless of station count
+                    _countries.value = result.data.sortedBy { it.name }
                 }
                 is RadioBrowserResult.Error -> {
                     // Silently fail - countries are optional
