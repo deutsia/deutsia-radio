@@ -151,6 +151,7 @@ class SettingsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
         val themeButton = view.findViewById<MaterialButton>(R.id.themeButton)
+        val colorSchemeButton = view.findViewById<MaterialButton>(R.id.colorSchemeButton)
         val githubButton = view.findViewById<MaterialButton>(R.id.githubButton)
         val materialYouSwitch = view.findViewById<MaterialSwitch>(R.id.materialYouSwitch)
         val materialYouContainer = view.findViewById<View>(R.id.materialYouContainer)
@@ -204,6 +205,14 @@ class SettingsFragment : Fragment() {
         // Theme selector
         themeButton.setOnClickListener {
             showThemeDialog(themeButton)
+        }
+
+        // Update color scheme button text
+        updateColorSchemeButtonText(colorSchemeButton)
+
+        // Color scheme selector
+        colorSchemeButton.setOnClickListener {
+            showColorSchemeDialog(colorSchemeButton)
         }
 
         // GitHub button
@@ -798,6 +807,38 @@ class SettingsFragment : Fragment() {
                 AppCompatDelegate.setDefaultNightMode(newMode)
                 PreferencesHelper.saveThemeMode(requireContext(), newMode)
                 updateThemeButtonText(themeButton)
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun updateColorSchemeButtonText(button: MaterialButton) {
+        val currentScheme = PreferencesHelper.getColorScheme(requireContext())
+        button.text = when (currentScheme) {
+            "red" -> "Red"
+            "green" -> "Green"
+            "purple" -> "Purple"
+            "orange" -> "Orange"
+            else -> "Blue"
+        }
+    }
+
+    private fun showColorSchemeDialog(colorSchemeButton: MaterialButton) {
+        val schemes = arrayOf("Blue (Default)", "Red", "Green", "Purple", "Orange")
+        val schemeValues = arrayOf("default", "red", "green", "purple", "orange")
+        val currentScheme = PreferencesHelper.getColorScheme(requireContext())
+        val selectedIndex = schemeValues.indexOf(currentScheme).coerceAtLeast(0)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Choose Color Scheme")
+            .setSingleChoiceItems(schemes, selectedIndex) { dialog, which ->
+                val newScheme = schemeValues[which]
+                PreferencesHelper.setColorScheme(requireContext(), newScheme)
+                updateColorSchemeButtonText(colorSchemeButton)
+                // Recreate activity to apply new color scheme
+                uiHandler.postDelayed({
+                    activity?.recreate()
+                }, 300)
                 dialog.dismiss()
             }
             .show()

@@ -320,30 +320,34 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun likeStation(station: RadioBrowserStation) {
+        // Check current like state before toggling
+        val wasLiked = viewModel.likedStationUuids.value?.contains(station.stationuuid) ?: false
+
         viewModel.toggleLike(station)
-        // Check the updated like state from the database and show toast
+
+        // Show appropriate toast based on the action performed
         lifecycleScope.launch {
             val updatedStation = repository.getStationInfoByUuid(station.stationuuid)
-            updatedStation?.let {
-                // Show toast message for both like and unlike
-                if (it.isLiked) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.station_saved, station.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.station_removed, station.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                // If this station is currently playing, update RadioViewModel to sync miniplayer/Now Playing
-                radioViewModel.getCurrentStation()?.let { currentStation ->
-                    if (currentStation.radioBrowserUuid == station.stationuuid) {
-                        radioViewModel.updateCurrentStationLikeState(it.isLiked)
-                    }
+            if (updatedStation != null && updatedStation.isLiked) {
+                // Station was added to library and liked
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.station_saved, station.name),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                // Station was removed from library (updatedStation is null or not liked)
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.station_removed, station.name),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            // If this station is currently playing, update RadioViewModel to sync miniplayer/Now Playing
+            radioViewModel.getCurrentStation()?.let { currentStation ->
+                if (currentStation.radioBrowserUuid == station.stationuuid) {
+                    radioViewModel.updateCurrentStationLikeState(updatedStation?.isLiked ?: false)
                 }
             }
         }

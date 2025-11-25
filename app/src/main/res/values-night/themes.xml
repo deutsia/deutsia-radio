@@ -36,4 +36,52 @@
         <item name="colorSurfaceContainerHigh">@color/md_theme_dark_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_dark_surfaceContainerHighest</item>
     </style>
+
+    <!-- Red Color Scheme Theme - Dark -->
+    <style name="Theme.I2PRadio.Red" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_red_dark_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_red_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_red_dark_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_red_dark_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_red_dark_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_red_dark_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_red_dark_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_red_dark_onSecondaryContainer</item>
+    </style>
+
+    <!-- Green Color Scheme Theme - Dark -->
+    <style name="Theme.I2PRadio.Green" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_green_dark_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_green_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_green_dark_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_green_dark_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_green_dark_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_green_dark_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_green_dark_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_green_dark_onSecondaryContainer</item>
+    </style>
+
+    <!-- Purple Color Scheme Theme - Dark -->
+    <style name="Theme.I2PRadio.Purple" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_purple_dark_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_purple_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_purple_dark_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_purple_dark_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_purple_dark_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_purple_dark_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_purple_dark_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_purple_dark_onSecondaryContainer</item>
+    </style>
+
+    <!-- Orange Color Scheme Theme - Dark -->
+    <style name="Theme.I2PRadio.Orange" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_orange_dark_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_orange_dark_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_orange_dark_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_orange_dark_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_orange_dark_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_orange_dark_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_orange_dark_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_orange_dark_onSecondaryContainer</item>
+    </style>
 </resources>

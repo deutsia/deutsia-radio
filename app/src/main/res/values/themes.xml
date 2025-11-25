@@ -39,6 +39,54 @@
 
     <style name="Theme.I2PRadio" parent="Base.Theme.I2PRadio" />
 
+    <!-- Red Color Scheme Theme -->
+    <style name="Theme.I2PRadio.Red" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_red_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_red_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_red_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_red_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_red_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_red_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_red_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_red_light_onSecondaryContainer</item>
+    </style>
+
+    <!-- Green Color Scheme Theme -->
+    <style name="Theme.I2PRadio.Green" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_green_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_green_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_green_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_green_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_green_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_green_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_green_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_green_light_onSecondaryContainer</item>
+    </style>
+
+    <!-- Purple Color Scheme Theme -->
+    <style name="Theme.I2PRadio.Purple" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_purple_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_purple_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_purple_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_purple_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_purple_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_purple_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_purple_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_purple_light_onSecondaryContainer</item>
+    </style>
+
+    <!-- Orange Color Scheme Theme -->
+    <style name="Theme.I2PRadio.Orange" parent="Base.Theme.I2PRadio">
+        <item name="colorPrimary">@color/md_theme_orange_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_orange_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_orange_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_orange_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_orange_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_orange_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_orange_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_orange_light_onSecondaryContainer</item>
+    </style>
+
     <!-- Mini Player rounded top corners -->
     <style name="ShapeAppearance.MiniPlayer" parent="">
         <item name="cornerFamily">rounded</item>

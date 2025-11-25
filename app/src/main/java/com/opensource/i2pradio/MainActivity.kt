@@ -112,9 +112,24 @@ class MainActivity : AppCompatActivity() {
         val savedTheme = PreferencesHelper.getThemeMode(this)
         AppCompatDelegate.setDefaultNightMode(savedTheme)
 
-        // Apply Material You dynamic colors if enabled (Android 12+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            PreferencesHelper.isMaterialYouEnabled(this)) {
+        // Apply color scheme theme (only if Material You is disabled)
+        // Material You takes precedence when enabled on Android 12+
+        val isMaterialYouEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                PreferencesHelper.isMaterialYouEnabled(this)
+
+        if (!isMaterialYouEnabled) {
+            // Apply custom color scheme based on user preference
+            val colorScheme = PreferencesHelper.getColorScheme(this)
+            val themeResId = when (colorScheme) {
+                "red" -> R.style.Theme_I2PRadio_Red
+                "green" -> R.style.Theme_I2PRadio_Green
+                "purple" -> R.style.Theme_I2PRadio_Purple
+                "orange" -> R.style.Theme_I2PRadio_Orange
+                else -> R.style.Theme_I2PRadio // default blue
+            }
+            setTheme(themeResId)
+        } else {
+            // Apply Material You dynamic colors if enabled (Android 12+)
             DynamicColors.applyToActivityIfAvailable(this)
         }
 
