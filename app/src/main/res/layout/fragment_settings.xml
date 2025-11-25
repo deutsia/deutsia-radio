@@ -200,7 +200,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -257,7 +259,9 @@
                     android:gravity="center_vertical"
                     android:paddingVertical="12dp"
                     android:layout_marginTop="8dp"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
 
                     <ImageView
                         android:id="@+id/torStatusIcon"
@@ -533,7 +537,7 @@
                             android:id="@+id/recordingDirectoryPath"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Default (Music/i2pradio)"
+                            android:text="Default (Music/deutsia_radio)"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:maxLines="1"

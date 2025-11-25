@@ -766,17 +766,17 @@ class SettingsFragment : Fragment() {
                 recordingDirectoryPath?.text = displayName
                 recordingDirectoryButton?.text = "Change"
             } catch (e: Exception) {
-                recordingDirectoryPath?.text = "Default (Music/i2pradio)"
+                recordingDirectoryPath?.text = "Default (Music/deutsia_radio)"
                 recordingDirectoryButton?.text = "Change"
             }
         } else {
-            recordingDirectoryPath?.text = "Default (Music/i2pradio)"
+            recordingDirectoryPath?.text = "Default (Music/deutsia_radio)"
             recordingDirectoryButton?.text = "Change"
         }
     }
 
     private fun showRecordingDirectoryDialog() {
-        val options = mutableListOf("Default (Music/i2pradio)", "Choose custom folder...")
+        val options = mutableListOf("Default (Music/deutsia_radio)", "Choose custom folder...")
         val savedUri = PreferencesHelper.getRecordingDirectoryUri(requireContext())
         if (savedUri != null) {
             options.add(1, "Clear custom folder")
