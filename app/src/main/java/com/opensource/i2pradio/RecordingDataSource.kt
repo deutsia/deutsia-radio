@@ -138,7 +138,6 @@ class RecordingDataSource(
             isRecordingActive: AtomicBoolean
         ): Thread {
             return Thread({
-                android.util.Log.d("RecordingDataSource", "Writer thread started")
                 var bufferedStream: BufferedOutputStream? = null
                 var currentOutputStream: OutputStream? = null
                 var bytesWrittenSinceFlush = 0
@@ -177,11 +176,9 @@ class RecordingDataSource(
 
                         // Exit if recording stopped and queue is drained
                         if (!isRecordingActive.get() && writeQueue.isEmpty() && outputStreamHolder.get() == null) {
-                            android.util.Log.d("RecordingDataSource", "Writer thread exiting - recording stopped")
                             break
                         }
                     } catch (e: InterruptedException) {
-                        android.util.Log.d("RecordingDataSource", "Writer thread interrupted")
                         break
                     } catch (e: Exception) {
                         android.util.Log.e("RecordingDataSource", "Error in writer thread", e)
@@ -194,7 +191,6 @@ class RecordingDataSource(
                 } catch (e: Exception) {
                     android.util.Log.e("RecordingDataSource", "Error flushing final buffer", e)
                 }
-                android.util.Log.d("RecordingDataSource", "Writer thread ended")
             }, "RecordingWriter").apply {
                 priority = Thread.MIN_PRIORITY // Low priority to not interfere with audio
             }

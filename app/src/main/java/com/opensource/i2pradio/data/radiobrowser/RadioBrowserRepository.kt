@@ -196,14 +196,12 @@ class RadioBrowserRepository(context: Context) {
                 if (!existing.isLiked) {
                     radioDao.toggleLike(existing.id)
                 }
-                Log.d(TAG, "Station already saved, toggled like: ${station.name}")
                 return@withContext existing.id
             }
 
             // Save new station with isLiked = true
             val radioStation = convertToRadioStation(station, asUserStation = true).copy(isLiked = true)
             val id = radioDao.insertStation(radioStation)
-            Log.d(TAG, "Saved and liked station: ${station.name} with ID: $id")
             id
         }
     }
@@ -224,13 +222,11 @@ class RadioBrowserRepository(context: Context) {
             // Check if already saved
             val existing = radioDao.getStationByRadioBrowserUuid(station.stationuuid)
             if (existing != null) {
-                Log.d(TAG, "Station already saved: ${station.name}")
                 return@withContext existing.id
             }
 
             val radioStation = convertToRadioStation(station, asUserStation)
             val id = radioDao.insertStation(radioStation)
-            Log.d(TAG, "Saved station: ${station.name} with ID: $id")
             id
         }
     }
@@ -272,7 +268,6 @@ class RadioBrowserRepository(context: Context) {
         withContext(Dispatchers.IO) {
             val radioStations = stations.map { convertToRadioStation(it, asUserStation = false) }
             radioDao.insertStations(radioStations)
-            Log.d(TAG, "Cached ${stations.size} stations")
         }
     }
 
@@ -283,7 +278,6 @@ class RadioBrowserRepository(context: Context) {
         withContext(Dispatchers.IO) {
             val cutoff = System.currentTimeMillis() - CACHE_TTL_MS
             radioDao.deleteStaleCachedStations(cutoff)
-            Log.d(TAG, "Cleaned up stale cached stations older than $cutoff")
         }
     }
 
@@ -321,10 +315,8 @@ class RadioBrowserRepository(context: Context) {
             val station = radioDao.getStationByRadioBrowserUuid(radioBrowserUuid)
             if (station != null) {
                 radioDao.deleteStation(station)
-                Log.d(TAG, "Deleted station: ${station.name}")
                 true
             } else {
-                Log.d(TAG, "Station not found for deletion: $radioBrowserUuid")
                 false
             }
         }
@@ -387,7 +379,6 @@ class RadioBrowserRepository(context: Context) {
                 if (existingCount > 0) {
                     // Update existing entry's timestamp
                     radioDao.updateBrowseHistoryTimestamp(station.stationuuid, timestamp)
-                    Log.d(TAG, "Updated browse history timestamp for: ${station.name}")
                 } else {
                     // Insert new entry
                     val browseHistory = BrowseHistory(
@@ -400,7 +391,6 @@ class RadioBrowserRepository(context: Context) {
                         genre = station.getPrimaryGenre()
                     )
                     radioDao.insertBrowseHistory(browseHistory)
-                    Log.d(TAG, "Added to browse history: ${station.name}")
 
                     // Clean up old entries to keep only 75 most recent
                     radioDao.deleteOldBrowseHistory()
@@ -417,7 +407,6 @@ class RadioBrowserRepository(context: Context) {
     suspend fun clearBrowseHistory() {
         withContext(Dispatchers.IO) {
             radioDao.clearBrowseHistory()
-            Log.d(TAG, "Cleared all browse history")
         }
     }
 }

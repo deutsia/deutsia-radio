@@ -63,7 +63,6 @@ object DefaultStations {
             stations.add(station)
         }
 
-        Log.d(TAG, "Loaded ${stations.size} bundled stations")
         return stations
     }
 
