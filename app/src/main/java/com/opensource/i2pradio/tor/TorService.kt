@@ -77,7 +77,6 @@ class TorService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START -> {
-                Log.d(TAG, "Starting Tor service...")
                 startForeground(NOTIFICATION_ID, createNotification(TorManager.TorState.STARTING))
                 TorManager.start(this) { success ->
                     if (!success) {
@@ -86,7 +85,6 @@ class TorService : Service() {
                 }
             }
             ACTION_STOP -> {
-                Log.d(TAG, "Stopping Tor service...")
                 TorManager.stop()
                 stopForeground(true)
                 stopSelf()

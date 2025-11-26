@@ -155,6 +155,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Restore state from savedInstanceState
+        savedInstanceState?.let {
+            miniPlayerManuallyClosed = it.getBoolean(STATE_MINI_PLAYER_CLOSED, false)
+            lastStationId = if (it.containsKey(STATE_LAST_STATION_ID)) {
+                it.getLong(STATE_LAST_STATION_ID)
+            } else null
+            lastStationUrl = it.getString(STATE_LAST_STATION_URL)
+        }
+
         repository = RadioRepository(this)
         radioBrowserRepository = RadioBrowserRepository(this)
 
@@ -488,6 +497,18 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_STATION_ID = "station_id"
         const val EXTRA_RADIO_BROWSER_UUID = "radio_browser_uuid"
         const val EXTRA_IS_LIKED = "is_liked"
+
+        // State persistence keys
+        private const val STATE_MINI_PLAYER_CLOSED = "mini_player_manually_closed"
+        private const val STATE_LAST_STATION_ID = "last_station_id"
+        private const val STATE_LAST_STATION_URL = "last_station_url"
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(STATE_MINI_PLAYER_CLOSED, miniPlayerManuallyClosed)
+        lastStationId?.let { outState.putLong(STATE_LAST_STATION_ID, it) }
+        lastStationUrl?.let { outState.putString(STATE_LAST_STATION_URL, it) }
     }
 
     private inner class ViewPagerAdapter(activity: AppCompatActivity) :

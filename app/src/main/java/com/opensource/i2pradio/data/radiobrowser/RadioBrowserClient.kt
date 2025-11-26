@@ -55,7 +55,6 @@ class RadioBrowserClient(private val context: Context) {
         val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(context)
         val torConnected = TorManager.isConnected()
 
-        Log.d(TAG, "Building HTTP client - ForceTorAll: $forceTorAll, ForceTorExceptI2P: $forceTorExceptI2P, TorEnabled: $torEnabled, TorConnected: $torConnected")
 
         // Only apply Force Tor settings if Tor integration itself is enabled
         // Route through Tor if Force Tor is enabled, Tor integration is enabled, and Tor is connected
@@ -64,7 +63,6 @@ class RadioBrowserClient(private val context: Context) {
             val socksPort = TorManager.getProxyPort()
 
             if (socksPort > 0) {
-                Log.d(TAG, "Routing RadioBrowser API through Tor SOCKS5 proxy at $socksHost:$socksPort")
                 builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(socksHost, socksPort)))
                 builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
                 builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
@@ -93,7 +91,6 @@ class RadioBrowserClient(private val context: Context) {
      */
     private fun cycleServer() {
         currentServerIndex = (currentServerIndex + 1) % API_SERVERS.size
-        Log.d(TAG, "Cycled to API server: ${API_SERVERS[currentServerIndex]}")
     }
 
     /**
@@ -108,7 +105,6 @@ class RadioBrowserClient(private val context: Context) {
                     val client = buildHttpClient()
                     val url = "${getApiBaseUrl()}$endpoint"
 
-                    Log.d(TAG, "API Request (attempt ${attempt + 1}): $url")
 
                     val request = Request.Builder()
                         .url(url)
@@ -142,7 +138,6 @@ class RadioBrowserClient(private val context: Context) {
                     }
 
                     val stations = parseStationsJson(body)
-                    Log.d(TAG, "Successfully parsed ${stations.size} stations")
                     return@withContext RadioBrowserResult.Success(stations)
 
                 } catch (e: Exception) {

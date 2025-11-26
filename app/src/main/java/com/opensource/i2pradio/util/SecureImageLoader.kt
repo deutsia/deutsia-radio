@@ -113,10 +113,8 @@ object SecureImageLoader {
 
             builder.okHttpClient(okHttpClient)
 
-            android.util.Log.d("SecureImageLoader",
                 "Created image loader with Tor proxy: ${config.host}:${config.port}")
         } else {
-            android.util.Log.d("SecureImageLoader",
                 "Created image loader without proxy (Tor not active or not required)")
         }
 

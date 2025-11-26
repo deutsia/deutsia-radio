@@ -69,38 +69,60 @@ object TorManager {
         ORBOT_NOT_INSTALLED
     }
 
-    private var _state: TorState = TorState.STOPPED
-    val state: TorState get() = _state
+    // Atomic state holder to prevent inconsistencies during updates
+    // All state changes happen atomically by replacing this entire object
+    private data class TorConnectionState(
+        val state: TorState = TorState.STOPPED,
+        val socksHost: String = "127.0.0.1",
+        val socksPort: Int = -1,
+        val httpPort: Int = -1,
+        val errorMessage: String? = null,
+        val connectionStartTime: Long = 0
+    )
 
-    private var _socksPort: Int = -1
-    val socksPort: Int get() = _socksPort
+    @Volatile
+    private var currentState = TorConnectionState()
 
-    private var _httpPort: Int = -1
-    val httpPort: Int get() = _httpPort
+    // Public accessors (maintain API compatibility)
+    val state: TorState get() = currentState.state
+    val socksPort: Int get() = currentState.socksPort
+    val httpPort: Int get() = currentState.httpPort
+    val socksHost: String get() = currentState.socksHost
+    val errorMessage: String? get() = currentState.errorMessage
+    val connectionDuration: Long get() {
+        val state = currentState
+        return if (state.state == TorState.CONNECTED && state.connectionStartTime > 0) {
+            System.currentTimeMillis() - state.connectionStartTime
+        } else 0
+    }
 
-    private var _socksHost: String = "127.0.0.1"
-    val socksHost: String get() = _socksHost
+    // Listeners for state changes (using WeakReferences to prevent memory leaks)
+    // Each listener is wrapped in WeakReference so if the owner is GC'd, listener is auto-removed
+    private data class WeakListener(
+        val ref: java.lang.ref.WeakReference<(TorState) -> Unit>,
+        val id: Int = System.identityHashCode(ref.get())
+    )
 
-    private var _errorMessage: String? = null
-    val errorMessage: String? get() = _errorMessage
-
-    // Connection start time for status display
-    private var _connectionStartTime: Long = 0
-    val connectionDuration: Long get() = if (_state == TorState.CONNECTED) System.currentTimeMillis() - _connectionStartTime else 0
-
-    // Listeners for state changes (thread-safe)
-    private val stateListeners = CopyOnWriteArrayList<(TorState) -> Unit>()
+    private val stateListeners = CopyOnWriteArrayList<WeakListener>()
 
     // Broadcast receiver for Orbot status updates
     private var orbotStatusReceiver: BroadcastReceiver? = null
     private var isReceiverRegistered = false
+    // Store application context to prevent activity leaks
+    @Volatile
+    private var appContext: android.content.Context? = null
 
     // Handler for periodic health checks
     private val healthCheckHandler = Handler(Looper.getMainLooper())
     private var healthCheckRunnable: Runnable? = null
 
     fun addStateListener(listener: (TorState) -> Unit, notifyImmediately: Boolean = true) {
-        stateListeners.add(listener)
+        // Clean up any dead references before adding
+        cleanupDeadListeners()
+
+        val weakListener = WeakListener(java.lang.ref.WeakReference(listener))
+        stateListeners.add(weakListener)
+
         // Immediately notify of current state (unless suppressed during initialization)
         if (notifyImmediately) {
             listener(_state)
@@ -108,30 +130,55 @@ object TorManager {
     }
 
     fun removeStateListener(listener: (TorState) -> Unit) {
-        stateListeners.remove(listener)
+        val id = System.identityHashCode(listener)
+        stateListeners.removeAll { it.id == id }
     }
 
-    private fun notifyStateChange(newState: TorState) {
-        val oldState = _state
-        _state = newState
+    private fun cleanupDeadListeners() {
+        stateListeners.removeAll { it.ref.get() == null }
+    }
 
-        // Track connection start time
+    /**
+     * Update Tor state atomically - all state changes in one operation
+     */
+    private fun updateState(
+        newState: TorState = currentState.state,
+        socksHost: String = currentState.socksHost,
+        socksPort: Int = currentState.socksPort,
+        httpPort: Int = currentState.httpPort,
+        errorMessage: String? = currentState.errorMessage
+    ) {
+        val oldState = currentState.state
+
+        // Calculate connection start time
+        val connectionStartTime = when {
+            newState == TorState.CONNECTED && oldState != TorState.CONNECTED -> System.currentTimeMillis()
+            newState == TorState.CONNECTED -> currentState.connectionStartTime
+            else -> 0
+        }
+
+        // Atomic state update - all fields updated together
+        currentState = TorConnectionState(
+            state = newState,
+            socksHost = socksHost,
+            socksPort = socksPort,
+            httpPort = httpPort,
+            errorMessage = errorMessage,
+            connectionStartTime = connectionStartTime
+        )
+
+        // Handle health checks
         if (newState == TorState.CONNECTED && oldState != TorState.CONNECTED) {
-            _connectionStartTime = System.currentTimeMillis()
             startHealthCheck()
         } else if (newState != TorState.CONNECTED) {
             stopHealthCheck()
         }
 
-        stateListeners.forEach { it(newState) }
-
-        // Enhanced logging for debugging Tor connectivity
-        Log.d(TAG, "===== TOR STATE CHANGE =====")
-        Log.d(TAG, "Tor state changed: $oldState -> $newState")
-        Log.d(TAG, "SOCKS proxy: $_socksHost:$_socksPort")
-        Log.d(TAG, "HTTP proxy port: $_httpPort")
-        Log.d(TAG, "Is connected: ${isConnected()}")
-        Log.d(TAG, "============================")
+        // Clean up dead references and notify alive listeners
+        cleanupDeadListeners()
+        stateListeners.forEach { weakListener ->
+            weakListener.ref.get()?.invoke(newState)
+        }
     }
 
     private fun startHealthCheck() {
@@ -154,23 +201,20 @@ object TorManager {
 
     private fun checkConnectionHealth() {
         Thread {
-            Log.d(TAG, "===== TOR HEALTH CHECK =====")
-            Log.d(TAG, "Checking SOCKS proxy at $_socksHost:$_socksPort")
             try {
                 val socket = java.net.Socket()
                 socket.connect(java.net.InetSocketAddress(_socksHost, _socksPort), 2000)
                 socket.close()
                 // Connection is healthy, no state change needed
-                Log.d(TAG, "Health check PASSED - Tor SOCKS proxy is responsive")
-                Log.d(TAG, "============================")
             } catch (e: Exception) {
                 Log.w(TAG, "Health check FAILED: ${e.message}")
-                Log.d(TAG, "============================")
                 Handler(Looper.getMainLooper()).post {
-                    if (_state == TorState.CONNECTED) {
+                    if (currentState.state == TorState.CONNECTED) {
                         Log.w(TAG, "Connection health check failed: ${e.message}")
-                        _errorMessage = "Tor connection lost. Please check Orbot."
-                        notifyStateChange(TorState.ERROR)
+                        updateState(
+                            newState = TorState.ERROR,
+                            errorMessage = "Tor connection lost. Please check Orbot."
+                        )
                     }
                 }
             }
@@ -217,26 +261,26 @@ object TorManager {
      * will be received via broadcast.
      */
     fun start(context: Context, onComplete: ((Boolean) -> Unit)? = null) {
-        if (_state == TorState.STARTING || _state == TorState.CONNECTED) {
-            Log.d(TAG, "Tor is already ${_state.name}")
-            onComplete?.invoke(_state == TorState.CONNECTED)
+        val state = currentState.state
+        if (state == TorState.STARTING || state == TorState.CONNECTED) {
+            onComplete?.invoke(state == TorState.CONNECTED)
             return
         }
 
         // Check if Orbot is installed
         if (!isOrbotInstalled(context)) {
             Log.w(TAG, "Orbot is not installed")
-            // CRITICAL: Clear port state when transitioning to ORBOT_NOT_INSTALLED
-            _socksPort = -1
-            _httpPort = -1
-            _errorMessage = "Orbot is not installed. Please install Orbot to use Tor."
-            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
+            updateState(
+                newState = TorState.ORBOT_NOT_INSTALLED,
+                socksPort = -1,
+                httpPort = -1,
+                errorMessage = "Orbot is not installed. Please install Orbot to use Tor."
+            )
             onComplete?.invoke(false)
             return
         }
 
-        notifyStateChange(TorState.STARTING)
-        _errorMessage = null
+        updateState(newState = TorState.STARTING, errorMessage = null)
 
         // Register receiver for Orbot status updates
         registerOrbotStatusReceiver(context, onComplete)
@@ -247,7 +291,6 @@ object TorManager {
             intent.setPackage(ORBOT_PACKAGE_NAME)
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
             context.sendBroadcast(intent)
-            Log.d(TAG, "Sent start request to Orbot")
 
             // Also try to launch Orbot activity if broadcast doesn't work
             try {
@@ -257,7 +300,6 @@ object TorManager {
                     context.startActivity(launchIntent)
                 }
             } catch (e: Exception) {
-                Log.d(TAG, "Could not launch Orbot activity (this is OK)", e)
             }
 
             // Set a timeout to check if Orbot responded
@@ -271,8 +313,10 @@ object TorManager {
 
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start Orbot", e)
-            _errorMessage = e.message ?: "Failed to start Orbot"
-            notifyStateChange(TorState.ERROR)
+            updateState(
+                newState = TorState.ERROR,
+                errorMessage = e.message ?: "Failed to start Orbot"
+            )
             onComplete?.invoke(false)
         }
     }
@@ -289,20 +333,22 @@ object TorManager {
                 socket.close()
 
                 // Connection successful - Orbot is running
-                _socksPort = DEFAULT_ORBOT_SOCKS_PORT
-                _httpPort = DEFAULT_ORBOT_HTTP_PORT
-                _socksHost = "127.0.0.1"
-
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
-                    Log.d(TAG, "Orbot is running on SOCKS port $_socksPort")
-                    notifyStateChange(TorState.CONNECTED)
+                    updateState(
+                        newState = TorState.CONNECTED,
+                        socksHost = "127.0.0.1",
+                        socksPort = DEFAULT_ORBOT_SOCKS_PORT,
+                        httpPort = DEFAULT_ORBOT_HTTP_PORT
+                    )
                     onComplete?.invoke(true)
                 }
             } catch (e: Exception) {
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                     Log.w(TAG, "Orbot SOCKS port not accessible: ${e.message}")
-                    _errorMessage = "Please open Orbot and start the Tor service"
-                    notifyStateChange(TorState.ERROR)
+                    updateState(
+                        newState = TorState.ERROR,
+                        errorMessage = "Please open Orbot and start the Tor service"
+                    )
                     onComplete?.invoke(false)
                 }
             }
@@ -311,40 +357,46 @@ object TorManager {
 
     /**
      * Register a broadcast receiver for Orbot status updates.
+     * Uses application context to prevent activity leaks.
      */
     private fun registerOrbotStatusReceiver(context: Context, onComplete: ((Boolean) -> Unit)?) {
         if (isReceiverRegistered) {
             return
         }
 
+        // Store application context to prevent leaks
+        appContext = context.applicationContext
+
         orbotStatusReceiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context?, intent: Intent?) {
                 if (intent?.action == ACTION_STATUS) {
                     val status = intent.getStringExtra(EXTRA_STATUS)
-                    Log.d(TAG, "Received Orbot status: $status")
 
                     when (status) {
                         STATUS_ON -> {
-                            _socksHost = intent.getStringExtra(EXTRA_SOCKS_PROXY_HOST) ?: "127.0.0.1"
-                            _socksPort = intent.getIntExtra(EXTRA_SOCKS_PROXY_PORT, DEFAULT_ORBOT_SOCKS_PORT)
-                            _httpPort = intent.getIntExtra(EXTRA_HTTP_PROXY_PORT, DEFAULT_ORBOT_HTTP_PORT)
+                            val host = intent.getStringExtra(EXTRA_SOCKS_PROXY_HOST) ?: "127.0.0.1"
+                            val socksPort = intent.getIntExtra(EXTRA_SOCKS_PROXY_PORT, DEFAULT_ORBOT_SOCKS_PORT)
+                            val httpPort = intent.getIntExtra(EXTRA_HTTP_PROXY_PORT, DEFAULT_ORBOT_HTTP_PORT)
 
-                            Log.d(TAG, "Orbot connected: SOCKS=$_socksHost:$_socksPort")
-                            notifyStateChange(TorState.CONNECTED)
+                            updateState(
+                                newState = TorState.CONNECTED,
+                                socksHost = host,
+                                socksPort = socksPort,
+                                httpPort = httpPort
+                            )
                             onComplete?.invoke(true)
                         }
                         STATUS_OFF -> {
-                            _socksPort = -1
-                            _httpPort = -1
-                            Log.d(TAG, "Orbot stopped")
-                            notifyStateChange(TorState.STOPPED)
+                            updateState(
+                                newState = TorState.STOPPED,
+                                socksPort = -1,
+                                httpPort = -1
+                            )
                         }
                         STATUS_STARTING -> {
-                            Log.d(TAG, "Orbot is starting...")
-                            notifyStateChange(TorState.STARTING)
+                            updateState(newState = TorState.STARTING)
                         }
                         STATUS_STOPPING -> {
-                            Log.d(TAG, "Orbot is stopping...")
                         }
                     }
                 }
@@ -352,11 +404,13 @@ object TorManager {
         }
 
         val filter = IntentFilter(ACTION_STATUS)
+        // Use application context to prevent activity leaks
+        val appCtx = appContext ?: context.applicationContext
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // Use RECEIVER_EXPORTED to receive broadcasts from Orbot (external app)
-            context.registerReceiver(orbotStatusReceiver, filter, Context.RECEIVER_EXPORTED)
+            appCtx.registerReceiver(orbotStatusReceiver, filter, Context.RECEIVER_EXPORTED)
         } else {
-            context.registerReceiver(orbotStatusReceiver, filter)
+            appCtx.registerReceiver(orbotStatusReceiver, filter)
         }
         isReceiverRegistered = true
     }
@@ -366,28 +420,35 @@ object TorManager {
      * Note: This doesn't stop Orbot itself - the user controls Orbot separately.
      */
     fun stop() {
-        Log.d(TAG, "Stopping Tor manager...")
-        _socksPort = -1
-        _httpPort = -1
-        _errorMessage = null
-        notifyStateChange(TorState.STOPPED)
-        Log.d(TAG, "Tor manager stopped")
+        updateState(
+            newState = TorState.STOPPED,
+            socksPort = -1,
+            httpPort = -1,
+            errorMessage = null
+        )
     }
 
     /**
      * Unregister the Orbot status receiver.
      * Call this when the app is being destroyed.
+     * Uses stored application context to prevent leaks.
      */
-    fun cleanup(context: Context) {
+    fun cleanup(context: Context = appContext ?: throw IllegalStateException("No context available")) {
         stopHealthCheck()
         if (isReceiverRegistered && orbotStatusReceiver != null) {
             try {
-                context.unregisterReceiver(orbotStatusReceiver)
+                // Use application context for unregistering (same context used for registration)
+                val ctx = appContext ?: context.applicationContext
+                ctx.unregisterReceiver(orbotStatusReceiver)
+            } catch (e: IllegalArgumentException) {
+                // Receiver was already unregistered - this is fine
             } catch (e: Exception) {
                 Log.w(TAG, "Error unregistering Orbot receiver", e)
+            } finally {
+                // Always mark as unregistered and clear reference
+                isReceiverRegistered = false
+                orbotStatusReceiver = null
             }
-            isReceiverRegistered = false
-            orbotStatusReceiver = null
         }
     }
 
@@ -410,12 +471,12 @@ object TorManager {
         // we're currently in a non-connected state. This prevents false positives
         // during activity recreation when PackageManager might be slow to respond
         // but Tor is actually running.
-        if (!isOrbotInstalled(context) && _state != TorState.CONNECTED) {
-            // CRITICAL: Clear port state when transitioning to ORBOT_NOT_INSTALLED
-            // to prevent UI showing leak warnings while ports are still set
-            _socksPort = -1
-            _httpPort = -1
-            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
+        if (!isOrbotInstalled(context) && currentState.state != TorState.CONNECTED) {
+            updateState(
+                newState = TorState.ORBOT_NOT_INSTALLED,
+                socksPort = -1,
+                httpPort = -1
+            )
         }
     }
 
@@ -428,7 +489,6 @@ object TorManager {
             val intent = Intent(ACTION_STATUS)
             intent.setPackage(ORBOT_PACKAGE_NAME)
             context.sendBroadcast(intent)
-            Log.d(TAG, "Requested Orbot status")
         } catch (e: Exception) {
             Log.w(TAG, "Failed to request Orbot status", e)
         }
@@ -442,21 +502,25 @@ object TorManager {
 
                 // Orbot is running
                 Handler(Looper.getMainLooper()).post {
-                    if (_state != TorState.CONNECTED) {
-                        _socksPort = DEFAULT_ORBOT_SOCKS_PORT
-                        _httpPort = DEFAULT_ORBOT_HTTP_PORT
-                        _socksHost = "127.0.0.1"
-                        notifyStateChange(TorState.CONNECTED)
+                    if (currentState.state != TorState.CONNECTED) {
+                        updateState(
+                            newState = TorState.CONNECTED,
+                            socksHost = "127.0.0.1",
+                            socksPort = DEFAULT_ORBOT_SOCKS_PORT,
+                            httpPort = DEFAULT_ORBOT_HTTP_PORT
+                        )
                     }
                 }
             } catch (e: Exception) {
                 // Orbot not running or not accessible - update state regardless of current state
                 Handler(Looper.getMainLooper()).post {
-                    if (_state == TorState.CONNECTED || _state == TorState.STARTING) {
-                        _socksPort = -1
-                        _httpPort = -1
-                        notifyStateChange(TorState.STOPPED)
-                        Log.d(TAG, "Tor socket check failed - marking as stopped")
+                    val state = currentState.state
+                    if (state == TorState.CONNECTED || state == TorState.STARTING) {
+                        updateState(
+                            newState = TorState.STOPPED,
+                            socksPort = -1,
+                            httpPort = -1
+                        )
                     }
                 }
             }
@@ -493,7 +557,8 @@ object TorManager {
      * Check if Tor is currently running and connected via Orbot.
      */
     fun isConnected(): Boolean {
-        return _state == TorState.CONNECTED && _socksPort > 0
+        val state = currentState
+        return state.state == TorState.CONNECTED && state.socksPort > 0
     }
 
     /**

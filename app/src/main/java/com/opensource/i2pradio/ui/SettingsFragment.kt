@@ -721,7 +721,6 @@ class SettingsFragment : Fragment() {
             action = RadioService.ACTION_STOP
         }
         requireContext().startService(stopIntent)
-        android.util.Log.d("SettingsFragment", "Stopped current stream due to proxy routing settings change")
     }
 
     private fun updateForceTorContainersVisibility(show: Boolean) {
