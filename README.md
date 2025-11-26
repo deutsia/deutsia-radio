@@ -1,4 +1,4 @@
-# <img src="assets/ic_launcher_monochrome.svg" alt="deutsia radio" height="1.2em" style="vertical-align: -0.15em;" /> deutsia radio
+# <img src="https://raw.githubusercontent.com/deutsia/deutsia-radio/main/assets/ic_launcher_monochrome.png" width="32" /> deutsia radio
 A privacy-focused multinet radio player built with Claude Code. Stream radio stations from clearnet, I2P, and TOR networks with advanced anonymity features.
 
 [Add main screenshot here]
