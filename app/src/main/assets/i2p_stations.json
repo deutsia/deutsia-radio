@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "description": "Curated I2P radio stations - privacy-focused streams accessible via I2P network",
+  "stations": [
+    {
+      "name": "Arav's Dwelling",
+      "streamUrl": "http://plkybcgxt4cdanot75cy3pbnqlbqcsrib2fmrpsnug4bqphqvfda.b32.i2p/live/stream.ogg",
+      "genre": "Pop",
+      "codec": "OGG",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Ayliva Radio",
+      "streamUrl": "http://wfrtnehsepy24l6hratffzcoysjddnwsjlk5dg46nbax2a6nz4bq.b32.i2p/radio",
+      "genre": "R&B",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "CoS Radio",
+      "streamUrl": "http://eba7h47sp5mmrew6ido6jkn75jhqoqa52slgx47fnpddb4d7hsrq.b32.i2p/stream.ogg",
+      "genre": "Rock",
+      "codec": "OGG",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Bushwacker History",
+      "streamUrl": "http://mrkssh4b2qkrf5hl4yxrwbtuowbmjugozaa7emaybnokw5jtcydq.b32.i2p/bushwacker.mp3",
+      "genre": "Educational",
+      "country": "Russia",
+      "countryCode": "RU",
+      "codec": "MP3",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "eQtv Ukrainian",
+      "streamUrl": "http://mrkssh4b2qkrf5hl4yxrwbtuowbmjugozaa7emaybnokw5jtcydq.b32.i2p/eqtv.mp3",
+      "genre": "News/Talk",
+      "country": "Ukraine",
+      "countryCode": "UA",
+      "codec": "MP3",
+      "coverArtUri": "https://equalit.ie/wp-content/uploads/2025/06/2025.png",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Hromadske Radio",
+      "streamUrl": "http://mrkssh4b2qkrf5hl4yxrwbtuowbmjugozaa7emaybnokw5jtcydq.b32.i2p/hromadske.mp3",
+      "genre": "News/Talk",
+      "country": "Ukraine",
+      "countryCode": "UA",
+      "codec": "MP3",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Rap Radio",
+      "streamUrl": "http://qynmpkz5ovhhmkmodvgpdm4npxihd5pqyusykg7rvhcee7pjzqbq.b32.i2p/radio",
+      "genre": "Hip-Hop",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "DarkStream",
+      "streamUrl": "http://ud3gcmvysjch4lbjr2khmhqpf7r2x5if4q43xkqdptl4k7lc4muq.b32.i2p/darkstream.mp3",
+      "genre": "Industrial",
+      "codec": "MP3",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "nERDS! IRC Radio",
+      "streamUrl": "http://tpbfxyluryodtfxdpwsfvw7fl35p5ezrjk3tlcv2atlmc4fl2ctq.b32.i2p/radio.ogg",
+      "genre": "Pop",
+      "codec": "OGG",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Lenin Speeches",
+      "streamUrl": "http://cv72xsje5ihg6e24atitmhyk2cbml6eggi6b6fjfh2vgw62gdpla.b32.i2p/",
+      "genre": "Spoken Word",
+      "country": "Russia",
+      "countryCode": "RU",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Rock Radio",
+      "streamUrl": "http://222eg5e4exnoddsmlrhhibigdn2u2gylggm75znethm4tlqbjxaa.b32.i2p/",
+      "genre": "Rock",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Ambientpsy",
+      "streamUrl": "http://r4diourtsel3qv7od5mgkpojagbzegsmunaoqyuyqg3jrkdsof4q.b32.i2p/psychill",
+      "genre": "Ambient",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Psyndora Psytrance",
+      "streamUrl": "http://r4diourtsel3qv7od5mgkpojagbzegsmunaoqyuyqg3jrkdsof4q.b32.i2p/psytrance",
+      "genre": "Psytrance",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Synthwave Radio",
+      "streamUrl": "http://r4diourtsel3qv7od5mgkpojagbzegsmunaoqyuyqg3jrkdsof4q.b32.i2p/synthwave",
+      "genre": "Synthwave",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    }
+  ]
+}
