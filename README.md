@@ -217,7 +217,7 @@ Force Tor modes enforce proxy-or-fail at the network layer. If Tor disconnects, 
 ![Select/mass delete shown](assets/resized_Screenshot_20251126-042744.png)  ![browse tab](assets/resized_Screenshot_20251126-085627.png ) ![Language search in browse tab](assets/resized_Screenshot_20251126-045342.png) 
 ## License
 
-[Add license]
+Apache License 2.0 - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
