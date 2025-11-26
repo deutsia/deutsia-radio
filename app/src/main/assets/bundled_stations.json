@@ -25,10 +25,14 @@
       "proxyPort": 9050
     },
     {
-      "name": "Aktuelle HITS",
+      "name": "Aktuelle HITS 24/7",
       "streamUrl": "https://rautemusik.stream43.radiohost.de/breakz",
       "genre": "Dance",
-      "coverArtUri": "https://i.ibb.co/3mtCKLC/aktHits.jpg"
+      "coverArtUri": "https://i.ibb.co/3mtCKLC/aktHits.jpg",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
     },
     {
       "name": "BBC World Service",
@@ -38,13 +42,21 @@
       "countryCode": "GB",
       "coverArtUri": "http://cdn-profiles.tunein.com/s24948/images/logoq.jpg",
       "bitrate": 96,
-      "codec": "MP3"
+      "codec": "MP3",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
     },
     {
       "name": "MANGORADIO",
       "streamUrl": "https://mangoradio.stream.laut.fm/mangoradio",
       "genre": "Music",
-      "coverArtUri": "https://mangoradio.de/wp-content/uploads/cropped-Logo-192x192.webp"
+      "coverArtUri": "https://mangoradio.de/wp-content/uploads/cropped-Logo-192x192.webp",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
     }
   ]
 }
