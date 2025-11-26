@@ -1487,6 +1487,11 @@ class RadioService : Service() {
             // This ensures old player IDLE states can clear buffering animations again
             isStartingNewStream = false
         }
+        } catch (e: Exception) {
+            android.util.Log.e("RadioService", "Error in playStream", e)
+            isStartingNewStream = false
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+        }
     }
 
     private fun scheduleReconnect() {
