@@ -19,7 +19,7 @@ import com.opensource.i2pradio.R
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -143,7 +143,7 @@ class AddEditRadioDialog : DialogFragment() {
         // Load station data if editing
         val stationId = arguments?.getLong("station_id", -1L) ?: -1L
         if (stationId != -1L) {
-            CoroutineScope(Dispatchers.Main).launch {
+            lifecycleScope.launch(Dispatchers.Main) {
                 val station = repository.getStationById(stationId)
                 station?.let {
                     stationToEdit = it
@@ -218,7 +218,7 @@ class AddEditRadioDialog : DialogFragment() {
                         isPreset = stationToEdit?.isPreset ?: false
                     )
 
-                    CoroutineScope(Dispatchers.IO).launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         if (stationToEdit == null) {
                             repository.insertStation(station)
                         } else {

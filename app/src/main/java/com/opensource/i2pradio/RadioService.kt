@@ -36,6 +36,9 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
@@ -74,12 +77,19 @@ class RadioService : Service() {
     private var reconnectAttempts = 0
     private val maxReconnectAttempts = 10
 
+    // Service-scoped coroutine scope that gets cancelled in onDestroy
+    // Prevents coroutine leaks when service is destroyed
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     // Store OkHttp client for proper cleanup to prevent memory leaks
-    private var currentOkHttpClient: OkHttpClient? = null
+    // @Volatile ensures visibility across threads when rapidly switching streams
+    @Volatile private var currentOkHttpClient: OkHttpClient? = null
+    private val okHttpClientLock = Any()
 
     // Flag to track when we're switching between streams
     // Prevents old player's IDLE state from clearing buffering animation during stream switch
-    private var isStartingNewStream = false
+    // AtomicBoolean ensures thread-safe access from player callbacks and UI thread
+    private val isStartingNewStream = AtomicBoolean(false)
 
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: android.media.AudioFocusRequest? = null
@@ -281,7 +291,7 @@ class RadioService : Service() {
 
         // Load cover art if available
         if (!coverArtUri.isNullOrEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
+            serviceScope.launch(Dispatchers.IO) {
                 try {
                     // Use SecureImageLoader to route remote URLs through Tor when Force Tor is enabled
                     // Local content URIs (file://, content://) bypass the proxy automatically
@@ -1323,7 +1333,7 @@ class RadioService : Service() {
 
             if (focusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 android.util.Log.w("RadioService", "Failed to gain audio focus")
-                isStartingNewStream = false  // Reset flag on early return
+                isStartingNewStream.set(false)  // Reset flag on early return
                 // Broadcast failure to UI so it can update the play button state
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification("Audio focus denied"))
@@ -1332,7 +1342,7 @@ class RadioService : Service() {
             hasAudioFocus = true
 
             // Set flag to prevent old player's IDLE state from clearing buffering animation
-            isStartingNewStream = true
+            isStartingNewStream.set(true)
 
             stopStream()
 
@@ -1387,26 +1397,28 @@ class RadioService : Service() {
 
             // Simple, clean OkHttp client - let ExoPlayer handle buffering
             // Store the client for proper cleanup to prevent memory leaks
-            currentOkHttpClient = if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
-                val javaProxyType = when (effectiveProxyType) {
-                    ProxyType.TOR -> Proxy.Type.SOCKS
-                    ProxyType.I2P -> Proxy.Type.HTTP
-                    ProxyType.NONE -> Proxy.Type.DIRECT
+            // Synchronized to prevent race conditions when rapidly switching streams
+            val okHttpClient = synchronized(okHttpClientLock) {
+                currentOkHttpClient = if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
+                    val javaProxyType = when (effectiveProxyType) {
+                        ProxyType.TOR -> Proxy.Type.SOCKS
+                        ProxyType.I2P -> Proxy.Type.HTTP
+                        ProxyType.NONE -> Proxy.Type.DIRECT
+                    }
+                    android.util.Log.d("RadioService", "Using ${effectiveProxyType.name} proxy: $effectiveProxyHost:$effectiveProxyPort")
+                    OkHttpClient.Builder()
+                        .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .build()
+                } else {
+                    OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .build()
                 }
-                android.util.Log.d("RadioService", "Using ${effectiveProxyType.name} proxy: $effectiveProxyHost:$effectiveProxyPort")
-                OkHttpClient.Builder()
-                    .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
-                    .connectTimeout(60, TimeUnit.SECONDS)
-                    .readTimeout(60, TimeUnit.SECONDS)
-                    .build()
-            } else {
-                OkHttpClient.Builder()
-                    .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .build()
+                currentOkHttpClient!!
             }
-
-            val okHttpClient = currentOkHttpClient!!
 
             // Direct data source - no wrapper, no middleware
             // This is the key simplification: let the stream go directly to ExoPlayer
@@ -1445,7 +1457,7 @@ class RadioService : Service() {
 
                 // Reset flag now that new player is set up
                 // The new player's state changes will handle buffering broadcasts from now on
-                isStartingNewStream = false
+                isStartingNewStream.set(false)
 
                 addListener(object : Player.Listener {
                     override fun onPlayerError(error: PlaybackException) {
@@ -1496,7 +1508,7 @@ class RadioService : Service() {
                                 android.util.Log.d("RadioService", "Player idle")
                                 // Don't clear buffering state if we're switching to a new stream
                                 // (the old player going IDLE shouldn't affect new stream's loading animation)
-                                if (!isStartingNewStream) {
+                                if (!isStartingNewStream.get()) {
                                     broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                                 }
                             }
@@ -1549,7 +1561,7 @@ class RadioService : Service() {
 
         } catch (e: Exception) {
             android.util.Log.e("RadioService", "Error playing stream", e)
-            isStartingNewStream = false  // Reset flag on exception
+            isStartingNewStream.set(false)  // Reset flag on exception
             // Broadcast failure to UI
             broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
             scheduleReconnect()
@@ -1621,20 +1633,23 @@ class RadioService : Service() {
         player = null
 
         // Clean up OkHttp client resources to prevent memory leaks
-        currentOkHttpClient?.let { client ->
-            try {
-                // Shutdown dispatcher to stop background threads
-                client.dispatcher.executorService.shutdown()
-                // Evict all connections from the pool
-                client.connectionPool.evictAll()
-                // Close the cache if present
-                client.cache?.close()
-                android.util.Log.d("RadioService", "OkHttp client resources cleaned up")
-            } catch (e: Exception) {
-                android.util.Log.w("RadioService", "Error cleaning up OkHttp client: ${e.message}")
+        // Synchronized to prevent race conditions when rapidly switching streams
+        synchronized(okHttpClientLock) {
+            currentOkHttpClient?.let { client ->
+                try {
+                    // Shutdown dispatcher to stop background threads
+                    client.dispatcher.executorService.shutdown()
+                    // Evict all connections from the pool
+                    client.connectionPool.evictAll()
+                    // Close the cache if present
+                    client.cache?.close()
+                    android.util.Log.d("RadioService", "OkHttp client resources cleaned up")
+                } catch (e: Exception) {
+                    android.util.Log.w("RadioService", "Error cleaning up OkHttp client: ${e.message}")
+                }
             }
+            currentOkHttpClient = null
         }
-        currentOkHttpClient = null
 
         // Properly abandon audio focus with the correct listener/request
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1934,5 +1949,7 @@ class RadioService : Service() {
             release()
         }
         mediaSession = null
+        // Cancel service-scoped coroutines to prevent leaks
+        serviceScope.cancel()
     }
 }
