@@ -302,6 +302,14 @@ object StationImportExport {
     }
 
     /**
+     * Import stations from JSON content (public convenience method)
+     */
+    fun importFromJson(content: String): ImportResult {
+        val errors = mutableListOf<String>()
+        return importFromJson(content, errors)
+    }
+
+    /**
      * Import stations from JSON content
      */
     private fun importFromJson(content: String, errors: MutableList<String>): ImportResult {
