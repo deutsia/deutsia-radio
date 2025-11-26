@@ -1219,72 +1219,71 @@ class RadioService : Service() {
     }
 
     private fun playStream(streamUrl: String, proxyHost: String, proxyPort: Int, proxyType: ProxyType = ProxyType.NONE) {
-        try {
-            // Check Force Tor settings FIRST - bulletproof mode
-            val forceTorAll = PreferencesHelper.isForceTorAll(this)
-            val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
-            val isI2PStream = proxyType == ProxyType.I2P || streamUrl.contains(".i2p")
+        // Check Force Tor settings FIRST - bulletproof mode
+        val forceTorAll = PreferencesHelper.isForceTorAll(this)
+        val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
+        val isI2PStream = proxyType == ProxyType.I2P || streamUrl.contains(".i2p")
 
-            // NETWORK ROUTING LOG - For debugging Tor/leak detection
+        // NETWORK ROUTING LOG - For debugging Tor/leak detection
 
-            // BULLETPROOF: If Force Tor All is enabled, Tor MUST be connected or we fail
-            if (forceTorAll && !TorManager.isConnected()) {
-                android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
-                isStartingNewStream = false  // Reset flag on early return
-                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
-                return
-            }
+        // BULLETPROOF: If Force Tor All is enabled, Tor MUST be connected or we fail
+        if (forceTorAll && !TorManager.isConnected()) {
+            android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
+            isStartingNewStream = false  // Reset flag on early return
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+            startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
+            return
+        }
 
-            // BULLETPROOF: If Force Tor Except I2P is enabled and this is NOT an I2P stream, Tor MUST be connected
-            if (forceTorExceptI2P && !isI2PStream && !TorManager.isConnected()) {
-                android.util.Log.e("RadioService", "FORCE TOR (except I2P): Tor not connected - BLOCKING non-I2P stream")
-                isStartingNewStream = false  // Reset flag on early return
-                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
-                return
-            }
+        // BULLETPROOF: If Force Tor Except I2P is enabled and this is NOT an I2P stream, Tor MUST be connected
+        if (forceTorExceptI2P && !isI2PStream && !TorManager.isConnected()) {
+            android.util.Log.e("RadioService", "FORCE TOR (except I2P): Tor not connected - BLOCKING non-I2P stream")
+            isStartingNewStream = false  // Reset flag on early return
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+            startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
+            return
+        }
 
-            // Request audio focus with proper listener to handle interruptions
-            val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                // Use AudioFocusRequest for API 26+
-                audioFocusRequest = android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                    .setAudioAttributes(
-                        android.media.AudioAttributes.Builder()
-                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
-                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .build()
-                    )
-                    .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener(audioFocusChangeListener, handler)
-                    .build()
-                audioManager.requestAudioFocus(audioFocusRequest!!)
-            } else {
-                // Legacy audio focus request for older APIs
-                @Suppress("DEPRECATION")
-                audioManager.requestAudioFocus(
-                    audioFocusChangeListener,
-                    AudioManager.STREAM_MUSIC,
-                    AudioManager.AUDIOFOCUS_GAIN
+        // Request audio focus with proper listener to handle interruptions
+        val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Use AudioFocusRequest for API 26+
+            audioFocusRequest = android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(
+                    android.media.AudioAttributes.Builder()
+                        .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
                 )
-            }
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(audioFocusChangeListener, handler)
+                .build()
+            audioManager.requestAudioFocus(audioFocusRequest!!)
+        } else {
+            // Legacy audio focus request for older APIs
+            @Suppress("DEPRECATION")
+            audioManager.requestAudioFocus(
+                audioFocusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN
+            )
+        }
 
-            if (focusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                android.util.Log.w("RadioService", "Failed to gain audio focus")
-                isStartingNewStream = false  // Reset flag on early return
-                // Broadcast failure to UI so it can update the play button state
-                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                startForeground(NOTIFICATION_ID, createNotification("Audio focus denied"))
-                return
-            }
-            hasAudioFocus = true
+        if (focusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            android.util.Log.w("RadioService", "Failed to gain audio focus")
+            isStartingNewStream = false  // Reset flag on early return
+            // Broadcast failure to UI so it can update the play button state
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+            startForeground(NOTIFICATION_ID, createNotification("Audio focus denied"))
+            return
+        }
+        hasAudioFocus = true
 
-            // Set flag to prevent old player's IDLE state from clearing buffering animation
-            // Using try-finally to ensure flag is always reset even if setup fails
-            isStartingNewStream = true
+        // Set flag to prevent old player's IDLE state from clearing buffering animation
+        // Using try-finally to ensure flag is always reset even if setup fails
+        isStartingNewStream = true
 
-            try {
-                stopStream()
+        try {
+            stopStream()
 
             // Determine proxy configuration with Force Tor enforcement
             // BULLETPROOF: Force Tor settings override normal proxy logic
