@@ -9,22 +9,19 @@ A privacy-focused, anti-censorship multinet radio player built with Claude Code.
 - Force Tor modes with fail-safe leak prevention
 - Per-station proxy configuration (Tor SOCKS5, I2P HTTP, custom)
 - Instant Orbot broadcast detection (< 100ms disconnect response)
-- 30-second health checks for silent failures
 - Automatic stream termination on proxy changes
 - Stream recording with automatic file management
-- Record across station switches (continuous recording)
 - Background playback with media controls
 - Sleep timer
 - Equalizer with customizable bands
 - Favorites and station library management
 - Browse by genre, country, language
-- Import/Export stations (CSV, JSON, M3U, PLS)
+- Import/Export stations
 - Curated I2P and Tor station lists
 - Material You dynamic theming (Android 12+)
 - 5 color schemes (Blue, Peach, Green, Purple, Orange)
 - Light/Dark/System theme modes
 - No tracking, analytics, telemetry, or ads
-- Local database (Room) - no cloud sync
 - Open source
 
 ## Tor Integration
@@ -47,7 +44,7 @@ Every 30 seconds, a socket connection test runs against 127.0.0.1:9050. If this 
 3. Tap "Start" to connect to Tor
 4. Wait for "Connected" status
 
-Orbot provides the Tor daemon - deutsia radio connects to it as a client.
+Orbot provides the Tor daemon - deutsia radio connects to it as a client. Note: deutsia radio connects to Orbot at the application level. This means that unless you've configured Orbot to be a full device VPN, your connection to other apps like Spotify or Chrome will be from your residential ip address. 
 
 ## Force Tor Protection
 
@@ -65,7 +62,7 @@ Routes clearnet through Tor, I2P streams through I2P proxy:
 - Clearnet streams → Tor (127.0.0.1:9050)
 - .i2p domains → I2P HTTP proxy (127.0.0.1:4444)
 - RadioBrowser API → Tor
-- Album art → Tor
+- Album art → Tor (local art loaded locally)
 
 ### How Force Tor Protects You
 
@@ -107,10 +104,9 @@ The broadcast is instant. The health check is a backup for edge cases where Orbo
 I2P streams (.i2p domains) use an HTTP proxy on port 4444.
 
 **Setup**
-1. Install I2P router (I2PD recommended for Android, or Java I2P)
-2. Start I2P and wait for it to integrate into the network
-3. Ensure HTTP proxy is running on 127.0.0.1:4444
-4. In deutsia radio, import I2P station list from Settings
+1. Install I2P for Android from wherever you get your apps (F-droid: https://f-droid.org/en/packages/net.i2p.android.router/) 
+2. Start I2P and wait for it to show "I2P HTTP Proxy" under tunnels ~50s
+3. Choose a custom I2P radio station to play or import I2P station list from Settings
 5. Stations with .i2p URLs automatically use the I2P proxy
 
 When Force Tor Except I2P is enabled, .i2p streams bypass Tor and use the I2P proxy directly. All other traffic goes through Tor.
@@ -126,7 +122,7 @@ You can configure custom proxies per-station:
 
 **Configuration**
 1. Add or edit a station
-2. Set proxy type (NONE, I2P, TOR)
+2. Set proxy type to I2P
 3. Set proxy host (e.g., 127.0.0.1)
 4. Set proxy port (e.g., 9050 for Tor, 4444 for I2P)
 
@@ -161,7 +157,7 @@ Result    - No leak, forced re-connection
 
 **Does Force Tor slow down streams?**
 
-Yes. Tor adds latency (typically 200-1000ms depending on circuit). Buffering may take longer. This is the cost of anonymity.
+Yes. Tor adds some latency when intially loading streams. It's quite negliable and there is no difference in experience from using clearnet to load streams after it's loaded.
 
 **Can I use Force Tor with I2P stations?**
 
@@ -169,7 +165,7 @@ Yes. Use "Force Tor Except I2P" mode. This routes clearnet through Tor but lets 
 
 **What if I don't have Orbot installed?**
 
-Force Tor modes require Orbot. If Orbot is not installed, Force Tor settings will block stream playback. Install Orbot to use these features.
+Force Tor modes require Orbot. If Orbot is not installed, Force Tor settings will block stream playback. However, you can access Tor stations and browse clearnet radios from Tor using alternative Tor device vpns like InviZible Pro. 
 
 **How do health checks work?**
 
@@ -178,6 +174,10 @@ Every 30 seconds (when Tor is connected), the app opens a socket to 127.0.0.1:90
 **Why separate recording connections?**
 
 Recording uses a completely separate OkHttp client instance to prevent interference with playback. The recording client has its own connection pool, dispatcher, and proxy configuration. This ensures recording cannot cause audio glitches.
+
+**Do clearnet stations block Tor requests?**
+
+Not that I personally know of, although I am sure some do. If you find a station that isn't loading it's more likely the station is down, rather you're being blocked. If you think that's not the issue, try setting a new identity within Orbot, or disabling Tor. 
 
 ## Requirements
 
@@ -222,7 +222,7 @@ Force Tor modes enforce proxy-or-fail at the network layer. If Tor disconnects, 
 
 - [RadioBrowser](https://www.radio-browser.info/) for station database
 - [Orbot](https://guardianproject.info/apps/org.torproject.android/) for Tor integration
-- [I2P Project](https://geti2p.net/) for anonymous networking
+- [I2P Project](https://geti2p.net/) for anonymous networking and android support
 - Built with [Claude Code](https://github.com/anthropics/claude-code)
 
 ## Support
