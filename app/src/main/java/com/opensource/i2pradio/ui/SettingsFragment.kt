@@ -61,6 +61,8 @@ class SettingsFragment : Fragment() {
 
     // Import/Export UI elements
     private var importStationsButton: MaterialButton? = null
+    private var importI2pStationsButton: MaterialButton? = null
+    private var importTorStationsButton: MaterialButton? = null
     private var exportStationsButton: MaterialButton? = null
     private lateinit var repository: RadioRepository
 
@@ -376,9 +378,17 @@ class SettingsFragment : Fragment() {
         // Import/Export stations
         repository = RadioRepository(requireContext())
         importStationsButton = view.findViewById(R.id.importStationsButton)
+        importI2pStationsButton = view.findViewById(R.id.importI2pStationsButton)
+        importTorStationsButton = view.findViewById(R.id.importTorStationsButton)
         exportStationsButton = view.findViewById(R.id.exportStationsButton)
         importStationsButton?.setOnClickListener {
             showImportDialog()
+        }
+        importI2pStationsButton?.setOnClickListener {
+            showImportCuratedListDialog("i2p")
+        }
+        importTorStationsButton?.setOnClickListener {
+            showImportCuratedListDialog("tor")
         }
         exportStationsButton?.setOnClickListener {
             showExportDialog()
@@ -945,6 +955,62 @@ class SettingsFragment : Fragment() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    private fun showImportCuratedListDialog(type: String) {
+        val (fileName, count, networkName) = when (type) {
+            "i2p" -> Triple("i2p_stations.json", 14, "I2P")
+            "tor" -> Triple("tor_stations.json", 3, "Tor")
+            else -> return
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Import $networkName Stations")
+            .setMessage("Import $count curated $networkName radio stations?\n\nThese stations are pre-configured with proxy settings and ready to use.")
+            .setPositiveButton("Import") { _, _ ->
+                importCuratedList(fileName, networkName)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun importCuratedList(fileName: String, networkName: String) {
+        val context = requireContext()
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // Load JSON from assets
+                val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+
+                // Parse using existing import utility
+                val result = StationImportExport.importFromJson(jsonString)
+
+                withContext(Dispatchers.Main) {
+                    if (!isAdded) return@withContext
+
+                    if (result.stations.isEmpty()) {
+                        Toast.makeText(
+                            context,
+                            "No stations found in $networkName list",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@withContext
+                    }
+
+                    // Import stations directly (no second confirmation needed)
+                    performImport(result.stations)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    if (!isAdded) return@withContext
+
+                    Toast.makeText(
+                        context,
+                        "Failed to import $networkName stations: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun showExportDialog() {
