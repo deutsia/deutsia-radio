@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "description": "Curated Tor radio stations - privacy-focused streams accessible via Tor network",
+  "stations": [
+    {
+      "name": "Arav's Dwelling",
+      "streamUrl": "http://wsmkgnmhmzqm7kyzv7jnzzafvgm7xlmlfvzhgorpapd5or2arnhuktqd.onion/live/stream.ogg",
+      "genre": "Pop",
+      "codec": "OGG",
+      "useProxy": true,
+      "proxyType": "TOR",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 9050
+    },
+    {
+      "name": "Lain Radio",
+      "streamUrl": "http://6z6g6lv4v7xhupvtjvo4jockd4af5dn47nrxcexu475tbhiflx6ln6ad.onion/radio/focus.mp3",
+      "genre": "Experimental",
+      "codec": "MP3",
+      "useProxy": true,
+      "proxyType": "TOR",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 9050
+    },
+    {
+      "name": "Rap Radio",
+      "streamUrl": "http://vlk5dt267mteudjamvzmsr5q5eaibxt7mhtklijacdjqgbxy7a5wegyd.onion/radio",
+      "genre": "Hip-Hop",
+      "useProxy": true,
+      "proxyType": "TOR",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 9050
+    }
+  ]
+}

@@ -1,186 +1,50 @@
 {
   "version": 1,
-  "description": "Bundled starter stations for deutsia radio",
+  "description": "Bundled starter stations for deutsia radio - featuring multinet (I2P, Tor, clearnet)",
   "stations": [
+    {
+      "name": "eQtv Ukrainian",
+      "streamUrl": "http://mrkssh4b2qkrf5hl4yxrwbtuowbmjugozaa7emaybnokw5jtcydq.b32.i2p/eqtv.mp3",
+      "genre": "News/Talk",
+      "country": "Ukraine",
+      "countryCode": "UA",
+      "codec": "MP3",
+      "coverArtUri": "https://equalit.ie/wp-content/uploads/2025/06/2025.png",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    },
+    {
+      "name": "Rap Radio",
+      "streamUrl": "http://vlk5dt267mteudjamvzmsr5q5eaibxt7mhtklijacdjqgbxy7a5wegyd.onion/radio",
+      "genre": "Hip-Hop",
+      "useProxy": true,
+      "proxyType": "TOR",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 9050
+    },
+    {
+      "name": "Aktuelle HITS",
+      "streamUrl": "https://rautemusik.stream43.radiohost.de/breakz",
+      "genre": "Dance",
+      "coverArtUri": "https://i.ibb.co/3mtCKLC/aktHits.jpg"
+    },
     {
       "name": "BBC World Service",
       "streamUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
       "genre": "News",
       "country": "United Kingdom",
       "countryCode": "GB",
+      "coverArtUri": "http://cdn-profiles.tunein.com/s24948/images/logoq.jpg",
       "bitrate": 96,
       "codec": "MP3"
     },
     {
-      "name": "NPR News",
-      "streamUrl": "https://npr-ice.streamguys1.com/live.mp3",
-      "genre": "News",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "Classical KING FM",
-      "streamUrl": "https://classicalking.streamguys1.com/king-aac-64k",
-      "genre": "Classical",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 64,
-      "codec": "AAC"
-    },
-    {
-      "name": "KEXP 90.3 FM",
-      "streamUrl": "https://kexp-mp3-128.streamguys1.com/kexp128.mp3",
-      "genre": "Alternative",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "Jazz24",
-      "streamUrl": "https://live.amperwave.net/direct/ppm-jazz24mp3-ibc1",
-      "genre": "Jazz",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "SomaFM Groove Salad",
-      "streamUrl": "https://ice4.somafm.com/groovesalad-128-mp3",
-      "genre": "Ambient",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "SomaFM Drone Zone",
-      "streamUrl": "https://ice4.somafm.com/dronezone-128-mp3",
-      "genre": "Ambient",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "SomaFM DEF CON Radio",
-      "streamUrl": "https://ice4.somafm.com/defcon-128-mp3",
-      "genre": "Electronic",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "Radio Paradise Main Mix",
-      "streamUrl": "https://stream.radioparadise.com/aac-320",
-      "genre": "Rock",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 320,
-      "codec": "AAC"
-    },
-    {
-      "name": "FIP Radio",
-      "streamUrl": "https://icecast.radiofrance.fr/fip-midfi.mp3",
-      "genre": "World",
-      "country": "France",
-      "countryCode": "FR",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "NTS Radio 1",
-      "streamUrl": "https://stream-relay-geo.ntslive.net/stream",
-      "genre": "Electronic",
-      "country": "United Kingdom",
-      "countryCode": "GB",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "BBC Radio 6 Music",
-      "streamUrl": "http://stream.live.vc.bbcmedia.co.uk/bbc_6music",
-      "genre": "Alternative",
-      "country": "United Kingdom",
-      "countryCode": "GB",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "FluxFM Berlin",
-      "streamUrl": "https://streams.fluxfm.de/live/mp3-320/audio/",
-      "genre": "Alternative",
-      "country": "Germany",
-      "countryCode": "DE",
-      "bitrate": 320,
-      "codec": "MP3"
-    },
-    {
-      "name": "WFMU Freeform Radio",
-      "streamUrl": "https://stream0.wfmu.org/freeform-128k",
-      "genre": "Alternative",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "Dublab",
-      "streamUrl": "https://dublab.out.airtime.pro/dublab_a",
-      "genre": "Electronic",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "Triple J",
-      "streamUrl": "https://live-radio01.mediahubaustralia.com/2TJW/mp3/",
-      "genre": "Alternative",
-      "country": "Australia",
-      "countryCode": "AU",
-      "bitrate": 96,
-      "codec": "MP3"
-    },
-    {
-      "name": "RAI Radio 3",
-      "streamUrl": "https://icestreaming.rai.it/3.mp3",
-      "genre": "Classical",
-      "country": "Italy",
-      "countryCode": "IT",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "RNE Radio Clásica",
-      "streamUrl": "https://rtvelivestreamv3.akamaized.net/rtvesec/rne/rne_r2_main.mp3",
-      "genre": "Classical",
-      "country": "Spain",
-      "countryCode": "ES",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "Bluegrass Country",
-      "streamUrl": "https://ice24.securenetsystems.net/WAMU",
-      "genre": "Country",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 128,
-      "codec": "MP3"
-    },
-    {
-      "name": "KCRW Eclectic24",
-      "streamUrl": "https://kcrw.streamguys1.com/kcrw_192k_mp3_e24",
-      "genre": "Alternative",
-      "country": "United States",
-      "countryCode": "US",
-      "bitrate": 192,
-      "codec": "MP3"
+      "name": "MANGORADIO",
+      "streamUrl": "https://mangoradio.stream.laut.fm/mangoradio",
+      "genre": "Music",
+      "coverArtUri": "https://mangoradio.de/wp-content/uploads/cropped-Logo-192x192.webp"
     }
   ]
 }
