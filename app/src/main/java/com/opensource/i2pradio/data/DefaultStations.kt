@@ -38,6 +38,12 @@ object DefaultStations {
 
         for (i in 0 until stationsArray.length()) {
             val stationJson = stationsArray.getJSONObject(i)
+
+            // Parse proxy settings
+            val useProxy = stationJson.optBoolean("useProxy", false)
+            val proxyTypeStr = stationJson.optString("proxyType", ProxyType.NONE.name)
+            val proxyType = ProxyType.fromString(proxyTypeStr)
+
             val station = RadioStation(
                 name = stationJson.getString("name"),
                 streamUrl = stationJson.getString("streamUrl"),
@@ -46,9 +52,13 @@ object DefaultStations {
                 countryCode = stationJson.optString("countryCode", ""),
                 bitrate = stationJson.optInt("bitrate", 0),
                 codec = stationJson.optString("codec", ""),
+                coverArtUri = stationJson.optString("coverArtUri", null),
+                useProxy = useProxy,
+                proxyType = proxyType.name,
+                proxyHost = stationJson.optString("proxyHost", proxyType.getDefaultHost()),
+                proxyPort = stationJson.optInt("proxyPort", proxyType.getDefaultPort()),
                 source = StationSource.BUNDLED.name,
-                isPreset = false,
-                useProxy = false
+                isPreset = false
             )
             stations.add(station)
         }
@@ -66,25 +76,41 @@ object DefaultStations {
                 name = "BBC World Service",
                 streamUrl = "http://stream.live.vc.bbcmedia.co.uk/bbc_world_service",
                 genre = "News",
+                country = "United Kingdom",
+                countryCode = "GB",
+                coverArtUri = "http://cdn-profiles.tunein.com/s24948/images/logoq.jpg",
+                bitrate = 96,
+                codec = "MP3",
+                useProxy = false,
+                proxyType = ProxyType.NONE.name,
+                proxyHost = "",
+                proxyPort = 0,
                 source = StationSource.BUNDLED.name,
-                isPreset = false,
-                useProxy = false
+                isPreset = false
             ),
             RadioStation(
-                name = "NPR News",
-                streamUrl = "https://npr-ice.streamguys1.com/live.mp3",
-                genre = "News",
+                name = "Aktuelle HITS 24/7",
+                streamUrl = "https://rautemusik.stream43.radiohost.de/breakz",
+                genre = "Dance",
+                coverArtUri = "https://i.ibb.co/3mtCKLC/aktHits.jpg",
+                useProxy = false,
+                proxyType = ProxyType.NONE.name,
+                proxyHost = "",
+                proxyPort = 0,
                 source = StationSource.BUNDLED.name,
-                isPreset = false,
-                useProxy = false
+                isPreset = false
             ),
             RadioStation(
-                name = "Classical KING FM",
-                streamUrl = "https://classicalking.streamguys1.com/king-aac-64k",
-                genre = "Classical",
+                name = "MANGORADIO",
+                streamUrl = "https://mangoradio.stream.laut.fm/mangoradio",
+                genre = "Music",
+                coverArtUri = "https://mangoradio.de/wp-content/uploads/cropped-Logo-192x192.webp",
+                useProxy = false,
+                proxyType = ProxyType.NONE.name,
+                proxyHost = "",
+                proxyPort = 0,
                 source = StationSource.BUNDLED.name,
-                isPreset = false,
-                useProxy = false
+                isPreset = false
             )
         )
     }
