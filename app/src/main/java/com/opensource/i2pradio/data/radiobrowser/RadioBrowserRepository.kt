@@ -121,6 +121,24 @@ class RadioBrowserRepository(context: Context) {
     }
 
     /**
+     * Get list of languages
+     */
+    suspend fun getLanguages(limit: Int = 100): RadioBrowserResult<List<LanguageInfo>> {
+        return apiClient.getLanguages(limit)
+    }
+
+    /**
+     * Get stations by language
+     */
+    suspend fun getByLanguage(
+        language: String,
+        limit: Int = 50,
+        offset: Int = 0
+    ): RadioBrowserResult<List<RadioBrowserStation>> {
+        return apiClient.getByLanguage(language, limit, offset)
+    }
+
+    /**
      * Check if a RadioBrowser station is already saved to user's library
      */
     suspend fun isStationSaved(radioBrowserUuid: String): Boolean {

@@ -148,9 +148,11 @@ data class RadioBrowserStation(
 enum class BrowseCategory {
     TOP_VOTED,
     TOP_CLICKED,
-    HISTORY,  // Recently changed stations (placeholder for future user browse history)
+    RANDOM,   // Recently changed stations (shown as "Random" to users)
+    HISTORY,  // User browse history
     BY_COUNTRY,
     BY_TAG,
+    BY_LANGUAGE,
     SEARCH
 }
 

@@ -431,6 +431,81 @@ class RadioBrowserClient(private val context: Context) {
     }
 
     /**
+     * Get list of available languages with station counts
+     */
+    suspend fun getLanguages(limit: Int = 100): RadioBrowserResult<List<LanguageInfo>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val client = buildHttpClient()
+                val url = "${getApiBaseUrl()}/languages?order=stationcount&reverse=true&limit=$limit"
+
+                val request = Request.Builder()
+                    .url(url)
+                    .header("User-Agent", USER_AGENT)
+                    .header("Accept", "application/json")
+                    .get()
+                    .build()
+
+                val response = client.newCall(request).execute()
+
+                if (!response.isSuccessful) {
+                    response.close()
+                    return@withContext RadioBrowserResult.Error("HTTP ${response.code}")
+                }
+
+                val body = response.body?.string()
+                response.close()
+
+                if (body.isNullOrEmpty()) {
+                    return@withContext RadioBrowserResult.Error("Empty response")
+                }
+
+                val languages = mutableListOf<LanguageInfo>()
+                val jsonArray = JSONArray(body)
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+                    val name = obj.optString("name", "")
+                    if (name.isNotEmpty()) {
+                        languages.add(
+                            LanguageInfo(
+                                name = name,
+                                stationCount = obj.optInt("stationcount", 0)
+                            )
+                        )
+                    }
+                }
+
+                RadioBrowserResult.Success(languages)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to fetch languages: ${e.message}")
+                RadioBrowserResult.Error(e.message ?: "Unknown error", e)
+            }
+        }
+    }
+
+    /**
+     * Get stations by language
+     */
+    suspend fun getByLanguage(
+        language: String,
+        limit: Int = DEFAULT_LIMIT,
+        offset: Int = 0,
+        order: String = "votes",
+        reverse: Boolean = true,
+        hidebroken: Boolean = true
+    ): RadioBrowserResult<List<RadioBrowserStation>> {
+        val params = buildString {
+            append("/stations/bylanguage/${java.net.URLEncoder.encode(language, "UTF-8")}")
+            append("?limit=$limit")
+            append("&offset=$offset")
+            append("&order=$order")
+            append("&reverse=$reverse")
+            append("&hidebroken=$hidebroken")
+        }
+        return executeRequest(params)
+    }
+
+    /**
      * Check if Force Tor is enabled but Tor is not connected
      * (used to warn users before making API calls)
      *
@@ -466,6 +541,14 @@ data class CountryInfo(
  * Tag/genre information from RadioBrowser
  */
 data class TagInfo(
+    val name: String,
+    val stationCount: Int
+)
+
+/**
+ * Language information from RadioBrowser
+ */
+data class LanguageInfo(
     val name: String,
     val stationCount: Int
 )
