@@ -1473,10 +1473,6 @@ class RadioService : Service() {
                         }
                     }
                 })
-            } finally {
-                // Always reset flag when player setup completes (success or failure)
-                // This ensures old player IDLE states can clear buffering animations again
-                isStartingNewStream = false
             }
 
             // Note: startForeground is called in onStartCommand before playStream()
@@ -1486,6 +1482,10 @@ class RadioService : Service() {
             // Broadcast failure to UI
             broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
             scheduleReconnect()
+        } finally {
+            // Always reset flag when player setup completes (success or failure)
+            // This ensures old player IDLE states can clear buffering animations again
+            isStartingNewStream = false
         }
     }
 
