@@ -1,216 +1,201 @@
 # <img src="assets/attempt3.png" width="75" align="absmiddle" />deutsia radio
-A privacy-focused multinet radio player built with Claude Code. Stream radio stations from clearnet, I2P, and TOR networks with advanced anonymity features.
-
-[Add main screenshot here]
+A privacy-focused, anti-censorship multinet radio player built with Claude Code. Stream radio stations from clearnet, I2P, and Tor networks with advanced anonymity features.
 
 ## Features
 
-### 🎧 Radio Streaming
-- [x] 50,000+ radio stations via RadioBrowser API
-- [x] Custom station support (add any stream URL)
-- [x] Equalizer with customizable bands
-- [x] Stream recording with automatic file management
-- [x] Record across station switches
-- [x] Background playback with media controls
-- [x] Sleep timer
-- [x] Mini player with Now Playing screen
+- 50,000+ radio stations via RadioBrowser API
+- Custom station support (add any stream URL)
+- Clearnet, I2P (.i2p domains), and Tor (.onion) network support
+- Force Tor modes with fail-safe leak prevention
+- Per-station proxy configuration (Tor SOCKS5, I2P HTTP, custom)
+- Instant Orbot broadcast detection (< 100ms disconnect response)
+- 30-second health checks for silent failures
+- Automatic stream termination on proxy changes
+- Stream recording with automatic file management
+- Record across station switches (continuous recording)
+- Background playback with media controls
+- Sleep timer
+- Equalizer with customizable bands
+- Favorites and station library management
+- Browse by genre, country, language
+- Import/Export stations (CSV, JSON, M3U, PLS)
+- Curated I2P and Tor station lists
+- Material You dynamic theming (Android 12+)
+- 5 color schemes (Blue, Peach, Green, Purple, Orange)
+- Light/Dark/System theme modes
+- No tracking, analytics, telemetry, or ads
+- Local database (Room) - no cloud sync
+- Open source
 
-### 🌐 Multi-Network Support
-- [x] **Clearnet** - Standard internet radio stations
-- [x] **I2P Network** - Anonymous I2P radio streams (.i2p domains)
-- [x] **TOR Network** - Onion service support via Orbot integration
-- [x] Per-station proxy configuration
-- [x] Automatic network detection
+## Tor Integration
 
-### 🔒 Privacy & Security Features
+deutsia radio integrates with Orbot (the official Tor client for Android) via SOCKS5 proxy on port 9050. The integration uses three layers of protection:
 
-#### TOR Integration
-deutsia radio integrates with **Orbot** (the official Tor client for Android) to provide robust anonymity:
+**1. Instant Orbot Broadcasts**
+Orbot sends immediate STATUS_ON/STATUS_OFF broadcasts when it starts or stops. The app registers a BroadcastReceiver that responds in under 100ms. When Orbot stops, the app receives STATUS_OFF instantly and updates state immediately.
 
-- [x] Real-time TOR connection monitoring
-- [x] Automatic TOR health checks (every 30 seconds)
-- [x] SOCKS5 proxy support (port 9050)
-- [x] Connection status indicators
-- [x] One-tap TOR start/stop controls
+**2. Fail-Safe Proxy Enforcement**
+When Force Tor is enabled, all connections use an explicit SOCKS5 proxy configuration. If the Tor proxy becomes unreachable, OkHttp connection attempts FAIL immediately - there is no clearnet fallback. The proxy is enforced at the network layer: `Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, 9050))`. If this socket is unreachable, the connection throws an exception.
 
-[Add TOR control screenshot here]
+**3. Health Checks (Backup)**
+Every 30 seconds, a socket connection test runs against 127.0.0.1:9050. If this fails while the app thinks Tor is connected, it updates the UI to show disconnected. This catches silent failures where Orbot crashes without broadcasting.
 
-#### Force TOR Mode 🛡️
+### Installation
 
-**This is where deutsia radio becomes a privacy powerhouse.** Force TOR mode ensures ALL your traffic goes through TOR, preventing IP leaks:
+1. Install Orbot from F-Droid or Google Play
+2. In deutsia radio Settings, enable "Orbot Integration"
+3. Tap "Start" to connect to Tor
+4. Wait for "Connected" status
 
-**Force TOR All:**
-- [x] Routes **ALL** traffic through TOR SOCKS5 proxy
-- [x] Clearnet streams → TOR
-- [x] RadioBrowser API metadata requests → TOR
-- [x] Album art downloads → TOR
-- [x] Everything encrypted and anonymized
+Orbot provides the Tor daemon - deutsia radio connects to it as a client.
 
-**Force TOR Except I2P:**
-- [x] Clearnet streams → TOR
-- [x] I2P streams → I2P HTTP proxy (port 4444)
-- [x] Best of both worlds: TOR for clearnet, I2P for .i2p domains
+## Force Tor Protection
 
-[Add Force TOR settings screenshot here]
+Force Tor modes ensure all traffic routes through Tor with multiple layers of leak prevention.
 
-#### Leak Prevention Architecture
+**Force Tor All**
+Routes everything through Tor SOCKS5 proxy:
+- Radio streams
+- RadioBrowser API metadata requests
+- Album art downloads
+- All HTTP traffic
 
-**Multi-Layer Protection System:**
+**Force Tor Except I2P**
+Routes clearnet through Tor, I2P streams through I2P proxy:
+- Clearnet streams → Tor (127.0.0.1:9050)
+- .i2p domains → I2P HTTP proxy (127.0.0.1:4444)
+- RadioBrowser API → Tor
+- Album art → Tor
 
-**1. Instant Orbot Broadcasts (Primary Protection)**
-- Orbot sends immediate status updates when connecting/disconnecting
-- App receives broadcasts in real-time (< 100ms)
-- No waiting for health checks
+### How Force Tor Protects You
 
-**2. Fail-Safe Proxy Mode (Critical Safety Net)**
-- When Force TOR enabled, all connections use explicit SOCKS5 proxy
-- If TOR proxy unreachable, connections **FAIL** immediately
-- **No clearnet fallback** - traffic never routes around the proxy
-- OkHttp enforces proxy-or-nothing policy
+When Force Tor is enabled and Tor disconnects, your traffic does not leak to clearnet. Here's how:
 
-**3. Periodic Health Checks (Backup Monitoring)**
-- Socket checks every 30 seconds detect silent failures
-- Updates UI status if Orbot crashes without broadcasting
-- Fast socket response (~1-100ms per check)
+**Instant Detection via Orbot Broadcasts**
+Orbot broadcasts STATUS_OFF immediately when it stops. The app receives this broadcast (line 336-340 in TorManager.kt), updates state to STOPPED, and the next stream chunk request sees Tor is unavailable.
 
-**4. Automatic Stream Termination**
-- Current streams stopped when proxy settings change
-- Prevents old routing from persisting
-- Forces re-connection with new security settings
+**Proxy-or-Fail Enforcement**
+The app configures OkHttp with an explicit proxy: `Proxy(Proxy.Type.SOCKS, InetSocketAddress("127.0.0.1", 9050))`. When this proxy is unreachable, OkHttp throws a connection exception. There is no fallback to direct connection - the connection simply fails.
 
-**What happens if TOR disconnects mid-stream?**
+**Automatic Stream Stopping**
+When you toggle Force Tor settings, the app automatically stops the current stream (line 1347 in RadioService.kt). You must restart playback manually. This prevents old routing from persisting.
+
+**Health Check Backup**
+Every 30 seconds, a socket test connects to 127.0.0.1:9050 with a 2-second timeout (line 161 in TorManager.kt). If this fails while state is CONNECTED, the UI updates to show ERROR. This catches crashes where Orbot fails to broadcast.
+
+**Separate Recording Protection**
+Recording uses a completely separate OkHttp client instance (buildRecordingHttpClient, line 1011). Force Tor settings apply to recording traffic identically - if Tor disconnects, recording connections also fail.
+
+### The Two Protection Mechanisms
+
+**Instant Orbot Broadcasts (Primary)**
+- Orbot sends STATUS_OFF when stopping
+- App receives broadcast in < 100ms
+- State updates immediately
+- Next stream chunk sees Tor unavailable
+
+**30-Second Health Check (Backup)**
+- Socket test runs every 30 seconds
+- Detects silent crashes (no broadcast)
+- Updates UI if proxy unreachable
+- Independent verification layer
+
+The broadcast is instant. The health check is a backup for edge cases where Orbot crashes without broadcasting.
+
+## I2P Integration
+
+I2P streams (.i2p domains) use an HTTP proxy on port 4444.
+
+**Setup**
+1. Install I2P router (I2PD recommended for Android, or Java I2P)
+2. Start I2P and wait for it to integrate into the network
+3. Ensure HTTP proxy is running on 127.0.0.1:4444
+4. In deutsia radio, import I2P station list from Settings
+5. Stations with .i2p URLs automatically use the I2P proxy
+
+When Force Tor Except I2P is enabled, .i2p streams bypass Tor and use the I2P proxy directly. All other traffic goes through Tor.
+
+## Custom Proxies
+
+You can configure custom proxies per-station:
+
+**Supported Types**
+- SOCKS5 (Tor-compatible)
+- HTTP (I2P-compatible)
+- Direct (no proxy)
+
+**Configuration**
+1. Add or edit a station
+2. Set proxy type (NONE, I2P, TOR)
+3. Set proxy host (e.g., 127.0.0.1)
+4. Set proxy port (e.g., 9050 for Tor, 4444 for I2P)
+
+The app enforces the proxy at the OkHttp client level. Custom proxies are not affected by Force Tor modes unless you're using the built-in Orbot integration.
+
+## FAQ
+
+**What happens if Tor dies?**
 
 ```
-Scenario 1 (Normal case):
-Time 0s:  TOR connected, streaming ✓
-Time 5s:  Orbot disconnects
-Time 5s:  → Orbot broadcasts STATUS_OFF immediately
-Time 5s:  → App updates: TOR STOPPED
-Time 5s:  → Stream fails on next chunk request
-Result:   No leak, instant detection
+Scenario 1: Normal shutdown
+Time 0s   - Tor connected, streaming
+Time 5s   - Orbot stops
+Time 5s   - Orbot broadcasts STATUS_OFF → App stops immediately
+Time 5s   - Next stream chunk tries to connect → SOCKS proxy unreachable → Fails
+Result    - No leak, instant detection
 
-Scenario 2 (Orbot crashes silently):
-Time 0s:  TOR connected, streaming ✓
-Time 5s:  Orbot crashes without broadcast
-Time 5s:  → Next stream chunk tries SOCKS proxy
-Time 5s:  → Proxy unreachable → Connection FAILS
-Time 35s: → Health check detects failure, updates UI
-Result:   No leak, connection fails safe
+Scenario 2: Orbot crashes (no broadcast)
+Time 0s   - Tor connected, streaming
+Time 5s   - Orbot crashes without broadcasting
+Time 5s   - Next stream chunk tries SOCKS proxy → Unreachable → Connection FAILS
+Time 35s  - Health check detects failure, updates UI
+Result    - No leak, connection fails immediately, UI updates within 30s
 
-Scenario 3 (You change Force TOR settings):
-Time 0s:  Streaming with old proxy settings
-Time 1s:  You toggle Force TOR mode
-Time 1s:  → App automatically STOPS current stream
-Time 1s:  → Must manually restart with new settings
-Result:   No leak, forced re-connection
+Scenario 3: You toggle Force Tor
+Time 0s   - Streaming with old proxy settings
+Time 1s   - You toggle Force Tor mode
+Time 1s   - App automatically STOPS current stream
+Time 1s   - Must manually restart with new settings
+Result    - No leak, forced re-connection
 ```
 
-**Your traffic NEVER routes around the proxy.**
+**Does Force Tor slow down streams?**
 
-### 📚 Library Management
-- [x] Favorites/liked stations
-- [x] Browse by genre, country, language
-- [x] Search functionality
-- [x] Import/Export stations (CSV, JSON, M3U, PLS formats)
-- [x] Curated I2P and TOR station lists (pre-configured)
+Yes. Tor adds latency (typically 200-1000ms depending on circuit). Buffering may take longer. This is the cost of anonymity.
 
-### 🎨 Customization
-- [x] Material You dynamic theming (Android 12+)
-- [x] 5 color schemes (Blue, Peach, Green, Purple, Orange)
-- [x] Light/Dark/System theme modes
-- [x] Customizable equalizer presets
+**Can I use Force Tor with I2P stations?**
 
-### 🔐 What Makes This App Secure?
+Yes. Use "Force Tor Except I2P" mode. This routes clearnet through Tor but lets .i2p domains use the I2P proxy directly. Force Tor All routes everything through Tor, which breaks I2P streams.
 
-**No Tracking or Ads:**
-- [x] No analytics
-- [x] No telemetry
-- [x] No advertisements
-- [x] No user tracking
+**What if I don't have Orbot installed?**
 
-**Privacy by Design:**
-- [x] All proxy settings configurable per-station
-- [x] Force TOR modes with automatic leak prevention
-- [x] Open source - audit the code yourself
-- [x] Local database (Room) - no cloud sync
+Force Tor modes require Orbot. If Orbot is not installed, Force Tor settings will block stream playback. Install Orbot to use these features.
 
-**Attack Surface Protection:**
+**How do health checks work?**
 
-Our Force TOR implementation protects against:
-- ✅ **IP Address Leaks** - Fail-safe proxy enforcement (no clearnet fallback)
-- ✅ **Metadata Leaks** - API requests also routed through TOR
-- ✅ **DNS Leaks** - SOCKS5 proxy handles DNS resolution
-- ✅ **Timing Attacks** - Connection health checks don't reveal listening patterns
-- ✅ **Stream Switch Leaks** - Automatic stream stopping on proxy changes
-- ✅ **Silent Disconnection** - Instant Orbot broadcasts + fail-safe connections
+Every 30 seconds (when Tor is connected), the app opens a socket to 127.0.0.1:9050 with a 2-second timeout and immediately closes it. If this fails, Tor is unreachable. This is separate from Orbot broadcasts and provides redundant verification.
 
-## Installation
+**Why separate recording connections?**
 
-### Requirements
+Recording uses a completely separate OkHttp client instance to prevent interference with playback. The recording client has its own connection pool, dispatcher, and proxy configuration. This ensures recording cannot cause audio glitches.
+
+## Requirements
+
 - Android 7.0 (API 24) or higher
-- **For TOR stations:** [Orbot](https://guardianproject.info/apps/org.torproject.android/) installed
-- **For I2P stations:** I2P router (I2PD or Java I2P) running locally
-
-### Download
-[Add download links - F-Droid, GitHub Releases, etc.]
-
-## Usage
-
-### Basic Streaming
-1. Browse or search for stations
-2. Tap to play
-3. Use mini player controls
-
-### Enabling TOR Protection
-
-**Step 1:** Install Orbot from [F-Droid](https://f-droid.org/packages/org.torproject.android/) or Google Play
-
-**Step 2:** In deutsia radio Settings:
-- Enable "Orbot Integration"
-- Tap "Start" to connect to TOR
-- Wait for "Connected" status
-
-**Step 3:** Choose your privacy level:
-- **Force TOR All** - Maximum anonymity (all traffic through TOR)
-- **Force TOR Except I2P** - Balanced (clearnet through TOR, I2P native)
-
-⚠️ **Important:** When Force TOR is enabled but TOR disconnects, streams will **fail** rather than leak to clearnet. This is intentional security behavior.
-
-[Add usage screenshots here]
-
-### I2P Configuration
-1. Install and run I2P router (I2PD recommended for Android)
-2. Ensure I2P HTTP proxy is running on 127.0.0.1:4444
-3. Import I2P station list from Settings
-4. Stations with .i2p domains will automatically use I2P proxy
-
-### Recording
-1. Tap record button on Now Playing screen
-2. Choose recording directory in Settings
-3. Enable "Record Across Stations" for continuous recording
+- For Tor: Orbot app
+- For I2P: I2P router (I2PD or Java I2P)
 
 ## Tech Stack
 
-- **Language:** Kotlin
-- **UI:** Material Design 3
-- **Media Playback:** ExoPlayer (Media3)
-- **Database:** Room
-- **Networking:** OkHttp with SOCKS/HTTP proxy support
-- **Image Loading:** Coil (proxy-aware)
-- **TOR:** Orbot integration via SOCKS5
-- **I2P:** HTTP proxy support
+- Kotlin
+- Material Design 3
+- ExoPlayer (Media3)
+- Room database
+- OkHttp (SOCKS/HTTP proxy support)
+- Coil (proxy-aware image loading)
+- Orbot integration via SOCKS5
 
-## Proxy Configuration
-
-deutsia radio supports three proxy types:
-
-| Type | Port | Use Case |
-|------|------|----------|
-| **TOR (SOCKS)** | 9050 | Clearnet anonymization via Orbot |
-| **I2P (HTTP)** | 4444 | I2P network (.i2p domains) |
-| **Custom** | Any | Your own proxy server |
-
-## Building from Source
+## Building
 
 ```bash
 git clone https://github.com/deutsia/deutsia-radio.git
@@ -218,41 +203,29 @@ cd deutsia-radio
 ./gradlew assembleDebug
 ```
 
-APK will be in `app/build/outputs/apk/debug/`
+APK output: `app/build/outputs/apk/debug/`
 
-## Contributing
+## Security Notes
 
-Contributions welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+Force Tor modes enforce proxy-or-fail at the network layer. If Tor disconnects, connections fail rather than leak. However:
 
-## Security Notice
-
-While deutsia radio implements strong privacy protections:
-- Force TOR modes route traffic through TOR with fail-safe enforcement
-- Automatic leak prevention on proxy changes
-- No built-in tracking or analytics
-- Connections fail rather than bypass proxy
-
-**However:**
-- You are responsible for configuring Orbot/I2P correctly
-- Always verify your TOR connection is active when using Force TOR
-- This app does not provide complete anonymity on its own
-- Use with proper OpSec practices
+- You must configure Orbot correctly
+- Always verify Tor connection is active
+- This app is not complete anonymity (use proper OpSec)
+- Network-level leaks (DNS, WebRTC) are outside app scope
 
 ## License
 
-[Add license information]
+[Add license]
 
 ## Acknowledgments
 
-- [RadioBrowser](https://www.radio-browser.info/) for the extensive station database
-- [Orbot](https://guardianproject.info/apps/org.torproject.android/) for TOR integration
+- [RadioBrowser](https://www.radio-browser.info/) for station database
+- [Orbot](https://guardianproject.info/apps/org.torproject.android/) for Tor integration
 - [I2P Project](https://geti2p.net/) for anonymous networking
 - Built with [Claude Code](https://github.com/anthropics/claude-code)
 
-## Support Development
+## Support
 
 **Monero (XMR):**
 ```
