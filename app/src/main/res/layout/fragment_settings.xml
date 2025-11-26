@@ -867,7 +867,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="deutsia radio is a free and open-source radio player that brings together streams from both the clearnet and I2P network. Enjoy your favorite stations with a beautiful Material You interface that adapts to your device."
+                    android:text="@string/about_description"
                     android:textSize="14sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:lineSpacingExtra="4dp" />
@@ -880,43 +880,6 @@
                     android:layout_marginTop="8dp"
                     android:text="View on GitHub"
                     app:icon="@drawable/ic_github" />
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Credits Section -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainer">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Credits"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorPrimary"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="• ExoPlayer for smooth, reliable streaming\n• OkHttp with I2P proxy support\n• Material 3 Design\n• Community-driven and always free"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:lineSpacingExtra="4dp" />
 
             </LinearLayout>
 
