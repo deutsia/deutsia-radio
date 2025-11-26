@@ -109,13 +109,13 @@ class EqualizerManager(private val context: Context) {
                 bassBoost = BassBoost(0, audioSessionId).apply {
                     // Mark as supported if we could instantiate it
                     this@EqualizerManager.isBassBoostSupported = true
-                    // Enable based on saved strength value (not equalizer enabled state)
+                    // Restore saved strength value
                     val savedStrength = PreferencesHelper.getBassBoostStrength(context)
-                    enabled = savedStrength > 0
                     try {
-                        if (savedStrength > 0) {
-                            setStrength(savedStrength)
-                        }
+                        // Always set strength first (including 0 to ensure clean state)
+                        setStrength(savedStrength)
+                        // Enable based on saved strength value (not equalizer enabled state)
+                        enabled = savedStrength > 0
                         Log.d(TAG, "BassBoost restored: enabled=$enabled, strength=$savedStrength")
                     } catch (e: Exception) {
                         Log.w(TAG, "BassBoost setStrength failed: ${e.message}")
@@ -133,13 +133,13 @@ class EqualizerManager(private val context: Context) {
                 virtualizer = Virtualizer(0, audioSessionId).apply {
                     // Mark as supported if we could instantiate it
                     this@EqualizerManager.isVirtualizerSupported = true
-                    // Enable based on saved strength value (not equalizer enabled state)
+                    // Restore saved strength value
                     val savedStrength = PreferencesHelper.getVirtualizerStrength(context)
-                    enabled = savedStrength > 0
                     try {
-                        if (savedStrength > 0) {
-                            setStrength(savedStrength)
-                        }
+                        // Always set strength first (including 0 to ensure clean state)
+                        setStrength(savedStrength)
+                        // Enable based on saved strength value (not equalizer enabled state)
+                        enabled = savedStrength > 0
                         Log.d(TAG, "Virtualizer restored: enabled=$enabled, strength=$savedStrength")
                     } catch (e: Exception) {
                         Log.w(TAG, "Virtualizer setStrength failed: ${e.message}")
@@ -450,11 +450,10 @@ class EqualizerManager(private val context: Context) {
         // Apply to bass boost if active
         bassBoost?.let { bb ->
             try {
+                // Always set strength first (including 0 to fully reset the effect)
+                bb.setStrength(strength)
                 // Enable/disable based on strength value (independent of equalizer state)
                 bb.enabled = strength > 0
-                if (strength > 0) {
-                    bb.setStrength(strength)
-                }
                 Log.d(TAG, "Bass boost applied: enabled=${bb.enabled}, strength=$strength")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to set bass boost strength", e)
@@ -486,11 +485,10 @@ class EqualizerManager(private val context: Context) {
         // Apply to virtualizer if active
         virtualizer?.let { virt ->
             try {
+                // Always set strength first (including 0 to fully reset the effect)
+                virt.setStrength(strength)
                 // Enable/disable based on strength value (independent of equalizer state)
                 virt.enabled = strength > 0
-                if (strength > 0) {
-                    virt.setStrength(strength)
-                }
                 Log.d(TAG, "Virtualizer applied: enabled=${virt.enabled}, strength=$strength")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to set virtualizer strength", e)
