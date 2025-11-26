@@ -17,7 +17,7 @@ A privacy-focused, anti-censorship multinet radio player built with Claude Code.
 - No tracking, analytics, telemetry, or ads
 - Open source
 
-![App screenshot description](assets/resized_Screenshot_20251126-080417.png) ![App screenshot description](assets/resized_Screenshot_20251126-003926.png) ![App screenshot description](assets/resized_sss.png)
+![Main playback screen with add station button](assets/resized_Screenshot_20251126-080417.png) ![Now playing screen with Material You and Tor enabled while recording](assets/resized_Screenshot_20251126-003926.png) ![Equalizer with Material You](assets/resized_Screenshot_20251126-043015.png)
 
 ## Tor Integration
 
@@ -35,8 +35,8 @@ Every 30 seconds, a socket connection test runs against 127.0.0.1:9050. If this 
 ### Installation
 
 1. Install Orbot from F-Droid or Google Play
-2. In deutsia radio Settings, enable "Orbot Integration"
-3. Tap "Start" to connect to Tor
+2. In deutsia orbot Settings, enable "Tor (via Orbot)" toggle
+3. In Orbot "Start" to connect to Tor
 4. Wait for "Connected" status
 
 Orbot provides the Tor daemon - deutsia radio connects to it as a client. Note: deutsia radio connects to Orbot at the application level. This means that unless you've configured Orbot to be a full device VPN, your connection to other apps like Spotify or Chrome will be from your residential ip address. 
@@ -94,7 +94,7 @@ Recording uses a completely separate OkHttp client instance (buildRecordingHttpC
 
 The broadcast is instant. The health check is a backup for edge cases where Orbot crashes without broadcasting.
 
-![App screenshot description](assets/resized_Screenshot_20251126-083145.png)
+![Force Tor screen](assets/resized_Screenshot_20251126-083145.png)
 
 ## I2P Integration
 
@@ -123,9 +123,9 @@ You can configure custom proxies per-station:
 3. Set proxy host (e.g., 127.0.0.1)
 4. Set proxy port (e.g., 9050 for Tor, 4444 for I2P)
 
-The app enforces the proxy at the OkHttp client level. Custom proxies are not affected by Force Tor modes unless you're using the built-in Orbot integration.
+The app enforces the proxy at the OkHttp client level. Custom proxies are not affected by Force Tor modes unless you're using the "force Tor over everything" setting.
 
-![App screenshot description](assets/resized_sss.png)
+![Add custom proxy screen](assets/resized_sss.png)
 
 ## FAQ
 
@@ -156,7 +156,7 @@ Result    - No leak, forced re-connection
 
 **Does Force Tor slow down streams?**
 
-Yes. Tor adds some latency when intially loading streams. It's quite negliable and there is no difference in experience from using clearnet to load streams after it's loaded.
+Yes. Tor adds some latency when intially loading streams. It's quite negliable and there is no difference in experience from using clearnet to load streams once a radio is loaded.
 
 **Can I use Force Tor with I2P stations?**
 
@@ -210,9 +210,11 @@ Force Tor modes enforce proxy-or-fail at the network layer. If Tor disconnects, 
 
 - You must configure Orbot correctly
 - Always verify Tor connection is active
-- This app is not complete anonymity (use proper OpSec)
+- This app is not complete anonymity, always use proper OpSec
 - Network-level leaks (DNS, WebRTC) are outside app scope
 
+## Screenshots
+![Select/mass delete shown](assets/resized_Screenshot_20251126-042744.png)  ![browse tab](assets/resized_Screenshot_20251126-085627.png ) ![Language search in browse tab](assets/resized_Screenshot_20251126-045342.png) 
 ## License
 
 [Add license]
