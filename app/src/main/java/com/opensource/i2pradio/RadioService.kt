@@ -1292,7 +1292,7 @@ class RadioService : Service() {
             // BULLETPROOF: If Force Tor All is enabled, Tor MUST be connected or we fail
             if (forceTorAll && !TorManager.isConnected()) {
                 android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
-                isStartingNewStream = false  // Reset flag on early return
+                isStartingNewStream.set(false)  // Reset flag on early return
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
                 return
@@ -1301,7 +1301,7 @@ class RadioService : Service() {
             // BULLETPROOF: If Force Tor Except I2P is enabled and this is NOT an I2P stream, Tor MUST be connected
             if (forceTorExceptI2P && !isI2PStream && !TorManager.isConnected()) {
                 android.util.Log.e("RadioService", "FORCE TOR (except I2P): Tor not connected - BLOCKING non-I2P stream")
-                isStartingNewStream = false  // Reset flag on early return
+                isStartingNewStream.set(false)  // Reset flag on early return
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
                 return
