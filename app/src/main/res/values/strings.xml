@@ -31,6 +31,9 @@
     <string name="genre_all">All Genres</string>
     <string name="filter_by_genre">Filter by Genre</string>
 
+     <!-- about -->
+    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with Orbot integration and configurable leak prevention</string>
+
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">Browse</string>
     <string name="search_radio_browser">Search thousands of stations…</string>
