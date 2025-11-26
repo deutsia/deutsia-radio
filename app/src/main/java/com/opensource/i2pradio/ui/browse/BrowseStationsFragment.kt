@@ -413,22 +413,35 @@ class BrowseStationsFragment : Fragment() {
             return
         }
 
-        val countryNames = listOf(getString(R.string.filter_all_countries)) +
-                countries.map { "${it.name} (${it.stationCount})" }
+        // Variable to hold the temporary selection
+        val currentCountry = viewModel.selectedCountry.value
+        var tempSelectedCountryIndex: Int? = if (currentCountry == null) {
+            null // "All Countries"
+        } else {
+            countries.indexOf(currentCountry).takeIf { it >= 0 }
+        }
 
-        AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.select_country)
-            .setItems(countryNames.toTypedArray()) { _, which ->
-                if (which == 0) {
+            .setView(createCountrySearchView(countries, tempSelectedCountryIndex) { selectedIndex ->
+                // Store the temporary selection but don't apply yet
+                tempSelectedCountryIndex = selectedIndex
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                // Apply the selection when OK is clicked
+                if (tempSelectedCountryIndex == null) {
                     viewModel.filterByCountry(null)
                     selectTopVotedChip()
                 } else {
-                    viewModel.filterByCountry(countries[which - 1])
+                    viewModel.filterByCountry(countries[tempSelectedCountryIndex!!])
                     clearChipSelection()
                     clearSearch()
                 }
             }
-            .show()
+            .create()
+
+        dialog.show()
     }
 
     private fun showGenreFilterDialog() {
@@ -438,22 +451,323 @@ class BrowseStationsFragment : Fragment() {
             return
         }
 
-        val tagNames = listOf(getString(R.string.filter_all_genres)) +
-                tags.map { "${it.name} (${it.stationCount})" }
+        // Variable to hold the temporary selection
+        val currentTag = viewModel.selectedTag.value
+        var tempSelectedTagIndex: Int? = if (currentTag == null) {
+            null // "All Genres"
+        } else {
+            tags.indexOf(currentTag).takeIf { it >= 0 }
+        }
 
-        AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.select_genre)
-            .setItems(tagNames.toTypedArray()) { _, which ->
-                if (which == 0) {
+            .setView(createTagSearchView(tags, tempSelectedTagIndex) { selectedIndex ->
+                // Store the temporary selection but don't apply yet
+                tempSelectedTagIndex = selectedIndex
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                // Apply the selection when OK is clicked
+                if (tempSelectedTagIndex == null) {
                     viewModel.filterByTag(null)
                     selectTopVotedChip()
                 } else {
-                    viewModel.filterByTag(tags[which - 1])
+                    viewModel.filterByTag(tags[tempSelectedTagIndex!!])
                     clearChipSelection()
                     clearSearch()
                 }
             }
-            .show()
+            .create()
+
+        dialog.show()
+    }
+
+    private fun createCountrySearchView(
+        countries: List<com.opensource.i2pradio.data.radiobrowser.CountryInfo>,
+        selectedIndex: Int?,
+        onCountrySelected: (Int?) -> Unit
+    ): View {
+        val context = requireContext()
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 8, 0, 0)
+        }
+
+        // Search input with improved styling
+        val searchInput = TextInputEditText(context).apply {
+            hint = getString(R.string.search_countries)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+
+        val searchLayout = com.google.android.material.textfield.TextInputLayout(context).apply {
+            boxBackgroundMode = com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILLED
+            isHintEnabled = true
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
+            setStartIconDrawable(R.drawable.ic_search)
+            addView(searchInput)
+        }
+
+        container.addView(searchLayout, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            setMargins(24, 0, 24, 8)
+        })
+
+        // Divider
+        val divider = View(context).apply {
+            val dividerColor = com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOutlineVariant
+            )
+            setBackgroundColor(dividerColor)
+        }
+        container.addView(divider, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            1
+        ))
+
+        // RecyclerView for country list
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+            // Set a max height for the dialog (approx 400dp)
+            val maxHeight = (400 * resources.displayMetrics.density).toInt()
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                maxHeight
+            )
+            clipToPadding = false
+            setPadding(0, 8, 0, 0)
+        }
+
+        var filteredCountries = countries.toList()
+        val adapter = CountryAdapter(filteredCountries, selectedIndex, onCountrySelected)
+        recyclerView.adapter = adapter
+
+        // Search functionality
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString() ?: ""
+                filteredCountries = if (query.isEmpty()) {
+                    countries
+                } else {
+                    countries.filter { it.name.contains(query, ignoreCase = true) }
+                }
+                adapter.updateCountries(filteredCountries)
+            }
+        })
+
+        container.addView(recyclerView)
+        return container
+    }
+
+    private fun createTagSearchView(
+        tags: List<com.opensource.i2pradio.data.radiobrowser.TagInfo>,
+        selectedIndex: Int?,
+        onTagSelected: (Int?) -> Unit
+    ): View {
+        val context = requireContext()
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 8, 0, 0)
+        }
+
+        // Search input with improved styling
+        val searchInput = TextInputEditText(context).apply {
+            hint = getString(R.string.search_genres)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+
+        val searchLayout = com.google.android.material.textfield.TextInputLayout(context).apply {
+            boxBackgroundMode = com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILLED
+            isHintEnabled = true
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
+            setStartIconDrawable(R.drawable.ic_search)
+            addView(searchInput)
+        }
+
+        container.addView(searchLayout, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            setMargins(24, 0, 24, 8)
+        })
+
+        // Divider
+        val divider = View(context).apply {
+            val dividerColor = com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOutlineVariant
+            )
+            setBackgroundColor(dividerColor)
+        }
+        container.addView(divider, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            1
+        ))
+
+        // RecyclerView for tag list
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+            // Set a max height for the dialog (approx 400dp)
+            val maxHeight = (400 * resources.displayMetrics.density).toInt()
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                maxHeight
+            )
+            clipToPadding = false
+            setPadding(0, 8, 0, 0)
+        }
+
+        var filteredTags = tags.toList()
+        val adapter = TagAdapter(filteredTags, selectedIndex, onTagSelected)
+        recyclerView.adapter = adapter
+
+        // Search functionality
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString() ?: ""
+                filteredTags = if (query.isEmpty()) {
+                    tags
+                } else {
+                    tags.filter { it.name.contains(query, ignoreCase = true) }
+                }
+                adapter.updateTags(filteredTags)
+            }
+        })
+
+        container.addView(recyclerView)
+        return container
+    }
+
+    // Adapter for Country list with search
+    private inner class CountryAdapter(
+        private var countries: List<com.opensource.i2pradio.data.radiobrowser.CountryInfo>,
+        private val initialSelectedIndex: Int?,
+        private val onCountrySelected: (Int?) -> Unit
+    ) : RecyclerView.Adapter<CountryAdapter.ViewHolder>() {
+
+        private var selectedPosition: Int = -1 // -1 means "All Countries"
+        private val originalCountries = countries
+
+        init {
+            selectedPosition = initialSelectedIndex ?: -1
+        }
+
+        fun updateCountries(newCountries: List<com.opensource.i2pradio.data.radiobrowser.CountryInfo>) {
+            countries = newCountries
+            notifyDataSetChanged()
+        }
+
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val textView: TextView? = view.findViewById(android.R.id.text1)
+            val radioButton: android.widget.RadioButton? = view.findViewById(R.id.radio_button)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(
+                R.layout.item_genre_choice, parent, false
+            )
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            if (position >= itemCount) return
+
+            if (position == 0) {
+                // "All Countries" option
+                holder.textView?.text = getString(R.string.filter_all_countries)
+                holder.radioButton?.isChecked = selectedPosition == -1
+
+                holder.itemView.setOnClickListener {
+                    selectedPosition = -1
+                    notifyDataSetChanged()
+                    onCountrySelected(null)
+                }
+            } else {
+                val country = countries[position - 1]
+                holder.textView?.text = "${country.name} (${country.stationCount})"
+
+                // Find the index in the original list
+                val originalIndex = originalCountries.indexOf(country)
+                holder.radioButton?.isChecked = selectedPosition == originalIndex
+
+                holder.itemView.setOnClickListener {
+                    selectedPosition = originalIndex
+                    notifyDataSetChanged()
+                    onCountrySelected(originalIndex)
+                }
+            }
+        }
+
+        override fun getItemCount() = countries.size + 1 // +1 for "All Countries"
+    }
+
+    // Adapter for Tag list with search
+    private inner class TagAdapter(
+        private var tags: List<com.opensource.i2pradio.data.radiobrowser.TagInfo>,
+        private val initialSelectedIndex: Int?,
+        private val onTagSelected: (Int?) -> Unit
+    ) : RecyclerView.Adapter<TagAdapter.ViewHolder>() {
+
+        private var selectedPosition: Int = -1 // -1 means "All Genres"
+        private val originalTags = tags
+
+        init {
+            selectedPosition = initialSelectedIndex ?: -1
+        }
+
+        fun updateTags(newTags: List<com.opensource.i2pradio.data.radiobrowser.TagInfo>) {
+            tags = newTags
+            notifyDataSetChanged()
+        }
+
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val textView: TextView? = view.findViewById(android.R.id.text1)
+            val radioButton: android.widget.RadioButton? = view.findViewById(R.id.radio_button)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(
+                R.layout.item_genre_choice, parent, false
+            )
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            if (position >= itemCount) return
+
+            if (position == 0) {
+                // "All Genres" option
+                holder.textView?.text = getString(R.string.filter_all_genres)
+                holder.radioButton?.isChecked = selectedPosition == -1
+
+                holder.itemView.setOnClickListener {
+                    selectedPosition = -1
+                    notifyDataSetChanged()
+                    onTagSelected(null)
+                }
+            } else {
+                val tag = tags[position - 1]
+                holder.textView?.text = "${tag.name} (${tag.stationCount})"
+
+                // Find the index in the original list
+                val originalIndex = originalTags.indexOf(tag)
+                holder.radioButton?.isChecked = selectedPosition == originalIndex
+
+                holder.itemView.setOnClickListener {
+                    selectedPosition = originalIndex
+                    notifyDataSetChanged()
+                    onTagSelected(originalIndex)
+                }
+            }
+        }
+
+        override fun getItemCount() = tags.size + 1 // +1 for "All Genres"
     }
 
     override fun onResume() {
