@@ -182,7 +182,7 @@ Not that I personally know of, although I am sure some do. If you find a station
 
 - Android 7.0 (API 24) or higher
 - For Tor: Orbot app
-- For I2P: I2P router (I2PD or Java I2P)
+- For I2P: official I2P app (recommended) or Invizlble Pro (i2pd) 
 
 ## Tech Stack
 
