@@ -5,24 +5,19 @@ A privacy-focused, anti-censorship multinet radio player built with Claude Code.
 
 - 50,000+ radio stations via RadioBrowser API
 - Custom station support (add any stream URL)
-- Clearnet, I2P (.i2p domains), and Tor (.onion) network support
+- Clearnet, I2P (.i2p), and Tor (.onion) network support
 - Force Tor modes with fail-safe leak prevention
 - Per-station proxy configuration (Tor SOCKS5, I2P HTTP, custom)
 - Instant Orbot broadcast detection (< 100ms disconnect response)
 - Automatic stream termination on proxy changes
-- Stream recording with automatic file management
-- Background playback with media controls
-- Sleep timer
-- Equalizer with customizable bands
-- Favorites and station library management
-- Browse by genre, country, language
-- Import/Export stations
-- Curated I2P and Tor station lists
+- Stream recording with file management
 - Material You dynamic theming (Android 12+)
 - 5 color schemes (Blue, Peach, Green, Purple, Orange)
 - Light/Dark/System theme modes
 - No tracking, analytics, telemetry, or ads
 - Open source
+
+![App screenshot description](assets/resized_Screenshot_20251126-080417.png) ![App screenshot description](assets/resized_Screenshot_20251126-003926.png) ![App screenshot description](assets/resized_sss.png)
 
 ## Tor Integration
 
@@ -99,6 +94,8 @@ Recording uses a completely separate OkHttp client instance (buildRecordingHttpC
 
 The broadcast is instant. The health check is a backup for edge cases where Orbot crashes without broadcasting.
 
+![App screenshot description](assets/resized_Screenshot_20251126-083145.png)
+
 ## I2P Integration
 
 I2P streams (.i2p domains) use an HTTP proxy on port 4444.
@@ -127,6 +124,8 @@ You can configure custom proxies per-station:
 4. Set proxy port (e.g., 9050 for Tor, 4444 for I2P)
 
 The app enforces the proxy at the OkHttp client level. Custom proxies are not affected by Force Tor modes unless you're using the built-in Orbot integration.
+
+![App screenshot description](assets/resized_sss.png)
 
 ## FAQ
 
@@ -177,7 +176,7 @@ Recording uses a completely separate OkHttp client instance to prevent interfere
 
 **Do clearnet stations block Tor requests?**
 
-Not that I personally know of, although I am sure some do. If you find a station that isn't loading it's more likely the station is down, rather you're being blocked. If you think that's not the issue, try setting a new identity within Orbot, or disabling Tor. 
+Not that I personally know of, although I am sure some do. If you find a station that isn't loading it's more likely the station is down, rather than your being blocked. If you think that's not the issue, try setting a new identity within Orbot, or disabling Tor. 
 
 ## Requirements
 
