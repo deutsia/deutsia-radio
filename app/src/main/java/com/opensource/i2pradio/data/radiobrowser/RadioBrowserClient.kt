@@ -39,7 +39,7 @@ class RadioBrowserClient(private val context: Context) {
         private const val READ_TIMEOUT_PROXY_SECONDS = 60L
 
         // User agent to identify our app to RadioBrowser
-        private const val USER_AGENT = "DeutsiaRadio/1.0 (Android; +https://github.com/deutsia/i2pradio)"
+        private const val USER_AGENT = "DeutsiaRadio/1.0 (Android; +https://github.com/deutsia/deutsia-radio)"
     }
 
     private var currentServerIndex = 0

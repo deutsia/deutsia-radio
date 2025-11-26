@@ -278,7 +278,7 @@ class SettingsFragment : Fragment() {
 
         // GitHub button
         githubButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/deutsia/i2pradio"))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/deutsia/deutsia-radio"))
             startActivity(intent)
         }
 
