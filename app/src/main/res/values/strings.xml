@@ -24,6 +24,8 @@
 
     <!-- Search -->
     <string name="search_stations">Search library</string>
+    <string name="search_countries">Search countries…</string>
+    <string name="search_genres">Search genres…</string>
 
     <!-- Genre filter -->
     <string name="genre_all">All Genres</string>

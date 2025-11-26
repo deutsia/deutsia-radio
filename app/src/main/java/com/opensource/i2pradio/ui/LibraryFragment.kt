@@ -265,6 +265,9 @@ class LibraryFragment : Fragment() {
                 combinedGenres.indexOf(currentGenreFilter).takeIf { it >= 0 } ?: 0
             }
 
+            // Variable to hold the temporary selection
+            var tempSelectedGenre: String? = currentGenreFilter
+
             // Create custom dialog with search functionality
             val dialogView = LayoutInflater.from(requireContext()).inflate(
                 android.R.layout.select_dialog_singlechoice, null
@@ -272,31 +275,45 @@ class LibraryFragment : Fragment() {
 
             val dialog = AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.filter_by_genre))
-                .setView(createGenreSearchView(combinedGenres, currentIndex))
+                .setView(createGenreSearchView(combinedGenres, currentIndex) { selectedGenre ->
+                    // Store the temporary selection but don't apply yet
+                    tempSelectedGenre = selectedGenre
+                })
                 .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    // Apply the selection when OK is clicked
+                    currentGenreFilter = if (tempSelectedGenre == "All Genres") null else tempSelectedGenre
+                    PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
+                    updateGenreFilterButtonText()
+                    // Clear search when changing genre filter
+                    currentSearchQuery = ""
+                    searchInput.setText("")
+                    observeStations()
+                }
                 .create()
 
             dialog.show()
         }
     }
 
-    private fun createGenreSearchView(genres: List<String>, selectedIndex: Int): View {
+    private fun createGenreSearchView(genres: List<String>, selectedIndex: Int, onGenreSelected: (String) -> Unit): View {
         val context = requireContext()
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(24, 16, 24, 0)
+            setPadding(0, 8, 0, 0)
         }
 
-        // Search input
+        // Search input with improved styling
         val searchInput = TextInputEditText(context).apply {
             hint = "Search genres..."
             inputType = android.text.InputType.TYPE_CLASS_TEXT
-            setPadding(16, 16, 16, 16)
         }
 
         val searchLayout = com.google.android.material.textfield.TextInputLayout(context).apply {
-            boxBackgroundMode = com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_OUTLINE
+            boxBackgroundMode = com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILLED
             isHintEnabled = true
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
+            setStartIconDrawable(R.drawable.ic_search)
             addView(searchInput)
         }
 
@@ -304,31 +321,39 @@ class LibraryFragment : Fragment() {
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         ).apply {
-            bottomMargin = 16
+            setMargins(24, 0, 24, 8)
         })
+
+        // Divider
+        val divider = View(context).apply {
+            val dividerColor = com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOutlineVariant
+            )
+            setBackgroundColor(dividerColor)
+        }
+        container.addView(divider, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            1
+        ))
 
         // RecyclerView for genre list
         val recyclerView = RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context)
+            // Set a max height for the dialog (approx 400dp)
+            val maxHeight = (400 * resources.displayMetrics.density).toInt()
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                0
-            ).apply {
-                weight = 1f
-            }
+                maxHeight
+            )
+            clipToPadding = false
+            setPadding(0, 8, 0, 0)
         }
 
         var filteredGenres = genres.toList()
         val adapter = GenreAdapter(filteredGenres, selectedIndex) { selectedGenre ->
-            currentGenreFilter = if (selectedGenre == "All Genres") null else selectedGenre
-            PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
-            updateGenreFilterButtonText()
-            // Clear search when changing genre filter
-            currentSearchQuery = ""
-            this.searchInput.setText("")
-            observeStations()
-            // Dismiss the dialog
-            (recyclerView.parent?.parent as? android.app.Dialog)?.dismiss()
+            // Just update the selection, don't apply or dismiss
+            onGenreSelected(selectedGenre)
         }
         recyclerView.adapter = adapter
 
