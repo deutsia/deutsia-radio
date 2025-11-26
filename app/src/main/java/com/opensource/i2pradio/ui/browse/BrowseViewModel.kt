@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.opensource.i2pradio.data.radiobrowser.BrowseCategory
 import com.opensource.i2pradio.data.radiobrowser.CountryInfo
+import com.opensource.i2pradio.data.radiobrowser.LanguageInfo
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserResult
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
@@ -55,6 +56,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     private val _selectedTag = MutableLiveData<TagInfo?>(null)
     val selectedTag: LiveData<TagInfo?> = _selectedTag
 
+    // Selected language for filtering
+    private val _selectedLanguage = MutableLiveData<LanguageInfo?>(null)
+    val selectedLanguage: LiveData<LanguageInfo?> = _selectedLanguage
+
     // Countries list (for filter dropdown)
     private val _countries = MutableLiveData<List<CountryInfo>>(emptyList())
     val countries: LiveData<List<CountryInfo>> = _countries
@@ -62,6 +67,13 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     // Tags list (for filter dropdown)
     private val _tags = MutableLiveData<List<TagInfo>>(emptyList())
     val tags: LiveData<List<TagInfo>> = _tags
+
+    // Languages list (for filter dropdown)
+    private val _languages = MutableLiveData<List<LanguageInfo>>(emptyList())
+    val languages: LiveData<List<LanguageInfo>> = _languages
+
+    // Temporary memory of stations shown in Top Voted (to hide in Popular)
+    private val topVotedStationUuids = mutableSetOf<String>()
 
     // Pagination
     private var currentOffset = 0
@@ -85,6 +97,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         loadTopVoted()
         loadCountries()
         loadTags()
+        loadLanguages()
     }
 
     /**
@@ -94,6 +107,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _currentCategory.value = BrowseCategory.TOP_VOTED
         currentOffset = 0
         _stations.value = emptyList()
+        // Clear the temporary memory when switching tabs
+        topVotedStationUuids.clear()
         fetchStations()
     }
 
@@ -102,6 +117,16 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun loadTopClicked() {
         _currentCategory.value = BrowseCategory.TOP_CLICKED
+        currentOffset = 0
+        _stations.value = emptyList()
+        fetchStations()
+    }
+
+    /**
+     * Load random stations (actually newest/recently changed stations)
+     */
+    fun loadRandom() {
+        _currentCategory.value = BrowseCategory.RANDOM
         currentOffset = 0
         _stations.value = emptyList()
         fetchStations()
@@ -152,6 +177,19 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         currentOffset = 0
         _stations.value = emptyList()
         if (tag != null) {
+            fetchStations()
+        }
+    }
+
+    /**
+     * Filter by language
+     */
+    fun filterByLanguage(language: LanguageInfo?) {
+        _selectedLanguage.value = language
+        _currentCategory.value = BrowseCategory.BY_LANGUAGE
+        currentOffset = 0
+        _stations.value = emptyList()
+        if (language != null) {
             fetchStations()
         }
     }
@@ -328,6 +366,26 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Load languages list
+     */
+    private fun loadLanguages() {
+        viewModelScope.launch {
+            when (val result = repository.getLanguages(200)) {
+                is RadioBrowserResult.Success -> {
+                    // Filter to languages with at least 10 stations and sort alphabetically
+                    _languages.value = result.data
+                        .filter { it.stationCount >= 10 }
+                        .sortedBy { it.name }
+                }
+                is RadioBrowserResult.Error -> {
+                    // Silently fail - languages are optional
+                }
+                is RadioBrowserResult.Loading -> {}
+            }
+        }
+    }
+
+    /**
      * Fetch stations based on current category and filters
      */
     private fun fetchStations(append: Boolean = false) {
@@ -352,6 +410,9 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 BrowseCategory.TOP_CLICKED -> {
                     repository.getTopClicked(pageSize, currentOffset)
                 }
+                BrowseCategory.RANDOM -> {
+                    repository.getRecentlyChanged(pageSize, currentOffset)
+                }
                 BrowseCategory.HISTORY -> {
                     // Show user's browse history (last 75 played from browse)
                     repository.getBrowseHistory()
@@ -370,6 +431,14 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                         repository.getByTag(tag.name, pageSize, currentOffset)
                     } else {
                         RadioBrowserResult.Error("No tag selected")
+                    }
+                }
+                BrowseCategory.BY_LANGUAGE -> {
+                    val language = _selectedLanguage.value
+                    if (language != null) {
+                        repository.getByLanguage(language.name, pageSize, currentOffset)
+                    } else {
+                        RadioBrowserResult.Error("No language selected")
                     }
                 }
                 BrowseCategory.SEARCH -> {
@@ -401,7 +470,18 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
             when (result) {
                 is RadioBrowserResult.Success -> {
-                    val newStations = result.data
+                    var newStations = result.data
+
+                    // Track Top Voted stations for hiding in Popular
+                    if (_currentCategory.value == BrowseCategory.TOP_VOTED) {
+                        newStations.forEach { topVotedStationUuids.add(it.stationuuid) }
+                    }
+
+                    // Filter out Top Voted stations from Popular
+                    if (_currentCategory.value == BrowseCategory.TOP_CLICKED && topVotedStationUuids.isNotEmpty()) {
+                        newStations = newStations.filter { it.stationuuid !in topVotedStationUuids }
+                    }
+
                     if (append) {
                         val current = _stations.value.orEmpty()
                         _stations.value = current + newStations

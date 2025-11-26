@@ -89,6 +89,13 @@
                     android:text="@string/browse_popular" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chipRandom"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/browse_random" />
+
+                <com.google.android.material.chip.Chip
                     android:id="@+id/chipHistory"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
@@ -125,6 +132,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/filter_genre"
+                android:textSize="12sp"
+                app:icon="@drawable/ic_menu"
+                app:iconSize="24dp" />
+
+            <!-- Language Filter -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/languageFilterButton"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_language"
                 android:textSize="12sp"
                 app:icon="@drawable/ic_menu"
                 app:iconSize="24dp" />

@@ -50,9 +50,11 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var searchInput: TextInputEditText
     private lateinit var chipTopVoted: Chip
     private lateinit var chipPopular: Chip
+    private lateinit var chipRandom: Chip
     private lateinit var chipHistory: Chip
     private lateinit var countryFilterButton: MaterialButton
     private lateinit var genreFilterButton: MaterialButton
+    private lateinit var languageFilterButton: MaterialButton
     private lateinit var adapter: BrowseStationsAdapter
 
     private val viewModel: BrowseViewModel by viewModels()
@@ -91,9 +93,11 @@ class BrowseStationsFragment : Fragment() {
         searchInput = view.findViewById(R.id.searchInput)
         chipTopVoted = view.findViewById(R.id.chipTopVoted)
         chipPopular = view.findViewById(R.id.chipPopular)
+        chipRandom = view.findViewById(R.id.chipRandom)
         chipHistory = view.findViewById(R.id.chipHistory)
         countryFilterButton = view.findViewById(R.id.countryFilterButton)
         genreFilterButton = view.findViewById(R.id.genreFilterButton)
+        languageFilterButton = view.findViewById(R.id.languageFilterButton)
 
         setupRecyclerView()
         setupSearch()
@@ -190,6 +194,15 @@ class BrowseStationsFragment : Fragment() {
             viewModel.loadTopClicked()
         }
 
+        chipRandom.setOnClickListener {
+            if (!chipRandom.isChecked) {
+                chipRandom.isChecked = true
+            }
+            clearOtherChips(chipRandom)
+            clearSearch()
+            viewModel.loadRandom()
+        }
+
         chipHistory.setOnClickListener {
             if (!chipHistory.isChecked) {
                 chipHistory.isChecked = true
@@ -203,6 +216,7 @@ class BrowseStationsFragment : Fragment() {
     private fun clearOtherChips(except: Chip) {
         if (except != chipTopVoted) chipTopVoted.isChecked = false
         if (except != chipPopular) chipPopular.isChecked = false
+        if (except != chipRandom) chipRandom.isChecked = false
         if (except != chipHistory) chipHistory.isChecked = false
     }
 
@@ -220,6 +234,10 @@ class BrowseStationsFragment : Fragment() {
 
         genreFilterButton.setOnClickListener {
             showGenreFilterDialog()
+        }
+
+        languageFilterButton.setOnClickListener {
+            showLanguageFilterDialog()
         }
     }
 
@@ -270,6 +288,10 @@ class BrowseStationsFragment : Fragment() {
         viewModel.selectedTag.observe(viewLifecycleOwner) { tag ->
             genreFilterButton.text = tag?.name ?: getString(R.string.filter_genre)
         }
+
+        viewModel.selectedLanguage.observe(viewLifecycleOwner) { language ->
+            languageFilterButton.text = language?.name ?: getString(R.string.filter_language)
+        }
     }
 
     private fun updateEmptyState(isEmpty: Boolean) {
@@ -285,6 +307,7 @@ class BrowseStationsFragment : Fragment() {
     private fun clearChipSelection() {
         chipTopVoted.isChecked = false
         chipPopular.isChecked = false
+        chipRandom.isChecked = false
         chipHistory.isChecked = false
     }
 
@@ -483,6 +506,44 @@ class BrowseStationsFragment : Fragment() {
         dialog.show()
     }
 
+    private fun showLanguageFilterDialog() {
+        val languages = viewModel.languages.value ?: return
+        if (languages.isEmpty()) {
+            Toast.makeText(requireContext(), R.string.loading_languages, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Variable to hold the temporary selection
+        val currentLanguage = viewModel.selectedLanguage.value
+        var tempSelectedLanguageIndex: Int? = if (currentLanguage == null) {
+            null // "All Languages"
+        } else {
+            languages.indexOf(currentLanguage).takeIf { it >= 0 }
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.select_language)
+            .setView(createLanguageSearchView(languages, tempSelectedLanguageIndex) { selectedIndex ->
+                // Store the temporary selection but don't apply yet
+                tempSelectedLanguageIndex = selectedIndex
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                // Apply the selection when OK is clicked
+                if (tempSelectedLanguageIndex == null) {
+                    viewModel.filterByLanguage(null)
+                    selectTopVotedChip()
+                } else {
+                    viewModel.filterByLanguage(languages[tempSelectedLanguageIndex!!])
+                    clearChipSelection()
+                    clearSearch()
+                }
+            }
+            .create()
+
+        dialog.show()
+    }
+
     private fun createCountrySearchView(
         countries: List<com.opensource.i2pradio.data.radiobrowser.CountryInfo>,
         selectedIndex: Int?,
@@ -645,6 +706,87 @@ class BrowseStationsFragment : Fragment() {
         return container
     }
 
+    private fun createLanguageSearchView(
+        languages: List<com.opensource.i2pradio.data.radiobrowser.LanguageInfo>,
+        selectedIndex: Int?,
+        onLanguageSelected: (Int?) -> Unit
+    ): View {
+        val context = requireContext()
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 8, 0, 0)
+        }
+
+        // Search input with improved styling
+        val searchInput = TextInputEditText(context).apply {
+            hint = getString(R.string.search_languages)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+
+        val searchLayout = com.google.android.material.textfield.TextInputLayout(context).apply {
+            boxBackgroundMode = com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILLED
+            isHintEnabled = true
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
+            setStartIconDrawable(R.drawable.ic_search)
+            addView(searchInput)
+        }
+
+        container.addView(searchLayout, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            setMargins(24, 0, 24, 8)
+        })
+
+        // Divider
+        val divider = View(context).apply {
+            val dividerColor = com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOutlineVariant
+            )
+            setBackgroundColor(dividerColor)
+        }
+        container.addView(divider, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            1
+        ))
+
+        // RecyclerView for language list
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+            // Set a max height for the dialog (approx 400dp)
+            val maxHeight = (400 * resources.displayMetrics.density).toInt()
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                maxHeight
+            )
+            clipToPadding = false
+            setPadding(0, 8, 0, 0)
+        }
+
+        var filteredLanguages = languages.toList()
+        val adapter = LanguageAdapter(filteredLanguages, selectedIndex, onLanguageSelected)
+        recyclerView.adapter = adapter
+
+        // Search functionality
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString() ?: ""
+                filteredLanguages = if (query.isEmpty()) {
+                    languages
+                } else {
+                    languages.filter { it.name.contains(query, ignoreCase = true) }
+                }
+                adapter.updateLanguages(filteredLanguages)
+            }
+        })
+
+        container.addView(recyclerView)
+        return container
+    }
+
     // Adapter for Country list with search
     private inner class CountryAdapter(
         private var countries: List<com.opensource.i2pradio.data.radiobrowser.CountryInfo>,
@@ -769,6 +911,69 @@ class BrowseStationsFragment : Fragment() {
         }
 
         override fun getItemCount() = tags.size + 1 // +1 for "All Genres"
+    }
+
+    // Adapter for Language list with search
+    private inner class LanguageAdapter(
+        private var languages: List<com.opensource.i2pradio.data.radiobrowser.LanguageInfo>,
+        private val initialSelectedIndex: Int?,
+        private val onLanguageSelected: (Int?) -> Unit
+    ) : RecyclerView.Adapter<LanguageAdapter.ViewHolder>() {
+
+        private var selectedPosition: Int = -1 // -1 means "All Languages"
+        private val originalLanguages = languages
+
+        init {
+            selectedPosition = initialSelectedIndex ?: -1
+        }
+
+        fun updateLanguages(newLanguages: List<com.opensource.i2pradio.data.radiobrowser.LanguageInfo>) {
+            languages = newLanguages
+            notifyDataSetChanged()
+        }
+
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val textView: TextView? = view.findViewById(android.R.id.text1)
+            val radioButton: android.widget.RadioButton? = view.findViewById(R.id.radio_button)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(
+                R.layout.item_genre_choice, parent, false
+            )
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            if (position >= itemCount) return
+
+            if (position == 0) {
+                // "All Languages" option
+                holder.textView?.text = getString(R.string.filter_all_languages)
+                holder.radioButton?.isChecked = selectedPosition == -1
+
+                holder.itemView.setOnClickListener {
+                    selectedPosition = -1
+                    notifyDataSetChanged()
+                    onLanguageSelected(null)
+                }
+            } else {
+                val language = languages[position - 1]
+                holder.textView?.text = "${language.name} (${language.stationCount})"
+
+                // Find the index in the original list
+                val originalIndex = originalLanguages.indexOf(language)
+                holder.radioButton?.isChecked = selectedPosition == originalIndex
+
+                holder.itemView.setOnClickListener {
+                    selectedPosition = originalIndex
+                    notifyDataSetChanged()
+                    onLanguageSelected(originalIndex)
+                }
+            }
+        }
+
+        override fun getItemCount() = languages.size + 1 // +1 for "All Languages"
     }
 
     override fun onResume() {
