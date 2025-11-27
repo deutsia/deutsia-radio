@@ -1,5 +1,7 @@
 package com.opensource.i2pradio
 
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -65,6 +67,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
+@OptIn(UnstableApi::class)
 class RadioService : Service() {
     private var player: ExoPlayer? = null
     private val binder = RadioBinder()
