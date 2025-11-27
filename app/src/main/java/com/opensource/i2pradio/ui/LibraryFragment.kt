@@ -200,9 +200,28 @@ class LibraryFragment : Fragment() {
         val filteredStations = if (currentSearchQuery.isEmpty()) {
             allStationsCache
         } else {
+            // Intelligent multi-word search across multiple fields
+            val searchTerms = currentSearchQuery.split("\\s+".toRegex())
+                .filter { it.isNotBlank() }
+                .map { it.lowercase() }
+
             allStationsCache.filter { station ->
-                station.name.contains(currentSearchQuery, ignoreCase = true) ||
-                station.genre.contains(currentSearchQuery, ignoreCase = true)
+                // Create a searchable text combining all relevant fields
+                val searchableText = buildString {
+                    append(station.name.lowercase())
+                    append(" ")
+                    append(station.genre.lowercase())
+                    append(" ")
+                    append(station.country.lowercase())
+                    append(" ")
+                    append(station.countryCode.lowercase())
+                }
+
+                // Check if all search terms match somewhere in the searchable text
+                // This allows multi-word queries like "BBC London" or "Jazz Germany"
+                searchTerms.all { term ->
+                    searchableText.contains(term)
+                }
             }
         }
 
