@@ -1049,7 +1049,13 @@ class RadioService : Service() {
                 Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
             }
             currentProxyHost?.isNotEmpty() == true && currentProxyType != ProxyType.NONE -> {
-                Triple(currentProxyHost!!, currentProxyPort, currentProxyType)
+                // BUG FIX: Don't use Tor proxy if Tor integration is disabled
+                if (currentProxyType == ProxyType.TOR && !PreferencesHelper.isEmbeddedTorEnabled(this)) {
+                    android.util.Log.w("RadioService", "Recording requires Tor but Tor integration is disabled - using direct connection")
+                    Triple("", 0, ProxyType.NONE)
+                } else {
+                    Triple(currentProxyHost!!, currentProxyPort, currentProxyType)
+                }
             }
             else -> Triple("", 0, ProxyType.NONE)
         }
@@ -1377,9 +1383,15 @@ class RadioService : Service() {
                     android.util.Log.d("RadioService", "Using embedded Tor proxy for .onion stream")
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
-                // Use manual proxy configuration
+                // Use manual proxy configuration (but only if Tor integration is enabled for TOR proxies)
                 proxyHost.isNotEmpty() && proxyType != ProxyType.NONE -> {
-                    Triple(proxyHost, proxyPort, proxyType)
+                    // BUG FIX: Don't use Tor proxy if Tor integration is disabled
+                    if (proxyType == ProxyType.TOR && !PreferencesHelper.isEmbeddedTorEnabled(this)) {
+                        android.util.Log.w("RadioService", "Station requires Tor but Tor integration is disabled - using direct connection")
+                        Triple("", 0, ProxyType.NONE)
+                    } else {
+                        Triple(proxyHost, proxyPort, proxyType)
+                    }
                 }
                 // Direct connection (only if Force Tor modes are disabled)
                 else -> Triple("", 0, ProxyType.NONE)
