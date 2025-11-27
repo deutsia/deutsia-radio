@@ -444,23 +444,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 BrowseCategory.SEARCH -> {
                     val query = _searchQuery.value
                     if (!query.isNullOrBlank()) {
-                        // Search by name first
-                        val nameResult = repository.searchByName(query, pageSize, currentOffset)
-
-                        // If searching on first page, also search by tag and combine results
-                        if (currentOffset == 0 && nameResult is RadioBrowserResult.Success) {
-                            val tagResult = repository.getByTag(query, pageSize / 2, 0)
-                            if (tagResult is RadioBrowserResult.Success) {
-                                // Combine results, removing duplicates
-                                val combined = (nameResult.data + tagResult.data)
-                                    .distinctBy { it.stationuuid }
-                                RadioBrowserResult.Success(combined)
-                            } else {
-                                nameResult
-                            }
-                        } else {
-                            nameResult
-                        }
+                        // Intelligent multi-word search across multiple fields
+                        performIntelligentSearch(query, pageSize, currentOffset)
                     } else {
                         RadioBrowserResult.Error("Empty search query")
                     }
@@ -546,6 +531,66 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 checkSavedStatus(currentStations)
             }
         }
+    }
+
+    /**
+     * Perform intelligent multi-field search that supports:
+     * - Multi-word queries (e.g., "BBC London", "Rock USA")
+     * - Searching by genre/tag (e.g., "Jazz", "Classical")
+     * - Searching by country (e.g., "Germany", "USA")
+     * - Combined searches (e.g., "Rock Germany" finds rock stations from Germany)
+     */
+    private suspend fun performIntelligentSearch(
+        query: String,
+        limit: Int,
+        offset: Int
+    ): RadioBrowserResult<List<RadioBrowserStation>> {
+        val trimmedQuery = query.trim()
+
+        // Use the advanced searchStations API that searches multiple fields simultaneously
+        // This single call searches across name, tag, and country fields
+        val mainResult = repository.searchStations(
+            name = trimmedQuery,
+            tag = trimmedQuery,
+            country = trimmedQuery,
+            limit = limit,
+            offset = offset
+        )
+
+        // On first page, also try searching for individual words to catch more results
+        // For example, "BBC London" will also search for "BBC" and "London" separately
+        if (offset == 0 && mainResult is RadioBrowserResult.Success) {
+            val words = trimmedQuery.split("\\s+".toRegex()).filter { it.length >= 2 }
+
+            // Only do multi-word search if there are actually multiple words
+            if (words.size > 1) {
+                val additionalResults = mutableListOf<RadioBrowserStation>()
+
+                // Search for each word individually (limit results to avoid overwhelming)
+                words.take(3).forEach { word ->
+                    val wordResult = repository.searchStations(
+                        name = word,
+                        tag = word,
+                        country = word,
+                        limit = 10,
+                        offset = 0
+                    )
+                    if (wordResult is RadioBrowserResult.Success) {
+                        additionalResults.addAll(wordResult.data)
+                    }
+                }
+
+                // Combine and deduplicate results
+                // Prioritize exact matches from mainResult by putting them first
+                val combined = (mainResult.data + additionalResults)
+                    .distinctBy { it.stationuuid }
+                    .take(limit)
+
+                return RadioBrowserResult.Success(combined)
+            }
+        }
+
+        return mainResult
     }
 
     override fun onCleared() {
