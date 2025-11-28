@@ -477,6 +477,12 @@ class LibraryFragment : Fragment() {
             putExtra("proxy_port", station.proxyPort)
             putExtra("proxy_type", proxyType.name)
             putExtra("cover_art_uri", station.coverArtUri)
+            // Custom proxy fields
+            putExtra("custom_proxy_protocol", station.customProxyProtocol)
+            putExtra("proxy_username", station.proxyUsername)
+            putExtra("proxy_password", station.proxyPassword)
+            putExtra("proxy_auth_type", station.proxyAuthType)
+            putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
         }
         // Use startForegroundService for Android 8+ compatibility
         ContextCompat.startForegroundService(requireContext(), intent)
