@@ -510,6 +510,7 @@ class NowPlayingFragment : Fragment() {
                     when (station.getProxyTypeEnum()) {
                         ProxyType.I2P -> " • I2P"
                         ProxyType.TOR -> " • Tor"
+                        ProxyType.CUSTOM -> " • Custom"
                         ProxyType.NONE -> ""
                     }
                 } else ""

@@ -108,6 +108,7 @@ object StationImportExport {
                     when (ProxyType.fromString(station.proxyType)) {
                         ProxyType.I2P -> " [I2P]"
                         ProxyType.TOR -> " [Tor]"
+                        ProxyType.CUSTOM -> " [Custom]"
                         ProxyType.NONE -> ""
                     }
                 } else ""
@@ -149,6 +150,7 @@ object StationImportExport {
                     when (ProxyType.fromString(station.proxyType)) {
                         ProxyType.I2P -> " [I2P]"
                         ProxyType.TOR -> " [Tor]"
+                        ProxyType.CUSTOM -> " [Custom]"
                         ProxyType.NONE -> ""
                     }
                 } else ""
@@ -388,7 +390,7 @@ object StationImportExport {
                     // Parse: #EXTINF:duration,title [info]
                     val info = trimmed.substringAfter(",").trim()
                     // Remove proxy indicators from name
-                    currentName = info.replace(Regex("\\s*\\[(I2P|Tor)\\]\\s*$"), "").trim()
+                    currentName = info.replace(Regex("\\s*\\[(I2P|Tor|Custom)\\]\\s*$"), "").trim()
 
                     // Detect proxy type from indicator
                     when {
@@ -401,6 +403,10 @@ object StationImportExport {
                             currentProxyType = ProxyType.TOR
                             currentProxyHost = ProxyType.TOR.getDefaultHost()
                             currentProxyPort = ProxyType.TOR.getDefaultPort()
+                        }
+                        info.contains("[Custom]") -> {
+                            currentProxyType = ProxyType.CUSTOM
+                            // Custom proxy requires explicit host/port from metadata
                         }
                     }
                 }
@@ -507,6 +513,10 @@ object StationImportExport {
                             title.contains("[Tor]") -> {
                                 proxyTypes[num] = ProxyType.TOR
                                 title = title.replace(Regex("\\s*\\[Tor\\]\\s*"), "")
+                            }
+                            title.contains("[Custom]") -> {
+                                proxyTypes[num] = ProxyType.CUSTOM
+                                title = title.replace(Regex("\\s*\\[Custom\\]\\s*"), "")
                             }
                         }
                         titles[num] = title.trim()
