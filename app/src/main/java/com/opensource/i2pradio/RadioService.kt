@@ -1084,6 +1084,7 @@ class RadioService : Service() {
         when (effectiveProxyType) {
             ProxyType.TOR -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through TOR SOCKS proxy")
             ProxyType.I2P -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through I2P HTTP proxy")
+            ProxyType.CUSTOM -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through CUSTOM proxy")
             ProxyType.NONE -> android.util.Log.w("RadioService", "RECORDING ROUTING: DIRECT - No proxy!")
         }
         android.util.Log.d("RadioService", "======================================")
@@ -1115,9 +1116,29 @@ class RadioService : Service() {
             val javaProxyType = when (effectiveProxyType) {
                 ProxyType.TOR -> Proxy.Type.SOCKS
                 ProxyType.I2P -> Proxy.Type.HTTP
+                ProxyType.CUSTOM -> {
+                    // Parse custom proxy protocol
+                    when (currentCustomProxyProtocol.uppercase()) {
+                        "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
+                        "HTTP", "HTTPS" -> Proxy.Type.HTTP
+                        else -> Proxy.Type.HTTP
+                    }
+                }
                 ProxyType.NONE -> Proxy.Type.DIRECT
             }
             builder.proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
+
+            // Add proxy authentication if custom proxy with credentials
+            if (effectiveProxyType == ProxyType.CUSTOM && currentProxyUsername.isNotEmpty() && currentProxyPassword.isNotEmpty()) {
+                android.util.Log.d("RadioService", "Adding proxy authentication for recording client")
+                builder.proxyAuthenticator { route, response ->
+                    val credential = okhttp3.Credentials.basic(currentProxyUsername, currentProxyPassword)
+                    response.request.newBuilder()
+                        .header("Proxy-Authorization", credential)
+                        .build()
+                }
+            }
+
             android.util.Log.d("RadioService", "Recording client using ${effectiveProxyType.name} proxy: $effectiveProxyHost:$effectiveProxyPort")
         } else {
             android.util.Log.d("RadioService", "Recording client using direct connection")
