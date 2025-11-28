@@ -556,51 +556,58 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             )
         }
 
+        // Split query into words for intelligent multi-field search
+        val words = trimmedQuery.split("\\s+".toRegex())
+            .filter { it.length >= 2 }
+
         // For first page: Search across multiple fields using OR logic
         // Make separate API calls for each field and combine results
         val allResults = mutableListOf<RadioBrowserStation>()
 
-        // Search by name
-        val nameResult = repository.searchStations(
-            name = trimmedQuery,
-            limit = limit,
-            offset = 0
-        )
-        if (nameResult is RadioBrowserResult.Success) {
-            allResults.addAll(nameResult.data)
-        }
+        // For each word in the query, search across all fields
+        // This allows "Jazz Germany" to find stations with "Jazz" in tags AND "Germany" in country
+        words.forEach { word ->
+            // Search by name for this word
+            val nameResult = repository.searchStations(
+                name = word,
+                limit = limit,
+                offset = 0
+            )
+            if (nameResult is RadioBrowserResult.Success) {
+                allResults.addAll(nameResult.data)
+            }
 
-        // Search by tag/genre
-        val tagResult = repository.searchStations(
-            tag = trimmedQuery,
-            limit = limit / 2,
-            offset = 0
-        )
-        if (tagResult is RadioBrowserResult.Success) {
-            allResults.addAll(tagResult.data)
-        }
+            // Search by tag/genre for this word
+            val tagResult = repository.searchStations(
+                tag = word,
+                limit = limit / 2,
+                offset = 0
+            )
+            if (tagResult is RadioBrowserResult.Success) {
+                allResults.addAll(tagResult.data)
+            }
 
-        // Search by country
-        val countryResult = repository.searchStations(
-            country = trimmedQuery,
-            limit = limit / 2,
-            offset = 0
-        )
-        if (countryResult is RadioBrowserResult.Success) {
-            allResults.addAll(countryResult.data)
+            // Search by country for this word
+            val countryResult = repository.searchStations(
+                country = word,
+                limit = limit / 2,
+                offset = 0
+            )
+            if (countryResult is RadioBrowserResult.Success) {
+                allResults.addAll(countryResult.data)
+            }
         }
 
         // If no results from any search, return error
         if (allResults.isEmpty()) {
-            return nameResult // Return the error from name search
+            return RadioBrowserResult.Error("No stations found for: $trimmedQuery")
         }
 
-        // For multi-word queries, filter results client-side
-        val words = trimmedQuery.split("\\s+".toRegex())
-            .filter { it.length >= 2 }
-            .map { it.lowercase() }
+        // For multi-word queries, filter results client-side to keep only stations
+        // that match ALL words somewhere in their searchable fields
+        val searchTerms = words.map { it.lowercase() }
 
-        val filteredResults = if (words.size > 1) {
+        val filteredResults = if (searchTerms.size > 1) {
             // Multi-word query: filter to stations that match all words somewhere
             allResults.filter { station ->
                 val searchableText = buildString {
@@ -611,7 +618,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                     append(station.country.lowercase())
                 }
                 // All words must appear somewhere in the station's searchable text
-                words.all { word -> searchableText.contains(word) }
+                searchTerms.all { term -> searchableText.contains(term) }
             }
         } else {
             allResults
