@@ -547,50 +547,82 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     ): RadioBrowserResult<List<RadioBrowserStation>> {
         val trimmedQuery = query.trim()
 
-        // Use the advanced searchStations API that searches multiple fields simultaneously
-        // This single call searches across name, tag, and country fields
-        val mainResult = repository.searchStations(
-            name = trimmedQuery,
-            tag = trimmedQuery,
-            country = trimmedQuery,
-            limit = limit,
-            offset = offset
-        )
-
-        // On first page, also try searching for individual words to catch more results
-        // For example, "BBC London" will also search for "BBC" and "London" separately
-        if (offset == 0 && mainResult is RadioBrowserResult.Success) {
-            val words = trimmedQuery.split("\\s+".toRegex()).filter { it.length >= 2 }
-
-            // Only do multi-word search if there are actually multiple words
-            if (words.size > 1) {
-                val additionalResults = mutableListOf<RadioBrowserStation>()
-
-                // Search for each word individually (limit results to avoid overwhelming)
-                words.take(3).forEach { word ->
-                    val wordResult = repository.searchStations(
-                        name = word,
-                        tag = word,
-                        country = word,
-                        limit = 10,
-                        offset = 0
-                    )
-                    if (wordResult is RadioBrowserResult.Success) {
-                        additionalResults.addAll(wordResult.data)
-                    }
-                }
-
-                // Combine and deduplicate results
-                // Prioritize exact matches from mainResult by putting them first
-                val combined = (mainResult.data + additionalResults)
-                    .distinctBy { it.stationuuid }
-                    .take(limit)
-
-                return RadioBrowserResult.Success(combined)
-            }
+        // For pagination (offset > 0), only search by name to keep it simple
+        if (offset > 0) {
+            return repository.searchStations(
+                name = trimmedQuery,
+                limit = limit,
+                offset = offset
+            )
         }
 
-        return mainResult
+        // For first page: Search across multiple fields using OR logic
+        // Make separate API calls for each field and combine results
+        val allResults = mutableListOf<RadioBrowserStation>()
+
+        // Search by name
+        val nameResult = repository.searchStations(
+            name = trimmedQuery,
+            limit = limit,
+            offset = 0
+        )
+        if (nameResult is RadioBrowserResult.Success) {
+            allResults.addAll(nameResult.data)
+        }
+
+        // Search by tag/genre
+        val tagResult = repository.searchStations(
+            tag = trimmedQuery,
+            limit = limit / 2,
+            offset = 0
+        )
+        if (tagResult is RadioBrowserResult.Success) {
+            allResults.addAll(tagResult.data)
+        }
+
+        // Search by country
+        val countryResult = repository.searchStations(
+            country = trimmedQuery,
+            limit = limit / 2,
+            offset = 0
+        )
+        if (countryResult is RadioBrowserResult.Success) {
+            allResults.addAll(countryResult.data)
+        }
+
+        // If no results from any search, return error
+        if (allResults.isEmpty()) {
+            return nameResult // Return the error from name search
+        }
+
+        // For multi-word queries, filter results client-side
+        val words = trimmedQuery.split("\\s+".toRegex())
+            .filter { it.length >= 2 }
+            .map { it.lowercase() }
+
+        val filteredResults = if (words.size > 1) {
+            // Multi-word query: filter to stations that match all words somewhere
+            allResults.filter { station ->
+                val searchableText = buildString {
+                    append(station.name.lowercase())
+                    append(" ")
+                    append(station.tags.lowercase())
+                    append(" ")
+                    append(station.country.lowercase())
+                }
+                // All words must appear somewhere in the station's searchable text
+                words.all { word -> searchableText.contains(word) }
+            }
+        } else {
+            allResults
+        }
+
+        // Deduplicate and limit results
+        val deduplicated = filteredResults
+            .distinctBy { it.stationuuid }
+            .take(limit)
+
+        return RadioBrowserResult.Success(deduplicated)
     }
 
     override fun onCleared() {
