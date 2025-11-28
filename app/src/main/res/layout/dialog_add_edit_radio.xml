@@ -194,8 +194,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:hint="Username (optional)"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                app:startIconDrawable="@drawable/ic_person">
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/proxyUsernameInput"
@@ -213,7 +212,6 @@
                 android:layout_marginTop="8dp"
                 android:hint="Password (optional)"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                app:startIconDrawable="@drawable/ic_lock"
                 app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
