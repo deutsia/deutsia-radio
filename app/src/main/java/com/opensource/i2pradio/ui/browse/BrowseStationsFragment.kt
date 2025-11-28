@@ -336,6 +336,12 @@ class BrowseStationsFragment : Fragment() {
             putExtra("proxy_port", 0)
             putExtra("proxy_type", "NONE")
             putExtra("cover_art_uri", radioStation.coverArtUri)
+            // Custom proxy fields (default values for new RadioBrowser stations)
+            putExtra("custom_proxy_protocol", "HTTP")
+            putExtra("proxy_username", "")
+            putExtra("proxy_password", "")
+            putExtra("proxy_auth_type", "NONE")
+            putExtra("proxy_connection_timeout", 30)
         }
         ContextCompat.startForegroundService(requireContext(), intent)
     }

@@ -73,6 +73,12 @@ class RadioService : Service() {
     private var currentProxyHost: String? = null
     private var currentProxyPort: Int = 4444
     private var currentProxyType: ProxyType = ProxyType.NONE
+    // Custom proxy fields
+    private var currentCustomProxyProtocol: String = "HTTP"
+    private var currentProxyUsername: String = ""
+    private var currentProxyPassword: String = ""
+    private var currentProxyAuthType: String = "NONE"
+    private var currentProxyConnectionTimeout: Int = 30
     private val handler = Handler(Looper.getMainLooper())
     private var reconnectAttempts = 0
     private val maxReconnectAttempts = 10
@@ -385,10 +391,22 @@ class RadioService : Service() {
                 val stationName = intent.getStringExtra("station_name") ?: "Unknown Station"
                 val coverArtUri = intent.getStringExtra("cover_art_uri")
 
+                // Custom proxy fields
+                val customProxyProtocol = intent.getStringExtra("custom_proxy_protocol") ?: "HTTP"
+                val proxyUsername = intent.getStringExtra("proxy_username") ?: ""
+                val proxyPassword = intent.getStringExtra("proxy_password") ?: ""
+                val proxyAuthType = intent.getStringExtra("proxy_auth_type") ?: "NONE"
+                val proxyConnectionTimeout = intent.getIntExtra("proxy_connection_timeout", 30)
+
                 currentStreamUrl = streamUrl
                 currentProxyHost = proxyHost
                 currentProxyPort = proxyPort
                 currentProxyType = proxyType
+                currentCustomProxyProtocol = customProxyProtocol
+                currentProxyUsername = proxyUsername
+                currentProxyPassword = proxyPassword
+                currentProxyAuthType = proxyAuthType
+                currentProxyConnectionTimeout = proxyConnectionTimeout
                 currentStationName = stationName
                 currentCoverArtUri = coverArtUri
                 reconnectAttempts = 0
@@ -405,7 +423,7 @@ class RadioService : Service() {
                 updateMediaMetadata(stationName, coverArtUri)
                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
 
-                playStream(streamUrl, proxyHost, proxyPort, proxyType)
+                playStream(streamUrl, proxyHost, proxyPort, proxyType, customProxyProtocol, proxyUsername, proxyPassword, proxyAuthType, proxyConnectionTimeout)
             }
             ACTION_PAUSE -> {
                 player?.pause()
@@ -1278,7 +1296,17 @@ class RadioService : Service() {
         }
     }
 
-    private fun playStream(streamUrl: String, proxyHost: String, proxyPort: Int, proxyType: ProxyType = ProxyType.NONE) {
+    private fun playStream(
+        streamUrl: String,
+        proxyHost: String,
+        proxyPort: Int,
+        proxyType: ProxyType = ProxyType.NONE,
+        customProxyProtocol: String = "HTTP",
+        proxyUsername: String = "",
+        proxyPassword: String = "",
+        proxyAuthType: String = "NONE",
+        proxyConnectionTimeout: Int = 30
+    ) {
         try {
             // Check Force Tor settings FIRST - bulletproof mode
             val forceTorAll = PreferencesHelper.isForceTorAll(this)
@@ -1403,6 +1431,12 @@ class RadioService : Service() {
             when (effectiveProxyType) {
                 ProxyType.TOR -> android.util.Log.d("RadioService", "ROUTING: Traffic will go through TOR SOCKS proxy")
                 ProxyType.I2P -> android.util.Log.d("RadioService", "ROUTING: Traffic will go through I2P HTTP proxy")
+                ProxyType.CUSTOM -> {
+                    android.util.Log.d("RadioService", "ROUTING: Traffic will go through CUSTOM $customProxyProtocol proxy")
+                    if (proxyUsername.isNotEmpty()) {
+                        android.util.Log.d("RadioService", "CUSTOM PROXY: Using authentication (username: $proxyUsername, auth type: $proxyAuthType)")
+                    }
+                }
                 ProxyType.NONE -> android.util.Log.w("RadioService", "ROUTING: DIRECT CONNECTION - No proxy! (potential leak if unintended)")
             }
             android.util.Log.d("RadioService", "==================================")
@@ -1415,13 +1449,42 @@ class RadioService : Service() {
                     val javaProxyType = when (effectiveProxyType) {
                         ProxyType.TOR -> Proxy.Type.SOCKS
                         ProxyType.I2P -> Proxy.Type.HTTP
+                        ProxyType.CUSTOM -> {
+                            // Parse custom proxy protocol
+                            when (customProxyProtocol.uppercase()) {
+                                "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
+                                "HTTP", "HTTPS" -> Proxy.Type.HTTP
+                                else -> Proxy.Type.HTTP
+                            }
+                        }
                         ProxyType.NONE -> Proxy.Type.DIRECT
                     }
                     android.util.Log.d("RadioService", "Using ${effectiveProxyType.name} proxy: $effectiveProxyHost:$effectiveProxyPort")
-                    OkHttpClient.Builder()
+
+                    val builder = OkHttpClient.Builder()
                         .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
-                        .connectTimeout(60, TimeUnit.SECONDS)
-                        .readTimeout(60, TimeUnit.SECONDS)
+
+                    // Add proxy authentication if custom proxy with credentials
+                    if (effectiveProxyType == ProxyType.CUSTOM && proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()) {
+                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy")
+                        builder.proxyAuthenticator { route, response ->
+                            val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
+                            response.request.newBuilder()
+                                .header("Proxy-Authorization", credential)
+                                .build()
+                        }
+                    }
+
+                    // Use custom connection timeout for CUSTOM proxy type
+                    val timeout = if (effectiveProxyType == ProxyType.CUSTOM && proxyConnectionTimeout > 0) {
+                        proxyConnectionTimeout.toLong()
+                    } else {
+                        60L
+                    }
+
+                    builder
+                        .connectTimeout(timeout, TimeUnit.SECONDS)
+                        .readTimeout(timeout, TimeUnit.SECONDS)
                         .build()
                 } else {
                     OkHttpClient.Builder()
@@ -1608,7 +1671,9 @@ class RadioService : Service() {
 
         reconnectRunnable = Runnable {
             currentStreamUrl?.let { url ->
-                playStream(url, currentProxyHost ?: "", currentProxyPort, currentProxyType)
+                playStream(url, currentProxyHost ?: "", currentProxyPort, currentProxyType,
+                    currentCustomProxyProtocol, currentProxyUsername, currentProxyPassword,
+                    currentProxyAuthType, currentProxyConnectionTimeout)
             }
         }
         handler.postDelayed(reconnectRunnable!!, delay)

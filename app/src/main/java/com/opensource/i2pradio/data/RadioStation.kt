@@ -8,17 +8,20 @@ import androidx.room.PrimaryKey
  * - NONE: Direct connection without proxy
  * - I2P: HTTP proxy (default port 4444)
  * - TOR: SOCKS5 proxy (default port 9050)
+ * - CUSTOM: User-defined custom proxy with full configuration
  */
 enum class ProxyType {
     NONE,
     I2P,
-    TOR;
+    TOR,
+    CUSTOM;
 
     companion object {
         fun fromString(value: String?): ProxyType {
             return when (value?.uppercase()) {
                 "I2P" -> I2P
                 "TOR" -> TOR
+                "CUSTOM" -> CUSTOM
                 else -> NONE
             }
         }
@@ -29,6 +32,7 @@ enum class ProxyType {
             NONE -> 0
             I2P -> 4444
             TOR -> 9050
+            CUSTOM -> 8080
         }
     }
 
@@ -36,6 +40,62 @@ enum class ProxyType {
         return when (this) {
             NONE -> ""
             I2P, TOR -> "127.0.0.1"
+            CUSTOM -> ""
+        }
+    }
+}
+
+/**
+ * Custom proxy protocol types
+ * - HTTP: Standard HTTP proxy
+ * - HTTPS: HTTP proxy over TLS
+ * - SOCKS4: SOCKS version 4 proxy
+ * - SOCKS5: SOCKS version 5 proxy (supports authentication)
+ */
+enum class ProxyProtocol {
+    HTTP,
+    HTTPS,
+    SOCKS4,
+    SOCKS5;
+
+    companion object {
+        fun fromString(value: String?): ProxyProtocol {
+            return when (value?.uppercase()) {
+                "HTTP" -> HTTP
+                "HTTPS" -> HTTPS
+                "SOCKS4" -> SOCKS4
+                "SOCKS5" -> SOCKS5
+                else -> HTTP
+            }
+        }
+    }
+
+    fun toJavaProxyType(): java.net.Proxy.Type {
+        return when (this) {
+            HTTP, HTTPS -> java.net.Proxy.Type.HTTP
+            SOCKS4, SOCKS5 -> java.net.Proxy.Type.SOCKS
+        }
+    }
+}
+
+/**
+ * Proxy authentication method
+ * - NONE: No authentication required
+ * - BASIC: HTTP Basic authentication (username:password in Base64)
+ * - DIGEST: HTTP Digest authentication (more secure than Basic)
+ */
+enum class ProxyAuthType {
+    NONE,
+    BASIC,
+    DIGEST;
+
+    companion object {
+        fun fromString(value: String?): ProxyAuthType {
+            return when (value?.uppercase()) {
+                "BASIC" -> BASIC
+                "DIGEST" -> DIGEST
+                else -> NONE
+            }
         }
     }
 }
@@ -77,7 +137,15 @@ data class RadioStation(
     val codec: String = "", // Audio codec (from RadioBrowser)
     val country: String = "", // Country name (from RadioBrowser)
     val countryCode: String = "", // ISO country code (from RadioBrowser)
-    val homepage: String = "" // Station homepage URL
+    val homepage: String = "", // Station homepage URL
+    // Custom proxy configuration fields
+    val customProxyProtocol: String = ProxyProtocol.HTTP.name, // HTTP, HTTPS, SOCKS4, SOCKS5
+    val proxyUsername: String = "", // Optional proxy authentication username
+    val proxyPassword: String = "", // Optional proxy authentication password
+    val proxyAuthType: String = ProxyAuthType.NONE.name, // NONE, BASIC, DIGEST
+    val proxyDnsResolution: Boolean = true, // Resolve DNS through proxy
+    val proxyConnectionTimeout: Int = 30, // Connection timeout in seconds (0 = use default)
+    val proxyBypassLocalAddresses: Boolean = false // Bypass proxy for local/private addresses
 ) {
     /**
      * Get the ProxyType enum from the stored string
@@ -113,5 +181,46 @@ data class RadioStation(
         if (bitrate > 0) parts.add("${bitrate}kbps")
         if (codec.isNotEmpty()) parts.add(codec.uppercase())
         return parts.joinToString(" ")
+    }
+
+    /**
+     * Get the ProxyProtocol enum from the stored string (for CUSTOM proxy type)
+     */
+    fun getCustomProxyProtocolEnum(): ProxyProtocol = ProxyProtocol.fromString(customProxyProtocol)
+
+    /**
+     * Get the ProxyAuthType enum from the stored string
+     */
+    fun getProxyAuthTypeEnum(): ProxyAuthType = ProxyAuthType.fromString(proxyAuthType)
+
+    /**
+     * Check if proxy authentication is configured
+     */
+    fun hasProxyAuthentication(): Boolean = proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()
+
+    /**
+     * Check if this is a custom proxy with valid configuration
+     */
+    fun isCustomProxy(): Boolean = getProxyTypeEnum() == ProxyType.CUSTOM && proxyHost.isNotEmpty()
+
+    /**
+     * Get effective connection timeout (returns 30 if set to 0 or negative)
+     */
+    fun getEffectiveConnectionTimeout(): Int = if (proxyConnectionTimeout > 0) proxyConnectionTimeout else 30
+
+    /**
+     * Get a display string for the proxy configuration
+     */
+    fun getProxyDisplayString(): String {
+        return when (val type = getProxyTypeEnum()) {
+            ProxyType.NONE -> "Direct Connection"
+            ProxyType.I2P -> "I2P ($proxyHost:$proxyPort)"
+            ProxyType.TOR -> "Tor ($proxyHost:$proxyPort)"
+            ProxyType.CUSTOM -> {
+                val protocol = getCustomProxyProtocolEnum().name
+                val auth = if (hasProxyAuthentication()) " [Auth]" else ""
+                "$protocol Proxy ($proxyHost:$proxyPort)$auth"
+            }
+        }
     }
 }

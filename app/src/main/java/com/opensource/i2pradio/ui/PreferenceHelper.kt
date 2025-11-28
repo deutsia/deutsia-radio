@@ -25,6 +25,18 @@ object PreferencesHelper {
     private const val KEY_RECORD_ALL_STATIONS = "record_all_stations"
     private const val KEY_COLOR_SCHEME = "color_scheme"
 
+    // Custom proxy settings (global defaults)
+    private const val KEY_CUSTOM_PROXY_ENABLED = "custom_proxy_enabled"
+    private const val KEY_CUSTOM_PROXY_HOST = "custom_proxy_host"
+    private const val KEY_CUSTOM_PROXY_PORT = "custom_proxy_port"
+    private const val KEY_CUSTOM_PROXY_PROTOCOL = "custom_proxy_protocol"
+    private const val KEY_CUSTOM_PROXY_USERNAME = "custom_proxy_username"
+    private const val KEY_CUSTOM_PROXY_PASSWORD = "custom_proxy_password"
+    private const val KEY_CUSTOM_PROXY_AUTH_TYPE = "custom_proxy_auth_type"
+    private const val KEY_CUSTOM_PROXY_DNS_RESOLUTION = "custom_proxy_dns_resolution"
+    private const val KEY_CUSTOM_PROXY_CONNECTION_TIMEOUT = "custom_proxy_connection_timeout"
+    private const val KEY_CUSTOM_PROXY_BYPASS_LOCAL = "custom_proxy_bypass_local"
+
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
@@ -326,5 +338,160 @@ object PreferencesHelper {
     fun getColorScheme(context: Context): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_COLOR_SCHEME, "default") ?: "default"
+    }
+
+    // Custom Proxy Settings - Global defaults that can be applied to stations
+    // These settings allow users to configure a custom HTTP/SOCKS proxy with authentication
+    // for enhanced privacy and network routing control
+
+    /**
+     * Enable/disable global custom proxy.
+     * When enabled, this provides default proxy settings that can be used for new stations.
+     */
+    fun setCustomProxyEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_CUSTOM_PROXY_ENABLED, enabled)
+            .apply()
+    }
+
+    fun isCustomProxyEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_CUSTOM_PROXY_ENABLED, false)
+    }
+
+    /**
+     * Set custom proxy host (IP address or hostname)
+     */
+    fun setCustomProxyHost(context: Context, host: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_CUSTOM_PROXY_HOST, host)
+            .apply()
+    }
+
+    fun getCustomProxyHost(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CUSTOM_PROXY_HOST, "") ?: ""
+    }
+
+    /**
+     * Set custom proxy port (typically 8080 for HTTP, 1080 for SOCKS)
+     */
+    fun setCustomProxyPort(context: Context, port: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_CUSTOM_PROXY_PORT, port)
+            .apply()
+    }
+
+    fun getCustomProxyPort(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_CUSTOM_PROXY_PORT, 8080)
+    }
+
+    /**
+     * Set custom proxy protocol (HTTP, HTTPS, SOCKS4, SOCKS5)
+     */
+    fun setCustomProxyProtocol(context: Context, protocol: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_CUSTOM_PROXY_PROTOCOL, protocol)
+            .apply()
+    }
+
+    fun getCustomProxyProtocol(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CUSTOM_PROXY_PROTOCOL, "HTTP") ?: "HTTP"
+    }
+
+    /**
+     * Set custom proxy username (optional, for authenticated proxies)
+     */
+    fun setCustomProxyUsername(context: Context, username: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_CUSTOM_PROXY_USERNAME, username)
+            .apply()
+    }
+
+    fun getCustomProxyUsername(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CUSTOM_PROXY_USERNAME, "") ?: ""
+    }
+
+    /**
+     * Set custom proxy password (optional, for authenticated proxies)
+     */
+    fun setCustomProxyPassword(context: Context, password: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_CUSTOM_PROXY_PASSWORD, password)
+            .apply()
+    }
+
+    fun getCustomProxyPassword(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CUSTOM_PROXY_PASSWORD, "") ?: ""
+    }
+
+    /**
+     * Set proxy authentication type (NONE, BASIC, DIGEST)
+     */
+    fun setCustomProxyAuthType(context: Context, authType: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_CUSTOM_PROXY_AUTH_TYPE, authType)
+            .apply()
+    }
+
+    fun getCustomProxyAuthType(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CUSTOM_PROXY_AUTH_TYPE, "NONE") ?: "NONE"
+    }
+
+    /**
+     * Set whether to resolve DNS through the proxy (recommended for privacy)
+     */
+    fun setCustomProxyDnsResolution(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_CUSTOM_PROXY_DNS_RESOLUTION, enabled)
+            .apply()
+    }
+
+    fun isCustomProxyDnsResolutionEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_CUSTOM_PROXY_DNS_RESOLUTION, true)
+    }
+
+    /**
+     * Set custom proxy connection timeout in seconds (0 = use default 30s)
+     */
+    fun setCustomProxyConnectionTimeout(context: Context, timeoutSeconds: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_CUSTOM_PROXY_CONNECTION_TIMEOUT, timeoutSeconds)
+            .apply()
+    }
+
+    fun getCustomProxyConnectionTimeout(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_CUSTOM_PROXY_CONNECTION_TIMEOUT, 30)
+    }
+
+    /**
+     * Set whether to bypass proxy for local/private addresses
+     */
+    fun setCustomProxyBypassLocal(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_CUSTOM_PROXY_BYPASS_LOCAL, enabled)
+            .apply()
+    }
+
+    fun isCustomProxyBypassLocalEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_CUSTOM_PROXY_BYPASS_LOCAL, false)
     }
 }

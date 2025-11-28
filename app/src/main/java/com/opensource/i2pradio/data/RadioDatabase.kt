@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [RadioStation::class, BrowseHistory::class], version = 5, exportSchema = false)
+@Database(entities = [RadioStation::class, BrowseHistory::class], version = 6, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
     abstract fun radioDao(): RadioDao
 
@@ -111,6 +111,40 @@ abstract class RadioDatabase : RoomDatabase() {
             }
         }
 
+        // Migration from version 5 to 6: Add custom proxy configuration fields
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add customProxyProtocol column (HTTP, HTTPS, SOCKS4, SOCKS5)
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN customProxyProtocol TEXT NOT NULL DEFAULT 'HTTP'"
+                )
+                // Add proxyUsername for optional authentication
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN proxyUsername TEXT NOT NULL DEFAULT ''"
+                )
+                // Add proxyPassword for optional authentication
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN proxyPassword TEXT NOT NULL DEFAULT ''"
+                )
+                // Add proxyAuthType (NONE, BASIC, DIGEST)
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN proxyAuthType TEXT NOT NULL DEFAULT 'NONE'"
+                )
+                // Add proxyDnsResolution flag
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN proxyDnsResolution INTEGER NOT NULL DEFAULT 1"
+                )
+                // Add proxyConnectionTimeout in seconds
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN proxyConnectionTimeout INTEGER NOT NULL DEFAULT 30"
+                )
+                // Add proxyBypassLocalAddresses flag
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN proxyBypassLocalAddresses INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
+
         fun getDatabase(context: Context): RadioDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -118,7 +152,7 @@ abstract class RadioDatabase : RoomDatabase() {
                     RadioDatabase::class.java,
                     "radio_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
                     .build()
                 INSTANCE = instance
