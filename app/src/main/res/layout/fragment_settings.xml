@@ -22,7 +22,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="deutsia radio"
+                android:text="@string/app_name"
                 android:textSize="28sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorPrimary" />
@@ -31,7 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Version 1.0"
+                android:text="@string/settings_version"
                 android:textSize="14sp"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -56,7 +56,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Appearance"
+                    android:text="@string/settings_appearance"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
@@ -79,14 +79,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Theme"
+                            android:text="@string/settings_theme"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Choose light, dark, or system"
+                            android:text="@string/settings_theme_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -97,7 +97,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="System Default"
+                        android:text="@string/settings_theme_system_default"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -121,14 +121,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Material You"
+                            android:text="@string/settings_material_you"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Use wallpaper-based dynamic colors"
+                            android:text="@string/settings_material_you_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -159,14 +159,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Color Scheme"
+                            android:text="@string/settings_color_scheme"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Choose your preferred color"
+                            android:text="@string/settings_color_scheme_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -177,7 +177,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Blue"
+                        android:text="@string/settings_color_blue"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -207,7 +207,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tor Network"
+                    android:text="@string/settings_tor_network"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
@@ -230,14 +230,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Enable Tor (via Orbot)"
+                            android:text="@string/settings_enable_tor"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Connect through the Tor network"
+                            android:text="@string/settings_enable_tor_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -281,7 +281,7 @@
                             android:id="@+id/torStatusText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Disconnected"
+                            android:text="@string/settings_tor_disconnected"
                             android:textSize="14sp"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -289,7 +289,7 @@
                             android:id="@+id/torStatusDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tor is not running"
+                            android:text="@string/settings_tor_not_running"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -300,7 +300,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Start"
+                        android:text="@string/button_start"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -325,7 +325,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Force Tor Over Everything"
+                            android:text="@string/settings_force_tor"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="?attr/colorOnSurface" />
@@ -333,7 +333,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Route all streams through Tor. Won't connect without Tor."
+                            android:text="@string/settings_force_tor_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -366,7 +366,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Force Tor Except I2P"
+                            android:text="@string/settings_force_tor_except_i2p"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="?attr/colorOnSurface" />
@@ -374,7 +374,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Route clearnet through Tor, I2P streams direct to I2P proxy."
+                            android:text="@string/settings_force_tor_except_i2p_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -392,7 +392,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable."
+                    android:text="@string/settings_tor_info"
                     android:textSize="12sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:lineSpacingExtra="2dp" />
@@ -420,7 +420,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Custom Proxy"
+                    android:text="@string/settings_custom_proxy"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
@@ -443,14 +443,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Configure Global Proxy"
+                            android:text="@string/settings_configure_proxy"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Set up your custom proxy settings"
+                            android:text="@string/settings_configure_proxy_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -461,7 +461,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Configure"
+                        android:text="@string/button_configure"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -484,14 +484,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Apply to All Stations"
+                            android:text="@string/settings_apply_to_all_stations"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Route all stations through global custom proxy"
+                            android:text="@string/settings_apply_to_all_stations_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -502,7 +502,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Apply"
+                        android:text="@string/button_apply"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -526,7 +526,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Force Custom Proxy"
+                            android:text="@string/settings_force_custom_proxy"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="?attr/colorOnSurface" />
@@ -534,7 +534,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Route all traffic through custom proxy. Won't connect without proxy."
+                            android:text="@string/settings_force_custom_proxy_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -570,7 +570,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bandwidth Usage"
+            android:text="@string/settings_bandwidth_usage"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="?attr/colorPrimary"
@@ -594,7 +594,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Total Usage (Lifetime)"
+                            android:text="@string/settings_total_usage"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -602,7 +602,7 @@
                             android:id="@+id/bandwidthTotalText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 B"
+                            android:text="@string/settings_bandwidth_zero"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -645,7 +645,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Session Usage"
+                            android:text="@string/settings_session_usage"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -653,7 +653,7 @@
                             android:id="@+id/bandwidthSessionText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 B"
+                            android:text="@string/settings_bandwidth_zero"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -664,7 +664,7 @@
                         style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Reset"
+                        android:text="@string/button_reset"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -692,7 +692,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Playback"
+                    android:text="@string/settings_playback"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
@@ -715,14 +715,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sleep Timer"
+                            android:text="@string/settings_sleep_timer"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Auto-stop playback after set time"
+                            android:text="@string/settings_sleep_timer_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -733,7 +733,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Off"
+                        android:text="@string/settings_sleep_timer_off"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_timer"
                         app:iconSize="18dp" />
@@ -758,14 +758,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Equalizer"
+                            android:text="@string/equalizer"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Adjust audio frequency bands and effects"
+                            android:text="@string/settings_equalizer_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -776,7 +776,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Open"
+                        android:text="@string/button_open"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_equalizer"
                         app:iconSize="18dp" />
@@ -801,7 +801,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Recording Directory"
+                            android:text="@string/settings_recording_directory"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -809,7 +809,7 @@
                             android:id="@+id/recordingDirectoryPath"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Default (Music/deutsia_radio)"
+                            android:text="@string/settings_recording_directory_default"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:maxLines="1"
@@ -822,7 +822,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Change"
+                        android:text="@string/button_change"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_folder"
                         app:iconSize="18dp" />
@@ -847,14 +847,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Record Across Stations"
+                            android:text="@string/settings_record_across_stations"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Keep recording when switching stations"
+                            android:text="@string/settings_record_across_stations_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -887,14 +887,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Record All Stations"
+                            android:text="@string/settings_record_all_stations"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Switch to new station's stream in same file"
+                            android:text="@string/settings_record_all_stations_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -930,7 +930,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Station Management"
+                    android:text="@string/settings_station_management"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
@@ -953,14 +953,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Import from File"
+                            android:text="@string/settings_import_from_file"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Import from CSV, JSON, M3U, or PLS"
+                            android:text="@string/settings_import_from_file_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -971,7 +971,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Import"
+                        android:text="@string/button_import"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_folder"
                         app:iconSize="18dp" />
@@ -996,14 +996,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Import I2P Stations"
+                            android:text="@string/settings_import_i2p_stations"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="14 curated I2P radio stations"
+                            android:text="@string/settings_import_i2p_stations_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -1014,7 +1014,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Import"
+                        android:text="@string/button_import"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_folder"
                         app:iconSize="18dp" />
@@ -1039,14 +1039,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Import Tor Stations"
+                            android:text="@string/settings_import_tor_stations"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="3 curated Tor radio stations"
+                            android:text="@string/settings_import_tor_stations_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -1057,7 +1057,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Import"
+                        android:text="@string/button_import"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_folder"
                         app:iconSize="18dp" />
@@ -1082,14 +1082,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Export Stations"
+                            android:text="@string/settings_export_stations"
                             android:textSize="16sp"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Export your stations to a file"
+                            android:text="@string/settings_export_stations_description"
                             android:textSize="12sp"
                             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -1100,7 +1100,7 @@
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Export"
+                        android:text="@string/button_export"
                         android:textSize="12sp"
                         app:icon="@drawable/ic_share"
                         app:iconSize="18dp" />
@@ -1130,7 +1130,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="About"
+                    android:text="@string/settings_about"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
@@ -1150,7 +1150,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="View on GitHub"
+                    android:text="@string/settings_view_github"
                     app:icon="@drawable/ic_github" />
 
             </LinearLayout>
@@ -1176,7 +1176,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Donate"
+                    android:text="@string/settings_donate"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
@@ -1185,7 +1185,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="If this app helped you out, consider donating"
+                    android:text="@string/settings_donate_description"
                     android:textSize="14sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:lineSpacingExtra="4dp"
@@ -1194,7 +1194,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Monero (XMR)"
+                    android:text="@string/settings_monero"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorPrimary"
@@ -1204,7 +1204,7 @@
                     android:id="@+id/moneroAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN"
+                    android:text="@string/settings_monero_address"
                     android:textSize="11sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:fontFamily="monospace"
@@ -1217,7 +1217,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Copy Address" />
+                    android:text="@string/settings_copy_address" />
 
             </LinearLayout>
 

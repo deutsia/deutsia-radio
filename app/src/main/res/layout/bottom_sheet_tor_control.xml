@@ -94,7 +94,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Connection Details"
+                android:text="@string/tor_connection_details"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorPrimary"
@@ -114,7 +114,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Proxy Host"
+                        android:text="@string/tor_proxy_host"
                         android:textSize="11sp"
                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -138,7 +138,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SOCKS Port"
+                        android:text="@string/tor_socks_port"
                         android:textSize="11sp"
                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -199,7 +199,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="What is Orbot?"
+                    android:text="@string/tor_what_is_orbot"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurface" />
@@ -208,7 +208,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Orbot is the official Tor client for Android. It provides secure, encrypted access to the Tor network."
+                    android:text="@string/tor_orbot_description"
                     android:textSize="12sp"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -235,7 +235,7 @@
             android:id="@+id/primaryActionButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Connect to Tor"
+            android:text="@string/tor_connect"
             android:textSize="16sp"
             app:cornerRadius="28dp"
             app:icon="@drawable/ic_tor_on"
@@ -248,7 +248,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:text="Open Orbot"
+            android:text="@string/tor_open_orbot"
             android:textSize="14sp"
             app:cornerRadius="24dp" />
 

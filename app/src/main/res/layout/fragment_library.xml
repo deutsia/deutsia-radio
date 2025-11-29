@@ -79,7 +79,7 @@
                 style="@style/Widget.Material3.Button.TextButton.Icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Default"
+                android:text="@string/sort_default"
                 android:textSize="12sp"
                 app:icon="@drawable/ic_sort"
                 app:iconSize="24dp" />

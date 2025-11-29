@@ -16,7 +16,7 @@
             android:id="@+id/nameInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Station Name"
+            android:hint="@string/hint_station_name"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             app:startIconDrawable="@drawable/ic_label">
 
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Stream URL"
+            android:hint="@string/hint_stream_url"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             app:startIconDrawable="@drawable/ic_link">
 
@@ -54,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Genre"
+            android:hint="@string/hint_genre"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
             <AutoCompleteTextView
@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Proxy Type"
+            android:hint="@string/hint_proxy_type"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
             <AutoCompleteTextView
@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="12dp"
-                android:text="Using embedded Tor - no proxy config needed"
+                android:text="@string/add_edit_tor_info"
                 android:textSize="12sp"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -123,14 +123,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Proxy Host"
+                android:hint="@string/hint_proxy_host"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/proxyHostInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="127.0.0.1"
+                    android:text="@string/default_proxy_host_i2p"
                     android:inputType="text" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -139,14 +139,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Proxy Port"
+                android:hint="@string/hint_proxy_port"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/proxyPortInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="4444"
+                    android:text="@string/default_proxy_port_i2p"
                     android:inputType="number" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -167,7 +167,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Protocol"
+                android:hint="@string/hint_protocol"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
                 <AutoCompleteTextView
@@ -183,7 +183,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Authentication (Optional)"
+                android:text="@string/add_edit_authentication_optional"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnSurfaceVariant" />
@@ -193,7 +193,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Username (optional)"
+                android:hint="@string/hint_username_optional"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -210,7 +210,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Password (optional)"
+                android:hint="@string/hint_password_optional"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 app:endIconMode="password_toggle">
 
@@ -228,7 +228,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Auth Method"
+                android:hint="@string/hint_auth_method"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
                 <AutoCompleteTextView
@@ -251,7 +251,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Advanced Options"
+                    android:text="@string/add_edit_advanced_options"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnSurfaceVariant" />
@@ -261,7 +261,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:hint="Connection Timeout (seconds)"
+                    android:hint="@string/hint_connection_timeout"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     app:helperText="Default: 30 seconds">
 
@@ -270,7 +270,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:text="30"
+                        android:text="@string/default_timeout"
                         android:maxLines="1" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -284,7 +284,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Cover Art"
+            android:text="@string/add_edit_cover_art"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="?attr/colorPrimary" />
@@ -322,7 +322,7 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Choose Image"
+                android:text="@string/button_choose_image"
                 app:icon="@drawable/ic_image" />
 
             <com.google.android.material.button.MaterialButton
@@ -331,7 +331,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Clear"
+                android:text="@string/button_clear"
                 android:visibility="gone"
                 app:icon="@drawable/ic_close" />
 
@@ -342,7 +342,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Or enter image URL"
+            android:text="@string/add_edit_or_enter_url"
             android:textSize="12sp"
             android:gravity="center"
             android:textColor="?attr/colorOnSurfaceVariant" />
@@ -351,7 +351,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Cover Art URL (optional)"
+            android:hint="@string/hint_cover_art_url"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText

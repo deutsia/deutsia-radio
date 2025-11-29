@@ -414,7 +414,7 @@ class RadioService : Service() {
 
                 // CRITICAL: Start foreground immediately to comply with Android 8+ requirements
                 // This must be called within 5 seconds of startForegroundService()
-                startForeground(NOTIFICATION_ID, createNotification("Connecting..."))
+                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connecting)))
 
                 // Broadcast buffering state to UI immediately
                 broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
@@ -430,7 +430,7 @@ class RadioService : Service() {
                 player?.pause()
                 updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
                 scheduleSessionDeactivation()
-                startForeground(NOTIFICATION_ID, createNotification("Paused"))
+                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
             }
             ACTION_STOP -> {
                 stopRecording()
@@ -1315,7 +1315,7 @@ class RadioService : Service() {
 
     private fun updateNotificationWithRecording() {
         if (player?.isPlaying == true) {
-            startForeground(NOTIFICATION_ID, createNotification("Playing • Recording"))
+            startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_playing_recording)))
         }
     }
 
@@ -1351,7 +1351,7 @@ class RadioService : Service() {
                 android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
                 isStartingNewStream.set(false)  // Reset flag on early return
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
+                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_tor_blocked)))
                 return
             }
 
@@ -1360,7 +1360,7 @@ class RadioService : Service() {
                 android.util.Log.e("RadioService", "FORCE TOR (except I2P): Tor not connected - BLOCKING non-I2P stream")
                 isStartingNewStream.set(false)  // Reset flag on early return
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                startForeground(NOTIFICATION_ID, createNotification("Tor not connected - stream blocked"))
+                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_tor_blocked)))
                 return
             }
 
@@ -1393,7 +1393,7 @@ class RadioService : Service() {
                 isStartingNewStream.set(false)  // Reset flag on early return
                 // Broadcast failure to UI so it can update the play button state
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                startForeground(NOTIFICATION_ID, createNotification("Audio focus denied"))
+                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_audio_focus_denied)))
                 return
             }
             hasAudioFocus = true
@@ -1570,7 +1570,7 @@ class RadioService : Service() {
                         when (playbackState) {
                             Player.STATE_READY -> {
                                 reconnectAttempts = 0
-                                val status = if (isRecording) "Playing • Recording" else "Playing"
+                                val status = if (isRecording) getString(R.string.notification_playing_recording) else getString(R.string.notification_playing)
                                 startForeground(NOTIFICATION_ID, createNotification(status))
                                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
                                 activateMediaSession()
@@ -1592,7 +1592,7 @@ class RadioService : Service() {
                                 android.util.Log.d("RadioService", "Stream playing successfully")
                             }
                             Player.STATE_BUFFERING -> {
-                                startForeground(NOTIFICATION_ID, createNotification("Buffering..."))
+                                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_buffering)))
                                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
                                 // Broadcast to UI that we're buffering
                                 broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
@@ -1679,7 +1679,7 @@ class RadioService : Service() {
             android.util.Log.e("RadioService", "Max reconnection attempts reached")
             // Broadcast final failure to UI
             broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-            startForeground(NOTIFICATION_ID, createNotification("Connection failed"))
+            startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connection_failed)))
             return
         }
 
@@ -1689,7 +1689,7 @@ class RadioService : Service() {
         android.util.Log.d("RadioService", "Reconnecting in ${delay}ms (attempt $reconnectAttempts)")
         // Keep buffering state while reconnecting
         broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
-        startForeground(NOTIFICATION_ID, createNotification("Reconnecting..."))
+        startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_reconnecting)))
 
         // Cancel any pending reconnect before scheduling a new one
         reconnectRunnable?.let { handler.removeCallbacks(it) }
@@ -1770,10 +1770,10 @@ class RadioService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "deutsia radio Playback",
+                getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Shows radio playback status"
+                description = getString(R.string.notification_channel_description)
             }
 
             val notificationManager = getSystemService(NotificationManager::class.java)
@@ -1818,8 +1818,8 @@ class RadioService : Service() {
             .setContentText(status)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentIntent(pendingIntent)
-            .addAction(R.drawable.ic_pause, "Pause", playPausePendingIntent)
-            .addAction(R.drawable.ic_stop, "Stop", stopPendingIntent)
+            .addAction(R.drawable.ic_pause, getString(R.string.notification_action_pause), playPausePendingIntent)
+            .addAction(R.drawable.ic_stop, getString(R.string.notification_action_stop), stopPendingIntent)
             .setStyle(mediaStyle)
             .setOngoing(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

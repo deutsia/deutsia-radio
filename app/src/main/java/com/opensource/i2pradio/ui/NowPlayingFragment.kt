@@ -183,14 +183,14 @@ class NowPlayingFragment : Fragment() {
                     val errorMessage = intent.getStringExtra(RadioService.EXTRA_ERROR_MESSAGE) ?: "Unknown error"
                     // Reset recording state in ViewModel
                     viewModel.onRecordingError()
-                    Toast.makeText(context, "Recording failed: $errorMessage", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, getString(R.string.recording_failed, errorMessage), Toast.LENGTH_LONG).show()
                 }
                 RadioService.BROADCAST_RECORDING_COMPLETE -> {
                     val filePath = intent.getStringExtra(RadioService.EXTRA_FILE_PATH) ?: ""
                     val fileSize = intent.getLongExtra(RadioService.EXTRA_FILE_SIZE, 0L)
                     val sizeKB = fileSize / 1024
                     val fileName = filePath.substringAfterLast("/")
-                    Toast.makeText(context, "Recording saved: $fileName (${sizeKB}KB)", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, getString(R.string.recording_saved, fileName, sizeKB), Toast.LENGTH_LONG).show()
                 }
                 RadioService.BROADCAST_COVER_ART_CHANGED -> {
                     val coverArtUri = intent.getStringExtra(RadioService.EXTRA_COVER_ART_URI)
@@ -617,12 +617,12 @@ class NowPlayingFragment : Fragment() {
             val recordingState = viewModel.recordingState.value
             if (recordingState?.isRecording == true) {
                 viewModel.stopRecording()
-                Toast.makeText(requireContext(), "Stopping recording...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.recording_stopping), Toast.LENGTH_SHORT).show()
             } else {
                 if (viewModel.startRecording()) {
-                    Toast.makeText(requireContext(), "Starting recording...", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.recording_starting), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(requireContext(), "No station playing", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.recording_no_station), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -754,7 +754,7 @@ class NowPlayingFragment : Fragment() {
 
             // Title
             val title = TextView(requireContext()).apply {
-                text = "Radio Volume"
+                text = getString(R.string.now_playing_volume_title)
                 textSize = 20f
                 setTextColor(com.google.android.material.color.MaterialColors.getColor(
                     this, com.google.android.material.R.attr.colorOnSurface))
@@ -764,7 +764,7 @@ class NowPlayingFragment : Fragment() {
 
             // Subtitle explaining this is radio-only
             val subtitle = TextView(requireContext()).apply {
-                text = "Adjusts radio stream only"
+                text = getString(R.string.now_playing_volume_description)
                 textSize = 12f
                 setTextColor(com.google.android.material.color.MaterialColors.getColor(
                     this, com.google.android.material.R.attr.colorOnSurfaceVariant))

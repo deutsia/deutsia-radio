@@ -124,7 +124,7 @@ class SettingsFragment : Fragment() {
             // Save the URI
             PreferencesHelper.setRecordingDirectoryUri(requireContext(), selectedUri.toString())
             updateRecordingDirectoryDisplay()
-            Toast.makeText(requireContext(), "Recording directory updated", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.recording_directory_updated), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -314,7 +314,7 @@ class SettingsFragment : Fragment() {
             clipboard.setPrimaryClip(clip)
 
             // Show a toast to confirm
-            Toast.makeText(requireContext(), "Address copied to clipboard", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_address_copied), Toast.LENGTH_SHORT).show()
         }
 
         // Sleep timer button
@@ -912,13 +912,13 @@ class SettingsFragment : Fragment() {
                         // Default
                         PreferencesHelper.setRecordingDirectoryUri(requireContext(), null)
                         updateRecordingDirectoryDisplay()
-                        Toast.makeText(requireContext(), "Using default directory", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.toast_using_default_directory), Toast.LENGTH_SHORT).show()
                     }
                     savedUri != null && which == 1 -> {
                         // Clear custom folder
                         PreferencesHelper.setRecordingDirectoryUri(requireContext(), null)
                         updateRecordingDirectoryDisplay()
-                        Toast.makeText(requireContext(), "Using default directory", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.toast_using_default_directory), Toast.LENGTH_SHORT).show()
                     }
                     else -> {
                         // Choose custom folder
@@ -1312,7 +1312,7 @@ class SettingsFragment : Fragment() {
                 .setPositiveButton("Reset") { _, _ ->
                     PreferencesHelper.resetSessionBandwidthUsage(requireContext())
                     updateBandwidthDisplay()
-                    Toast.makeText(requireContext(), "Session bandwidth reset", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.toast_session_bandwidth_reset), Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
@@ -1418,7 +1418,7 @@ class SettingsFragment : Fragment() {
                 androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
                     .sendBroadcast(broadcastIntent)
 
-                Toast.makeText(requireContext(), "Custom proxy settings saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_saved), Toast.LENGTH_SHORT).show()
             }
             .setNeutralButton("Clear Proxy") { _, _ ->
                 // Clear all proxy settings
@@ -1441,7 +1441,7 @@ class SettingsFragment : Fragment() {
                 androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
                     .sendBroadcast(broadcastIntent)
 
-                Toast.makeText(requireContext(), "Custom proxy settings cleared", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_cleared), Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null)
             .show()

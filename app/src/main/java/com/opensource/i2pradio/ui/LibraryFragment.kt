@@ -246,7 +246,7 @@ class LibraryFragment : Fragment() {
         val currentIndex = currentSortOrder.ordinal
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Sort Stations")
+            .setTitle(getString(R.string.dialog_sort_stations))
             .setSingleChoiceItems(sortOptions, currentIndex) { dialog, which ->
                 currentSortOrder = SortOrder.entries[which]
                 PreferencesHelper.setSortOrder(requireContext(), currentSortOrder.name)
@@ -643,7 +643,7 @@ class LibraryFragment : Fragment() {
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Delete stations")
+            .setTitle(getString(R.string.dialog_delete_stations))
             .setMessage("Are you sure you want to delete $selectedCount station${if (selectedCount > 1) "s" else ""}?")
             .setPositiveButton("Delete") { _, _ ->
                 deleteSelectedStations()
