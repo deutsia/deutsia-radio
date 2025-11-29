@@ -1573,30 +1573,67 @@ class SettingsFragment : Fragment() {
 
             val client = clientBuilder.build()
 
-            // Test with a lightweight endpoint
-            // Use HTTP (not HTTPS) for maximum proxy compatibility
-            val request = okhttp3.Request.Builder()
-                .url("http://connectivitycheck.gstatic.com/generate_204")
-                .head() // HEAD request is lighter than GET
-                .build()
+            // Test with multiple endpoints for better reliability
+            // Many proxies block Google domains, so we use proxy-friendly alternatives
+            val testUrls = listOf(
+                "http://httpbin.org/status/200",      // Primary: Proxy-friendly test endpoint
+                "http://example.com",                  // Fallback 1: Universal lightweight site
+                "http://www.w3.org"                    // Fallback 2: Standards organization
+            )
 
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful || response.code == 204) {
-                    TestResult(true, "✓ Proxy working! (${response.code})")
-                } else {
-                    TestResult(false, "❌ Proxy responded but failed: HTTP ${response.code}")
+            var lastError: Exception? = null
+
+            for ((index, testUrl) in testUrls.withIndex()) {
+                try {
+                    val request = okhttp3.Request.Builder()
+                        .url(testUrl)
+                        .head() // HEAD request is lighter than GET
+                        .build()
+
+                    client.newCall(request).execute().use { response ->
+                        when {
+                            response.isSuccessful || response.code == 204 -> {
+                                val endpointName = when (index) {
+                                    0 -> "httpbin.org"
+                                    1 -> "example.com"
+                                    else -> "w3.org"
+                                }
+                                return TestResult(true, "✓ Proxy working! (${response.code} from $endpointName)")
+                            }
+                            response.code == 403 -> {
+                                // 403 means proxy is working but endpoint is blocking it
+                                // Try next endpoint instead of failing immediately
+                                lastError = Exception("HTTP 403 from $testUrl")
+                                continue
+                            }
+                            else -> {
+                                return TestResult(false, "❌ Proxy responded but failed: HTTP ${response.code}")
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    lastError = e
+                    // Try next endpoint
+                    continue
                 }
             }
-        } catch (e: java.net.UnknownHostException) {
-            TestResult(false, "❌ Unknown host: ${e.message?.take(50)}")
-        } catch (e: java.net.SocketTimeoutException) {
-            TestResult(false, "❌ Connection timeout - check host/port")
-        } catch (e: java.net.ConnectException) {
-            TestResult(false, "❌ Connection refused - proxy not running?")
-        } catch (e: java.io.IOException) {
-            TestResult(false, "❌ Network error: ${e.message?.take(50)}")
+
+            // If we get here, all endpoints failed
+            when (lastError) {
+                is java.net.UnknownHostException ->
+                    TestResult(false, "❌ Unknown host: ${lastError.message?.take(50)}")
+                is java.net.SocketTimeoutException ->
+                    TestResult(false, "❌ Connection timeout - check host/port")
+                is java.net.ConnectException ->
+                    TestResult(false, "❌ Connection refused - proxy not running?")
+                is java.io.IOException ->
+                    TestResult(false, "❌ Network error: ${lastError.message?.take(50)}")
+                else ->
+                    TestResult(false, "❌ All test endpoints failed: ${lastError?.message?.take(50)}")
+            }
         } catch (e: Exception) {
-            TestResult(false, "❌ Failed: ${e.message?.take(50)}")
+            // Catch any unexpected errors during proxy setup
+            TestResult(false, "❌ Configuration error: ${e.message?.take(50)}")
         }
     }
 
