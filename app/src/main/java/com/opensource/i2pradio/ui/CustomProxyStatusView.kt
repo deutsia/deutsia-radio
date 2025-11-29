@@ -25,6 +25,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
 
     private val statusIcon: ImageView
     private val statusText: TextView
+    private val statusDetail: TextView
     private val statusContainer: View
     private var pulseAnimator: ObjectAnimator? = null
 
@@ -45,6 +46,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
         val view = LayoutInflater.from(context).inflate(R.layout.view_custom_proxy_status, this, true)
         statusIcon = view.findViewById(R.id.customProxyStatusIcon)
         statusText = view.findViewById(R.id.customProxyStatusText)
+        statusDetail = view.findViewById(R.id.customProxyStatusDetail)
         statusContainer = view.findViewById(R.id.customProxyStatusContainer)
 
         // Set click listener
@@ -64,12 +66,14 @@ class CustomProxyStatusView @JvmOverloads constructor(
     fun setCompactMode(compact: Boolean) {
         compactMode = compact
         statusText.visibility = if (compact) View.GONE else View.VISIBLE
+        statusDetail.visibility = if (compact) View.GONE else View.VISIBLE
     }
 
     fun setShowText(show: Boolean) {
         showText = show
         if (!compactMode) {
             statusText.visibility = if (show) View.VISIBLE else View.GONE
+            statusDetail.visibility = if (show) View.VISIBLE else View.GONE
         }
     }
 
@@ -80,21 +84,26 @@ class CustomProxyStatusView @JvmOverloads constructor(
             ProxyState.CONNECTED -> {
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom_on)
                 statusIcon.alpha = 1f
-                // Display protocol and port like Tor does (e.g., "HTTP:8080" or "SOCKS5:9050")
-                statusText.text = if (protocol.isNotEmpty() && port > 0) {
-                    "$protocol:$port"
-                } else {
-                    "Proxy Configured"
-                }
+                // Main status text
+                statusText.text = "Connected"
                 statusText.setTextColor(context.getColor(R.color.tor_connected))
+                // Detail text with protocol and port (matching Tor format: "SOCKS port: 9050")
+                statusDetail.text = if (protocol.isNotEmpty() && port > 0) {
+                    "$protocol port: $port"
+                } else {
+                    "Proxy configured"
+                }
+                statusDetail.setTextColor(context.getColor(R.color.tor_connected))
                 contentDescription = "Custom proxy is configured. Tap to view details."
                 showConnectedAnimation()
             }
             ProxyState.NOT_CONFIGURED -> {
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom_off)
                 statusIcon.alpha = 1f
-                statusText.text = "Proxy Off"
+                statusText.text = "Not Configured"
                 statusText.setTextColor(context.getColor(R.color.tor_disconnected))
+                statusDetail.text = "No proxy set"
+                statusDetail.setTextColor(context.getColor(R.color.tor_disconnected))
                 contentDescription = "Custom proxy is not configured. Tap to configure."
             }
             ProxyState.LEAK_WARNING -> {
@@ -102,6 +111,8 @@ class CustomProxyStatusView @JvmOverloads constructor(
                 statusIcon.alpha = 1f
                 statusText.text = "Leak Warning"
                 statusText.setTextColor(context.getColor(R.color.tor_error))
+                statusDetail.text = "Force enabled but not configured"
+                statusDetail.setTextColor(context.getColor(R.color.tor_error))
                 contentDescription = "Force custom proxy enabled but not configured. Privacy may be compromised."
                 showLeakWarningAnimation()
             }
