@@ -73,14 +73,19 @@ class CustomProxyStatusView @JvmOverloads constructor(
         }
     }
 
-    fun updateState(state: ProxyState) {
+    fun updateState(state: ProxyState, protocol: String = "", port: Int = 0) {
         stopAnimations()
 
         when (state) {
             ProxyState.CONNECTED -> {
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom_on)
                 statusIcon.alpha = 1f
-                statusText.text = "Proxy Configured"
+                // Display protocol and port like Tor does (e.g., "HTTP:8080" or "SOCKS5:9050")
+                statusText.text = if (protocol.isNotEmpty() && port > 0) {
+                    "$protocol:$port"
+                } else {
+                    "Proxy Configured"
+                }
                 statusText.setTextColor(context.getColor(R.color.tor_connected))
                 contentDescription = "Custom proxy is configured. Tap to view details."
                 showConnectedAnimation()
@@ -106,7 +111,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
     /**
      * Update state based on current proxy configuration
      */
-    fun updateStateFromConfig(forceEnabled: Boolean, proxyHost: String) {
+    fun updateStateFromConfig(forceEnabled: Boolean, proxyHost: String, protocol: String = "", port: Int = 0) {
         val state = when {
             // Force enabled but no proxy configured = privacy leak warning
             forceEnabled && proxyHost.isEmpty() -> ProxyState.LEAK_WARNING
@@ -115,7 +120,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
             // No force, no proxy configured = not configured
             else -> ProxyState.NOT_CONFIGURED
         }
-        updateState(state)
+        updateState(state, protocol, port)
     }
 
     private fun showConnectedAnimation() {

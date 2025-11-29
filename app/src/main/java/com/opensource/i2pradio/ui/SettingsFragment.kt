@@ -77,7 +77,6 @@ class SettingsFragment : Fragment() {
 
     // Custom Proxy UI elements
     private var configureProxyButton: MaterialButton? = null
-    private var applyProxyToAllButton: MaterialButton? = null
     private var forceCustomProxySwitch: MaterialSwitch? = null
     private var forceCustomProxyExceptTorI2pSwitch: MaterialSwitch? = null
     private var customProxyStatusViewSettings: CustomProxyStatusView? = null
@@ -426,7 +425,6 @@ class SettingsFragment : Fragment() {
 
         // Custom Proxy UI elements
         configureProxyButton = view.findViewById(R.id.configureProxyButton)
-        applyProxyToAllButton = view.findViewById(R.id.applyProxyToAllButton)
         forceCustomProxySwitch = view.findViewById(R.id.forceCustomProxySwitch)
         forceCustomProxyExceptTorI2pSwitch = view.findViewById(R.id.forceCustomProxyExceptTorI2pSwitch)
         customProxyStatusViewSettings = view.findViewById(R.id.customProxyStatusViewSettings)
@@ -1254,28 +1252,6 @@ class SettingsFragment : Fragment() {
             showConfigureProxyDialog()
         }
 
-        // Apply Custom Proxy to Browse button - toggles whether browse uses custom proxy
-        applyProxyToAllButton?.setOnClickListener {
-            val isApplied = PreferencesHelper.isCustomProxyAppliedToClearnet(requireContext())
-
-            // Simple toggle - just flip the flag
-            PreferencesHelper.setCustomProxyAppliedToClearnet(requireContext(), !isApplied)
-
-            // Update button text
-            updateApplyProxyButtonText()
-
-            // Show confirmation
-            val message = if (!isApplied) {
-                "Custom proxy will be used for browsing stations"
-            } else {
-                "Custom proxy removed from browsing"
-            }
-            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-        }
-
-        // Initialize button text based on current state
-        updateApplyProxyButtonText()
-
         // Update custom proxy status view
         updateCustomProxyStatusView()
 
@@ -1392,7 +1368,9 @@ class SettingsFragment : Fragment() {
         val isForceCustomProxy = PreferencesHelper.isForceCustomProxy(requireContext()) ||
                                  PreferencesHelper.isForceCustomProxyExceptTorI2P(requireContext())
         val proxyHost = PreferencesHelper.getCustomProxyHost(requireContext())
-        customProxyStatusViewSettings?.updateStateFromConfig(isForceCustomProxy, proxyHost)
+        val protocol = PreferencesHelper.getCustomProxyProtocol(requireContext())
+        val port = PreferencesHelper.getCustomProxyPort(requireContext())
+        customProxyStatusViewSettings?.updateStateFromConfig(isForceCustomProxy, proxyHost, protocol, port)
     }
 
     private fun setupBandwidthDisplay() {
@@ -1693,16 +1671,4 @@ class SettingsFragment : Fragment() {
     }
 
 
-    /**
-     * Updates the Apply Proxy button text based on whether custom proxy
-     * is currently applied to browsing (RadioBrowser API).
-     */
-    private fun updateApplyProxyButtonText() {
-        val isApplied = PreferencesHelper.isCustomProxyAppliedToClearnet(requireContext())
-        applyProxyToAllButton?.text = if (isApplied) {
-            getString(R.string.settings_unapply_custom_proxy_from_browse)
-        } else {
-            getString(R.string.settings_apply_custom_proxy_to_browse)
-        }
-    }
 }
