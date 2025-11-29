@@ -1,6 +1,7 @@
 package com.opensource.i2pradio.data
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
@@ -112,7 +113,10 @@ enum class StationSource {
     BUNDLED
 }
 
-@Entity(tableName = "radio_stations")
+@Entity(
+    tableName = "radio_stations",
+    indices = [Index(value = ["radioBrowserUuid"])]
+)
 data class RadioStation(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
