@@ -507,6 +507,14 @@
 
                 </LinearLayout>
 
+                <!-- Custom Proxy Status View -->
+                <com.opensource.i2pradio.ui.CustomProxyStatusView
+                    android:id="@+id/customProxyStatusViewSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:padding="8dp" />
+
                 <!-- Force Custom Proxy -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -542,6 +550,47 @@
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/forceCustomProxySwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <!-- Force Custom Proxy Except Tor/I2P -->
+                <LinearLayout
+                    android:id="@+id/forceCustomProxyExceptContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_force_custom_proxy_except_tor_i2p"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_force_custom_proxy_except_tor_i2p_description"
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/forceCustomProxyExceptTorI2pSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 

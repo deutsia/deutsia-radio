@@ -136,6 +136,8 @@
     <string name="settings_apply_to_all_stations_description">Route all stations through global custom proxy</string>
     <string name="settings_force_custom_proxy">Force Custom Proxy</string>
     <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">Bandwidth Usage</string>
@@ -214,7 +216,7 @@
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
-    <string name="default_protocol_http">HTTP</string>
+    <string name="default_protocol_https">HTTPS</string>
     <string name="default_auth_none">None</string>
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
