@@ -582,23 +582,39 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     android:paddingVertical="8dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Total Usage (Lifetime)"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/bandwidthTotalText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0 B"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total Usage (Lifetime)"
+                            android:textSize="16sp"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:id="@+id/bandwidthTotalText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 B"
+                            android:textSize="12sp"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_bandwidth"
+                        android:contentDescription="Bandwidth icon"
+                        app:tint="?attr/colorPrimary" />
 
                 </LinearLayout>
 
@@ -634,30 +650,13 @@
 
                     </LinearLayout>
 
-                    <!-- Right side: Icon centered over Reset button -->
-                    <LinearLayout
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/resetBandwidthButton"
+                        style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_horizontal">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_bandwidth"
-                            android:contentDescription="Bandwidth icon"
-                            android:layout_marginBottom="4dp"
-                            app:tint="?attr/colorPrimary" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/resetBandwidthButton"
-                            style="@style/Widget.Material3.Button.TextButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Reset"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
+                        android:text="Reset"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 
