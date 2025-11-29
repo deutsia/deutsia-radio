@@ -44,6 +44,7 @@ import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
+import com.opensource.i2pradio.util.BandwidthTrackingInterceptor
 import com.opensource.i2pradio.util.SecureImageLoader
 import okhttp3.Call
 import okhttp3.Request
@@ -1106,6 +1107,7 @@ class RadioService : Service() {
         val builder = OkHttpClient.Builder()
             .connectionPool(recordingConnectionPool)
             .dispatcher(recordingDispatcher)
+            .addInterceptor(BandwidthTrackingInterceptor(this))
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -1484,6 +1486,7 @@ class RadioService : Service() {
 
                     val builder = OkHttpClient.Builder()
                         .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
+                        .addInterceptor(BandwidthTrackingInterceptor(this))
 
                     // Add proxy authentication if custom proxy with credentials
                     if (effectiveProxyType == ProxyType.CUSTOM && proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()) {
@@ -1509,6 +1512,7 @@ class RadioService : Service() {
                         .build()
                 } else {
                     OkHttpClient.Builder()
+                        .addInterceptor(BandwidthTrackingInterceptor(this))
                         .connectTimeout(30, TimeUnit.SECONDS)
                         .readTimeout(30, TimeUnit.SECONDS)
                         .build()
