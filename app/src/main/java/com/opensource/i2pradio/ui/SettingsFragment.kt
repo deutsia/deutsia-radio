@@ -1458,12 +1458,4 @@ class SettingsFragment : Fragment() {
             }
         }
     }
-
-    private fun stopCurrentStream() {
-        // Stop current playback when proxy settings change
-        val serviceIntent = Intent(requireContext(), RadioService::class.java).apply {
-            action = "ACTION_STOP"
-        }
-        requireContext().startService(serviceIntent)
-    }
 }
