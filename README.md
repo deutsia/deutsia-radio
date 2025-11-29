@@ -1,4 +1,4 @@
-# <img src="assets/asss.png" width="25" align="absmiddle" /> deutsia radio
+# <img src="assets/rename.png" width="25" align="absmiddle" /> deutsia radio
 A privacy-focused, anti-censorship multinet radio player built with Claude Code. Stream radio stations from clearnet, I2P, and Tor networks with advanced anonymity features.
 
 ## Features
