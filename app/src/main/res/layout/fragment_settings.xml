@@ -462,9 +462,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Configure"
-                        android:textSize="12sp"
-                        app:icon="@drawable/ic_proxy_custom"
-                        app:iconSize="18dp" />
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 

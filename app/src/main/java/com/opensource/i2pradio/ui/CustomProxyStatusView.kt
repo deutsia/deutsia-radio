@@ -36,7 +36,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
      * Custom proxy connection states
      */
     enum class ProxyState {
-        CONNECTED,      // Proxy is configured and assumed working
+        CONNECTED,      // Proxy is configured (settings saved)
         NOT_CONFIGURED, // No proxy configured
         LEAK_WARNING    // Force custom proxy enabled but proxy not configured (privacy leak)
     }
@@ -80,9 +80,9 @@ class CustomProxyStatusView @JvmOverloads constructor(
             ProxyState.CONNECTED -> {
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom)
                 statusIcon.alpha = 1f
-                statusText.text = "Proxy Connected"
+                statusText.text = "Proxy Configured"
                 statusText.setTextColor(context.getColor(R.color.tor_connected))
-                contentDescription = "Custom proxy is connected. Tap to view details."
+                contentDescription = "Custom proxy is configured. Tap to view details."
                 showConnectedAnimation()
             }
             ProxyState.NOT_CONFIGURED -> {
@@ -108,8 +108,11 @@ class CustomProxyStatusView @JvmOverloads constructor(
      */
     fun updateStateFromConfig(forceEnabled: Boolean, proxyHost: String) {
         val state = when {
+            // Force enabled but no proxy configured = privacy leak warning
             forceEnabled && proxyHost.isEmpty() -> ProxyState.LEAK_WARNING
-            forceEnabled || proxyHost.isNotEmpty() -> ProxyState.CONNECTED
+            // Proxy configured (whether force is enabled or not) = show as connected
+            proxyHost.isNotEmpty() -> ProxyState.CONNECTED
+            // No force, no proxy configured = not configured
             else -> ProxyState.NOT_CONFIGURED
         }
         updateState(state)

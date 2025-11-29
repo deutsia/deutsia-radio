@@ -1413,7 +1413,35 @@ class SettingsFragment : Fragment() {
                 PreferencesHelper.setCustomProxyAuthType(requireContext(), authType)
                 PreferencesHelper.setCustomProxyConnectionTimeout(requireContext(), timeout)
 
+                // Broadcast proxy mode change to update MainActivity UI
+                val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+                    .sendBroadcast(broadcastIntent)
+
                 Toast.makeText(requireContext(), "Custom proxy settings saved", Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton("Clear Proxy") { _, _ ->
+                // Clear all proxy settings
+                PreferencesHelper.setCustomProxyHost(requireContext(), "")
+                PreferencesHelper.setCustomProxyPort(requireContext(), 8080)
+                PreferencesHelper.setCustomProxyProtocol(requireContext(), "HTTP")
+                PreferencesHelper.setCustomProxyUsername(requireContext(), "")
+                PreferencesHelper.setCustomProxyPassword(requireContext(), "")
+                PreferencesHelper.setCustomProxyAuthType(requireContext(), "None")
+                PreferencesHelper.setCustomProxyConnectionTimeout(requireContext(), 30)
+
+                // Disable Force Custom Proxy if enabled
+                if (forceCustomProxySwitch?.isChecked == true) {
+                    forceCustomProxySwitch?.isChecked = false
+                    PreferencesHelper.setForceCustomProxy(requireContext(), false)
+                }
+
+                // Broadcast proxy mode change to update MainActivity UI
+                val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+                    .sendBroadcast(broadcastIntent)
+
+                Toast.makeText(requireContext(), "Custom proxy settings cleared", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null)
             .show()
