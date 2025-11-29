@@ -34,7 +34,9 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
+import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 import com.opensource.i2pradio.util.StationImportExport
@@ -1252,10 +1254,18 @@ class SettingsFragment : Fragment() {
             showConfigureProxyDialog()
         }
 
-        // Apply to All Stations button
+        // Apply to All Clearnet Stations button - toggles between apply and unapply
         applyProxyToAllButton?.setOnClickListener {
-            showApplyProxyToAllDialog()
+            val isApplied = PreferencesHelper.isCustomProxyAppliedToClearnet(requireContext())
+            if (isApplied) {
+                showUnapplyProxyFromClearnetDialog()
+            } else {
+                showApplyProxyToAllDialog()
+            }
         }
+
+        // Initialize button text based on current state
+        updateApplyProxyButtonText()
 
         // Update custom proxy status view
         updateCustomProxyStatusView()
@@ -1592,6 +1602,31 @@ class SettingsFragment : Fragment() {
 
     private data class TestResult(val success: Boolean, val message: String)
 
+    /**
+     * Helper function to determine if a station is a clearnet station
+     * (not I2P or Tor). This checks both the proxy type and the stream URL.
+     *
+     * CRITICAL: URL is checked FIRST as it is the ground truth - a .onion or .i2p
+     * domain is ALWAYS Tor/I2P regardless of proxy configuration.
+     */
+    private fun isClearnetStation(station: RadioStation): Boolean {
+        val streamUrl = station.streamUrl.lowercase()
+
+        // Check URL FIRST - this is ground truth
+        // A .onion or .i2p URL is ALWAYS Tor/I2P, regardless of proxy settings
+        if (streamUrl.contains(".onion") || streamUrl.contains(".i2p")) {
+            return false
+        }
+
+        // Then check proxy type as a secondary indicator
+        val proxyType = ProxyType.fromString(station.proxyType)
+        if (proxyType == ProxyType.I2P || proxyType == ProxyType.TOR) {
+            return false
+        }
+
+        return true
+    }
+
     private fun showApplyProxyToAllDialog() {
         val host = PreferencesHelper.getCustomProxyHost(requireContext())
         if (host.isEmpty()) {
@@ -1604,12 +1639,13 @@ class SettingsFragment : Fragment() {
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val stationCount = repository.getAllStationsSync().size
+            val allStations = repository.getAllStationsSync()
+            val clearnetStationCount = allStations.count { isClearnetStation(it) }
 
             withContext(Dispatchers.Main) {
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Apply Custom Proxy to All Stations")
-                    .setMessage("Apply global custom proxy settings to all $stationCount stations?\n\nThis will override individual station proxy settings.")
+                    .setTitle("Apply Custom Proxy to All Clearnet Stations")
+                    .setMessage("Apply global custom proxy settings to all $clearnetStationCount clearnet stations?\n\nThis will exclude Tor and I2P stations, which will continue to use their native proxies.\n\nThis will override individual station proxy settings for clearnet stations.")
                     .setPositiveButton("Apply") { _, _ ->
                         applyCustomProxyToAllStations()
                     }
@@ -1630,8 +1666,17 @@ class SettingsFragment : Fragment() {
             val authType = PreferencesHelper.getCustomProxyAuthType(requireContext())
             val timeout = PreferencesHelper.getCustomProxyConnectionTimeout(requireContext())
 
+            // Set flag BEFORE updates to prevent double-application on crash recovery.
+            // This is safe because apply operation is idempotent.
+            PreferencesHelper.setCustomProxyAppliedToClearnet(requireContext(), true)
+
             var updated = 0
             for (station in stations) {
+                // Skip I2P and Tor stations
+                if (!isClearnetStation(station)) {
+                    continue
+                }
+
                 try {
                     val updatedStation = station.copy(
                         proxyType = "CUSTOM",
@@ -1654,10 +1699,87 @@ class SettingsFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 Toast.makeText(
                     requireContext(),
-                    "Applied custom proxy to $updated station(s)",
+                    "Applied custom proxy to $updated clearnet station(s)",
                     Toast.LENGTH_SHORT
                 ).show()
+                // Update button text to show "Unapply"
+                updateApplyProxyButtonText()
             }
+        }
+    }
+
+    private fun showUnapplyProxyFromClearnetDialog() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val allStations = repository.getAllStationsSync()
+            val clearnetStationCount = allStations.count { isClearnetStation(it) }
+
+            withContext(Dispatchers.Main) {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Unapply Custom Proxy from All Clearnet Stations")
+                    .setMessage("Remove custom proxy settings from all $clearnetStationCount clearnet stations?\n\nThis will reset them to direct connections.\n\nTor and I2P stations will not be affected.")
+                    .setPositiveButton("Unapply") { _, _ ->
+                        unapplyCustomProxyFromClearnetStations()
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
+    }
+
+    private fun unapplyCustomProxyFromClearnetStations() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val stations = repository.getAllStationsSync()
+
+            // Set flag BEFORE updates to prevent double-unapplication on crash recovery.
+            // This is safe because unapply operation is idempotent.
+            PreferencesHelper.setCustomProxyAppliedToClearnet(requireContext(), false)
+
+            var updated = 0
+            for (station in stations) {
+                // Skip I2P and Tor stations
+                if (!isClearnetStation(station)) {
+                    continue
+                }
+
+                // Only update stations that currently have CUSTOM proxy
+                if (station.proxyType == "CUSTOM") {
+                    try {
+                        val updatedStation = station.copy(
+                            proxyType = "NONE",
+                            proxyHost = "",
+                            proxyPort = 0,
+                            useProxy = false
+                        )
+                        repository.updateStation(updatedStation)
+                        updated++
+                    } catch (e: Exception) {
+                        android.util.Log.e("SettingsFragment", "Failed to update station ${station.name}", e)
+                    }
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    requireContext(),
+                    "Removed custom proxy from $updated clearnet station(s)",
+                    Toast.LENGTH_SHORT
+                ).show()
+                // Update button text to show "Apply"
+                updateApplyProxyButtonText()
+            }
+        }
+    }
+
+    /**
+     * Updates the Apply Proxy button text based on whether custom proxy
+     * is currently applied to clearnet stations.
+     */
+    private fun updateApplyProxyButtonText() {
+        val isApplied = PreferencesHelper.isCustomProxyAppliedToClearnet(requireContext())
+        applyProxyToAllButton?.text = if (isApplied) {
+            getString(R.string.settings_unapply_from_all_clearnet_stations)
+        } else {
+            getString(R.string.settings_apply_to_all_clearnet_stations)
         }
     }
 }
