@@ -42,6 +42,7 @@ object PreferencesHelper {
     private const val KEY_CUSTOM_PROXY_BYPASS_LOCAL = "custom_proxy_bypass_local"
     private const val KEY_FORCE_CUSTOM_PROXY = "force_custom_proxy"
     private const val KEY_FORCE_CUSTOM_PROXY_EXCEPT_TOR_I2P = "force_custom_proxy_except_tor_i2p"
+    private const val KEY_CUSTOM_PROXY_APPLIED_TO_CLEARNET = "custom_proxy_applied_to_clearnet"
     private const val KEY_BANDWIDTH_USAGE_TOTAL = "bandwidth_usage_total"
     private const val KEY_BANDWIDTH_USAGE_SESSION = "bandwidth_usage_session"
     private const val KEY_BANDWIDTH_USAGE_LAST_RESET = "bandwidth_usage_last_reset"
@@ -565,6 +566,22 @@ object PreferencesHelper {
     fun isForceCustomProxyExceptTorI2P(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_FORCE_CUSTOM_PROXY_EXCEPT_TOR_I2P, false)
+    }
+
+    /**
+     * Track whether custom proxy has been applied to all clearnet stations.
+     * This allows the UI to toggle between "Apply" and "Unapply" states.
+     */
+    fun setCustomProxyAppliedToClearnet(context: Context, applied: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_CUSTOM_PROXY_APPLIED_TO_CLEARNET, applied)
+            .apply()
+    }
+
+    fun isCustomProxyAppliedToClearnet(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_CUSTOM_PROXY_APPLIED_TO_CLEARNET, false)
     }
 
     // Bandwidth Usage Tracking

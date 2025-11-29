@@ -132,8 +132,9 @@
     <string name="settings_custom_proxy">Custom Proxy</string>
     <string name="settings_configure_proxy">Configure Global Proxy</string>
     <string name="settings_configure_proxy_description">Set up your custom proxy settings</string>
-    <string name="settings_apply_to_all_stations">Apply to All Stations</string>
-    <string name="settings_apply_to_all_stations_description">Route all stations through global custom proxy</string>
+    <string name="settings_apply_to_all_clearnet_stations">Apply to All Clearnet Stations</string>
+    <string name="settings_unapply_from_all_clearnet_stations">Unapply from All Clearnet Stations</string>
+    <string name="settings_apply_to_all_clearnet_stations_description">Route all clearnet stations through global custom proxy (excludes Tor/I2P)</string>
     <string name="settings_force_custom_proxy">Force Custom Proxy</string>
     <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
