@@ -256,7 +256,7 @@
                 android:id="@+id/playbackElapsedTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00:00"
+                android:text="@string/now_playing_time_placeholder"
                 android:textSize="12sp"
                 android:fontFamily="monospace"
                 android:textColor="?attr/colorOnSurfaceVariant" />
@@ -272,7 +272,7 @@
                 android:id="@+id/liveIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LIVE"
+                android:text="@string/now_playing_live"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorPrimary"
@@ -331,7 +331,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="00:00"
+                android:text="@string/now_playing_time_placeholder"
                 android:textSize="14sp"
                 android:fontFamily="monospace"
                 android:textColor="?attr/colorOnErrorContainer" />
@@ -364,7 +364,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="No Station Playing"
+            android:text="@string/now_playing_no_station"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="?attr/colorOnSurface" />
@@ -373,7 +373,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Select a station from the list"
+            android:text="@string/now_playing_no_station_subtitle"
             android:textSize="14sp"
             android:textColor="?attr/colorOnSurfaceVariant" />
 

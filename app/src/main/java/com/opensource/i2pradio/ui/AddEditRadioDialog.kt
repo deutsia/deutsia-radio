@@ -248,9 +248,9 @@ class AddEditRadioDialog : DialogFragment() {
         }
 
         return AlertDialog.Builder(requireContext())
-            .setTitle(if (stationId == -1L) "Add Radio Station" else "Edit Radio Station")
+            .setTitle(if (stationId == -1L) getString(R.string.dialog_add_station) else getString(R.string.dialog_edit_station))
             .setView(view)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton(getString(R.string.button_save)) { _, _ ->
                 val name = nameInput.text.toString()
                 val url = urlInput.text.toString()
                 val genre = genreInput.text.toString().ifEmpty { "Other" }
@@ -339,7 +339,7 @@ class AddEditRadioDialog : DialogFragment() {
                     onSaveCallback?.invoke(station)
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .create()
     }
 
