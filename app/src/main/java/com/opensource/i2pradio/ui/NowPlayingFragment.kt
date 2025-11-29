@@ -180,7 +180,7 @@ class NowPlayingFragment : Fragment() {
                     updateBufferBarVisibility(isPlaying)
                 }
                 RadioService.BROADCAST_RECORDING_ERROR -> {
-                    val errorMessage = intent.getStringExtra(RadioService.EXTRA_ERROR_MESSAGE) ?: "Unknown error"
+                    val errorMessage = intent.getStringExtra(RadioService.EXTRA_ERROR_MESSAGE) ?: getString(R.string.error_unknown)
                     // Reset recording state in ViewModel
                     viewModel.onRecordingError()
                     Toast.makeText(context, getString(R.string.recording_failed, errorMessage), Toast.LENGTH_LONG).show()

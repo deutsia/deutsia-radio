@@ -99,10 +99,10 @@ class TorService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Tor Connection",
+                getString(R.string.tor_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Shows Tor connection status"
+                description = getString(R.string.tor_channel_description)
                 setShowBadge(false)
             }
 
@@ -127,11 +127,11 @@ class TorService : Service() {
         )
 
         val (title, text, icon) = when (state) {
-            TorManager.TorState.STOPPED -> Triple("Tor Disconnected", "Tap to open app", R.drawable.ic_tor_off)
-            TorManager.TorState.STARTING -> Triple("Connecting via Orbot...", "Please wait", R.drawable.ic_tor_connecting)
-            TorManager.TorState.CONNECTED -> Triple("Tor Connected", "SOCKS port: ${TorManager.socksPort}", R.drawable.ic_tor_on)
-            TorManager.TorState.ERROR -> Triple("Tor Error", TorManager.errorMessage ?: "Connection failed", R.drawable.ic_tor_off)
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> Triple("Orbot Required", "Please install Orbot for Tor support", R.drawable.ic_tor_off)
+            TorManager.TorState.STOPPED -> Triple(getString(R.string.tor_notification_disconnected), getString(R.string.tor_notification_tap_to_open), R.drawable.ic_tor_off)
+            TorManager.TorState.STARTING -> Triple(getString(R.string.tor_notification_connecting), getString(R.string.tor_notification_please_wait), R.drawable.ic_tor_connecting)
+            TorManager.TorState.CONNECTED -> Triple(getString(R.string.tor_notification_connected), "SOCKS port: ${TorManager.socksPort}", R.drawable.ic_tor_on)
+            TorManager.TorState.ERROR -> Triple(getString(R.string.tor_notification_error), TorManager.errorMessage ?: getString(R.string.tor_notification_connection_failed), R.drawable.ic_tor_off)
+            TorManager.TorState.ORBOT_NOT_INSTALLED -> Triple(getString(R.string.tor_notification_orbot_required), getString(R.string.tor_notification_install_orbot), R.drawable.ic_tor_off)
         }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
@@ -143,7 +143,7 @@ class TorService : Service() {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .apply {
                 if (state != TorManager.TorState.STARTING) {
-                    addAction(R.drawable.ic_stop, "Stop Tor", stopPendingIntent)
+                    addAction(R.drawable.ic_stop, getString(R.string.tor_notification_action_stop), stopPendingIntent)
                 }
             }
             .build()

@@ -85,13 +85,13 @@ class CustomProxyStatusView @JvmOverloads constructor(
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom_on)
                 statusIcon.alpha = 1f
                 // Main status text
-                statusText.text = "Connected"
+                statusText.text = context.getString(R.string.custom_proxy_status_connected)
                 statusText.setTextColor(context.getColor(R.color.tor_connected))
                 // Detail text with protocol and port (matching Tor format: "SOCKS port: 9050")
                 statusDetail.text = if (protocol.isNotEmpty() && port > 0) {
                     "$protocol port: $port"
                 } else {
-                    "Proxy configured"
+                    context.getString(R.string.custom_proxy_status_configured)
                 }
                 statusDetail.setTextColor(context.getColor(R.color.tor_connected))
                 contentDescription = "Custom proxy is configured. Tap to view details."
@@ -100,18 +100,18 @@ class CustomProxyStatusView @JvmOverloads constructor(
             ProxyState.NOT_CONFIGURED -> {
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom_off)
                 statusIcon.alpha = 1f
-                statusText.text = "Not Configured"
+                statusText.text = context.getString(R.string.custom_proxy_status_not_configured)
                 statusText.setTextColor(context.getColor(R.color.tor_disconnected))
-                statusDetail.text = "No proxy set"
+                statusDetail.text = context.getString(R.string.custom_proxy_status_no_proxy)
                 statusDetail.setTextColor(context.getColor(R.color.tor_disconnected))
                 contentDescription = "Custom proxy is not configured. Tap to configure."
             }
             ProxyState.LEAK_WARNING -> {
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom_error)
                 statusIcon.alpha = 1f
-                statusText.text = "Leak Warning"
+                statusText.text = context.getString(R.string.custom_proxy_status_leak_warning)
                 statusText.setTextColor(context.getColor(R.color.tor_error))
-                statusDetail.text = "Force enabled but not configured"
+                statusDetail.text = context.getString(R.string.custom_proxy_status_leak_detail)
                 statusDetail.setTextColor(context.getColor(R.color.tor_error))
                 contentDescription = "Force custom proxy enabled but not configured. Privacy may be compromised."
                 showLeakWarningAnimation()
