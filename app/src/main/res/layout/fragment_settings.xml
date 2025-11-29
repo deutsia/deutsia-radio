@@ -610,6 +610,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_marginStart="8dp"
                         android:src="@drawable/ic_bandwidth"
                         android:contentDescription="Bandwidth icon"
                         app:tint="?attr/colorPrimary" />
@@ -623,7 +624,7 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingVertical="8dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="16dp">
 
                     <LinearLayout
                         android:layout_width="0dp"
