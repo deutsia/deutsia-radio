@@ -17,6 +17,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +29,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.RadioRepository
@@ -65,6 +68,16 @@ class SettingsFragment : Fragment() {
     private var importTorStationsButton: MaterialButton? = null
     private var exportStationsButton: MaterialButton? = null
     private lateinit var repository: RadioRepository
+
+    // Custom Proxy UI elements
+    private var configureProxyButton: MaterialButton? = null
+    private var applyProxyToAllButton: MaterialButton? = null
+    private var forceCustomProxySwitch: MaterialSwitch? = null
+
+    // Bandwidth tracking UI elements
+    private var bandwidthTotalText: TextView? = null
+    private var bandwidthSessionText: TextView? = null
+    private var resetBandwidthButton: MaterialButton? = null
 
     // Import file picker launcher
     private val importFileLauncher = registerForActivityResult(
@@ -393,6 +406,22 @@ class SettingsFragment : Fragment() {
         exportStationsButton?.setOnClickListener {
             showExportDialog()
         }
+
+        // Custom Proxy UI elements
+        configureProxyButton = view.findViewById(R.id.configureProxyButton)
+        applyProxyToAllButton = view.findViewById(R.id.applyProxyToAllButton)
+        forceCustomProxySwitch = view.findViewById(R.id.forceCustomProxySwitch)
+
+        // Bandwidth tracking UI elements
+        bandwidthTotalText = view.findViewById(R.id.bandwidthTotalText)
+        bandwidthSessionText = view.findViewById(R.id.bandwidthSessionText)
+        resetBandwidthButton = view.findViewById(R.id.resetBandwidthButton)
+
+        // Setup custom proxy controls
+        setupCustomProxyControls()
+
+        // Setup bandwidth display
+        setupBandwidthDisplay()
 
         // Setup Tor controls
         setupTorControls()
@@ -1177,5 +1206,264 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun setupCustomProxyControls() {
+        // Configure Proxy button
+        configureProxyButton?.setOnClickListener {
+            showConfigureProxyDialog()
+        }
+
+        // Apply to All Stations button
+        applyProxyToAllButton?.setOnClickListener {
+            showApplyProxyToAllDialog()
+        }
+
+        // Force Custom Proxy switch
+        val forceCustomProxyEnabled = PreferencesHelper.isForceCustomProxy(requireContext())
+        forceCustomProxySwitch?.isChecked = forceCustomProxyEnabled
+
+        forceCustomProxySwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setForceCustomProxy(requireContext(), isChecked)
+
+            // Stop current stream when proxy settings change
+            stopCurrentStream()
+
+            // Show warning if enabling and custom proxy is not configured
+            if (isChecked) {
+                val host = PreferencesHelper.getCustomProxyHost(requireContext())
+                if (host.isEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "⚠️ Custom proxy not configured! Configure proxy first.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun setupBandwidthDisplay() {
+        updateBandwidthDisplay()
+
+        resetBandwidthButton?.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Reset Session Bandwidth")
+                .setMessage("Reset the session bandwidth counter to zero?")
+                .setPositiveButton("Reset") { _, _ ->
+                    PreferencesHelper.resetSessionBandwidthUsage(requireContext())
+                    updateBandwidthDisplay()
+                    Toast.makeText(requireContext(), "Session bandwidth reset", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+    }
+
+    private fun updateBandwidthDisplay() {
+        val total = PreferencesHelper.getTotalBandwidthUsage(requireContext())
+        val session = PreferencesHelper.getSessionBandwidthUsage(requireContext())
+
+        bandwidthTotalText?.text = PreferencesHelper.formatBandwidth(total)
+        bandwidthSessionText?.text = PreferencesHelper.formatBandwidth(session)
+    }
+
+    private fun showConfigureProxyDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_configure_proxy, null)
+
+        val hostInput = dialogView.findViewById<TextInputEditText>(R.id.proxyHostInput)
+        val portInput = dialogView.findViewById<TextInputEditText>(R.id.proxyPortInput)
+        val protocolInput = dialogView.findViewById<AutoCompleteTextView>(R.id.proxyProtocolInput)
+        val usernameInput = dialogView.findViewById<TextInputEditText>(R.id.proxyUsernameInput)
+        val passwordInput = dialogView.findViewById<TextInputEditText>(R.id.proxyPasswordInput)
+        val authTypeInput = dialogView.findViewById<AutoCompleteTextView>(R.id.proxyAuthTypeInput)
+        val timeoutInput = dialogView.findViewById<TextInputEditText>(R.id.proxyTimeoutInput)
+        val testButton = dialogView.findViewById<MaterialButton>(R.id.testConnectionButton)
+        val testResultText = dialogView.findViewById<TextView>(R.id.testResultText)
+
+        // Set up dropdowns
+        val protocols = arrayOf("HTTP", "HTTPS", "SOCKS4", "SOCKS5")
+        val protocolAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, protocols)
+        protocolInput.setAdapter(protocolAdapter)
+
+        val authTypes = arrayOf("None", "Basic", "Digest")
+        val authTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, authTypes)
+        authTypeInput.setAdapter(authTypeAdapter)
+
+        // Load current settings
+        hostInput.setText(PreferencesHelper.getCustomProxyHost(requireContext()))
+        portInput.setText(PreferencesHelper.getCustomProxyPort(requireContext()).toString())
+        protocolInput.setText(PreferencesHelper.getCustomProxyProtocol(requireContext()), false)
+        usernameInput.setText(PreferencesHelper.getCustomProxyUsername(requireContext()))
+        passwordInput.setText(PreferencesHelper.getCustomProxyPassword(requireContext()))
+        authTypeInput.setText(PreferencesHelper.getCustomProxyAuthType(requireContext()), false)
+        timeoutInput.setText(PreferencesHelper.getCustomProxyConnectionTimeout(requireContext()).toString())
+
+        // Test Connection button
+        testButton.setOnClickListener {
+            val host = hostInput.text?.toString() ?: ""
+            val port = portInput.text?.toString()?.toIntOrNull() ?: 8080
+
+            if (host.isEmpty()) {
+                testResultText.text = "❌ Please enter a proxy host"
+                testResultText.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
+                testResultText.visibility = View.VISIBLE
+                return@setOnClickListener
+            }
+
+            testResultText.text = "Testing connection..."
+            testResultText.setTextColor(resources.getColor(android.R.color.holo_orange_dark, null))
+            testResultText.visibility = View.VISIBLE
+            testButton.isEnabled = false
+
+            // Test proxy connection in background
+            lifecycleScope.launch(Dispatchers.IO) {
+                val result = testProxyConnection(host, port)
+                withContext(Dispatchers.Main) {
+                    testButton.isEnabled = true
+                    testResultText.text = result.message
+                    testResultText.setTextColor(
+                        resources.getColor(
+                            if (result.success) android.R.color.holo_green_dark
+                            else android.R.color.holo_red_dark,
+                            null
+                        )
+                    )
+                    testResultText.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Configure Global Custom Proxy")
+            .setView(dialogView)
+            .setPositiveButton("Save") { _, _ ->
+                val host = hostInput.text?.toString() ?: ""
+                val port = portInput.text?.toString()?.toIntOrNull() ?: 8080
+                val protocol = protocolInput.text?.toString() ?: "HTTP"
+                val username = usernameInput.text?.toString() ?: ""
+                val password = passwordInput.text?.toString() ?: ""
+                val authType = authTypeInput.text?.toString() ?: "None"
+                val timeout = timeoutInput.text?.toString()?.toIntOrNull() ?: 30
+
+                PreferencesHelper.setCustomProxyHost(requireContext(), host)
+                PreferencesHelper.setCustomProxyPort(requireContext(), port)
+                PreferencesHelper.setCustomProxyProtocol(requireContext(), protocol)
+                PreferencesHelper.setCustomProxyUsername(requireContext(), username)
+                PreferencesHelper.setCustomProxyPassword(requireContext(), password)
+                PreferencesHelper.setCustomProxyAuthType(requireContext(), authType)
+                PreferencesHelper.setCustomProxyConnectionTimeout(requireContext(), timeout)
+
+                Toast.makeText(requireContext(), "Custom proxy settings saved", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private suspend fun testProxyConnection(host: String, port: Int): TestResult {
+        return try {
+            // Simple TCP connection test
+            val socket = java.net.Socket()
+            socket.connect(java.net.InetSocketAddress(host, port), 5000)
+            socket.close()
+            TestResult(true, "✓ Connection successful!")
+        } catch (e: Exception) {
+            TestResult(false, "❌ Connection failed: ${e.message?.take(50)}")
+        }
+    }
+
+    private data class TestResult(val success: Boolean, val message: String)
+
+    private fun showApplyProxyToAllDialog() {
+        val host = PreferencesHelper.getCustomProxyHost(requireContext())
+        if (host.isEmpty()) {
+            Toast.makeText(
+                requireContext(),
+                "Please configure global custom proxy first",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val stationCount = repository.getAllStationsSync().size
+
+            withContext(Dispatchers.Main) {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Apply Custom Proxy to All Stations")
+                    .setMessage("Apply global custom proxy settings to all $stationCount stations?\n\nThis will override individual station proxy settings.")
+                    .setPositiveButton("Apply") { _, _ ->
+                        applyCustomProxyToAllStations()
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
+    }
+
+    private fun applyCustomProxyToAllStations() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val stations = repository.getAllStationsSync()
+            val host = PreferencesHelper.getCustomProxyHost(requireContext())
+            val port = PreferencesHelper.getCustomProxyPort(requireContext())
+            val protocol = PreferencesHelper.getCustomProxyProtocol(requireContext())
+            val username = PreferencesHelper.getCustomProxyUsername(requireContext())
+            val password = PreferencesHelper.getCustomProxyPassword(requireContext())
+            val authType = PreferencesHelper.getCustomProxyAuthType(requireContext())
+            val timeout = PreferencesHelper.getCustomProxyConnectionTimeout(requireContext())
+
+            var updated = 0
+            for (station in stations) {
+                try {
+                    val updatedStation = station.copy(
+                        proxyType = "CUSTOM",
+                        proxyHost = host,
+                        proxyPort = port,
+                        customProxyProtocol = protocol,
+                        proxyUsername = username,
+                        proxyPassword = password,
+                        proxyAuthType = authType,
+                        proxyConnectionTimeout = timeout,
+                        useProxy = true
+                    )
+                    repository.updateStation(updatedStation)
+                    updated++
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsFragment", "Failed to update station ${station.name}", e)
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    requireContext(),
+                    "Applied custom proxy to $updated station(s)",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun stopCurrentStream() {
+        // Stop current playback when proxy settings change
+        val serviceIntent = Intent(requireContext(), RadioService::class.java).apply {
+            action = "ACTION_STOP"
+        }
+        requireContext().startService(serviceIntent)
     }
 }

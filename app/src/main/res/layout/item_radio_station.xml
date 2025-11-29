@@ -43,25 +43,12 @@
             app:layout_constraintTop_toTopOf="@id/coverArtImage"
             tools:visibility="visible" />
 
-        <!-- Proxy Status Badge -->
-        <ImageView
-            android:id="@+id/proxyStatusBadge"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginStart="16dp"
-            android:src="@drawable/ic_proxy_direct"
-            android:contentDescription="Proxy status"
-            app:tint="?attr/colorPrimary"
-            app:layout_constraintStart_toEndOf="@id/coverArtImage"
-            app:layout_constraintTop_toTopOf="@id/coverArtImage"
-            tools:visibility="visible" />
-
         <!-- Station Info -->
         <TextView
             android:id="@+id/stationNameText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="16dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="2dp"
             android:ellipsize="end"
@@ -71,7 +58,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/genreText"
             app:layout_constraintEnd_toStartOf="@id/likeButton"
-            app:layout_constraintStart_toEndOf="@id/proxyStatusBadge"
+            app:layout_constraintStart_toEndOf="@id/coverArtImage"
             app:layout_constraintTop_toTopOf="@id/coverArtImage"
             app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintHorizontal_bias="0"
