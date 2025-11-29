@@ -77,6 +77,8 @@ class SettingsFragment : Fragment() {
     private var configureProxyButton: MaterialButton? = null
     private var applyProxyToAllButton: MaterialButton? = null
     private var forceCustomProxySwitch: MaterialSwitch? = null
+    private var forceCustomProxyExceptTorI2pSwitch: MaterialSwitch? = null
+    private var customProxyStatusViewSettings: CustomProxyStatusView? = null
 
     // Bandwidth tracking UI elements
     private var bandwidthTotalText: TextView? = null
@@ -424,6 +426,8 @@ class SettingsFragment : Fragment() {
         configureProxyButton = view.findViewById(R.id.configureProxyButton)
         applyProxyToAllButton = view.findViewById(R.id.applyProxyToAllButton)
         forceCustomProxySwitch = view.findViewById(R.id.forceCustomProxySwitch)
+        forceCustomProxyExceptTorI2pSwitch = view.findViewById(R.id.forceCustomProxyExceptTorI2pSwitch)
+        customProxyStatusViewSettings = view.findViewById(R.id.customProxyStatusViewSettings)
 
         // Bandwidth tracking UI elements
         bandwidthTotalText = view.findViewById(R.id.bandwidthTotalText)
@@ -1253,6 +1257,9 @@ class SettingsFragment : Fragment() {
             showApplyProxyToAllDialog()
         }
 
+        // Update custom proxy status view
+        updateCustomProxyStatusView()
+
         // Force Custom Proxy switch
         val forceCustomProxyEnabled = PreferencesHelper.isForceCustomProxy(requireContext())
         forceCustomProxySwitch?.isChecked = forceCustomProxyEnabled
@@ -1276,16 +1283,20 @@ class SettingsFragment : Fragment() {
 
             PreferencesHelper.setForceCustomProxy(requireContext(), isChecked)
 
-            // Update Force Tor switches to maintain mutual exclusivity
+            // Update Force Tor switches and other force proxy switches to maintain mutual exclusivity
             if (isChecked) {
                 forceTorAllSwitch?.isChecked = false
                 forceTorExceptI2pSwitch?.isChecked = false
+                forceCustomProxyExceptTorI2pSwitch?.isChecked = false
             }
 
             // Broadcast proxy mode change to update MainActivity UI
             val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
             androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
                 .sendBroadcast(broadcastIntent)
+
+            // Update status view
+            updateCustomProxyStatusView()
 
             // Stop current stream when proxy settings change
             stopCurrentStream()
@@ -1302,6 +1313,67 @@ class SettingsFragment : Fragment() {
                 }
             }
         }
+
+        // Force Custom Proxy Except Tor/I2P switch
+        val forceCustomProxyExceptEnabled = PreferencesHelper.isForceCustomProxyExceptTorI2P(requireContext())
+        forceCustomProxyExceptTorI2pSwitch?.isChecked = forceCustomProxyExceptEnabled
+
+        forceCustomProxyExceptTorI2pSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setForceCustomProxyExceptTorI2P(requireContext(), isChecked)
+
+            // Update Force Tor switches and other force proxy switches to maintain mutual exclusivity
+            if (isChecked) {
+                forceTorAllSwitch?.isChecked = false
+                forceTorExceptI2pSwitch?.isChecked = false
+                forceCustomProxySwitch?.isChecked = false
+            }
+
+            // Broadcast proxy mode change to update MainActivity UI
+            val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+                .sendBroadcast(broadcastIntent)
+
+            // Update status view
+            updateCustomProxyStatusView()
+
+            // Stop current stream when proxy settings change
+            stopCurrentStream()
+
+            // Show warning if enabling and custom proxy is not configured
+            if (isChecked) {
+                val host = PreferencesHelper.getCustomProxyHost(requireContext())
+                if (host.isEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "⚠️ Custom proxy not configured! Configure proxy first.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun updateCustomProxyStatusView() {
+        val isForceCustomProxy = PreferencesHelper.isForceCustomProxy(requireContext()) ||
+                                 PreferencesHelper.isForceCustomProxyExceptTorI2P(requireContext())
+        val proxyHost = PreferencesHelper.getCustomProxyHost(requireContext())
+        customProxyStatusViewSettings?.updateStateFromConfig(isForceCustomProxy, proxyHost)
     }
 
     private fun setupBandwidthDisplay() {
@@ -1423,6 +1495,9 @@ class SettingsFragment : Fragment() {
                 androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
                     .sendBroadcast(broadcastIntent)
 
+                // Update status view in settings
+                updateCustomProxyStatusView()
+
                 Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_saved), Toast.LENGTH_SHORT).show()
             }
             .setNeutralButton("Clear Proxy") { _, _ ->
@@ -1445,6 +1520,9 @@ class SettingsFragment : Fragment() {
                 val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
                 androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
                     .sendBroadcast(broadcastIntent)
+
+                // Update status view in settings
+                updateCustomProxyStatusView()
 
                 Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_cleared), Toast.LENGTH_SHORT).show()
             }

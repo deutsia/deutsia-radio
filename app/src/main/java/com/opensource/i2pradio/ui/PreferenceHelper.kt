@@ -41,6 +41,7 @@ object PreferencesHelper {
     private const val KEY_CUSTOM_PROXY_CONNECTION_TIMEOUT = "custom_proxy_connection_timeout"
     private const val KEY_CUSTOM_PROXY_BYPASS_LOCAL = "custom_proxy_bypass_local"
     private const val KEY_FORCE_CUSTOM_PROXY = "force_custom_proxy"
+    private const val KEY_FORCE_CUSTOM_PROXY_EXCEPT_TOR_I2P = "force_custom_proxy_except_tor_i2p"
     private const val KEY_BANDWIDTH_USAGE_TOTAL = "bandwidth_usage_total"
     private const val KEY_BANDWIDTH_USAGE_SESSION = "bandwidth_usage_session"
     private const val KEY_BANDWIDTH_USAGE_LAST_RESET = "bandwidth_usage_last_reset"
@@ -241,6 +242,7 @@ object PreferencesHelper {
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit()
                 .putBoolean(KEY_FORCE_CUSTOM_PROXY, false)
+                .putBoolean(KEY_FORCE_CUSTOM_PROXY_EXCEPT_TOR_I2P, false)
                 .apply()
         }
     }
@@ -267,6 +269,7 @@ object PreferencesHelper {
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit()
                 .putBoolean(KEY_FORCE_CUSTOM_PROXY, false)
+                .putBoolean(KEY_FORCE_CUSTOM_PROXY_EXCEPT_TOR_I2P, false)
                 .apply()
         }
     }
@@ -418,7 +421,7 @@ object PreferencesHelper {
 
     fun getCustomProxyProtocol(context: Context): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_CUSTOM_PROXY_PROTOCOL, "HTTP") ?: "HTTP"
+            .getString(KEY_CUSTOM_PROXY_PROTOCOL, "HTTPS") ?: "HTTPS"
     }
 
     /**
@@ -527,12 +530,41 @@ object PreferencesHelper {
         if (enabled) {
             setForceTorAll(context, false)
             setForceTorExceptI2P(context, false)
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_FORCE_CUSTOM_PROXY_EXCEPT_TOR_I2P, false)
+                .apply()
         }
     }
 
     fun isForceCustomProxy(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_FORCE_CUSTOM_PROXY, false)
+    }
+
+    /**
+     * Force Custom Proxy Except Tor/I2P setting - forces clearnet traffic through custom proxy
+     * but allows Tor and I2P stations to use their native proxies.
+     * When enabled, clearnet traffic goes through the configured custom proxy.
+     * Tor and I2P stations use their native Tor SOCKS proxy and I2P HTTP proxy respectively.
+     * Mutually exclusive with Force Tor modes and Force Custom Proxy.
+     */
+    fun setForceCustomProxyExceptTorI2P(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_FORCE_CUSTOM_PROXY_EXCEPT_TOR_I2P, enabled)
+            .apply()
+        // If enabling this, disable other force options (mutual exclusivity)
+        if (enabled) {
+            setForceTorAll(context, false)
+            setForceTorExceptI2P(context, false)
+            setForceCustomProxy(context, false)
+        }
+    }
+
+    fun isForceCustomProxyExceptTorI2P(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_FORCE_CUSTOM_PROXY_EXCEPT_TOR_I2P, false)
     }
 
     // Bandwidth Usage Tracking

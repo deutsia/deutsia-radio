@@ -227,12 +227,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Update proxy status view visibility based on Force Custom Proxy setting
+     * Update proxy status view visibility based on Force Custom Proxy settings
      */
     private fun updateProxyStatusViewVisibility() {
         val isForceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
+        val isForceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(this)
 
-        if (isForceCustomProxy) {
+        if (isForceCustomProxy || isForceCustomProxyExceptTorI2P) {
             // Show custom proxy status, hide Tor status
             torStatusView.visibility = View.GONE
             customProxyStatusView.visibility = View.VISIBLE
