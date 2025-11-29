@@ -202,7 +202,15 @@ object StationImportExport {
             FileFormat.JSON -> importFromJson(content, errors)
             FileFormat.M3U -> importFromM3u(content, errors)
             FileFormat.PLS -> importFromPls(content, errors)
-            null -> ImportResult(emptyList(), listOf("Unknown file format"), null)
+            null -> {
+                // Try to extract stations from plain text with URLs
+                val textResult = importFromPlainText(content, errors)
+                if (textResult.stations.isNotEmpty()) {
+                    textResult
+                } else {
+                    ImportResult(emptyList(), listOf("Unknown file format"), null)
+                }
+            }
         }
     }
 
@@ -279,7 +287,12 @@ object StationImportExport {
                 }
 
                 val proxyTypeStr = fields.getOrNull(proxyTypeIdx)?.trim()?.uppercase() ?: "NONE"
-                val proxyType = ProxyType.fromString(proxyTypeStr)
+                // Auto-detect proxy type from URL if not explicitly set to something other than NONE
+                val proxyType = if (proxyTypeStr == "NONE") {
+                    detectProxyTypeFromUrl(url)
+                } else {
+                    ProxyType.fromString(proxyTypeStr)
+                }
                 val useProxy = proxyType != ProxyType.NONE
 
                 val station = RadioStation(
@@ -340,7 +353,12 @@ object StationImportExport {
                     }
 
                     val proxyTypeStr = obj.optString("proxyType", "NONE").uppercase()
-                    val proxyType = ProxyType.fromString(proxyTypeStr)
+                    // Auto-detect proxy type from URL if not explicitly set
+                    val proxyType = if (proxyTypeStr == "NONE") {
+                        detectProxyTypeFromUrl(url)
+                    } else {
+                        ProxyType.fromString(proxyTypeStr)
+                    }
                     val useProxy = proxyType != ProxyType.NONE
 
                     val station = RadioStation(
@@ -437,13 +455,19 @@ object StationImportExport {
                     val name = currentName ?: url.substringAfterLast("/").substringBefore(".")
 
                     if (url.startsWith("http://") || url.startsWith("https://")) {
-                        val useProxy = currentProxyType != ProxyType.NONE
+                        // Auto-detect proxy type from URL if not explicitly set
+                        val detectedProxyType = if (currentProxyType == ProxyType.NONE) {
+                            detectProxyTypeFromUrl(url)
+                        } else {
+                            currentProxyType
+                        }
+                        val useProxy = detectedProxyType != ProxyType.NONE
                         val station = RadioStation(
                             name = name,
                             streamUrl = url,
-                            proxyType = currentProxyType.name,
-                            proxyHost = if (useProxy) currentProxyHost else "",
-                            proxyPort = if (useProxy) currentProxyPort else 0,
+                            proxyType = detectedProxyType.name,
+                            proxyHost = if (useProxy) (currentProxyHost.takeIf { it.isNotEmpty() } ?: detectedProxyType.getDefaultHost()) else "",
+                            proxyPort = if (useProxy) (currentProxyPort.takeIf { it > 0 } ?: detectedProxyType.getDefaultPort()) else 0,
                             useProxy = useProxy,
                             genre = currentGenre,
                             coverArtUri = currentCoverArt,
@@ -544,15 +568,16 @@ object StationImportExport {
             if (!url.startsWith("http://") && !url.startsWith("https://")) continue
 
             val title = titles[num] ?: url.substringAfterLast("/").substringBefore(".")
-            val proxyType = proxyTypes[num] ?: ProxyType.NONE
-            val useProxy = proxyType != ProxyType.NONE
+            // Auto-detect proxy type from URL if not explicitly set
+            val detectedProxyType = proxyTypes[num] ?: detectProxyTypeFromUrl(url)
+            val useProxy = detectedProxyType != ProxyType.NONE
 
             val station = RadioStation(
                 name = title,
                 streamUrl = url,
-                proxyType = proxyType.name,
-                proxyHost = proxyHosts[num] ?: proxyType.getDefaultHost(),
-                proxyPort = proxyPorts[num] ?: proxyType.getDefaultPort(),
+                proxyType = detectedProxyType.name,
+                proxyHost = proxyHosts[num] ?: detectedProxyType.getDefaultHost(),
+                proxyPort = proxyPorts[num] ?: detectedProxyType.getDefaultPort(),
                 useProxy = useProxy,
                 genre = genres[num] ?: "Other",
                 coverArtUri = coverArts[num]?.takeIf { it.isNotEmpty() },
@@ -609,5 +634,139 @@ object StationImportExport {
         fields.add(current.toString())
 
         return fields
+    }
+
+    /**
+     * Auto-detect proxy type from URL
+     */
+    private fun detectProxyTypeFromUrl(url: String): ProxyType {
+        return when {
+            url.contains(".i2p", ignoreCase = true) -> ProxyType.I2P
+            url.contains(".onion", ignoreCase = true) -> ProxyType.TOR
+            else -> ProxyType.NONE
+        }
+    }
+
+    /**
+     * Extract cover art URL from various text patterns
+     */
+    private fun extractCoverArt(text: String): String? {
+        // Try to find image URLs in common patterns
+        val imagePatterns = listOf(
+            Regex("""(?:cover|art|image|logo)[:=]\s*([^\s,;"'\n]+\.(?:jpg|jpeg|png|gif|webp))""", RegexOption.IGNORE_CASE),
+            Regex("""(https?://[^\s,;"'\n]+\.(?:jpg|jpeg|png|gif|webp))""", RegexOption.IGNORE_CASE),
+            Regex(""""([^"]+\.(?:jpg|jpeg|png|gif|webp))" """, RegexOption.IGNORE_CASE)
+        )
+
+        for (pattern in imagePatterns) {
+            val match = pattern.find(text)
+            if (match != null) {
+                return match.groupValues.getOrNull(1)?.trim()
+            }
+        }
+        return null
+    }
+
+    /**
+     * Import stations from plain text containing URLs
+     * This is a fallback for malformed files that just contain stream URLs
+     */
+    private fun importFromPlainText(content: String, errors: MutableList<String>): ImportResult {
+        val stations = mutableListOf<RadioStation>()
+        val lines = content.lines()
+
+        // Regex to find HTTP/HTTPS URLs
+        val urlRegex = Regex("""(https?://[^\s<>"{}|\\^`\[\]]+)""", RegexOption.IGNORE_CASE)
+
+        var currentName: String? = null
+        var currentCoverArt: String? = null
+
+        for ((lineNum, line) in lines.withIndex()) {
+            val trimmed = line.trim()
+            if (trimmed.isEmpty() || trimmed.startsWith("#") && !trimmed.contains("http")) continue
+
+            // Try to extract cover art from this line
+            val coverArt = extractCoverArt(trimmed)
+            if (coverArt != null && currentCoverArt == null) {
+                currentCoverArt = coverArt
+            }
+
+            // Find all URLs in this line
+            val urls = urlRegex.findAll(trimmed).map { it.value }.toList()
+
+            for (url in urls) {
+                // Skip image URLs as they're cover art
+                if (url.matches(Regex(""".*\.(?:jpg|jpeg|png|gif|webp)$""", RegexOption.IGNORE_CASE))) {
+                    if (currentCoverArt == null) currentCoverArt = url
+                    continue
+                }
+
+                // Check if this looks like a stream URL
+                if (!url.contains("stream", ignoreCase = true) &&
+                    !url.endsWith(".mp3") && !url.endsWith(".m3u") &&
+                    !url.endsWith(".pls") && !url.endsWith(".ogg") &&
+                    !url.endsWith(".aac") && !url.contains("radio", ignoreCase = true) &&
+                    !url.contains(".i2p") && !url.contains(".onion")) {
+                    // Might be an image or other URL, try to use as cover art
+                    if (url.matches(Regex(""".*\.(?:jpg|jpeg|png|gif|webp)""", RegexOption.IGNORE_CASE))) {
+                        if (currentCoverArt == null) currentCoverArt = url
+                    }
+                    continue
+                }
+
+                // Try to extract station name from the line
+                val name = when {
+                    // If there's text before the URL, use it as name
+                    trimmed.indexOf(url) > 0 -> {
+                        val beforeUrl = trimmed.substring(0, trimmed.indexOf(url)).trim()
+                        // Remove common prefixes
+                        beforeUrl.replace(Regex("""^[#\-*•]\s*"""), "")
+                               .replace(Regex("""[:=]\s*$"""), "")
+                               .trim()
+                               .takeIf { it.isNotEmpty() && it.length < 100 }
+                    }
+                    // Check previous line for a name
+                    lineNum > 0 && currentName != null -> currentName
+                    // Use URL-based name
+                    else -> null
+                } ?: url.substringAfter("//")
+                       .substringBefore("/")
+                       .replace(Regex("""^www\."""), "")
+                       .split(".").firstOrNull()
+                       ?.replaceFirstChar { it.uppercase() }
+                       ?: "Radio Station"
+
+                // Auto-detect proxy type
+                val proxyType = detectProxyTypeFromUrl(url)
+                val useProxy = proxyType != ProxyType.NONE
+
+                val station = RadioStation(
+                    name = name,
+                    streamUrl = url,
+                    proxyType = proxyType.name,
+                    proxyHost = if (useProxy) proxyType.getDefaultHost() else "",
+                    proxyPort = if (useProxy) proxyType.getDefaultPort() else 0,
+                    useProxy = useProxy,
+                    genre = "Other",
+                    coverArtUri = currentCoverArt,
+                    isLiked = false
+                )
+
+                stations.add(station)
+                currentName = null
+                currentCoverArt = null
+            }
+
+            // If line has no URLs but has text, might be a station name for next line
+            if (urls.isEmpty() && trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
+                currentName = trimmed.take(100) // Limit name length
+            }
+        }
+
+        if (stations.isEmpty()) {
+            errors.add("No valid stream URLs found in file")
+        }
+
+        return ImportResult(stations, errors, null)
     }
 }

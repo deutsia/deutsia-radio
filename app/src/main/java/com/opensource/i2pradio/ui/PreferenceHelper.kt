@@ -5,6 +5,10 @@ import androidx.appcompat.app.AppCompatDelegate
 
 object PreferencesHelper {
     private const val PREFS_NAME = "DeutsiaRadioPrefs"
+
+    // Broadcast actions
+    const val BROADCAST_BANDWIDTH_UPDATED = "com.opensource.i2pradio.BANDWIDTH_UPDATED"
+
     private const val KEY_THEME_MODE = "theme_mode"
     private const val KEY_PRESETS_INITIALIZED = "presets_initialized"
     private const val KEY_MATERIAL_YOU_ENABLED = "material_you_enabled"
@@ -535,6 +539,7 @@ object PreferencesHelper {
     /**
      * Add bandwidth usage in bytes.
      * Updates both total lifetime usage and current session usage.
+     * Broadcasts an update for real-time UI refresh.
      */
     fun addBandwidthUsage(context: Context, bytes: Long) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -545,6 +550,14 @@ object PreferencesHelper {
             .putLong(KEY_BANDWIDTH_USAGE_TOTAL, currentTotal + bytes)
             .putLong(KEY_BANDWIDTH_USAGE_SESSION, currentSession + bytes)
             .apply()
+
+        // Broadcast bandwidth update for real-time UI refresh
+        // Only broadcast every ~100KB to avoid excessive updates
+        if ((currentSession + bytes) / 102400 > currentSession / 102400) {
+            val intent = android.content.Intent(BROADCAST_BANDWIDTH_UPDATED)
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(context)
+                .sendBroadcast(intent)
+        }
     }
 
     /**

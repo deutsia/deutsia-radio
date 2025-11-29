@@ -1,10 +1,12 @@
 package com.opensource.i2pradio.ui
 
+import android.content.BroadcastReceiver
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.SharedPreferences
 import android.net.Uri
@@ -78,6 +80,15 @@ class SettingsFragment : Fragment() {
     private var bandwidthTotalText: TextView? = null
     private var bandwidthSessionText: TextView? = null
     private var resetBandwidthButton: MaterialButton? = null
+
+    // Bandwidth update broadcast receiver
+    private val bandwidthUpdateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == PreferencesHelper.BROADCAST_BANDWIDTH_UPDATED) {
+                updateBandwidthDisplay()
+            }
+        }
+    }
 
     // Import file picker launcher
     private val importFileLauncher = registerForActivityResult(
@@ -507,6 +518,11 @@ class SettingsFragment : Fragment() {
         // Register preference change listener to sync Tor switch with preference updates
         requireContext().getSharedPreferences("DeutsiaRadioPrefs", Context.MODE_PRIVATE)
             .registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+
+        // Register bandwidth update receiver for real-time updates
+        val bandwidthFilter = IntentFilter(PreferencesHelper.BROADCAST_BANDWIDTH_UPDATED)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+            .registerReceiver(bandwidthUpdateReceiver, bandwidthFilter)
     }
 
     override fun onPause() {
@@ -516,6 +532,10 @@ class SettingsFragment : Fragment() {
         // Unregister preference change listener
         requireContext().getSharedPreferences("DeutsiaRadioPrefs", Context.MODE_PRIVATE)
             .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
+
+        // Unregister bandwidth update receiver
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+            .unregisterReceiver(bandwidthUpdateReceiver)
     }
 
     override fun onDestroyView() {
@@ -658,9 +678,15 @@ class SettingsFragment : Fragment() {
 
             PreferencesHelper.setForceTorAll(requireContext(), isChecked)
 
-            // Update the other switch to maintain mutual exclusivity
+            // Update the other switches to maintain mutual exclusivity
             if (isChecked) {
                 forceTorExceptI2pSwitch?.isChecked = false
+                forceCustomProxySwitch?.isChecked = false
+
+                // Broadcast proxy mode change to update MainActivity UI
+                val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+                    .sendBroadcast(broadcastIntent)
             }
 
             // SECURITY: Stop any currently playing stream when proxy settings change
@@ -701,9 +727,15 @@ class SettingsFragment : Fragment() {
 
             PreferencesHelper.setForceTorExceptI2P(requireContext(), isChecked)
 
-            // Update the other switch to maintain mutual exclusivity
+            // Update the other switches to maintain mutual exclusivity
             if (isChecked) {
                 forceTorAllSwitch?.isChecked = false
+                forceCustomProxySwitch?.isChecked = false
+
+                // Broadcast proxy mode change to update MainActivity UI
+                val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+                    .sendBroadcast(broadcastIntent)
             }
 
             // SECURITY: Stop any currently playing stream when proxy settings change
@@ -1241,6 +1273,17 @@ class SettingsFragment : Fragment() {
                 .start()
 
             PreferencesHelper.setForceCustomProxy(requireContext(), isChecked)
+
+            // Update Force Tor switches to maintain mutual exclusivity
+            if (isChecked) {
+                forceTorAllSwitch?.isChecked = false
+                forceTorExceptI2pSwitch?.isChecked = false
+            }
+
+            // Broadcast proxy mode change to update MainActivity UI
+            val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+                .sendBroadcast(broadcastIntent)
 
             // Stop current stream when proxy settings change
             stopCurrentStream()
