@@ -45,7 +45,10 @@ class RadioBrowserClient(private val context: Context) {
     private var currentServerIndex = 0
 
     /**
-     * Build an OkHttpClient respecting Force Tor settings
+     * Build an OkHttpClient respecting both Force Tor and Force Custom Proxy settings.
+     *
+     * IMPORTANT: This ensures RadioBrowser API calls respect the same proxy settings
+     * as media streams to prevent privacy leaks.
      */
     private fun buildHttpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
@@ -53,12 +56,16 @@ class RadioBrowserClient(private val context: Context) {
         val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
         val forceTorAll = PreferencesHelper.isForceTorAll(context)
         val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(context)
+        val forceCustomProxy = PreferencesHelper.isForceCustomProxy(context)
+        val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(context)
+        val customProxyAppliedToClearnet = PreferencesHelper.isCustomProxyAppliedToClearnet(context)
         val torConnected = TorManager.isConnected()
 
-        Log.d(TAG, "Building HTTP client - ForceTorAll: $forceTorAll, ForceTorExceptI2P: $forceTorExceptI2P, TorEnabled: $torEnabled, TorConnected: $torConnected")
+        Log.d(TAG, "Building HTTP client - ForceTorAll: $forceTorAll, ForceTorExceptI2P: $forceTorExceptI2P, " +
+                "ForceCustomProxy: $forceCustomProxy, ForceCustomProxyExceptTorI2P: $forceCustomProxyExceptTorI2P, " +
+                "TorEnabled: $torEnabled, TorConnected: $torConnected")
 
-        // Only apply Force Tor settings if Tor integration itself is enabled
-        // Route through Tor if Force Tor is enabled, Tor integration is enabled, and Tor is connected
+        // Priority 1: Force Tor (if Tor integration is enabled)
         if (torEnabled && (forceTorAll || forceTorExceptI2P) && torConnected) {
             val socksHost = TorManager.getProxyHost()
             val socksPort = TorManager.getProxyPort()
@@ -73,7 +80,34 @@ class RadioBrowserClient(private val context: Context) {
                 builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             }
+        }
+        // Priority 2: Force Custom Proxy for clearnet (RadioBrowser API is clearnet)
+        else if ((forceCustomProxy || (forceCustomProxyExceptTorI2P && customProxyAppliedToClearnet))) {
+            val proxyHost = PreferencesHelper.getCustomProxyHost(context)
+            val proxyPort = PreferencesHelper.getCustomProxyPort(context)
+            val proxyProtocol = PreferencesHelper.getCustomProxyProtocol(context)
+
+            if (proxyHost.isNotEmpty() && proxyPort > 0) {
+                val proxyType = when (proxyProtocol.uppercase()) {
+                    "SOCKS4", "SOCKS5", "SOCKS" -> Proxy.Type.SOCKS
+                    "HTTP", "HTTPS" -> Proxy.Type.HTTP
+                    else -> Proxy.Type.HTTP
+                }
+
+                Log.d(TAG, "Routing RadioBrowser API through CUSTOM proxy ($proxyProtocol) at $proxyHost:$proxyPort")
+                builder.proxy(Proxy(proxyType, InetSocketAddress(proxyHost, proxyPort)))
+
+                // Use longer timeouts for proxy connections
+                builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
+                builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
+            } else {
+                Log.w(TAG, "Force Custom Proxy enabled but proxy configuration invalid, using direct connection")
+                builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            }
         } else {
+            // No forced proxy - use direct connection
+            Log.d(TAG, "No forced proxy configured - using direct connection for RadioBrowser API")
             builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         }
