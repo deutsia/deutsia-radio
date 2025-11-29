@@ -36,6 +36,10 @@ object PreferencesHelper {
     private const val KEY_CUSTOM_PROXY_DNS_RESOLUTION = "custom_proxy_dns_resolution"
     private const val KEY_CUSTOM_PROXY_CONNECTION_TIMEOUT = "custom_proxy_connection_timeout"
     private const val KEY_CUSTOM_PROXY_BYPASS_LOCAL = "custom_proxy_bypass_local"
+    private const val KEY_FORCE_CUSTOM_PROXY = "force_custom_proxy"
+    private const val KEY_BANDWIDTH_USAGE_TOTAL = "bandwidth_usage_total"
+    private const val KEY_BANDWIDTH_USAGE_SESSION = "bandwidth_usage_session"
+    private const val KEY_BANDWIDTH_USAGE_LAST_RESET = "bandwidth_usage_last_reset"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -227,9 +231,13 @@ object PreferencesHelper {
             .edit()
             .putBoolean(KEY_FORCE_TOR_ALL, enabled)
             .apply()
-        // If enabling this, disable the other option (mutual exclusivity)
+        // If enabling this, disable the other options (mutual exclusivity)
         if (enabled) {
             setForceTorExceptI2P(context, false)
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_FORCE_CUSTOM_PROXY, false)
+                .apply()
         }
     }
 
@@ -249,9 +257,13 @@ object PreferencesHelper {
             .edit()
             .putBoolean(KEY_FORCE_TOR_EXCEPT_I2P, enabled)
             .apply()
-        // If enabling this, disable the other option (mutual exclusivity)
+        // If enabling this, disable the other options (mutual exclusivity)
         if (enabled) {
             setForceTorAll(context, false)
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_FORCE_CUSTOM_PROXY, false)
+                .apply()
         }
     }
 
@@ -493,5 +505,92 @@ object PreferencesHelper {
     fun isCustomProxyBypassLocalEnabled(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_CUSTOM_PROXY_BYPASS_LOCAL, false)
+    }
+
+    // Force Custom Proxy setting - forces all traffic through the configured custom proxy
+    /**
+     * Force ALL traffic through the custom proxy.
+     * When enabled, all network traffic goes through the configured custom proxy.
+     * If custom proxy is not configured, network requests will FAIL (no fallback).
+     * Mutually exclusive with Force Tor modes.
+     */
+    fun setForceCustomProxy(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_FORCE_CUSTOM_PROXY, enabled)
+            .apply()
+        // If enabling this, disable Force Tor options (mutual exclusivity)
+        if (enabled) {
+            setForceTorAll(context, false)
+            setForceTorExceptI2P(context, false)
+        }
+    }
+
+    fun isForceCustomProxy(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_FORCE_CUSTOM_PROXY, false)
+    }
+
+    // Bandwidth Usage Tracking
+    /**
+     * Add bandwidth usage in bytes.
+     * Updates both total lifetime usage and current session usage.
+     */
+    fun addBandwidthUsage(context: Context, bytes: Long) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val currentTotal = prefs.getLong(KEY_BANDWIDTH_USAGE_TOTAL, 0L)
+        val currentSession = prefs.getLong(KEY_BANDWIDTH_USAGE_SESSION, 0L)
+
+        prefs.edit()
+            .putLong(KEY_BANDWIDTH_USAGE_TOTAL, currentTotal + bytes)
+            .putLong(KEY_BANDWIDTH_USAGE_SESSION, currentSession + bytes)
+            .apply()
+    }
+
+    /**
+     * Get total bandwidth usage in bytes (lifetime).
+     */
+    fun getTotalBandwidthUsage(context: Context): Long {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(KEY_BANDWIDTH_USAGE_TOTAL, 0L)
+    }
+
+    /**
+     * Get session bandwidth usage in bytes (since last reset).
+     */
+    fun getSessionBandwidthUsage(context: Context): Long {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(KEY_BANDWIDTH_USAGE_SESSION, 0L)
+    }
+
+    /**
+     * Reset session bandwidth usage counter.
+     */
+    fun resetSessionBandwidthUsage(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putLong(KEY_BANDWIDTH_USAGE_SESSION, 0L)
+            .putLong(KEY_BANDWIDTH_USAGE_LAST_RESET, System.currentTimeMillis())
+            .apply()
+    }
+
+    /**
+     * Get the timestamp of the last bandwidth usage reset.
+     */
+    fun getLastBandwidthResetTime(context: Context): Long {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(KEY_BANDWIDTH_USAGE_LAST_RESET, 0L)
+    }
+
+    /**
+     * Format bytes as human-readable string (KB, MB, GB).
+     */
+    fun formatBandwidth(bytes: Long): String {
+        return when {
+            bytes < 1024 -> "$bytes B"
+            bytes < 1024 * 1024 -> String.format("%.2f KB", bytes / 1024.0)
+            bytes < 1024 * 1024 * 1024 -> String.format("%.2f MB", bytes / (1024.0 * 1024.0))
+            else -> String.format("%.2f GB", bytes / (1024.0 * 1024.0 * 1024.0))
+        }
     }
 }
