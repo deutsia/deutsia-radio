@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [RadioStation::class, BrowseHistory::class], version = 6, exportSchema = false)
+@Database(entities = [RadioStation::class, BrowseHistory::class], version = 7, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
     abstract fun radioDao(): RadioDao
 
@@ -145,6 +145,16 @@ abstract class RadioDatabase : RoomDatabase() {
             }
         }
 
+        // Migration from version 6 to 7: Add index on radioBrowserUuid for faster batch lookups
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Create index on radioBrowserUuid for faster queries when checking if stations are saved
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_radio_stations_radioBrowserUuid ON radio_stations(radioBrowserUuid)"
+                )
+            }
+        }
+
         fun getDatabase(context: Context): RadioDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -152,7 +162,7 @@ abstract class RadioDatabase : RoomDatabase() {
                     RadioDatabase::class.java,
                     "radio_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
                     .build()
                 INSTANCE = instance
