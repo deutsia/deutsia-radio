@@ -78,7 +78,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
 
         when (state) {
             ProxyState.CONNECTED -> {
-                statusIcon.setImageResource(R.drawable.ic_network)
+                statusIcon.setImageResource(R.drawable.ic_proxy_custom)
                 statusIcon.alpha = 1f
                 statusText.text = "Proxy Connected"
                 statusText.setTextColor(context.getColor(R.color.tor_connected))
@@ -86,14 +86,14 @@ class CustomProxyStatusView @JvmOverloads constructor(
                 showConnectedAnimation()
             }
             ProxyState.NOT_CONFIGURED -> {
-                statusIcon.setImageResource(R.drawable.ic_network)
+                statusIcon.setImageResource(R.drawable.ic_proxy_custom)
                 statusIcon.alpha = 0.5f
                 statusText.text = "Proxy Off"
                 statusText.setTextColor(context.getColor(R.color.tor_disconnected))
                 contentDescription = "Custom proxy is not configured. Tap to configure."
             }
             ProxyState.LEAK_WARNING -> {
-                statusIcon.setImageResource(R.drawable.ic_network)
+                statusIcon.setImageResource(R.drawable.ic_proxy_custom)
                 statusIcon.alpha = 1f
                 statusText.text = "Leak Warning"
                 statusText.setTextColor(context.getColor(R.color.tor_error))
