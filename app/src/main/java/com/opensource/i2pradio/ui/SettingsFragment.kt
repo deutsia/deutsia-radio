@@ -1547,6 +1547,10 @@ class SettingsFragment : Fragment() {
         username: String,
         password: String
     ): TestResult {
+        android.util.Log.d("ProxyTest", "===== PROXY CONNECTION TEST START =====")
+        android.util.Log.d("ProxyTest", "Proxy: $protocol://$host:$port")
+        android.util.Log.d("ProxyTest", "Auth: ${if (username.isNotEmpty()) "enabled (user: $username)" else "disabled"}")
+
         return try {
             // Create OkHttp client with proxy configuration
             val javaProxyType = when (protocol) {
@@ -1554,16 +1558,32 @@ class SettingsFragment : Fragment() {
                 "HTTP", "HTTPS" -> java.net.Proxy.Type.HTTP
                 else -> java.net.Proxy.Type.HTTP
             }
+            android.util.Log.d("ProxyTest", "Java proxy type: $javaProxyType")
 
             val clientBuilder = okhttp3.OkHttpClient.Builder()
                 .proxy(java.net.Proxy(javaProxyType, InetSocketAddress(host, port)))
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .writeTimeout(5, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .addInterceptor { chain ->
+                    val request = chain.request()
+                    android.util.Log.d("ProxyTest", "REQUEST: ${request.method} ${request.url}")
+                    try {
+                        val response = chain.proceed(request)
+                        android.util.Log.d("ProxyTest", "RESPONSE: ${response.code} ${response.message}")
+                        android.util.Log.d("ProxyTest", "Response headers: ${response.headers}")
+                        response
+                    } catch (e: Exception) {
+                        android.util.Log.e("ProxyTest", "Interceptor error: ${e.javaClass.simpleName}: ${e.message}")
+                        throw e
+                    }
+                }
 
             // Add authentication if credentials are provided
             if (username.isNotEmpty() && password.isNotEmpty()) {
+                android.util.Log.d("ProxyTest", "Adding proxy authentication")
                 clientBuilder.proxyAuthenticator { _, response ->
+                    android.util.Log.d("ProxyTest", "Proxy authentication requested (${response.code})")
                     val credential = okhttp3.Credentials.basic(username, password)
                     response.request.newBuilder()
                         .header("Proxy-Authorization", credential)
@@ -1573,29 +1593,66 @@ class SettingsFragment : Fragment() {
 
             val client = clientBuilder.build()
 
-            // Test with httpbin.org - a proxy-friendly testing endpoint
+            // Test with a simple, reliable endpoint that works well with proxies
+            // Using example.com which is designed to be accessible from anywhere
+            val testUrl = "http://example.com/"
+            android.util.Log.d("ProxyTest", "Testing connectivity to: $testUrl")
+
             val request = okhttp3.Request.Builder()
-                .url("http://httpbin.org/status/200")
-                .head() // HEAD request is lighter than GET
+                .url(testUrl)
+                .get() // Use GET to ensure we get a response body
                 .build()
 
             client.newCall(request).execute().use { response ->
-                if (response.isSuccessful || response.code == 204) {
-                    TestResult(true, "✓ Proxy working! (${response.code})")
-                } else {
-                    TestResult(false, "❌ Proxy responded but failed: HTTP ${response.code}")
+                val responseBody = response.body?.string()
+                android.util.Log.d("ProxyTest", "Response code: ${response.code}")
+                android.util.Log.d("ProxyTest", "Response body length: ${responseBody?.length ?: 0}")
+                android.util.Log.d("ProxyTest", "Response body preview: ${responseBody?.take(100)}")
+
+                when {
+                    response.isSuccessful -> {
+                        if (responseBody != null && responseBody.isNotEmpty()) {
+                            android.util.Log.d("ProxyTest", "✓ SUCCESS: Proxy is working correctly!")
+                            TestResult(true, "✓ Proxy working! (HTTP ${response.code}, ${responseBody.length} bytes received)")
+                        } else {
+                            android.util.Log.w("ProxyTest", "⚠ WARNING: Got HTTP ${response.code} but empty body")
+                            TestResult(true, "⚠ Proxy responds but returns empty content (HTTP ${response.code})")
+                        }
+                    }
+                    response.code == 407 -> {
+                        android.util.Log.e("ProxyTest", "❌ Proxy authentication required (407)")
+                        TestResult(false, "❌ Proxy auth required - check username/password")
+                    }
+                    response.code == 403 -> {
+                        android.util.Log.e("ProxyTest", "❌ Proxy forbidden (403)")
+                        TestResult(false, "❌ Proxy blocked request (HTTP 403) - proxy may block this domain")
+                    }
+                    else -> {
+                        android.util.Log.e("ProxyTest", "❌ Unexpected response: ${response.code}")
+                        TestResult(false, "❌ Proxy responded with error: HTTP ${response.code}")
+                    }
                 }
             }
         } catch (e: java.net.UnknownHostException) {
-            TestResult(false, "❌ Unknown host: ${e.message?.take(50)}")
+            android.util.Log.e("ProxyTest", "❌ Unknown host error", e)
+            TestResult(false, "❌ Cannot resolve proxy host '$host' - check hostname")
         } catch (e: java.net.SocketTimeoutException) {
-            TestResult(false, "❌ Connection timeout - check host/port")
+            android.util.Log.e("ProxyTest", "❌ Connection timeout", e)
+            TestResult(false, "❌ Connection timeout - proxy not responding on $host:$port")
         } catch (e: java.net.ConnectException) {
-            TestResult(false, "❌ Connection refused - proxy not running?")
+            android.util.Log.e("ProxyTest", "❌ Connection refused", e)
+            TestResult(false, "❌ Connection refused - proxy not running or wrong port ($port)")
+        } catch (e: javax.net.ssl.SSLException) {
+            android.util.Log.e("ProxyTest", "❌ SSL/TLS error", e)
+            TestResult(false, "❌ SSL error: ${e.message?.take(50)}")
         } catch (e: java.io.IOException) {
-            TestResult(false, "❌ Network error: ${e.message?.take(50)}")
+            android.util.Log.e("ProxyTest", "❌ Network IO error", e)
+            TestResult(false, "❌ Network error: ${e.message?.take(60)}")
         } catch (e: Exception) {
-            TestResult(false, "❌ Failed: ${e.message?.take(50)}")
+            android.util.Log.e("ProxyTest", "❌ Unexpected error", e)
+            TestResult(false, "❌ Error: ${e.javaClass.simpleName}: ${e.message?.take(50)}")
+        } finally {
+            android.util.Log.d("ProxyTest", "===== PROXY CONNECTION TEST END =====")
         }
     }
 

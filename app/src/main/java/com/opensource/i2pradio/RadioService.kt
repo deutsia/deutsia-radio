@@ -1579,11 +1579,37 @@ class RadioService : Service() {
                     val builder = OkHttpClient.Builder()
                         .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
                         .addInterceptor(BandwidthTrackingInterceptor(this))
+                        .addInterceptor { chain ->
+                            val request = chain.request()
+                            android.util.Log.d("RadioService", "PROXY REQUEST: ${request.method} ${request.url}")
+                            android.util.Log.d("RadioService", "PROXY TYPE: ${effectiveProxyType.name} ($javaProxyType)")
+                            android.util.Log.d("RadioService", "PROXY ADDRESS: $effectiveProxyHost:$effectiveProxyPort")
+                            try {
+                                val startTime = System.currentTimeMillis()
+                                val response = chain.proceed(request)
+                                val duration = System.currentTimeMillis() - startTime
+                                android.util.Log.d("RadioService", "PROXY RESPONSE: ${response.code} ${response.message} (${duration}ms)")
+                                android.util.Log.d("RadioService", "PROXY HANDSHAKE: ${response.handshake?.let { "TLS ${it.tlsVersion}" } ?: "None"}")
+                                android.util.Log.d("RadioService", "RESPONSE HEADERS: ${response.headers}")
+                                response
+                            } catch (e: Exception) {
+                                android.util.Log.e("RadioService", "PROXY CONNECTION ERROR: ${e.javaClass.simpleName}: ${e.message}", e)
+                                when (e) {
+                                    is java.net.ConnectException -> android.util.Log.e("RadioService", "└─ Proxy not reachable - check if proxy is running on $effectiveProxyHost:$effectiveProxyPort")
+                                    is java.net.SocketTimeoutException -> android.util.Log.e("RadioService", "└─ Proxy connection timeout - proxy may be slow or unresponsive")
+                                    is java.net.UnknownHostException -> android.util.Log.e("RadioService", "└─ Cannot resolve proxy host '$effectiveProxyHost'")
+                                    is javax.net.ssl.SSLException -> android.util.Log.e("RadioService", "└─ SSL/TLS error - check proxy protocol settings")
+                                    is java.io.EOFException -> android.util.Log.e("RadioService", "└─ Proxy closed connection unexpectedly")
+                                }
+                                throw e
+                            }
+                        }
 
                     // Add proxy authentication if custom proxy with credentials
                     if (effectiveProxyType == ProxyType.CUSTOM && proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()) {
-                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy")
+                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy (user: $proxyUsername)")
                         builder.proxyAuthenticator { route, response ->
+                            android.util.Log.d("RadioService", "Proxy authentication challenge received (${response.code})")
                             val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
                             response.request.newBuilder()
                                 .header("Proxy-Authorization", credential)
