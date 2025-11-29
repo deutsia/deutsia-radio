@@ -607,13 +607,21 @@
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginStart="8dp"
-                        android:src="@drawable/ic_bandwidth"
-                        android:contentDescription="Bandwidth icon"
-                        app:tint="?attr/colorPrimary" />
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="72dp">
+
+                        <ImageView
+                            android:id="@+id/ic_bandwidth"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_bandwidth"
+                            android:contentDescription="Bandwidth icon"
+                            app:tint="?attr/colorPrimary" />
+
+                    </FrameLayout>
 
                 </LinearLayout>
 
