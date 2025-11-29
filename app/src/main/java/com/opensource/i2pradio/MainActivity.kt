@@ -240,7 +240,9 @@ class MainActivity : AppCompatActivity() {
 
             // Update custom proxy state
             val proxyHost = PreferencesHelper.getCustomProxyHost(this)
-            customProxyStatusView.updateStateFromConfig(true, proxyHost)
+            val protocol = PreferencesHelper.getCustomProxyProtocol(this)
+            val port = PreferencesHelper.getCustomProxyPort(this)
+            customProxyStatusView.updateStateFromConfig(true, proxyHost, protocol, port)
         } else {
             // Show Tor status, hide custom proxy status
             torStatusView.visibility = View.VISIBLE
