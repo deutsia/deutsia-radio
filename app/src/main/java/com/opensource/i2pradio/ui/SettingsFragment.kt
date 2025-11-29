@@ -864,7 +864,7 @@ class SettingsFragment : Fragment() {
                 } else {
                     torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
                     torStatusText?.text = "Connection Failed"
-                    torStatusDetail?.text = TorManager.errorMessage ?: "Unknown error"
+                    torStatusDetail?.text = TorManager.errorMessage ?: getString(R.string.error_unknown)
                     torActionButton?.text = "Retry"
                     torActionButton?.isEnabled = true
                 }
@@ -909,7 +909,7 @@ class SettingsFragment : Fragment() {
             try {
                 val uri = Uri.parse(savedUri)
                 val docFile = DocumentFile.fromTreeUri(requireContext(), uri)
-                val displayName = docFile?.name ?: "Custom folder"
+                val displayName = docFile?.name ?: getString(R.string.folder_custom)
                 recordingDirectoryPath?.text = displayName
                 recordingDirectoryButton?.text = "Change"
             } catch (e: Exception) {

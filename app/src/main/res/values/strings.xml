@@ -169,7 +169,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">About</string>
-    <string name="settings_version">Version 1.0</string>
+    <string name="settings_version">Version 1.1</string>
     <string name="settings_view_github">View on GitHub</string>
     <string name="settings_donate">Donate</string>
     <string name="settings_donate_description">If this app helped you out, consider donating</string>
@@ -233,4 +233,45 @@
     <string name="toast_custom_proxy_cleared">Custom proxy settings cleared</string>
     <string name="toast_address_copied">Address copied to clipboard</string>
     <string name="toast_using_default_directory">Using default directory</string>
+
+    <!-- Custom Proxy Status Messages -->
+    <string name="custom_proxy_status_connected">Connected</string>
+    <string name="custom_proxy_status_configured">Proxy configured</string>
+    <string name="custom_proxy_status_not_configured">Not Configured</string>
+    <string name="custom_proxy_status_no_proxy">No proxy set</string>
+    <string name="custom_proxy_status_leak_warning">Leak Warning</string>
+    <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+
+    <!-- Tor Service Notification Messages -->
+    <string name="tor_channel_name">Tor Connection</string>
+    <string name="tor_channel_description">Shows Tor connection status</string>
+    <string name="tor_notification_disconnected">Tor Disconnected</string>
+    <string name="tor_notification_tap_to_open">Tap to open app</string>
+    <string name="tor_notification_connecting">Connecting via Orbot...</string>
+    <string name="tor_notification_please_wait">Please wait</string>
+    <string name="tor_notification_connected">Tor Connected</string>
+    <string name="tor_notification_error">Tor Error</string>
+    <string name="tor_notification_connection_failed">Connection failed</string>
+    <string name="tor_notification_orbot_required">Orbot Required</string>
+    <string name="tor_notification_install_orbot">Please install Orbot for Tor support</string>
+    <string name="tor_notification_action_stop">Stop Tor</string>
+
+    <!-- Other Error Messages -->
+    <string name="error_unknown">Unknown error</string>
+    <string name="folder_custom">Custom folder</string>
+
+    <!-- AddEditRadioDialog Default Values -->
+    <string name="default_genre_other">Other</string>
+    <string name="default_proxy_none">None</string>
+    <string name="default_proxy_i2p">I2P</string>
+    <string name="default_proxy_tor">Tor</string>
+    <string name="default_proxy_custom">Custom</string>
+    <string name="default_protocol_http">HTTP</string>
+    <string name="default_protocol_https">HTTPS</string>
+    <string name="default_protocol_socks4">SOCKS4</string>
+    <string name="default_protocol_socks5">SOCKS5</string>
+    <string name="default_auth_basic">Basic</string>
+    <string name="default_auth_digest">Digest</string>
+    <string name="default_port_8080">8080</string>
+    <string name="default_timeout_30">30</string>
 </resources>

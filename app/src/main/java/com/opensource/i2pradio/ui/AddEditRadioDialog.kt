@@ -102,17 +102,17 @@ class AddEditRadioDialog : DialogFragment() {
             "Comedy", "Country", "Dance", "EDM", "Electronic", "Folk",
             "Funk", "Gospel", "Hip Hop", "Indie", "Jazz", "K-Pop",
             "Latin", "Lo-Fi", "Metal", "News", "Oldies", "Pop", "Punk",
-            "R&B", "Reggae", "Rock", "Soul", "Sports", "Talk", "World", "Other"
+            "R&B", "Reggae", "Rock", "Soul", "Sports", "Talk", "World", getString(R.string.default_genre_other)
         )
         val genreAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, genres)
         genreInput.setAdapter(genreAdapter)
-        genreInput.setText("Other", false)
+        genreInput.setText(getString(R.string.default_genre_other), false)
 
         // Setup proxy type dropdown
-        val proxyTypes = arrayOf("None", "I2P", "Tor", "Custom")
+        val proxyTypes = arrayOf(getString(R.string.default_proxy_none), getString(R.string.default_proxy_i2p), getString(R.string.default_proxy_tor), getString(R.string.default_proxy_custom))
         val proxyTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, proxyTypes)
         proxyTypeInput.setAdapter(proxyTypeAdapter)
-        proxyTypeInput.setText("None", false)
+        proxyTypeInput.setText(getString(R.string.default_proxy_none), false)
 
         // Initialize custom proxy fields
         customProxyContainer = view.findViewById(R.id.customProxyContainer)
@@ -124,43 +124,43 @@ class AddEditRadioDialog : DialogFragment() {
         proxyConnectionTimeoutInput = view.findViewById(R.id.proxyConnectionTimeoutInput)
 
         // Setup custom proxy protocol dropdown
-        val protocols = arrayOf("HTTP", "HTTPS", "SOCKS4", "SOCKS5")
+        val protocols = arrayOf(getString(R.string.default_protocol_http), getString(R.string.default_protocol_https), getString(R.string.default_protocol_socks4), getString(R.string.default_protocol_socks5))
         val protocolAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, protocols)
         customProxyProtocolInput?.setAdapter(protocolAdapter)
-        customProxyProtocolInput?.setText("HTTP", false)
+        customProxyProtocolInput?.setText(getString(R.string.default_protocol_http), false)
 
         // Setup auth type dropdown
-        val authTypes = arrayOf("None", "Basic", "Digest")
+        val authTypes = arrayOf(getString(R.string.default_proxy_none), getString(R.string.default_auth_basic), getString(R.string.default_auth_digest))
         val authTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, authTypes)
         proxyAuthTypeInput?.setAdapter(authTypeAdapter)
-        proxyAuthTypeInput?.setText("None", false)
+        proxyAuthTypeInput?.setText(getString(R.string.default_proxy_none), false)
 
         // Toggle proxy settings visibility based on proxy type selection
         proxyTypeInput.setOnItemClickListener { _, _, position, _ ->
             val selectedType = proxyTypes[position]
             when {
-                selectedType == "None" -> {
+                selectedType == getString(R.string.default_proxy_none) -> {
                     proxySettingsContainer.visibility = View.GONE
                     embeddedTorInfoContainer?.visibility = View.GONE
                     customProxyContainer?.visibility = View.GONE
                 }
-                selectedType == "Tor" && isEmbeddedTorEnabled -> {
+                selectedType == getString(R.string.default_proxy_tor) && isEmbeddedTorEnabled -> {
                     // Show embedded Tor info, hide manual proxy settings
                     embeddedTorInfoContainer?.visibility = View.VISIBLE
                     proxySettingsContainer.visibility = View.GONE
                     customProxyContainer?.visibility = View.GONE
                 }
-                selectedType == "Custom" -> {
+                selectedType == getString(R.string.default_proxy_custom) -> {
                     // Show both basic and custom proxy settings
                     embeddedTorInfoContainer?.visibility = View.GONE
                     proxySettingsContainer.visibility = View.VISIBLE
                     customProxyContainer?.visibility = View.VISIBLE
                     // Set default values for custom proxy
                     proxyHostInput.setText("")
-                    proxyPortInput.setText("8080")
-                    customProxyProtocolInput?.setText("HTTP", false)
-                    proxyAuthTypeInput?.setText("None", false)
-                    proxyConnectionTimeoutInput?.setText("30")
+                    proxyPortInput.setText(getString(R.string.default_port_8080))
+                    customProxyProtocolInput?.setText(getString(R.string.default_protocol_http), false)
+                    proxyAuthTypeInput?.setText(getString(R.string.default_proxy_none), false)
+                    proxyConnectionTimeoutInput?.setText(getString(R.string.default_timeout_30))
                 }
                 else -> {
                     // Show manual proxy settings for I2P or when embedded Tor is disabled
