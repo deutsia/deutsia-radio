@@ -35,6 +35,7 @@ import com.opensource.i2pradio.ui.RadioViewModel
 import com.opensource.i2pradio.ui.LibraryFragment
 import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
 import com.opensource.i2pradio.ui.TorStatusView
+import com.opensource.i2pradio.ui.CustomProxyStatusView
 import com.opensource.i2pradio.ui.browse.BrowseStationsFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var miniPlayerContainer: FrameLayout
     private lateinit var miniPlayerView: MiniPlayerView
     private lateinit var torStatusView: TorStatusView
+    private lateinit var customProxyStatusView: CustomProxyStatusView
     private lateinit var repository: RadioRepository
     private lateinit var radioBrowserRepository: RadioBrowserRepository
     private val viewModel: RadioViewModel by viewModels()
@@ -64,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Broadcast receiver for playback state, cover art, and like state changes
+    // Broadcast receiver for playback state, cover art, like state, and proxy mode changes
     private val playbackStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -98,6 +100,10 @@ class MainActivity : AppCompatActivity() {
                             miniPlayerView.updateLikeState(isLiked)
                         }
                     }
+                }
+                BROADCAST_PROXY_MODE_CHANGED -> {
+                    // Update proxy status view visibility
+                    updateProxyStatusViewVisibility()
                 }
             }
         }
@@ -189,26 +195,59 @@ class MainActivity : AppCompatActivity() {
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
             addAction(BROADCAST_LIKE_STATE_CHANGED)
+            addAction(BROADCAST_PROXY_MODE_CHANGED)
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(playbackStateReceiver, filter)
     }
 
     private fun setupTorStatusView() {
         torStatusView = findViewById(R.id.torStatusView)
+        customProxyStatusView = findViewById(R.id.customProxyStatusView)
 
         // Set compact mode for toolbar (icon + short text)
         torStatusView.setCompactMode(false)
+        customProxyStatusView.setCompactMode(false)
 
         // Handle click to show quick control bottom sheet
         torStatusView.setOnStatusClickListener {
             showTorQuickControlBottomSheet()
         }
 
+        // Handle click on custom proxy status to show settings
+        customProxyStatusView.setOnStatusClickListener {
+            // Navigate to settings tab (index 3)
+            viewPager.currentItem = 3
+        }
+
         // Listen for Tor state changes
         TorManager.addStateListener(torStateListener)
 
-        // Update initial state
-        torStatusView.updateState(TorManager.state)
+        // Update initial state and switch visibility based on Force Custom Proxy setting
+        updateProxyStatusViewVisibility()
+    }
+
+    /**
+     * Update proxy status view visibility based on Force Custom Proxy setting
+     */
+    private fun updateProxyStatusViewVisibility() {
+        val isForceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
+
+        if (isForceCustomProxy) {
+            // Show custom proxy status, hide Tor status
+            torStatusView.visibility = View.GONE
+            customProxyStatusView.visibility = View.VISIBLE
+
+            // Update custom proxy state
+            val proxyHost = PreferencesHelper.getCustomProxyHost(this)
+            customProxyStatusView.updateStateFromConfig(true, proxyHost)
+        } else {
+            // Show Tor status, hide custom proxy status
+            torStatusView.visibility = View.VISIBLE
+            customProxyStatusView.visibility = View.GONE
+
+            // Update Tor state
+            torStatusView.updateState(TorManager.state)
+        }
     }
 
     private fun showTorQuickControlBottomSheet() {
@@ -488,6 +527,9 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_STATION_ID = "station_id"
         const val EXTRA_RADIO_BROWSER_UUID = "radio_browser_uuid"
         const val EXTRA_IS_LIKED = "is_liked"
+
+        // Broadcast action for proxy mode changes
+        const val BROADCAST_PROXY_MODE_CHANGED = "com.opensource.i2pradio.PROXY_MODE_CHANGED"
     }
 
     private inner class ViewPagerAdapter(activity: AppCompatActivity) :

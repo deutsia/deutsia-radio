@@ -27,6 +27,15 @@
                 android:layout_gravity="end|center_vertical"
                 android:layout_marginEnd="8dp" />
 
+            <!-- Custom Proxy Status Indicator in Toolbar (shown when Force Custom Proxy is enabled) -->
+            <com.opensource.i2pradio.ui.CustomProxyStatusView
+                android:id="@+id/customProxyStatusView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone" />
+
         </com.google.android.material.appbar.MaterialToolbar>
 
         <com.google.android.material.tabs.TabLayout
