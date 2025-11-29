@@ -19,9 +19,9 @@
             android:id="@+id/customProxyStatusIcon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_network"
+            android:src="@drawable/ic_proxy_custom"
             android:contentDescription="Custom proxy status"
-            tools:src="@drawable/ic_network" />
+            tools:src="@drawable/ic_proxy_custom" />
 
         <TextView
             android:id="@+id/customProxyStatusText"
