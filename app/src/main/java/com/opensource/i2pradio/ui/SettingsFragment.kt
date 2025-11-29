@@ -42,6 +42,8 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.InetSocketAddress
+import java.util.concurrent.TimeUnit
 
 class SettingsFragment : Fragment() {
 
@@ -1362,6 +1364,9 @@ class SettingsFragment : Fragment() {
         testButton.setOnClickListener {
             val host = hostInput.text?.toString() ?: ""
             val port = portInput.text?.toString()?.toIntOrNull() ?: 8080
+            val protocol = protocolInput.text?.toString()?.uppercase() ?: "HTTP"
+            val username = usernameInput.text?.toString() ?: ""
+            val password = passwordInput.text?.toString() ?: ""
 
             if (host.isEmpty()) {
                 testResultText.text = "❌ Please enter a proxy host"
@@ -1377,7 +1382,7 @@ class SettingsFragment : Fragment() {
 
             // Test proxy connection in background
             lifecycleScope.launch(Dispatchers.IO) {
-                val result = testProxyConnection(host, port)
+                val result = testProxyConnection(host, port, protocol, username, password)
                 withContext(Dispatchers.Main) {
                     testButton.isEnabled = true
                     testResultText.text = result.message
@@ -1447,15 +1452,63 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
-    private suspend fun testProxyConnection(host: String, port: Int): TestResult {
+    private suspend fun testProxyConnection(
+        host: String,
+        port: Int,
+        protocol: String,
+        username: String,
+        password: String
+    ): TestResult {
         return try {
-            // Simple TCP connection test
-            val socket = java.net.Socket()
-            socket.connect(java.net.InetSocketAddress(host, port), 5000)
-            socket.close()
-            TestResult(true, "✓ Connection successful!")
+            // Create OkHttp client with proxy configuration
+            val javaProxyType = when (protocol) {
+                "SOCKS4", "SOCKS5" -> java.net.Proxy.Type.SOCKS
+                "HTTP", "HTTPS" -> java.net.Proxy.Type.HTTP
+                else -> java.net.Proxy.Type.HTTP
+            }
+
+            val clientBuilder = okhttp3.OkHttpClient.Builder()
+                .proxy(java.net.Proxy(javaProxyType, InetSocketAddress(host, port)))
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.SECONDS)
+
+            // Add authentication if credentials are provided
+            if (username.isNotEmpty() && password.isNotEmpty()) {
+                clientBuilder.proxyAuthenticator { _, response ->
+                    val credential = okhttp3.Credentials.basic(username, password)
+                    response.request.newBuilder()
+                        .header("Proxy-Authorization", credential)
+                        .build()
+                }
+            }
+
+            val client = clientBuilder.build()
+
+            // Test with a lightweight endpoint
+            // Use HTTP (not HTTPS) for maximum proxy compatibility
+            val request = okhttp3.Request.Builder()
+                .url("http://connectivitycheck.gstatic.com/generate_204")
+                .head() // HEAD request is lighter than GET
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful || response.code == 204) {
+                    TestResult(true, "✓ Proxy working! (${response.code})")
+                } else {
+                    TestResult(false, "❌ Proxy responded but failed: HTTP ${response.code}")
+                }
+            }
+        } catch (e: java.net.UnknownHostException) {
+            TestResult(false, "❌ Unknown host: ${e.message?.take(50)}")
+        } catch (e: java.net.SocketTimeoutException) {
+            TestResult(false, "❌ Connection timeout - check host/port")
+        } catch (e: java.net.ConnectException) {
+            TestResult(false, "❌ Connection refused - proxy not running?")
+        } catch (e: java.io.IOException) {
+            TestResult(false, "❌ Network error: ${e.message?.take(50)}")
         } catch (e: Exception) {
-            TestResult(false, "❌ Connection failed: ${e.message?.take(50)}")
+            TestResult(false, "❌ Failed: ${e.message?.take(50)}")
         }
     }
 

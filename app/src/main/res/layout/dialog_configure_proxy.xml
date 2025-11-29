@@ -143,6 +143,16 @@
             app:icon="@drawable/ic_link"
             app:iconGravity="start" />
 
+        <!-- Test Connection Disclaimer -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/hint_test_connection_disclaimer"
+            android:textSize="11sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:alpha="0.7" />
+
         <TextView
             android:id="@+id/testResultText"
             android:layout_width="match_parent"

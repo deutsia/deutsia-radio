@@ -101,6 +101,7 @@
     <string name="button_change">Change</string>
     <string name="button_start">Start</string>
     <string name="button_test_connection">Test Connection</string>
+    <string name="hint_test_connection_disclaimer">Note: Testing will connect to connectivitycheck.gstatic.com via your proxy</string>
     <string name="button_choose_image">Choose Image</string>
     <string name="button_clear">Clear</string>
 
