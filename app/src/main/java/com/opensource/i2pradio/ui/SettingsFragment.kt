@@ -1573,10 +1573,9 @@ class SettingsFragment : Fragment() {
 
             val client = clientBuilder.build()
 
-            // Test with a lightweight endpoint
-            // Use HTTP (not HTTPS) for maximum proxy compatibility
+            // Test with httpbin.org - a proxy-friendly testing endpoint
             val request = okhttp3.Request.Builder()
-                .url("http://connectivitycheck.gstatic.com/generate_204")
+                .url("http://httpbin.org/status/200")
                 .head() // HEAD request is lighter than GET
                 .build()
 
