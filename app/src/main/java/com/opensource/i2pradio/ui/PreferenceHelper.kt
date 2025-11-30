@@ -29,6 +29,7 @@ object PreferencesHelper {
     private const val KEY_RECORD_ACROSS_STATIONS = "record_across_stations"
     private const val KEY_RECORD_ALL_STATIONS = "record_all_stations"
     private const val KEY_COLOR_SCHEME = "color_scheme"
+    private const val KEY_APP_LANGUAGE = "app_language"
 
     // Custom proxy settings (global defaults)
     private const val KEY_CUSTOM_PROXY_ENABLED = "custom_proxy_enabled"
@@ -364,6 +365,31 @@ object PreferencesHelper {
     fun getColorScheme(context: Context): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_COLOR_SCHEME, "default") ?: "default"
+    }
+
+    // Language preferences
+    // Available languages: system (follow device), ar, de, es, fa, fr, hi, it, ja, ko, my, pt, ru, tr, uk, vi, zh
+
+    /**
+     * Set the app language.
+     * Available values: "system", "ar", "de", "es", "fa", "fr", "hi", "it", "ja", "ko", "my", "pt", "ru", "tr", "uk", "vi", "zh"
+     * Default: "system" (follow device language)
+     */
+    fun setAppLanguage(context: Context, languageCode: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_APP_LANGUAGE, languageCode)
+            .apply()
+    }
+
+    /**
+     * Get the selected app language.
+     * Returns: language code or "system" for device default
+     * Default: "system"
+     */
+    fun getAppLanguage(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_APP_LANGUAGE, "system") ?: "system"
     }
 
     // Custom Proxy Settings - Global defaults that can be applied to stations
