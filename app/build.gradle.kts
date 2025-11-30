@@ -84,6 +84,11 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")  // IMPORTANT: Room annotation processor
+
+    // SECURITY: SQLCipher for database encryption
+    implementation("net.zetetic:android-database-sqlcipher:4.5.4")
+    implementation("androidx.sqlite:sqlite-ktx:2.4.0")
+
     // Coil for image loading
     implementation("io.coil-kt:coil:2.5.0")
 
@@ -101,6 +106,10 @@ dependencies {
     // Material 3
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.media:media:1.7.0")
+
+    // SECURITY: Encrypted SharedPreferences for secure credential storage
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
     // Test dependencies
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

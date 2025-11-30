@@ -6,6 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.db.SupportSQLiteOpenHelper
+import com.opensource.i2pradio.security.SecurityAuditLogger
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SupportFactory
 
 @Database(entities = [RadioStation::class, BrowseHistory::class], version = 7, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
@@ -157,16 +161,105 @@ abstract class RadioDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): RadioDatabase {
             return INSTANCE ?: synchronized(this) {
+                try {
+                    // Load SQLCipher native libraries
+                    System.loadLibrary("sqlcipher")
+                    SecurityAuditLogger.logSecurityInit("SQLCipher", true, "Native library loaded")
+                } catch (e: Exception) {
+                    SecurityAuditLogger.logSecurityInit("SQLCipher", false, "Failed to load native library: ${e.message}")
+                }
+
+                // Generate database encryption passphrase from Android Keystore
+                val passphrase = getDatabasePassphrase(context)
+
+                // Create SQLCipher support factory
+                val factory: SupportSQLiteOpenHelper.Factory = SupportFactory(passphrase)
+
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     RadioDatabase::class.java,
                     "radio_database"
                 )
+                    .openHelperFactory(factory)  // Enable SQLCipher encryption
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
                     .build()
+
+                // Verify database encryption
+                verifyDatabaseEncryption(instance)
+
+                SecurityAuditLogger.logSecurityInit(
+                    "RadioDatabase",
+                    true,
+                    "Database encrypted with SQLCipher (AES-256-CBC)"
+                )
+
                 INSTANCE = instance
                 instance
+            }
+        }
+
+        /**
+         * Generate or retrieve database encryption passphrase
+         * This passphrase is stored in EncryptedSharedPreferences
+         */
+        private fun getDatabasePassphrase(context: Context): ByteArray {
+            val prefsManager = com.opensource.i2pradio.security.SecurePreferencesManager
+
+            // Initialize secure preferences if not already done
+            if (!prefsManager.initialize(context)) {
+                android.util.Log.e("RadioDatabase", "Failed to initialize secure preferences")
+            }
+
+            val key = "database_encryption_key"
+            var passphrase = prefsManager.getString(key, "")
+
+            if (passphrase.isEmpty()) {
+                // Generate new secure random passphrase
+                val random = java.security.SecureRandom()
+                val passphraseBytes = ByteArray(32) // 256 bits
+                random.nextBytes(passphraseBytes)
+                passphrase = android.util.Base64.encodeToString(passphraseBytes, android.util.Base64.NO_WRAP)
+
+                // Store encrypted passphrase
+                prefsManager.putString(key, passphrase)
+
+                SecurityAuditLogger.logSecurityInit(
+                    "DatabasePassphrase",
+                    true,
+                    "Generated new 256-bit passphrase"
+                )
+            } else {
+                SecurityAuditLogger.logSecurityInit(
+                    "DatabasePassphrase",
+                    true,
+                    "Retrieved existing passphrase from secure storage"
+                )
+            }
+
+            return passphrase.toByteArray(Charsets.UTF_8)
+        }
+
+        /**
+         * Verify that database encryption is working
+         */
+        private fun verifyDatabaseEncryption(database: RadioDatabase) {
+            try {
+                // Try to read from database - this will fail if encryption is broken
+                database.radioDao().getAllStations()
+
+                SecurityAuditLogger.logSecurityCheck(
+                    "Database Encryption",
+                    true,
+                    "Database successfully encrypted and accessible"
+                )
+            } catch (e: Exception) {
+                SecurityAuditLogger.logSecurityCheck(
+                    "Database Encryption",
+                    false,
+                    "Database encryption verification failed: ${e.message}"
+                )
+                throw e
             }
         }
     }

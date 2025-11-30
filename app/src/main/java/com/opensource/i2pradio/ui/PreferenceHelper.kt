@@ -2,6 +2,8 @@ package com.opensource.i2pradio.ui
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.opensource.i2pradio.security.SecurePreferencesManager
+import com.opensource.i2pradio.security.SecurityAuditLogger
 
 object PreferencesHelper {
     private const val PREFS_NAME = "DeutsiaRadioPrefs"
@@ -427,32 +429,81 @@ object PreferencesHelper {
 
     /**
      * Set custom proxy username (optional, for authenticated proxies)
+     * SECURITY: Stored in encrypted SharedPreferences
      */
     fun setCustomProxyUsername(context: Context, username: String) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_CUSTOM_PROXY_USERNAME, username)
-            .apply()
+        // Initialize secure preferences
+        if (!SecurePreferencesManager.initialize(context)) {
+            android.util.Log.e("PreferencesHelper", "Failed to initialize secure storage for username")
+            return
+        }
+
+        // Store username in encrypted preferences
+        SecurePreferencesManager.putString(KEY_CUSTOM_PROXY_USERNAME, username)
+
+        SecurityAuditLogger.logSecureStorage(
+            KEY_CUSTOM_PROXY_USERNAME,
+            if (username.isEmpty()) "[EMPTY]" else "[${username.length} chars]",
+            true
+        )
     }
 
     fun getCustomProxyUsername(context: Context): String {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_CUSTOM_PROXY_USERNAME, "") ?: ""
+        // Initialize secure preferences
+        if (!SecurePreferencesManager.initialize(context)) {
+            android.util.Log.e("PreferencesHelper", "Failed to initialize secure storage for username")
+            return ""
+        }
+
+        return SecurePreferencesManager.getString(KEY_CUSTOM_PROXY_USERNAME, "")
     }
 
     /**
      * Set custom proxy password (optional, for authenticated proxies)
+     * SECURITY: Stored in ENCRYPTED SharedPreferences (AES256-GCM)
+     * Never stored in plaintext!
      */
     fun setCustomProxyPassword(context: Context, password: String) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_CUSTOM_PROXY_PASSWORD, password)
-            .apply()
+        // Initialize secure preferences
+        if (!SecurePreferencesManager.initialize(context)) {
+            android.util.Log.e("PreferencesHelper", "Failed to initialize secure storage for password")
+            return
+        }
+
+        // Store password in encrypted preferences
+        SecurePreferencesManager.putString(KEY_CUSTOM_PROXY_PASSWORD, password)
+
+        // Log password storage (without revealing password)
+        SecurityAuditLogger.logPasswordUsage(
+            "Store Global Proxy Password",
+            password.length,
+            true // encrypted
+        )
+
+        SecurityAuditLogger.logSecureStorage(
+            KEY_CUSTOM_PROXY_PASSWORD,
+            "[PASSWORD: ${password.length} chars]",
+            true
+        )
     }
 
     fun getCustomProxyPassword(context: Context): String {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_CUSTOM_PROXY_PASSWORD, "") ?: ""
+        // Initialize secure preferences
+        if (!SecurePreferencesManager.initialize(context)) {
+            android.util.Log.e("PreferencesHelper", "Failed to initialize secure storage for password")
+            return ""
+        }
+
+        val password = SecurePreferencesManager.getString(KEY_CUSTOM_PROXY_PASSWORD, "")
+
+        // Log password retrieval (without revealing password)
+        SecurityAuditLogger.logPasswordUsage(
+            "Retrieve Global Proxy Password",
+            password.length,
+            true // encrypted
+        )
+
+        return password
     }
 
     /**

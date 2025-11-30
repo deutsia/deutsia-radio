@@ -16,6 +16,7 @@
     <application
         android:name=".I2PRadioApplication"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="deutsia radio"
         android:roundIcon="@mipmap/ic_launcher_round"

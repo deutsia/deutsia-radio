@@ -1,13 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample backup rules file; uncomment and customize as necessary.
-   See https://developer.android.com/guide/topics/data/autobackup
-   for details.
-   Note: This file is ignored for devices older than API 31
-   See https://developer.android.com/about/versions/12/backup-restore
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Security Backup Rules
+
+  Defines what data should be excluded from Android backups (ADB, Cloud, etc.)
+  to prevent sensitive data exposure.
+
+  CRITICAL: Passwords, encryption keys, and sensitive credentials must NEVER
+  be included in backups, as backup files may not be encrypted or could be
+  accessed by unauthorized parties.
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <!-- EXCLUDE: Encrypted SharedPreferences containing passwords and keys -->
+    <exclude domain="sharedpref" path="deutsia_radio_secure_prefs.xml"/>
+
+    <!-- EXCLUDE: Legacy SharedPreferences that may contain sensitive data -->
+    <exclude domain="sharedpref" path="DeutsiaRadioPrefs.xml"/>
+
+    <!-- EXCLUDE: Encrypted database containing proxy credentials -->
+    <exclude domain="database" path="radio_database"/>
+    <exclude domain="database" path="radio_database-shm"/>
+    <exclude domain="database" path="radio_database-wal"/>
+
+    <!-- EXCLUDE: Any SQLCipher temporary files -->
+    <exclude domain="database" path="radio_database-journal"/>
+
+    <!-- INCLUDE: Allow backup of non-sensitive app data -->
+    <!-- App settings (theme, UI preferences) are safe to backup -->
+
+    <!-- EXCLUDE: Any files that might contain cached credentials -->
+    <exclude domain="file" path="cache/"/>
+    <exclude domain="file" path="code_cache/"/>
 </full-backup-content>
