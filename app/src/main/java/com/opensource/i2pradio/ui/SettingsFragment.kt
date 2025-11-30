@@ -881,8 +881,12 @@ class SettingsFragment : Fragment() {
         val isForceTorEnabled = PreferencesHelper.isForceTorAll(requireContext()) ||
                                 PreferencesHelper.isForceTorExceptI2P(requireContext())
 
-        // Hide the action button during force mode - users shouldn't be able to stop Tor manually
-        torActionButton?.visibility = if (isForceTorEnabled) View.GONE else View.VISIBLE
+        // Grey out the action button during force mode - users shouldn't be able to stop Tor manually
+        // Keep it visible but disabled to provide better UX feedback
+        torActionButton?.apply {
+            isEnabled = !isForceTorEnabled
+            alpha = if (isForceTorEnabled) 0.5f else 1.0f
+        }
 
         when (state) {
             TorManager.TorState.STOPPED -> {
@@ -949,7 +953,9 @@ class SettingsFragment : Fragment() {
         torStatusText?.text = "Connected"
         torStatusDetail?.text = "SOCKS port: ${TorManager.socksPort}"
         torActionButton?.text = "Stop"
-        torActionButton?.isEnabled = true
+        // Keep button disabled and greyed out in force mode (handled by updateTorStatusUI)
+        torActionButton?.isEnabled = false
+        torActionButton?.alpha = 0.5f
     }
 
     private fun showForceTorWarning() {
@@ -957,7 +963,9 @@ class SettingsFragment : Fragment() {
         torStatusText?.text = "Connection Failed"
         torStatusDetail?.text = "Force Tor is enabled but not connected"
         torActionButton?.text = "Retry"
-        torActionButton?.isEnabled = true
+        // Keep button disabled and greyed out in force mode (handled by updateTorStatusUI)
+        torActionButton?.isEnabled = false
+        torActionButton?.alpha = 0.5f
     }
 
     private fun updateRecordingDirectoryDisplay() {

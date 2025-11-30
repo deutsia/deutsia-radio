@@ -276,12 +276,9 @@ class MainActivity : AppCompatActivity() {
             val protocol = PreferencesHelper.getCustomProxyProtocol(this)
             val port = PreferencesHelper.getCustomProxyPort(this)
             customProxyStatusView.updateStateFromConfig(true, proxyHost, protocol, port)
-        } else if (isForceTorAll || isForceTorExceptI2P) {
-            // Hide both status views when Tor is in force mode
-            torStatusView.visibility = View.GONE
-            customProxyStatusView.visibility = View.GONE
         } else {
-            // Show Tor status, hide custom proxy status
+            // Show Tor status (always visible when Tor is enabled, including force mode)
+            // Hide custom proxy status
             torStatusView.visibility = View.VISIBLE
             customProxyStatusView.visibility = View.GONE
 
