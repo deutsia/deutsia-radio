@@ -5,6 +5,7 @@ import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 import com.opensource.i2pradio.ui.PreferencesHelper
 import com.opensource.i2pradio.util.SecureImageLoader
+import com.opensource.i2pradio.utils.DatabaseEncryptionManager
 
 class I2PRadioApplication : Application() {
 
@@ -16,6 +17,11 @@ class I2PRadioApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Initialize SQLCipher library early
+        // This must be done before any database operations
+        DatabaseEncryptionManager.initializeSQLCipher(this)
+
         // Dynamic colors are now applied at Activity level in MainActivity
         // to allow toggling Material You on/off without requiring app restart
 
