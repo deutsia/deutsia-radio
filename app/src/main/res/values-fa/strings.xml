@@ -1,334 +1,337 @@
+<!--
+    Farsi/Persian (فارسی) Translation
+-->
 <resources>
     <string name="app_name">deutsia radio</string>
-    <string name="tab_radios">Library</string>
-    <string name="tab_now_playing">Now Playing</string>
-    <string name="tab_settings">Settings</string>
+    <string name="tab_radios">کتابخانه</string>
+    <string name="tab_now_playing">در حال پخش</string>
+    <string name="tab_settings">تنظیمات</string>
 
     <!-- Equalizer -->
-    <string name="equalizer">Equalizer</string>
-    <string name="equalizer_no_audio">Start playing a station first</string>
-    <string name="equalizer_not_found">No equalizer app found. Install an equalizer app like Wavelet.</string>
-    <string name="equalizer_preset">Preset</string>
-    <string name="equalizer_custom">Custom</string>
-    <string name="equalizer_reset">Reset to Flat</string>
-    <string name="equalizer_init_failed">Could not initialize equalizer</string>
-    <string name="equalizer_bass_boost">Bass Booster</string>
-    <string name="equalizer_surround_sound">Surround Sound</string>
+    <string name="equalizer">اکولایزر</string>
+    <string name="equalizer_no_audio">ابتدا یک ایستگاه را پخش کنید</string>
+    <string name="equalizer_not_found">برنامه اکولایزر یافت نشد. برنامه‌ای مانند Wavelet را نصب کنید.</string>
+    <string name="equalizer_preset">پیش‌تنظیم</string>
+    <string name="equalizer_custom">سفارشی</string>
+    <string name="equalizer_reset">بازنشانی به حالت صاف</string>
+    <string name="equalizer_init_failed">راه‌اندازی اکولایزر ناموفق بود</string>
+    <string name="equalizer_bass_boost">تقویت بیس</string>
+    <string name="equalizer_surround_sound">صدای فراگیر</string>
 
     <!-- Sort options -->
-    <string name="sort_default">Default</string>
-    <string name="sort_name">Name</string>
-    <string name="sort_recent">Recent</string>
-    <string name="sort_liked">Liked</string>
-    <string name="sort_genre">Genre</string>
+    <string name="sort_default">پیش‌فرض</string>
+    <string name="sort_name">نام</string>
+    <string name="sort_recent">اخیر</string>
+    <string name="sort_liked">پسندیده</string>
+    <string name="sort_genre">ژانر</string>
 
     <!-- Search -->
-    <string name="search_stations">Search library</string>
-    <string name="search_countries">Search countries…</string>
-    <string name="search_genres">Search genres…</string>
+    <string name="search_stations">جستجوی کتابخانه</string>
+    <string name="search_countries">جستجوی کشورها…</string>
+    <string name="search_genres">جستجوی ژانرها…</string>
 
     <!-- Genre filter -->
-    <string name="genre_all">All Genres</string>
-    <string name="filter_by_genre">Filter by Genre</string>
+    <string name="genre_all">همه ژانرها</string>
+    <string name="filter_by_genre">فیلتر بر اساس ژانر</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with Orbot integration and configurable leak prevention</string>
+    <string name="about_description">deutsia radio یک پخش‌کننده رادیوی چند شبکه‌ای رایگان و متن‌باز است که جریان‌ها از شبکه‌های clearnet، Tor (.onion) و I2P را گرد هم می‌آورد. از ایستگاه‌های مورد علاقه خود در رابط Material You با یکپارچگی Orbot و جلوگیری از نشت قابل پیکربندی لذت ببرید</string>
 
     <!-- Browse/Discover Stations -->
-    <string name="tab_browse">Browse</string>
-    <string name="search_radio_browser">Search thousands of stations…</string>
-    <string name="browse_top_voted">Top Voted</string>
-    <string name="browse_popular">Popular</string>
-    <string name="browse_random">Random</string>
-    <string name="browse_history">History</string>
-    <string name="browse_no_results">No Stations Found</string>
-    <string name="browse_no_results_hint">Try a different search or filter</string>
-    <string name="filter_country">Country</string>
-    <string name="filter_genre">Genre</string>
-    <string name="filter_language">Language</string>
-    <string name="filter_all_countries">All Countries</string>
-    <string name="filter_all_genres">All Genres</string>
-    <string name="filter_all_languages">All Languages</string>
-    <string name="select_country">Select Country</string>
-    <string name="select_genre">Select Genre</string>
-    <string name="select_language">Select Language</string>
-    <string name="loading_countries">Loading countries…</string>
-    <string name="loading_genres">Loading genres…</string>
-    <string name="loading_languages">Loading languages…</string>
-    <string name="search_languages">Search languages…</string>
-    <string name="station_saved">%s added to library</string>
-    <string name="station_removed">%s removed from library</string>
-    <string name="station_added_to_favorites">%s added to favorites</string>
-    <string name="station_removed_from_favorites">%s removed from favorites</string>
-    <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
+    <string name="tab_browse">مرور</string>
+    <string name="search_radio_browser">جستجو در هزاران ایستگاه…</string>
+    <string name="browse_top_voted">پررأی‌ترین</string>
+    <string name="browse_popular">محبوب</string>
+    <string name="browse_random">تصادفی</string>
+    <string name="browse_history">تاریخچه</string>
+    <string name="browse_no_results">ایستگاهی یافت نشد</string>
+    <string name="browse_no_results_hint">جستجو یا فیلتر دیگری امتحان کنید</string>
+    <string name="filter_country">کشور</string>
+    <string name="filter_genre">ژانر</string>
+    <string name="filter_language">زبان</string>
+    <string name="filter_all_countries">همه کشورها</string>
+    <string name="filter_all_genres">همه ژانرها</string>
+    <string name="filter_all_languages">همه زبان‌ها</string>
+    <string name="select_country">انتخاب کشور</string>
+    <string name="select_genre">انتخاب ژانر</string>
+    <string name="select_language">انتخاب زبان</string>
+    <string name="loading_countries">در حال بارگیری کشورها…</string>
+    <string name="loading_genres">در حال بارگیری ژانرها…</string>
+    <string name="loading_languages">در حال بارگیری زبان‌ها…</string>
+    <string name="search_languages">جستجوی زبان‌ها…</string>
+    <string name="station_saved">%s به کتابخانه اضافه شد</string>
+    <string name="station_removed">%s از کتابخانه حذف شد</string>
+    <string name="station_added_to_favorites">%s به علاقه‌مندی‌ها اضافه شد</string>
+    <string name="station_removed_from_favorites">%s از علاقه‌مندی‌ها حذف شد</string>
+    <string name="tor_required_warning">اجبار Tor فعال است اما Tor متصل نیست. برای مرور ایستگاه‌ها به Tor متصل شوید.</string>
 
     <!-- Notification and Status Messages -->
-    <string name="notification_connecting">Connecting...</string>
-    <string name="notification_paused">Paused</string>
-    <string name="notification_playing">Playing</string>
-    <string name="notification_playing_recording">Playing • Recording</string>
-    <string name="notification_buffering">Buffering...</string>
-    <string name="notification_reconnecting">Reconnecting...</string>
-    <string name="notification_connection_failed">Connection failed</string>
-    <string name="notification_tor_blocked">Tor not connected - stream blocked</string>
-    <string name="notification_audio_focus_denied">Audio focus denied</string>
-    <string name="notification_channel_name">deutsia radio Playback</string>
-    <string name="notification_channel_description">Shows radio playback status</string>
-    <string name="notification_action_pause">Pause</string>
-    <string name="notification_action_stop">Stop</string>
+    <string name="notification_connecting">در حال اتصال...</string>
+    <string name="notification_paused">متوقف شده</string>
+    <string name="notification_playing">در حال پخش</string>
+    <string name="notification_playing_recording">در حال پخش • ضبط</string>
+    <string name="notification_buffering">در حال بافرکردن...</string>
+    <string name="notification_reconnecting">در حال اتصال مجدد...</string>
+    <string name="notification_connection_failed">اتصال ناموفق بود</string>
+    <string name="notification_tor_blocked">Tor متصل نیست - جریان مسدود شد</string>
+    <string name="notification_audio_focus_denied">تمرکز صدا رد شد</string>
+    <string name="notification_channel_name">پخش deutsia radio</string>
+    <string name="notification_channel_description">وضعیت پخش رادیو را نمایش می‌دهد</string>
+    <string name="notification_action_pause">توقف</string>
+    <string name="notification_action_stop">متوقف کردن</string>
 
     <!-- Recording Messages -->
-    <string name="recording_failed">Recording failed: %s</string>
-    <string name="recording_saved">Recording saved: %s (%dKB)</string>
-    <string name="recording_stopping">Stopping recording...</string>
-    <string name="recording_starting">Starting recording...</string>
-    <string name="recording_no_station">No station playing</string>
-    <string name="recording_directory_updated">Recording directory updated</string>
+    <string name="recording_failed">ضبط ناموفق بود: %s</string>
+    <string name="recording_saved">ضبط ذخیره شد: %s (%dKB)</string>
+    <string name="recording_stopping">در حال توقف ضبط...</string>
+    <string name="recording_starting">در حال شروع ضبط...</string>
+    <string name="recording_no_station">ایستگاهی در حال پخش نیست</string>
+    <string name="recording_directory_updated">پوشه ضبط به‌روزرسانی شد</string>
 
     <!-- Dialog Titles and Buttons -->
-    <string name="dialog_add_station">Add Radio Station</string>
-    <string name="dialog_edit_station">Edit Radio Station</string>
-    <string name="dialog_sort_stations">Sort Stations</string>
-    <string name="dialog_delete_stations">Delete stations</string>
-    <string name="button_save">Save</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="button_import">Import</string>
-    <string name="button_export">Export</string>
-    <string name="button_open">Open</string>
-    <string name="button_configure">Configure</string>
-    <string name="button_apply">Apply</string>
-    <string name="button_reset">Reset</string>
-    <string name="button_change">Change</string>
-    <string name="button_start">Start</string>
-    <string name="button_test_connection">Test Connection</string>
-    <string name="hint_test_connection_disclaimer">Note: Testing will connect to httpbin.org via your proxy</string>
-    <string name="button_choose_image">Choose Image</string>
-    <string name="button_clear">Clear</string>
+    <string name="dialog_add_station">افزودن ایستگاه رادیویی</string>
+    <string name="dialog_edit_station">ویرایش ایستگاه رادیویی</string>
+    <string name="dialog_sort_stations">مرتب‌سازی ایستگاه‌ها</string>
+    <string name="dialog_delete_stations">حذف ایستگاه‌ها</string>
+    <string name="button_save">ذخیره</string>
+    <string name="button_cancel">لغو</string>
+    <string name="button_import">وارد کردن</string>
+    <string name="button_export">خروجی گرفتن</string>
+    <string name="button_open">باز کردن</string>
+    <string name="button_configure">پیکربندی</string>
+    <string name="button_apply">اعمال</string>
+    <string name="button_reset">بازنشانی</string>
+    <string name="button_change">تغییر</string>
+    <string name="button_start">شروع</string>
+    <string name="button_test_connection">آزمایش اتصال</string>
+    <string name="hint_test_connection_disclaimer">توجه: آزمایش از طریق پروکسی شما به httpbin.org متصل می‌شود</string>
+    <string name="button_choose_image">انتخاب تصویر</string>
+    <string name="button_clear">پاک کردن</string>
 
     <!-- Settings - Appearance -->
-    <string name="settings_appearance">Appearance</string>
-    <string name="settings_theme">Theme</string>
-    <string name="settings_theme_description">Choose light, dark, or system</string>
-    <string name="settings_theme_system_default">System Default</string>
+    <string name="settings_appearance">ظاهر</string>
+    <string name="settings_theme">پوسته</string>
+    <string name="settings_theme_description">روشن، تیره یا سیستم را انتخاب کنید</string>
+    <string name="settings_theme_system_default">پیش‌فرض سیستم</string>
     <string name="settings_material_you">Material You</string>
-    <string name="settings_material_you_description">Use wallpaper-based dynamic colors</string>
-    <string name="settings_color_scheme">Color Scheme</string>
-    <string name="settings_color_scheme_description">Choose your preferred color</string>
-    <string name="settings_color_blue">Blue</string>
+    <string name="settings_material_you_description">استفاده از رنگ‌های پویا مبتنی بر تصویر زمینه</string>
+    <string name="settings_color_scheme">طرح رنگی</string>
+    <string name="settings_color_scheme_description">رنگ مورد نظر خود را انتخاب کنید</string>
+    <string name="settings_color_blue">آبی</string>
 
     <!-- Settings - Tor Network -->
-    <string name="settings_tor_network">Tor Network</string>
-    <string name="settings_enable_tor">Enable Tor (via Orbot)</string>
-    <string name="settings_enable_tor_description">Connect through the Tor network</string>
-    <string name="settings_tor_disconnected">Disconnected</string>
-    <string name="settings_tor_not_running">Tor is not running</string>
-    <string name="settings_force_tor">Force Tor Over Everything</string>
-    <string name="settings_force_tor_description">Route all streams through Tor. Won\'t connect without Tor.</string>
-    <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
-    <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
-    <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_network">شبکه Tor</string>
+    <string name="settings_enable_tor">فعال‌سازی Tor (از طریق Orbot)</string>
+    <string name="settings_enable_tor_description">اتصال از طریق شبکه Tor</string>
+    <string name="settings_tor_disconnected">قطع شده</string>
+    <string name="settings_tor_not_running">Tor در حال اجرا نیست</string>
+    <string name="settings_force_tor">اجبار Tor برای همه چیز</string>
+    <string name="settings_force_tor_description">مسیریابی همه جریان‌ها از طریق Tor. بدون Tor متصل نمی‌شود.</string>
+    <string name="settings_force_tor_except_i2p">اجبار Tor به جز I2P</string>
+    <string name="settings_force_tor_except_i2p_description">مسیریابی clearnet از طریق Tor، جریان‌های I2P مستقیماً به پروکسی I2P.</string>
+    <string name="settings_tor_info">به Orbot نیاز دارد (رایگان از Play Store یا F-Droid). برای دسترسی سریع روی آیکون Tor در نوار ابزار ضربه بزنید.\n\nحالت‌های اجبار هنگامی که Tor در دسترس نیست، اتصالات را مسدود می‌کنند.</string>
 
     <!-- Settings - Custom Proxy -->
-    <string name="settings_custom_proxy">Custom Proxy</string>
-    <string name="settings_enable_custom_proxy">Enable Custom Proxy</string>
-    <string name="settings_enable_custom_proxy_description">Use custom proxy for connections</string>
-    <string name="settings_configure_proxy">Configure Global Proxy</string>
-    <string name="settings_configure_proxy_description">Set up your custom proxy settings</string>
-    <string name="settings_force_custom_proxy">Force Custom Proxy</string>
-    <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
+    <string name="settings_custom_proxy">پروکسی سفارشی</string>
+    <string name="settings_enable_custom_proxy">فعال‌سازی پروکسی سفارشی</string>
+    <string name="settings_enable_custom_proxy_description">استفاده از پروکسی سفارشی برای اتصالات</string>
+    <string name="settings_configure_proxy">پیکربندی پروکسی عمومی</string>
+    <string name="settings_configure_proxy_description">تنظیمات پروکسی سفارشی خود را پیکربندی کنید</string>
+    <string name="settings_force_custom_proxy">اجبار پروکسی سفارشی</string>
+    <string name="settings_force_custom_proxy_description">مسیریابی همه ترافیک از طریق پروکسی سفارشی. بدون پروکسی متصل نمی‌شود.</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">اجبار پروکسی سفارشی به جز ایستگاه‌های Tor/I2P</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">مسیریابی همه ترافیک clearnet از طریق پروکسی سفارشی، اما اجازه دهید ایستگاه‌های Tor و I2P از پروکسی‌های بومی خود استفاده کنند.</string>
 
     <!-- Settings - Bandwidth -->
-    <string name="settings_bandwidth_usage">Bandwidth Usage</string>
-    <string name="settings_total_usage">Total Usage (Lifetime)</string>
-    <string name="settings_session_usage">Session Usage</string>
+    <string name="settings_bandwidth_usage">مصرف پهنای باند</string>
+    <string name="settings_total_usage">مصرف کل (طول عمر)</string>
+    <string name="settings_session_usage">مصرف جلسه</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
     <!-- Settings - Playback -->
-    <string name="settings_playback">Playback</string>
-    <string name="settings_sleep_timer">Sleep Timer</string>
-    <string name="settings_sleep_timer_description">Auto-stop playback after set time</string>
-    <string name="settings_sleep_timer_off">Off</string>
-    <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
-    <string name="settings_recording_directory">Recording Directory</string>
-    <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
-    <string name="settings_record_across_stations">Record Across Stations</string>
-    <string name="settings_record_across_stations_description">Keep recording when switching stations</string>
-    <string name="settings_record_all_stations">Record All Stations</string>
-    <string name="settings_record_all_stations_description">Switch to new station\'s stream in same file</string>
+    <string name="settings_playback">پخش</string>
+    <string name="settings_sleep_timer">تایمر خواب</string>
+    <string name="settings_sleep_timer_description">توقف خودکار پخش پس از زمان تنظیم شده</string>
+    <string name="settings_sleep_timer_off">خاموش</string>
+    <string name="settings_equalizer_description">تنظیم باندهای فرکانس صدا و جلوه‌ها</string>
+    <string name="settings_recording_directory">پوشه ضبط</string>
+    <string name="settings_recording_directory_default">پیش‌فرض (Music/deutsia_radio)</string>
+    <string name="settings_record_across_stations">ضبط در بین ایستگاه‌ها</string>
+    <string name="settings_record_across_stations_description">ادامه ضبط هنگام تغییر ایستگاه</string>
+    <string name="settings_record_all_stations">ضبط همه ایستگاه‌ها</string>
+    <string name="settings_record_all_stations_description">تغییر به جریان ایستگاه جدید در همان فایل</string>
 
     <!-- Settings - Station Management -->
-    <string name="settings_station_management">Station Management</string>
-    <string name="settings_import_from_file">Import from File</string>
-    <string name="settings_import_from_file_description">Import from CSV, JSON, M3U, or PLS</string>
-    <string name="settings_import_i2p_stations">Import I2P Stations</string>
-    <string name="settings_import_i2p_stations_description">14 curated I2P radio stations</string>
-    <string name="settings_import_tor_stations">Import Tor Stations</string>
-    <string name="settings_import_tor_stations_description">3 curated Tor radio stations</string>
-    <string name="settings_export_stations">Export Stations</string>
-    <string name="settings_export_stations_description">Export your stations to a file</string>
+    <string name="settings_station_management">مدیریت ایستگاه</string>
+    <string name="settings_import_from_file">وارد کردن از فایل</string>
+    <string name="settings_import_from_file_description">وارد کردن از CSV، JSON، M3U یا PLS</string>
+    <string name="settings_import_i2p_stations">وارد کردن ایستگاه‌های I2P</string>
+    <string name="settings_import_i2p_stations_description">14 ایستگاه رادیویی منتخب I2P</string>
+    <string name="settings_import_tor_stations">وارد کردن ایستگاه‌های Tor</string>
+    <string name="settings_import_tor_stations_description">3 ایستگاه رادیویی منتخب Tor</string>
+    <string name="settings_export_stations">خروجی ایستگاه‌ها</string>
+    <string name="settings_export_stations_description">خروجی گرفتن ایستگاه‌های خود به فایل</string>
 
     <!-- Settings - About -->
-    <string name="settings_about">About</string>
-    <string name="settings_version">Version 1.1</string>
-    <string name="settings_view_github">View on GitHub</string>
-    <string name="settings_donate">Donate</string>
-    <string name="settings_donate_description">If this app helped you out, consider donating</string>
+    <string name="settings_about">درباره</string>
+    <string name="settings_version">نسخه 1.1</string>
+    <string name="settings_view_github">مشاهده در GitHub</string>
+    <string name="settings_donate">کمک مالی</string>
+    <string name="settings_donate_description">اگر این برنامه به شما کمک کرد، کمک مالی را در نظر بگیرید</string>
     <string name="settings_monero">Monero (XMR)</string>
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
-    <string name="settings_copy_address">Copy Address</string>
+    <string name="settings_copy_address">کپی آدرس</string>
 
     <!-- Tor Control Bottom Sheet -->
-    <string name="tor_connection_details">Connection Details</string>
-    <string name="tor_proxy_host">Proxy Host</string>
-    <string name="tor_socks_port">SOCKS Port</string>
-    <string name="tor_what_is_orbot">What is Orbot?</string>
-    <string name="tor_orbot_description">Orbot is the official Tor client for Android. It provides secure, encrypted access to the Tor network.</string>
-    <string name="tor_connect">Connect to Tor</string>
-    <string name="tor_open_orbot">Open Orbot</string>
+    <string name="tor_connection_details">جزئیات اتصال</string>
+    <string name="tor_proxy_host">میزبان پروکسی</string>
+    <string name="tor_socks_port">پورت SOCKS</string>
+    <string name="tor_what_is_orbot">Orbot چیست؟</string>
+    <string name="tor_orbot_description">Orbot کلاینت رسمی Tor برای Android است. دسترسی امن و رمزنگاری شده به شبکه Tor فراهم می‌کند.</string>
+    <string name="tor_connect">اتصال به Tor</string>
+    <string name="tor_open_orbot">باز کردن Orbot</string>
 
     <!-- Add/Edit Radio Dialog -->
-    <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
-    <string name="add_edit_authentication_optional">Authentication (Optional)</string>
-    <string name="add_edit_advanced_options">Advanced Options</string>
-    <string name="add_edit_cover_art">Cover Art</string>
-    <string name="add_edit_or_enter_url">Or enter image URL</string>
+    <string name="add_edit_tor_info">استفاده از Tor تعبیه شده - نیازی به پیکربندی پروکسی نیست</string>
+    <string name="add_edit_authentication_optional">احراز هویت (اختیاری)</string>
+    <string name="add_edit_advanced_options">گزینه‌های پیشرفته</string>
+    <string name="add_edit_cover_art">تصویر جلد</string>
+    <string name="add_edit_or_enter_url">یا URL تصویر را وارد کنید</string>
 
     <!-- Input Hints -->
-    <string name="hint_station_name">Station Name</string>
-    <string name="hint_stream_url">Stream URL</string>
-    <string name="hint_genre">Genre</string>
-    <string name="hint_proxy_type">Proxy Type</string>
-    <string name="hint_proxy_host">Proxy Host</string>
-    <string name="hint_proxy_port">Proxy Port</string>
-    <string name="hint_protocol">Protocol</string>
-    <string name="hint_username_optional">Username (optional)</string>
-    <string name="hint_password_optional">Password (optional)</string>
-    <string name="hint_auth_method">Auth Method</string>
-    <string name="hint_connection_timeout">Connection Timeout (seconds)</string>
-    <string name="hint_cover_art_url">Cover Art URL (optional)</string>
-    <string name="hint_username_optional_caps">Username (Optional)</string>
-    <string name="hint_password_optional_caps">Password (Optional)</string>
-    <string name="hint_auth_type">Authentication Type</string>
+    <string name="hint_station_name">نام ایستگاه</string>
+    <string name="hint_stream_url">URL جریان</string>
+    <string name="hint_genre">ژانر</string>
+    <string name="hint_proxy_type">نوع پروکسی</string>
+    <string name="hint_proxy_host">میزبان پروکسی</string>
+    <string name="hint_proxy_port">پورت پروکسی</string>
+    <string name="hint_protocol">پروتکل</string>
+    <string name="hint_username_optional">نام کاربری (اختیاری)</string>
+    <string name="hint_password_optional">رمز عبور (اختیاری)</string>
+    <string name="hint_auth_method">روش احراز هویت</string>
+    <string name="hint_connection_timeout">مهلت اتصال (ثانیه)</string>
+    <string name="hint_cover_art_url">URL تصویر جلد (اختیاری)</string>
+    <string name="hint_username_optional_caps">نام کاربری (اختیاری)</string>
+    <string name="hint_password_optional_caps">رمز عبور (اختیاری)</string>
+    <string name="hint_auth_type">نوع احراز هویت</string>
 
     <!-- Default Values -->
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
-    <string name="default_auth_none">None</string>
+    <string name="default_auth_none">هیچ</string>
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
     <!-- Now Playing Fragment -->
     <string name="now_playing_time_placeholder">00:00</string>
-    <string name="now_playing_live">LIVE</string>
-    <string name="now_playing_no_station">No Station Playing</string>
-    <string name="now_playing_no_station_subtitle">Select a station from the list</string>
-    <string name="now_playing_volume_title">Radio Volume</string>
-    <string name="now_playing_volume_description">Adjusts radio stream only</string>
+    <string name="now_playing_live">زنده</string>
+    <string name="now_playing_no_station">ایستگاهی در حال پخش نیست</string>
+    <string name="now_playing_no_station_subtitle">ایستگاهی را از فهرست انتخاب کنید</string>
+    <string name="now_playing_volume_title">حجم صدای رادیو</string>
+    <string name="now_playing_volume_description">فقط جریان رادیو را تنظیم می‌کند</string>
 
     <!-- Toast Messages -->
-    <string name="toast_session_bandwidth_reset">Session bandwidth reset</string>
-    <string name="toast_custom_proxy_saved">Custom proxy settings saved</string>
-    <string name="toast_custom_proxy_cleared">Custom proxy settings cleared</string>
-    <string name="toast_address_copied">Address copied to clipboard</string>
-    <string name="toast_using_default_directory">Using default directory</string>
+    <string name="toast_session_bandwidth_reset">پهنای باند جلسه بازنشانی شد</string>
+    <string name="toast_custom_proxy_saved">تنظیمات پروکسی سفارشی ذخیره شد</string>
+    <string name="toast_custom_proxy_cleared">تنظیمات پروکسی سفارشی پاک شد</string>
+    <string name="toast_address_copied">آدرس به کلیپ‌بورد کپی شد</string>
+    <string name="toast_using_default_directory">در حال استفاده از پوشه پیش‌فرض</string>
 
     <!-- Custom Proxy Status Messages -->
-    <string name="custom_proxy_status_connected">Connected</string>
-    <string name="custom_proxy_status_configured">Proxy configured</string>
-    <string name="custom_proxy_status_not_configured">Not Configured</string>
-    <string name="custom_proxy_status_no_proxy">No proxy set</string>
-    <string name="custom_proxy_status_leak_warning">Leak Warning</string>
-    <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+    <string name="custom_proxy_status_connected">متصل</string>
+    <string name="custom_proxy_status_configured">پروکسی پیکربندی شد</string>
+    <string name="custom_proxy_status_not_configured">پیکربندی نشده</string>
+    <string name="custom_proxy_status_no_proxy">پروکسی تنظیم نشده</string>
+    <string name="custom_proxy_status_leak_warning">هشدار نشت</string>
+    <string name="custom_proxy_status_leak_detail">اجبار فعال اما پیکربندی نشده</string>
 
     <!-- Tor Service Notification Messages -->
-    <string name="tor_channel_name">Tor Connection</string>
-    <string name="tor_channel_description">Shows Tor connection status</string>
-    <string name="tor_notification_disconnected">Tor Disconnected</string>
-    <string name="tor_notification_tap_to_open">Tap to open app</string>
-    <string name="tor_notification_connecting">Connecting via Orbot...</string>
-    <string name="tor_notification_please_wait">Please wait</string>
-    <string name="tor_notification_connected">Tor Connected</string>
-    <string name="tor_notification_error">Tor Error</string>
-    <string name="tor_notification_connection_failed">Connection failed</string>
-    <string name="tor_notification_orbot_required">Orbot Required</string>
-    <string name="tor_notification_install_orbot">Please install Orbot for Tor support</string>
-    <string name="tor_notification_action_stop">Stop Tor</string>
+    <string name="tor_channel_name">اتصال Tor</string>
+    <string name="tor_channel_description">وضعیت اتصال Tor را نمایش می‌دهد</string>
+    <string name="tor_notification_disconnected">Tor قطع شد</string>
+    <string name="tor_notification_tap_to_open">برای باز کردن برنامه ضربه بزنید</string>
+    <string name="tor_notification_connecting">در حال اتصال از طریق Orbot...</string>
+    <string name="tor_notification_please_wait">لطفاً صبر کنید</string>
+    <string name="tor_notification_connected">Tor متصل شد</string>
+    <string name="tor_notification_error">خطای Tor</string>
+    <string name="tor_notification_connection_failed">اتصال ناموفق بود</string>
+    <string name="tor_notification_orbot_required">Orbot لازم است</string>
+    <string name="tor_notification_install_orbot">لطفاً Orbot را برای پشتیبانی Tor نصب کنید</string>
+    <string name="tor_notification_action_stop">توقف Tor</string>
 
     <!-- Other Error Messages -->
-    <string name="error_unknown">Unknown error</string>
-    <string name="folder_custom">Custom folder</string>
+    <string name="error_unknown">خطای ناشناخته</string>
+    <string name="folder_custom">پوشه سفارشی</string>
 
     <!-- AddEditRadioDialog Default Values -->
-    <string name="default_genre_other">Other</string>
-    <string name="default_proxy_none">None</string>
+    <string name="default_genre_other">سایر</string>
+    <string name="default_proxy_none">هیچ</string>
     <string name="default_proxy_i2p">I2P</string>
     <string name="default_proxy_tor">Tor</string>
-    <string name="default_proxy_custom">Custom</string>
+    <string name="default_proxy_custom">سفارشی</string>
     <string name="default_protocol_http">HTTP</string>
     <string name="default_protocol_https">HTTPS</string>
     <string name="default_protocol_socks4">SOCKS4</string>
     <string name="default_protocol_socks5">SOCKS5</string>
-    <string name="default_auth_basic">Basic</string>
-    <string name="default_auth_digest">Digest</string>
+    <string name="default_auth_basic">پایه</string>
+    <string name="default_auth_digest">خلاصه</string>
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
     <!-- Security & Privacy -->
-    <string name="settings_security_privacy">Security &amp; Privacy</string>
-    <string name="settings_app_lock">App Lock</string>
-    <string name="settings_app_lock_description">Require password or biometric to unlock app</string>
-    <string name="settings_biometric_auth">Biometric Authentication</string>
-    <string name="settings_biometric_auth_description">Use fingerprint or face unlock</string>
-    <string name="settings_require_auth_on_launch">Require Auth on Launch</string>
-    <string name="settings_require_auth_on_launch_description">Always require authentication when opening app</string>
-    <string name="settings_set_password">Set Password</string>
-    <string name="settings_change_password">Change Password</string>
-    <string name="settings_database_encryption">Database Encryption</string>
-    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher using your app password (requires restart)</string>
-    <string name="settings_database_encryption_warning">Warning: This is an experimental feature. Make sure you have a backup before enabling!</string>
-    <string name="settings_database_encryption_enable_title">Enable Database Encryption?</string>
-    <string name="settings_database_encryption_enable_message">This will encrypt your entire radio database using your app password. The app will restart to apply changes.\n\nWARNING: This is experimental. Make sure you have a backup!</string>
-    <string name="settings_database_encryption_disable_title">Disable Database Encryption?</string>
-    <string name="settings_database_encryption_disable_message">This will decrypt your database and remove encryption. The app will restart to apply changes.</string>
-    <string name="settings_database_encryption_enabled">Database encryption enabled</string>
-    <string name="settings_database_encryption_disabled">Database encryption disabled</string>
-    <string name="settings_database_encryption_error">Failed to change encryption setting</string>
-    <string name="settings_database_encryption_password_required_title">App Password Required</string>
-    <string name="settings_database_encryption_password_required_message">Database encryption uses your app password to generate the encryption key. Please set an app password first by enabling \"App Lock\" above.\n\nOnce set, you can enable database encryption using the same password - no separate password needed.</string>
+    <string name="settings_security_privacy">امنیت و حریم خصوصی</string>
+    <string name="settings_app_lock">قفل برنامه</string>
+    <string name="settings_app_lock_description">نیاز به رمز عبور یا بیومتریک برای باز کردن قفل برنامه</string>
+    <string name="settings_biometric_auth">احراز هویت بیومتریک</string>
+    <string name="settings_biometric_auth_description">استفاده از اثر انگشت یا باز کردن قفل چهره</string>
+    <string name="settings_require_auth_on_launch">نیاز به احراز هویت در راه‌اندازی</string>
+    <string name="settings_require_auth_on_launch_description">همیشه هنگام باز کردن برنامه به احراز هویت نیاز دارد</string>
+    <string name="settings_set_password">تنظیم رمز عبور</string>
+    <string name="settings_change_password">تغییر رمز عبور</string>
+    <string name="settings_database_encryption">رمزنگاری پایگاه داده</string>
+    <string name="settings_database_encryption_description">رمزنگاری کل پایگاه داده با SQLCipher با استفاده از رمز عبور برنامه شما (نیاز به راه‌اندازی مجدد)</string>
+    <string name="settings_database_encryption_warning">هشدار: این یک ویژگی آزمایشی است. قبل از فعال‌سازی مطمئن شوید پشتیبان دارید!</string>
+    <string name="settings_database_encryption_enable_title">فعال‌سازی رمزنگاری پایگاه داده؟</string>
+    <string name="settings_database_encryption_enable_message">این کل پایگاه داده رادیوی شما را با استفاده از رمز عبور برنامه رمزنگاری می‌کند. برنامه برای اعمال تغییرات راه‌اندازی مجدد می‌شود.\n\nهشدار: این آزمایشی است. مطمئن شوید پشتیبان دارید!</string>
+    <string name="settings_database_encryption_disable_title">غیرفعال‌سازی رمزنگاری پایگاه داده؟</string>
+    <string name="settings_database_encryption_disable_message">این پایگاه داده شما را رمزگشایی کرده و رمزنگاری را حذف می‌کند. برنامه برای اعمال تغییرات راه‌اندازی مجدد می‌شود.</string>
+    <string name="settings_database_encryption_enabled">رمزنگاری پایگاه داده فعال شد</string>
+    <string name="settings_database_encryption_disabled">رمزنگاری پایگاه داده غیرفعال شد</string>
+    <string name="settings_database_encryption_error">تغییر تنظیم رمزنگاری ناموفق بود</string>
+    <string name="settings_database_encryption_password_required_title">رمز عبور برنامه لازم است</string>
+    <string name="settings_database_encryption_password_required_message">رمزنگاری پایگاه داده از رمز عبور برنامه شما برای تولید کلید رمزنگاری استفاده می‌کند. لطفاً ابتدا با فعال‌سازی \"قفل برنامه\" در بالا، رمز عبور برنامه را تنظیم کنید.\n\nپس از تنظیم، می‌توانید رمزنگاری پایگاه داده را با استفاده از همان رمز عبور فعال کنید - نیازی به رمز عبور جداگانه نیست.</string>
 
     <!-- Authentication Dialog -->
-    <string name="auth_dialog_title">Set App Password</string>
-    <string name="auth_dialog_change_title">Change Password</string>
-    <string name="auth_dialog_change_message">Note: If database encryption is enabled, it will be automatically updated to use the new password.</string>
-    <string name="auth_dialog_current_password">Current Password</string>
-    <string name="auth_dialog_new_password">New Password</string>
-    <string name="auth_dialog_confirm_password">Confirm Password</string>
-    <string name="auth_dialog_set">Set Password</string>
-    <string name="auth_dialog_change">Change Password</string>
-    <string name="auth_error_passwords_dont_match">Passwords don\'t match</string>
-    <string name="auth_error_password_too_short">Password must be at least 4 characters</string>
-    <string name="auth_error_current_password_wrong">Current password is incorrect</string>
-    <string name="auth_password_set">Password set successfully</string>
-    <string name="auth_password_changed">Password changed successfully</string>
-    <string name="auth_enter_password_to_encrypt">Verify Your App Password</string>
-    <string name="auth_enter_password_to_decrypt">Verify Your App Password</string>
-    <string name="auth_password_for_encryption">Enter your existing app password to enable database encryption.\n\nYour app password will be used to derive the encryption key. No separate password is needed.</string>
-    <string name="auth_password_for_decryption">Enter your app password to verify and decrypt the database before disabling encryption.</string>
-    <string name="auth_encrypting_database">Encrypting database with your app password…</string>
-    <string name="auth_decrypting_database">Decrypting database…</string>
-    <string name="auth_rekeying_database">Updating database encryption with new password…</string>
+    <string name="auth_dialog_title">تنظیم رمز عبور برنامه</string>
+    <string name="auth_dialog_change_title">تغییر رمز عبور</string>
+    <string name="auth_dialog_change_message">توجه: اگر رمزنگاری پایگاه داده فعال است، به طور خودکار برای استفاده از رمز عبور جدید به‌روزرسانی می‌شود.</string>
+    <string name="auth_dialog_current_password">رمز عبور فعلی</string>
+    <string name="auth_dialog_new_password">رمز عبور جدید</string>
+    <string name="auth_dialog_confirm_password">تأیید رمز عبور</string>
+    <string name="auth_dialog_set">تنظیم رمز عبور</string>
+    <string name="auth_dialog_change">تغییر رمز عبور</string>
+    <string name="auth_error_passwords_dont_match">رمزهای عبور مطابقت ندارند</string>
+    <string name="auth_error_password_too_short">رمز عبور باید حداقل 4 کاراکتر باشد</string>
+    <string name="auth_error_current_password_wrong">رمز عبور فعلی نادرست است</string>
+    <string name="auth_password_set">رمز عبور با موفقیت تنظیم شد</string>
+    <string name="auth_password_changed">رمز عبور با موفقیت تغییر کرد</string>
+    <string name="auth_enter_password_to_encrypt">تأیید رمز عبور برنامه خود</string>
+    <string name="auth_enter_password_to_decrypt">تأیید رمز عبور برنامه خود</string>
+    <string name="auth_password_for_encryption">رمز عبور موجود برنامه خود را برای فعال‌سازی رمزنگاری پایگاه داده وارد کنید.\n\nرمز عبور برنامه شما برای استخراج کلید رمزنگاری استفاده خواهد شد. نیازی به رمز عبور جداگانه نیست.</string>
+    <string name="auth_password_for_decryption">رمز عبور برنامه خود را برای تأیید و رمزگشایی پایگاه داده قبل از غیرفعال کردن رمزنگاری وارد کنید.</string>
+    <string name="auth_encrypting_database">در حال رمزنگاری پایگاه داده با رمز عبور برنامه شما…</string>
+    <string name="auth_decrypting_database">در حال رمزگشایی پایگاه داده…</string>
+    <string name="auth_rekeying_database">در حال به‌روزرسانی رمزنگاری پایگاه داده با رمز عبور جدید…</string>
 
     <!-- Authentication Activity -->
-    <string name="auth_unlock_app">Unlock deutsia radio</string>
-    <string name="auth_enter_password">Enter your password</string>
-    <string name="auth_password_hint">Password</string>
-    <string name="auth_unlock_button">Unlock</string>
-    <string name="auth_use_biometric">Use Biometric</string>
-    <string name="auth_error_wrong_password">Wrong password</string>
-    <string name="auth_biometric_title">Unlock deutsia radio</string>
-    <string name="auth_biometric_subtitle">Authenticate to continue</string>
-    <string name="auth_biometric_negative">Use Password</string>
+    <string name="auth_unlock_app">باز کردن قفل deutsia radio</string>
+    <string name="auth_enter_password">رمز عبور خود را وارد کنید</string>
+    <string name="auth_password_hint">رمز عبور</string>
+    <string name="auth_unlock_button">باز کردن قفل</string>
+    <string name="auth_use_biometric">استفاده از بیومتریک</string>
+    <string name="auth_error_wrong_password">رمز عبور اشتباه</string>
+    <string name="auth_biometric_title">باز کردن قفل deutsia radio</string>
+    <string name="auth_biometric_subtitle">برای ادامه احراز هویت کنید</string>
+    <string name="auth_biometric_negative">استفاده از رمز عبور</string>
 </resources>
