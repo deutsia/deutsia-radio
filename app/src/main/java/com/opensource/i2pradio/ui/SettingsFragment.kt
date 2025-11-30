@@ -2188,7 +2188,7 @@ class SettingsFragment : Fragment() {
             .getLaunchIntentForPackage(requireActivity().packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
+        intent?.let { startActivity(it) }
         requireActivity().finish()
         android.os.Process.killProcess(android.os.Process.myPid())
     }
