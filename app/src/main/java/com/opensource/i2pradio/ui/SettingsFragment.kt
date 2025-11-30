@@ -2162,10 +2162,10 @@ class SettingsFragment : Fragment() {
                 }
 
                 // Show password prompt for enabling encryption
-                showPasswordPromptForEncryption(switch)
+                showPasswordPromptForEncryption(switch as MaterialSwitch)
             } else {
                 // Show password prompt for disabling encryption
-                showPasswordPromptForDecryption(switch)
+                showPasswordPromptForDecryption(switch as MaterialSwitch)
             }
         }
     }
