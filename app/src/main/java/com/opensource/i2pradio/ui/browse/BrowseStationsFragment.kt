@@ -286,7 +286,12 @@ class BrowseStationsFragment : Fragment() {
         }
 
         viewModel.selectedTag.observe(viewLifecycleOwner) { tag ->
-            genreFilterButton.text = tag?.name ?: getString(R.string.filter_genre)
+            // Display translated genre name on the filter button
+            genreFilterButton.text = if (tag != null) {
+                translateGenreName(tag.name)
+            } else {
+                getString(R.string.filter_genre)
+            }
         }
 
         viewModel.selectedLanguage.observe(viewLifecycleOwner) { language ->
@@ -315,6 +320,51 @@ class BrowseStationsFragment : Fragment() {
         searchDebounceRunnable?.let { searchInput.removeCallbacks(it) }
         isManualSearchClear = true
         searchInput.setText("")
+    }
+
+    /**
+     * Translate common genre names from English (RadioBrowser API) to localized strings.
+     * Returns the translated name if available, otherwise returns the original name.
+     */
+    private fun translateGenreName(englishName: String): String {
+        // Normalize the genre name for matching (lowercase, trim)
+        val normalized = englishName.trim().lowercase()
+
+        return when (normalized) {
+            "alternative" -> getString(R.string.genre_alternative)
+            "ambient" -> getString(R.string.genre_ambient)
+            "blues" -> getString(R.string.genre_blues)
+            "christian" -> getString(R.string.genre_christian)
+            "classical" -> getString(R.string.genre_classical)
+            "comedy" -> getString(R.string.genre_comedy)
+            "country" -> getString(R.string.genre_country)
+            "dance" -> getString(R.string.genre_dance)
+            "edm" -> getString(R.string.genre_edm)
+            "electronic" -> getString(R.string.genre_electronic)
+            "folk" -> getString(R.string.genre_folk)
+            "funk" -> getString(R.string.genre_funk)
+            "gospel" -> getString(R.string.genre_gospel)
+            "hip hop", "hip-hop", "hiphop" -> getString(R.string.genre_hip_hop)
+            "indie" -> getString(R.string.genre_indie)
+            "jazz" -> getString(R.string.genre_jazz)
+            "k-pop", "kpop" -> getString(R.string.genre_k_pop)
+            "latin" -> getString(R.string.genre_latin)
+            "lo-fi", "lofi" -> getString(R.string.genre_lo_fi)
+            "metal" -> getString(R.string.genre_metal)
+            "news" -> getString(R.string.genre_news)
+            "oldies" -> getString(R.string.genre_oldies)
+            "pop" -> getString(R.string.genre_pop)
+            "punk" -> getString(R.string.genre_punk)
+            "r&b", "r and b", "rnb" -> getString(R.string.genre_r_and_b)
+            "reggae" -> getString(R.string.genre_reggae)
+            "rock" -> getString(R.string.genre_rock)
+            "soul" -> getString(R.string.genre_soul)
+            "sports" -> getString(R.string.genre_sports)
+            "talk" -> getString(R.string.genre_talk)
+            "world" -> getString(R.string.genre_world)
+            "other" -> getString(R.string.genre_other)
+            else -> englishName // Return original if no translation available
+        }
     }
 
     private fun playStation(station: RadioBrowserStation) {
@@ -693,7 +743,7 @@ class BrowseStationsFragment : Fragment() {
         val adapter = TagAdapter(filteredTags, selectedIndex, onTagSelected)
         recyclerView.adapter = adapter
 
-        // Search functionality
+        // Search functionality - searches both English and translated genre names
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -702,7 +752,13 @@ class BrowseStationsFragment : Fragment() {
                 filteredTags = if (query.isEmpty()) {
                     tags
                 } else {
-                    tags.filter { it.name.contains(query, ignoreCase = true) }
+                    tags.filter { tag ->
+                        // Search against both English name and translated name
+                        val englishName = tag.name
+                        val translatedName = translateGenreName(tag.name)
+                        englishName.contains(query, ignoreCase = true) ||
+                        translatedName.contains(query, ignoreCase = true)
+                    }
                 }
                 adapter.updateTags(filteredTags)
             }
@@ -902,7 +958,9 @@ class BrowseStationsFragment : Fragment() {
                 }
             } else {
                 val tag = tags[position - 1]
-                holder.textView?.text = "${tag.name} (${tag.stationCount})"
+                // Display translated genre name if available
+                val displayName = translateGenreName(tag.name)
+                holder.textView?.text = "$displayName (${tag.stationCount})"
 
                 // Find the index in the original list
                 val originalIndex = originalTags.indexOf(tag)
