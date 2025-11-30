@@ -209,7 +209,7 @@
     <string name="settings_configure_proxy">Configura proxy globale</string>
     <string name="settings_configure_proxy_description">Imposta le impostazioni del proxy personalizzato</string>
     <string name="settings_force_custom_proxy">Forza proxy personalizzato</string>
-    <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
+    <string name="settings_force_custom_proxy_description">Instrada tutto il traffico tramite proxy personalizzato. Non si connetterà senza proxy.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Forza proxy personalizzato eccetto stazioni Tor/I2P</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Instrada tutto il traffico clearnet tramite proxy personalizzato, ma consenti alle stazioni Tor e I2P di usare i loro proxy nativi.</string>
 
@@ -237,7 +237,7 @@
     <string name="settings_record_across_stations">Registra tra le stazioni</string>
     <string name="settings_record_across_stations_description">Continua la registrazione quando cambi stazione</string>
     <string name="settings_record_all_stations">Registra tutte le stazioni</string>
-    <string name="settings_record_all_stations_description">Switch to new station\'s stream in same file</string>
+    <string name="settings_record_all_stations_description">Passa allo stream della nuova stazione nello stesso file</string>
 
     <!-- Settings - Station Management -->
     <string name="settings_station_management">Gestione stazioni</string>
@@ -407,7 +407,7 @@
     <string name="settings_database_encryption_disabled">Crittografia database disabilitata</string>
     <string name="settings_database_encryption_error">Impossibile modificare impostazione crittografia</string>
     <string name="settings_database_encryption_password_required_title">Password app richiesta</string>
-    <string name="settings_database_encryption_password_required_message">Database encryption uses your app password to generate the encryption key. Please set an app password first by enabling \"App Lock\" above.\n\nOnce set, you can enable database encryption using the same password - no separate password needed.</string>
+    <string name="settings_database_encryption_password_required_message">La crittografia del database usa la password dell\'app per generare la chiave di crittografia. Imposta prima una password dell\'app abilitando \"Blocco app\" qui sopra.\n\nUna volta impostata, puoi abilitare la crittografia del database usando la stessa password - non serve una password separata.</string>
 
     <!-- Authentication Dialog -->
     <string name="auth_dialog_title">Imposta password app</string>
@@ -418,7 +418,7 @@
     <string name="auth_dialog_confirm_password">Conferma password</string>
     <string name="auth_dialog_set">Imposta password</string>
     <string name="auth_dialog_change">Cambia password</string>
-    <string name="auth_error_passwords_dont_match">Passwords don\'t match</string>
+    <string name="auth_error_passwords_dont_match">Le password non corrispondono</string>
     <string name="auth_error_password_too_short">La password deve essere di almeno 4 caratteri</string>
     <string name="auth_error_current_password_wrong">La password attuale non è corretta</string>
     <string name="auth_password_set">Password impostata con successo</string>
