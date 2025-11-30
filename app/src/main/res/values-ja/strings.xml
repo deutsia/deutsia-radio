@@ -147,12 +147,19 @@
     <string name="settings_theme">テーマ</string>
     <string name="settings_theme_description">ライト、ダーク、またはシステムを選択</string>
     <string name="settings_theme_system_default">システムデフォルト</string>
+    <string name="settings_theme_light">ライト</string>
+    <string name="settings_theme_dark">ダーク</string>
     <string name="settings_material_you">Material You</string>
     <string name="settings_material_you_description">壁紙ベースの動的カラーを使用</string>
     <string name="settings_color_scheme">配色</string>
     <string name="settings_color_scheme_description">お好みの色を選択</string>
     <string name="settings_color_blue">青</string>
-    <string name="settings_language">Language</string>
+    <string name="settings_color_blue_default">青（デフォルト）</string>
+    <string name="settings_color_peach">ピーチ</string>
+    <string name="settings_color_green">緑</string>
+    <string name="settings_color_purple">紫</string>
+    <string name="settings_color_orange">オレンジ</string>
+    <string name="settings_language">言語</string>
     <string name="settings_language_description">Choose your preferred language</string>
 
     <!-- Language Names -->
@@ -210,9 +217,16 @@
     <string name="settings_sleep_timer">スリープタイマー</string>
     <string name="settings_sleep_timer_description">設定時間後に再生を自動停止</string>
     <string name="settings_sleep_timer_off">オフ</string>
+    <string name="settings_sleep_timer_15min">15分</string>
+    <string name="settings_sleep_timer_30min">30分</string>
+    <string name="settings_sleep_timer_45min">45分</string>
+    <string name="settings_sleep_timer_60min">60分</string>
+    <string name="settings_sleep_timer_90min">90分</string>
     <string name="settings_equalizer_description">オーディオ周波数帯とエフェクトを調整</string>
     <string name="settings_recording_directory">録音ディレクトリ</string>
     <string name="settings_recording_directory_default">デフォルト（Music/deutsia_radio）</string>
+    <string name="settings_recording_directory_choose">カスタムフォルダを選択...</string>
+    <string name="settings_recording_directory_clear">カスタムフォルダをクリア</string>
     <string name="settings_record_across_stations">ステーション間で録音</string>
     <string name="settings_record_across_stations_description">ステーション切り替え時に録音を継続</string>
     <string name="settings_record_all_stations">すべてのステーションを録音</string>
@@ -247,6 +261,35 @@
     <string name="tor_orbot_description">OrbotはAndroid用の公式Torクライアントです。Torネットワークへの安全で暗号化されたアクセスを提供します。</string>
     <string name="tor_connect">Torに接続</string>
     <string name="tor_open_orbot">Orbotを開く</string>
+
+    <!-- Tor Status Messages -->
+    <string name="tor_status_connecting">接続中...</string>
+    <string name="tor_status_connected">Tor接続済み</string>
+    <string name="tor_status_disconnected">Tor切断済み</string>
+    <string name="tor_status_off">Torオフ</string>
+    <string name="tor_status_error">Torエラー</string>
+    <string name="tor_status_leak_warning">リーク警告</string>
+    <string name="tor_status_install_orbot">Orbotをインストール</string>
+    <string name="tor_status_connecting_message">Torに接続中...</string>
+    <string name="tor_status_connected_message">Tor経由で接続済み</string>
+    <string name="tor_control_title_stopped">Tor切断済み</string>
+    <string name="tor_control_subtitle_stopped">接続をタップしてTor経由で匿名ブラウジング</string>
+    <string name="tor_control_subtitle_connecting">Orbot経由で安全な接続を確立中</string>
+    <string name="tor_control_title_connecting">Torに接続中...</string>
+    <string name="tor_control_title_connected">Torに接続済み</string>
+    <string name="tor_control_title_connected_force">Torに接続済み（強制モード）</string>
+    <string name="tor_control_subtitle_connected">接続はプライベートで匿名です</string>
+    <string name="tor_control_subtitle_connected_force">Orbot経由で切断するか、設定で強制Torを無効にしてください</string>
+    <string name="tor_control_title_error">接続失敗</string>
+    <string name="tor_control_subtitle_error">Torネットワークに接続できませんでした</string>
+    <string name="tor_control_title_orbot_required">Orbotが必要</string>
+    <string name="tor_control_subtitle_orbot_required">Torネットワークに接続するにはOrbotをインストールしてください</string>
+    <string name="tor_control_button_connecting">接続中...</string>
+    <string name="tor_control_button_disconnect">切断</string>
+    <string name="tor_control_button_cancel">キャンセル</string>
+    <string name="tor_control_button_retry">再接続</string>
+    <string name="tor_control_button_install">Orbotをインストール</string>
+    <string name="tor_control_button_open_orbot">Orbotを開く</string>
 
     <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">埋め込みTorを使用 - プロキシ設定は不要</string>

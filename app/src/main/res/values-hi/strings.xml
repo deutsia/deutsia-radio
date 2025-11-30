@@ -144,11 +144,18 @@
     <string name="settings_theme">Theme</string>
     <string name="settings_theme_description">Choose light, dark, or system</string>
     <string name="settings_theme_system_default">System Default</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
     <string name="settings_material_you">Material You</string>
     <string name="settings_material_you_description">Use wallpaper-based dynamic colors</string>
     <string name="settings_color_scheme">Color Scheme</string>
     <string name="settings_color_scheme_description">Choose your preferred color</string>
     <string name="settings_color_blue">Blue</string>
+    <string name="settings_color_blue_default">Blue (Default)</string>
+    <string name="settings_color_peach">Peach</string>
+    <string name="settings_color_green">Green</string>
+    <string name="settings_color_purple">Purple</string>
+    <string name="settings_color_orange">Orange</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_description">Choose your preferred language</string>
 
@@ -207,9 +214,16 @@
     <string name="settings_sleep_timer">Sleep Timer</string>
     <string name="settings_sleep_timer_description">Auto-stop playback after set time</string>
     <string name="settings_sleep_timer_off">Off</string>
+    <string name="settings_sleep_timer_15min">15 minutes</string>
+    <string name="settings_sleep_timer_30min">30 minutes</string>
+    <string name="settings_sleep_timer_45min">45 minutes</string>
+    <string name="settings_sleep_timer_60min">60 minutes</string>
+    <string name="settings_sleep_timer_90min">90 minutes</string>
     <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
     <string name="settings_recording_directory">Recording Directory</string>
     <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
+    <string name="settings_recording_directory_choose">Choose custom folder...</string>
+    <string name="settings_recording_directory_clear">Clear custom folder</string>
     <string name="settings_record_across_stations">Record Across Stations</string>
     <string name="settings_record_across_stations_description">Keep recording when switching stations</string>
     <string name="settings_record_all_stations">Record All Stations</string>
@@ -245,7 +259,36 @@
     <string name="tor_connect">Connect to Tor</string>
     <string name="tor_open_orbot">Open Orbot</string>
 
-    <!-- Add/Edit Radio Dialog -->
+    <!-- Tor Status Messages -->
+    <string name="tor_status_connecting">Connecting...</string>
+    <string name="tor_status_connected">Tor Connected</string>
+    <string name="tor_status_disconnected">Tor Disconnected</string>
+    <string name="tor_status_off">Tor Off</string>
+    <string name="tor_status_error">Tor Error</string>
+    <string name="tor_status_leak_warning">Leak Warning</string>
+    <string name="tor_status_install_orbot">Install Orbot</string>
+    <string name="tor_status_connecting_message">Connecting to Tor...</string>
+    <string name="tor_status_connected_message">Connected via Tor</string>
+    <string name="tor_control_title_stopped">Tor Disconnected</string>
+    <string name="tor_control_subtitle_stopped">Tap Connect to browse anonymously via Tor</string>
+    <string name="tor_control_subtitle_connecting">Establishing secure connection via Orbot</string>
+    <string name="tor_control_title_connecting">Connecting to Tor...</string>
+    <string name="tor_control_title_connected">Connected to Tor</string>
+    <string name="tor_control_title_connected_force">Connected to Tor (Force Mode)</string>
+    <string name="tor_control_subtitle_connected">Your connection is private and anonymous</string>
+    <string name="tor_control_subtitle_connected_force">Disconnect via Orbot or disable Force Tor in settings</string>
+    <string name="tor_control_title_error">Connection Failed</string>
+    <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
+    <string name="tor_control_title_orbot_required">Orbot Required</string>
+    <string name="tor_control_subtitle_orbot_required">Install Orbot to connect to the Tor network</string>
+    <string name="tor_control_button_connecting">Connecting...</string>
+    <string name="tor_control_button_disconnect">Disconnect</string>
+    <string name="tor_control_button_cancel">Cancel</string>
+    <string name="tor_control_button_retry">Retry Connection</string>
+    <string name="tor_control_button_install">Install Orbot</string>
+    <string name="tor_control_button_open_orbot">Open Orbot</string>
+
+    
     <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
     <string name="add_edit_authentication_optional">Authentication (Optional)</string>
     <string name="add_edit_advanced_options">Advanced Options</string>
