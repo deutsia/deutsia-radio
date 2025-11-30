@@ -214,7 +214,6 @@
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
-    <string name="default_protocol_https">HTTPS</string>
     <string name="default_auth_none">None</string>
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
