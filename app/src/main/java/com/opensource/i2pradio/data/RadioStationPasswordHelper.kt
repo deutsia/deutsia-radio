@@ -17,9 +17,9 @@ object RadioStationPasswordHelper {
         if (station.proxyPassword.isEmpty()) return ""
 
         // Check if password is already encrypted
-        return if (PasswordEncryptionUtil.isEncrypted(station.proxyPassword)) {
-            // Decrypt it
-            PasswordEncryptionUtil.decryptPassword(context, station.proxyPassword)
+        return if (PasswordEncryptionUtil.isEncrypted(context, station.proxyPassword)) {
+            // Decrypt it (use safe version to handle errors gracefully)
+            PasswordEncryptionUtil.decryptPasswordSafe(context, station.proxyPassword)
         } else {
             // Plain-text password (legacy), return as-is
             station.proxyPassword
@@ -35,7 +35,7 @@ object RadioStationPasswordHelper {
         if (station.proxyPassword.isEmpty()) return station
 
         // Check if password is already encrypted
-        return if (PasswordEncryptionUtil.isEncrypted(station.proxyPassword)) {
+        return if (PasswordEncryptionUtil.isEncrypted(context, station.proxyPassword)) {
             // Already encrypted
             station
         } else {
@@ -69,16 +69,16 @@ object RadioStationPasswordHelper {
     /**
      * Check if a station has an encrypted password
      */
-    fun hasEncryptedPassword(station: RadioStation): Boolean {
+    fun hasEncryptedPassword(context: Context, station: RadioStation): Boolean {
         return station.proxyPassword.isNotEmpty() &&
-               PasswordEncryptionUtil.isEncrypted(station.proxyPassword)
+               PasswordEncryptionUtil.isEncrypted(context, station.proxyPassword)
     }
 
     /**
      * Check if a station has a plain-text password that needs migration
      */
-    fun needsPasswordMigration(station: RadioStation): Boolean {
+    fun needsPasswordMigration(context: Context, station: RadioStation): Boolean {
         return station.proxyPassword.isNotEmpty() &&
-               !PasswordEncryptionUtil.isEncrypted(station.proxyPassword)
+               !PasswordEncryptionUtil.isEncrypted(context, station.proxyPassword)
     }
 }

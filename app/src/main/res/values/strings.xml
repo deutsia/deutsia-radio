@@ -286,6 +286,16 @@
     <string name="settings_require_auth_on_launch_description">Always require authentication when opening app</string>
     <string name="settings_set_password">Set Password</string>
     <string name="settings_change_password">Change Password</string>
+    <string name="settings_database_encryption">Database Encryption</string>
+    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher (requires app restart)</string>
+    <string name="settings_database_encryption_warning">Warning: This is an experimental feature. Make sure you have a backup before enabling!</string>
+    <string name="settings_database_encryption_enable_title">Enable Database Encryption?</string>
+    <string name="settings_database_encryption_enable_message">This will encrypt your entire radio database. The app will restart to apply changes.\n\nWARNING: This is experimental. Make sure you have a backup!</string>
+    <string name="settings_database_encryption_disable_title">Disable Database Encryption?</string>
+    <string name="settings_database_encryption_disable_message">This will decrypt your database and remove encryption. The app will restart to apply changes.</string>
+    <string name="settings_database_encryption_enabled">Database encryption enabled</string>
+    <string name="settings_database_encryption_disabled">Database encryption disabled</string>
+    <string name="settings_database_encryption_error">Failed to change encryption setting</string>
 
     <!-- Authentication Dialog -->
     <string name="auth_dialog_title">Set App Password</string>

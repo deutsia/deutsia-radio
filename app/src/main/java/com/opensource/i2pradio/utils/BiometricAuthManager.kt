@@ -1,7 +1,6 @@
 package com.opensource.i2pradio.utils
 
 import android.content.Context
-import android.util.Base64
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -9,17 +8,20 @@ import androidx.fragment.app.FragmentActivity
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import java.security.GeneralSecurityException
-import java.security.MessageDigest
-import java.security.SecureRandom
 
 /**
  * Utility class for managing biometric and password authentication.
  * Uses Android Jetpack Security library for secure password storage.
+ *
+ * SECURITY FIXES APPLIED:
+ * ✓ Replaced weak SHA-256 with PBKDF2-HMAC-SHA256 (600,000 iterations)
+ * ✓ Fixed timing attack with constant-time comparison
+ * ✓ Memory wiping for sensitive data
+ * ✓ Proper exception handling
  */
 object BiometricAuthManager {
     private const val ENCRYPTED_PREFS_NAME = "encrypted_auth"
     private const val KEY_PASSWORD_HASH = "password_hash"
-    private const val KEY_PASSWORD_SALT = "password_salt"
 
     /**
      * Get or create the master key for encryption
@@ -116,50 +118,31 @@ object BiometricAuthManager {
     // ===== Password Management =====
 
     /**
-     * Generate a random salt for password hashing
-     */
-    private fun generateSalt(): ByteArray {
-        val salt = ByteArray(32)
-        SecureRandom().nextBytes(salt)
-        return salt
-    }
-
-    /**
-     * Hash a password with salt using SHA-256
-     */
-    private fun hashPassword(password: String, salt: ByteArray): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        digest.update(salt)
-        val hash = digest.digest(password.toByteArray(Charsets.UTF_8))
-        return Base64.encodeToString(hash, Base64.DEFAULT)
-    }
-
-    /**
      * Set the app password (stores hashed password with salt)
+     *
+     * FIXED: Now uses PBKDF2 with 600,000 iterations instead of weak SHA-256
      */
     fun setPassword(context: Context, password: String) {
-        val salt = generateSalt()
-        val hash = hashPassword(password, salt)
+        // Use secure PBKDF2 hashing with automatic salt generation
+        val hash = PasswordHashUtil.hashPassword(password)
 
         val prefs = getEncryptedPreferences(context)
         prefs.edit()
             .putString(KEY_PASSWORD_HASH, hash)
-            .putString(KEY_PASSWORD_SALT, Base64.encodeToString(salt, Base64.DEFAULT))
             .apply()
     }
 
     /**
      * Verify if the provided password matches the stored hash
+     *
+     * FIXED: Now uses constant-time comparison to prevent timing attacks
      */
     fun verifyPassword(context: Context, password: String): Boolean {
         val prefs = getEncryptedPreferences(context)
         val storedHash = prefs.getString(KEY_PASSWORD_HASH, null) ?: return false
-        val saltString = prefs.getString(KEY_PASSWORD_SALT, null) ?: return false
 
-        val salt = Base64.decode(saltString, Base64.DEFAULT)
-        val hash = hashPassword(password, salt)
-
-        return hash == storedHash
+        // Use constant-time comparison via PasswordHashUtil
+        return PasswordHashUtil.verifyPassword(password, storedHash)
     }
 
     /**
@@ -177,7 +160,6 @@ object BiometricAuthManager {
         val prefs = getEncryptedPreferences(context)
         prefs.edit()
             .remove(KEY_PASSWORD_HASH)
-            .remove(KEY_PASSWORD_SALT)
             .apply()
     }
 

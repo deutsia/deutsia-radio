@@ -96,6 +96,7 @@ class SettingsFragment : Fragment() {
     private var biometricSwitch: MaterialSwitch? = null
     private var requireAuthContainer: View? = null
     private var requireAuthSwitch: MaterialSwitch? = null
+    private var databaseEncryptionSwitch: MaterialSwitch? = null
 
     // Bandwidth update broadcast receiver
     private val bandwidthUpdateReceiver = object : BroadcastReceiver() {
@@ -454,9 +455,11 @@ class SettingsFragment : Fragment() {
         biometricSwitch = view.findViewById(R.id.biometricSwitch)
         requireAuthContainer = view.findViewById(R.id.requireAuthContainer)
         requireAuthSwitch = view.findViewById(R.id.requireAuthSwitch)
+        databaseEncryptionSwitch = view.findViewById(R.id.databaseEncryptionSwitch)
 
         // Setup authentication controls
         setupAuthenticationControls()
+        setupDatabaseEncryptionControls()
 
         // Setup custom proxy controls
         setupCustomProxyControls()
@@ -2074,6 +2077,120 @@ class SettingsFragment : Fragment() {
             .create()
 
         dialog.show()
+    }
+
+    /**
+     * Setup database encryption controls
+     */
+    private fun setupDatabaseEncryptionControls() {
+        val isEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(requireContext())
+        databaseEncryptionSwitch?.isChecked = isEncryptionEnabled
+
+        databaseEncryptionSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Prevent toggling during processing
+            switch.isEnabled = false
+
+            if (isChecked) {
+                // Show confirmation dialog for enabling encryption
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.settings_database_encryption_enable_title)
+                    .setMessage(R.string.settings_database_encryption_enable_message)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        try {
+                            // Enable database encryption
+                            val passphrase = com.opensource.i2pradio.utils.DatabaseEncryptionManager.enableDatabaseEncryption(requireContext())
+
+                            // Close current database instance
+                            com.opensource.i2pradio.data.RadioDatabase.closeDatabase()
+
+                            // Encrypt the database file
+                            val dbName = "radio_database"
+                            com.opensource.i2pradio.utils.DatabaseEncryptionManager.encryptDatabase(requireContext(), dbName, passphrase)
+
+                            Toast.makeText(requireContext(), R.string.settings_database_encryption_enabled, Toast.LENGTH_SHORT).show()
+
+                            // Restart the app
+                            restartApp()
+                        } catch (e: Exception) {
+                            android.util.Log.e("SettingsFragment", "Failed to enable database encryption", e)
+                            Toast.makeText(requireContext(), R.string.settings_database_encryption_error, Toast.LENGTH_LONG).show()
+
+                            // Disable encryption setting
+                            com.opensource.i2pradio.utils.DatabaseEncryptionManager.disableDatabaseEncryption(requireContext())
+                            switch.isChecked = false
+                            switch.isEnabled = true
+                        }
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        switch.isChecked = false
+                        switch.isEnabled = true
+                    }
+                    .setOnCancelListener {
+                        switch.isChecked = false
+                        switch.isEnabled = true
+                    }
+                    .show()
+            } else {
+                // Show confirmation dialog for disabling encryption
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.settings_database_encryption_disable_title)
+                    .setMessage(R.string.settings_database_encryption_disable_message)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        try {
+                            // Get current passphrase before disabling
+                            val passphrase = com.opensource.i2pradio.utils.DatabaseEncryptionManager.getDatabasePassphrase(requireContext())
+
+                            if (passphrase != null) {
+                                // Close current database instance
+                                com.opensource.i2pradio.data.RadioDatabase.closeDatabase()
+
+                                // Decrypt the database file
+                                val dbName = "radio_database"
+                                com.opensource.i2pradio.utils.DatabaseEncryptionManager.decryptDatabase(requireContext(), dbName, passphrase)
+
+                                // Disable database encryption
+                                com.opensource.i2pradio.utils.DatabaseEncryptionManager.disableDatabaseEncryption(requireContext())
+
+                                Toast.makeText(requireContext(), R.string.settings_database_encryption_disabled, Toast.LENGTH_SHORT).show()
+
+                                // Restart the app
+                                restartApp()
+                            } else {
+                                Toast.makeText(requireContext(), R.string.settings_database_encryption_error, Toast.LENGTH_LONG).show()
+                                switch.isChecked = true
+                                switch.isEnabled = true
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("SettingsFragment", "Failed to disable database encryption", e)
+                            Toast.makeText(requireContext(), R.string.settings_database_encryption_error, Toast.LENGTH_LONG).show()
+                            switch.isChecked = true
+                            switch.isEnabled = true
+                        }
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        switch.isChecked = true
+                        switch.isEnabled = true
+                    }
+                    .setOnCancelListener {
+                        switch.isChecked = true
+                        switch.isEnabled = true
+                    }
+                    .show()
+            }
+        }
+    }
+
+    /**
+     * Restart the app to apply database encryption changes
+     */
+    private fun restartApp() {
+        val intent = requireActivity().packageManager
+            .getLaunchIntentForPackage(requireActivity().packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        requireActivity().finish()
+        android.os.Process.killProcess(android.os.Process.myPid())
     }
 
 
