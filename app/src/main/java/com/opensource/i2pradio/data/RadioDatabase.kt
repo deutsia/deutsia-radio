@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [RadioStation::class, BrowseHistory::class], version = 7, exportSchema = false)
+@Database(entities = [RadioStation::class, BrowseHistory::class], version = 8, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
     abstract fun radioDao(): RadioDao
 
@@ -155,6 +155,17 @@ abstract class RadioDatabase : RoomDatabase() {
             }
         }
 
+        // Migration from version 7 to 8: Encrypt all proxy passwords
+        // Note: Actual encryption happens lazily when passwords are accessed
+        // This migration just marks the schema change for password encryption
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // No schema changes needed - passwords will be encrypted transparently
+                // when accessed through helper methods. Existing plain-text passwords
+                // will be automatically migrated to encrypted format on first access.
+            }
+        }
+
         fun getDatabase(context: Context): RadioDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -162,7 +173,7 @@ abstract class RadioDatabase : RoomDatabase() {
                     RadioDatabase::class.java,
                     "radio_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                     .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
                     .build()
                 INSTANCE = instance
