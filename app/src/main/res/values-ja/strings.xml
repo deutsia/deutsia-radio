@@ -160,11 +160,11 @@
     <string name="settings_color_purple">紫</string>
     <string name="settings_color_orange">オレンジ</string>
     <string name="settings_language">言語</string>
-    <string name="settings_language_description">Choose your preferred language</string>
+    <string name="settings_language_description">お好みの言語を選択してください</string>
 
     <!-- Language Names -->
-    <string name="language_choose">Choose Language</string>
-    <string name="language_system_default">System Default</string>
+    <string name="language_choose">言語を選択</string>
+    <string name="language_system_default">システムデフォルト</string>
     <string name="language_arabic">العربية</string>
     <string name="language_german">Deutsch</string>
     <string name="language_english">English</string>
@@ -225,8 +225,8 @@
     <string name="settings_equalizer_description">オーディオ周波数帯とエフェクトを調整</string>
     <string name="settings_recording_directory">録音ディレクトリ</string>
     <string name="settings_recording_directory_default">デフォルト（Music/deutsia_radio）</string>
-    <string name="settings_recording_directory_choose">カスタムフォルダを選択...</string>
-    <string name="settings_recording_directory_clear">カスタムフォルダをクリア</string>
+    <string name="settings_recording_directory_choose">カスタムフォルダーを選択...</string>
+    <string name="settings_recording_directory_clear">カスタムフォルダーをクリア</string>
     <string name="settings_record_across_stations">ステーション間で録音</string>
     <string name="settings_record_across_stations_description">ステーション切り替え時に録音を継続</string>
     <string name="settings_record_all_stations">すべてのステーションを録音</string>

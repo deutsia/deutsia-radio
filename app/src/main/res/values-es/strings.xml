@@ -154,11 +154,11 @@
     <string name="settings_color_scheme">Esquema de color</string>
     <string name="settings_color_scheme_description">Elige tu color preferido</string>
     <string name="settings_color_blue">Azul</string>
-    <string name="settings_color_blue_default">Blue (Default)</string>
-    <string name="settings_color_peach">Peach</string>
-    <string name="settings_color_green">Green</string>
-    <string name="settings_color_purple">Purple</string>
-    <string name="settings_color_orange">Orange</string>
+    <string name="settings_color_blue_default">Azul (Predeterminado)</string>
+    <string name="settings_color_peach">Melocotón</string>
+    <string name="settings_color_green">Verde</string>
+    <string name="settings_color_purple">Morado</string>
+    <string name="settings_color_orange">Naranja</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_description">Elige tu idioma preferido</string>
 
@@ -217,16 +217,16 @@
     <string name="settings_sleep_timer">Temporizador de suspensión</string>
     <string name="settings_sleep_timer_description">Detener reproducción automáticamente después del tiempo establecido</string>
     <string name="settings_sleep_timer_off">Apagado</string>
-    <string name="settings_sleep_timer_15min">15 minutes</string>
-    <string name="settings_sleep_timer_30min">30 minutes</string>
-    <string name="settings_sleep_timer_45min">45 minutes</string>
-    <string name="settings_sleep_timer_60min">60 minutes</string>
-    <string name="settings_sleep_timer_90min">90 minutes</string>
+    <string name="settings_sleep_timer_15min">15 minutos</string>
+    <string name="settings_sleep_timer_30min">30 minutos</string>
+    <string name="settings_sleep_timer_45min">45 minutos</string>
+    <string name="settings_sleep_timer_60min">60 minutos</string>
+    <string name="settings_sleep_timer_90min">90 minutos</string>
     <string name="settings_equalizer_description">Ajustar bandas de frecuencia de audio y efectos</string>
     <string name="settings_recording_directory">Directorio de grabación</string>
     <string name="settings_recording_directory_default">Predeterminado (Music/deutsia_radio)</string>
-    <string name="settings_recording_directory_choose">Choose custom folder...</string>
-    <string name="settings_recording_directory_clear">Clear custom folder</string>
+    <string name="settings_recording_directory_choose">Elegir carpeta personalizada...</string>
+    <string name="settings_recording_directory_clear">Borrar carpeta personalizada</string>
     <string name="settings_record_across_stations">Grabar entre estaciones</string>
     <string name="settings_record_across_stations_description">Continuar grabación al cambiar de estación</string>
     <string name="settings_record_all_stations">Grabar todas las estaciones</string>
@@ -291,7 +291,8 @@
     <string name="tor_control_button_install">Install Orbot</string>
     <string name="tor_control_button_open_orbot">Open Orbot</string>
 
-    
+
+    <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">Usando Tor integrado - no se requiere configuración de proxy</string>
     <string name="add_edit_authentication_optional">Autenticación (opcional)</string>
     <string name="add_edit_advanced_options">Opciones avanzadas</string>
