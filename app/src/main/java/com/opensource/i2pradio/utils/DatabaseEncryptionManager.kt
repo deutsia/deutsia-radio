@@ -120,7 +120,7 @@ object DatabaseEncryptionManager {
             // clearing the passphrase after first use. This is required for Room which
             // may close and reopen the database multiple times (e.g., for LiveData queries).
             // We still clear our local passphrase copy in the finally block.
-            SupportFactory(passphrase, false)
+            SupportFactory(passphrase, null, false)
         } finally {
             // Clear passphrase from memory
             passphrase.fill(0)
