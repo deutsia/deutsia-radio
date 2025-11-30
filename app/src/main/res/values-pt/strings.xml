@@ -154,17 +154,17 @@
     <string name="settings_color_scheme">Esquema de cores</string>
     <string name="settings_color_scheme_description">Escolha sua cor preferida</string>
     <string name="settings_color_blue">Azul</string>
-    <string name="settings_color_blue_default">Blue (Default)</string>
-    <string name="settings_color_peach">Peach</string>
-    <string name="settings_color_green">Green</string>
-    <string name="settings_color_purple">Purple</string>
-    <string name="settings_color_orange">Orange</string>
-    <string name="settings_language">Language</string>
-    <string name="settings_language_description">Choose your preferred language</string>
+    <string name="settings_color_blue_default">Azul (Padrão)</string>
+    <string name="settings_color_peach">Pêssego</string>
+    <string name="settings_color_green">Verde</string>
+    <string name="settings_color_purple">Roxo</string>
+    <string name="settings_color_orange">Laranja</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_description">Escolha seu idioma preferido</string>
 
     <!-- Language Names -->
-    <string name="language_choose">Choose Language</string>
-    <string name="language_system_default">System Default</string>
+    <string name="language_choose">Escolher idioma</string>
+    <string name="language_system_default">Padrão do sistema</string>
     <string name="language_arabic">العربية</string>
     <string name="language_german">Deutsch</string>
     <string name="language_english">English</string>
@@ -217,16 +217,16 @@
     <string name="settings_sleep_timer">Temporizador de suspensão</string>
     <string name="settings_sleep_timer_description">Parar reprodução automaticamente após o tempo definido</string>
     <string name="settings_sleep_timer_off">Desligado</string>
-    <string name="settings_sleep_timer_15min">15 minutes</string>
-    <string name="settings_sleep_timer_30min">30 minutes</string>
-    <string name="settings_sleep_timer_45min">45 minutes</string>
-    <string name="settings_sleep_timer_60min">60 minutes</string>
-    <string name="settings_sleep_timer_90min">90 minutes</string>
+    <string name="settings_sleep_timer_15min">15 minutos</string>
+    <string name="settings_sleep_timer_30min">30 minutos</string>
+    <string name="settings_sleep_timer_45min">45 minutos</string>
+    <string name="settings_sleep_timer_60min">60 minutos</string>
+    <string name="settings_sleep_timer_90min">90 minutos</string>
     <string name="settings_equalizer_description">Ajustar bandas de frequência de áudio e efeitos</string>
     <string name="settings_recording_directory">Diretório de gravação</string>
     <string name="settings_recording_directory_default">Padrão (Music/deutsia_radio)</string>
-    <string name="settings_recording_directory_choose">Choose custom folder...</string>
-    <string name="settings_recording_directory_clear">Clear custom folder</string>
+    <string name="settings_recording_directory_choose">Escolher pasta personalizada...</string>
+    <string name="settings_recording_directory_clear">Limpar pasta personalizada</string>
     <string name="settings_record_across_stations">Gravar entre estações</string>
     <string name="settings_record_across_stations_description">Continuar gravação ao trocar de estação</string>
     <string name="settings_record_all_stations">Gravar todas as estações</string>
@@ -291,7 +291,8 @@
     <string name="tor_control_button_install">Install Orbot</string>
     <string name="tor_control_button_open_orbot">Open Orbot</string>
 
-    
+
+    <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">Usando Tor integrado - nenhuma configuração de proxy necessária</string>
     <string name="add_edit_authentication_optional">Autenticação (opcional)</string>
     <string name="add_edit_advanced_options">Opções avançadas</string>

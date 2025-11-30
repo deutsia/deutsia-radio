@@ -10,48 +10,48 @@
 -->
 <resources>
     <string name="app_name">deutsia radio</string>
-    <string name="tab_radios">Library</string>
-    <string name="tab_now_playing">Now Playing</string>
-    <string name="tab_settings">Settings</string>
+    <string name="tab_radios">Bibliothèque</string>
+    <string name="tab_now_playing">En lecture</string>
+    <string name="tab_settings">Paramètres</string>
 
     <!-- Equalizer -->
-    <string name="equalizer">Equalizer</string>
-    <string name="equalizer_no_audio">Start playing a station first</string>
-    <string name="equalizer_not_found">No equalizer app found. Install an equalizer app like Wavelet.</string>
-    <string name="equalizer_preset">Preset</string>
-    <string name="equalizer_custom">Custom</string>
-    <string name="equalizer_reset">Reset to Flat</string>
-    <string name="equalizer_init_failed">Could not initialize equalizer</string>
-    <string name="equalizer_bass_boost">Bass Booster</string>
-    <string name="equalizer_surround_sound">Surround Sound</string>
+    <string name="equalizer">Égaliseur</string>
+    <string name="equalizer_no_audio">Lancez d\'abord une station</string>
+    <string name="equalizer_not_found">Aucune application d\'égaliseur trouvée. Installez une application d\'égaliseur comme Wavelet.</string>
+    <string name="equalizer_preset">Préréglage</string>
+    <string name="equalizer_custom">Personnalisé</string>
+    <string name="equalizer_reset">Réinitialiser à plat</string>
+    <string name="equalizer_init_failed">Impossible d\'initialiser l\'égaliseur</string>
+    <string name="equalizer_bass_boost">Amplificateur de basses</string>
+    <string name="equalizer_surround_sound">Son surround</string>
 
     <!-- Sort options -->
-    <string name="sort_default">Default</string>
-    <string name="sort_name">Name</string>
-    <string name="sort_recent">Recent</string>
-    <string name="sort_liked">Liked</string>
+    <string name="sort_default">Par défaut</string>
+    <string name="sort_name">Nom</string>
+    <string name="sort_recent">Récentes</string>
+    <string name="sort_liked">Favoris</string>
     <string name="sort_genre">Genre</string>
 
     <!-- Search -->
-    <string name="search_stations">Search library</string>
-    <string name="search_countries">Search countries…</string>
-    <string name="search_genres">Search genres…</string>
+    <string name="search_stations">Rechercher dans la bibliothèque</string>
+    <string name="search_countries">Rechercher des pays…</string>
+    <string name="search_genres">Rechercher des genres…</string>
 
     <!-- Genre filter -->
-    <string name="genre_all">All Genres</string>
-    <string name="filter_by_genre">Filter by Genre</string>
+    <string name="genre_all">Tous les genres</string>
+    <string name="filter_by_genre">Filtrer par genre</string>
 
     <!-- Genre Names -->
     <string name="genre_alternative">Alternative</string>
     <string name="genre_ambient">Ambient</string>
     <string name="genre_blues">Blues</string>
     <string name="genre_christian">Christian</string>
-    <string name="genre_classical">Classical</string>
-    <string name="genre_comedy">Comedy</string>
+    <string name="genre_classical">Classique</string>
+    <string name="genre_comedy">Comédie</string>
     <string name="genre_country">Country</string>
     <string name="genre_dance">Dance</string>
     <string name="genre_edm">EDM</string>
-    <string name="genre_electronic">Electronic</string>
+    <string name="genre_electronic">Électronique</string>
     <string name="genre_folk">Folk</string>
     <string name="genre_funk">Funk</string>
     <string name="genre_gospel">Gospel</string>
@@ -62,7 +62,7 @@
     <string name="genre_latin">Latin</string>
     <string name="genre_lo_fi">Lo-Fi</string>
     <string name="genre_metal">Metal</string>
-    <string name="genre_news">News</string>
+    <string name="genre_news">Actualités</string>
     <string name="genre_oldies">Oldies</string>
     <string name="genre_pop">Pop</string>
     <string name="genre_punk">Punk</string>
@@ -73,105 +73,105 @@
     <string name="genre_sports">Sports</string>
     <string name="genre_talk">Talk</string>
     <string name="genre_world">World</string>
-    <string name="genre_other">Other</string>
+    <string name="genre_other">Autre</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with Orbot integration and configurable leak prevention</string>
+    <string name="about_description">deutsia radio est un lecteur radio multiréseau gratuit et open source qui rassemble les flux du clearnet, de Tor (.onion) et des réseaux I2P. Profitez de vos stations préférées dans une interface Material You avec intégration Orbot et prévention des fuites configurable</string>
 
     <!-- Browse/Discover Stations -->
-    <string name="tab_browse">Browse</string>
-    <string name="search_radio_browser">Search thousands of stations…</string>
-    <string name="browse_top_voted">Top Voted</string>
-    <string name="browse_popular">Popular</string>
-    <string name="browse_random">Random</string>
-    <string name="browse_history">History</string>
-    <string name="browse_no_results">No Stations Found</string>
-    <string name="browse_no_results_hint">Try a different search or filter</string>
-    <string name="filter_country">Country</string>
+    <string name="tab_browse">Parcourir</string>
+    <string name="search_radio_browser">Rechercher parmi des milliers de stations…</string>
+    <string name="browse_top_voted">Les mieux notées</string>
+    <string name="browse_popular">Populaires</string>
+    <string name="browse_random">Aléatoire</string>
+    <string name="browse_history">Historique</string>
+    <string name="browse_no_results">Aucune station trouvée</string>
+    <string name="browse_no_results_hint">Essayez une recherche ou un filtre différent</string>
+    <string name="filter_country">Pays</string>
     <string name="filter_genre">Genre</string>
-    <string name="filter_language">Language</string>
-    <string name="filter_all_countries">All Countries</string>
-    <string name="filter_all_genres">All Genres</string>
-    <string name="filter_all_languages">All Languages</string>
-    <string name="select_country">Select Country</string>
-    <string name="select_genre">Select Genre</string>
-    <string name="select_language">Select Language</string>
-    <string name="loading_countries">Loading countries…</string>
-    <string name="loading_genres">Loading genres…</string>
-    <string name="loading_languages">Loading languages…</string>
-    <string name="search_languages">Search languages…</string>
-    <string name="station_saved">%s added to library</string>
-    <string name="station_removed">%s removed from library</string>
-    <string name="station_added_to_favorites">%s added to favorites</string>
-    <string name="station_removed_from_favorites">%s removed from favorites</string>
-    <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
+    <string name="filter_language">Langue</string>
+    <string name="filter_all_countries">Tous les pays</string>
+    <string name="filter_all_genres">Tous les genres</string>
+    <string name="filter_all_languages">Toutes les langues</string>
+    <string name="select_country">Sélectionner un pays</string>
+    <string name="select_genre">Sélectionner un genre</string>
+    <string name="select_language">Sélectionner une langue</string>
+    <string name="loading_countries">Chargement des pays…</string>
+    <string name="loading_genres">Chargement des genres…</string>
+    <string name="loading_languages">Chargement des langues…</string>
+    <string name="search_languages">Rechercher des langues…</string>
+    <string name="station_saved">%s ajoutée à la bibliothèque</string>
+    <string name="station_removed">%s retirée de la bibliothèque</string>
+    <string name="station_added_to_favorites">%s ajoutée aux favoris</string>
+    <string name="station_removed_from_favorites">%s retirée des favoris</string>
+    <string name="tor_required_warning">Forcer Tor est activé mais Tor n\'est pas connecté. Connectez-vous à Tor pour parcourir les stations.</string>
 
     <!-- Notification and Status Messages -->
-    <string name="notification_connecting">Connecting...</string>
-    <string name="notification_paused">Paused</string>
-    <string name="notification_playing">Playing</string>
-    <string name="notification_playing_recording">Playing • Recording</string>
-    <string name="notification_buffering">Buffering...</string>
-    <string name="notification_reconnecting">Reconnecting...</string>
-    <string name="notification_connection_failed">Connection failed</string>
-    <string name="notification_tor_blocked">Tor not connected - stream blocked</string>
-    <string name="notification_audio_focus_denied">Audio focus denied</string>
-    <string name="notification_channel_name">deutsia radio Playback</string>
-    <string name="notification_channel_description">Shows radio playback status</string>
+    <string name="notification_connecting">Connexion...</string>
+    <string name="notification_paused">En pause</string>
+    <string name="notification_playing">Lecture en cours</string>
+    <string name="notification_playing_recording">Lecture • Enregistrement</string>
+    <string name="notification_buffering">Mise en mémoire tampon...</string>
+    <string name="notification_reconnecting">Reconnexion...</string>
+    <string name="notification_connection_failed">Échec de connexion</string>
+    <string name="notification_tor_blocked">Tor non connecté - flux bloqué</string>
+    <string name="notification_audio_focus_denied">Focus audio refusé</string>
+    <string name="notification_channel_name">Lecture deutsia radio</string>
+    <string name="notification_channel_description">Affiche l\'état de lecture de la radio</string>
     <string name="notification_action_pause">Pause</string>
-    <string name="notification_action_stop">Stop</string>
+    <string name="notification_action_stop">Arrêter</string>
 
     <!-- Recording Messages -->
-    <string name="recording_failed">Recording failed: %s</string>
-    <string name="recording_saved">Recording saved: %s (%dKB)</string>
-    <string name="recording_stopping">Stopping recording...</string>
-    <string name="recording_starting">Starting recording...</string>
-    <string name="recording_no_station">No station playing</string>
-    <string name="recording_directory_updated">Recording directory updated</string>
+    <string name="recording_failed">Échec de l\'enregistrement : %s</string>
+    <string name="recording_saved">Enregistrement sauvegardé : %s (%dKo)</string>
+    <string name="recording_stopping">Arrêt de l\'enregistrement...</string>
+    <string name="recording_starting">Démarrage de l\'enregistrement...</string>
+    <string name="recording_no_station">Aucune station en lecture</string>
+    <string name="recording_directory_updated">Répertoire d\'enregistrement mis à jour</string>
 
     <!-- Dialog Titles and Buttons -->
-    <string name="dialog_add_station">Add Radio Station</string>
-    <string name="dialog_edit_station">Edit Radio Station</string>
-    <string name="dialog_sort_stations">Sort Stations</string>
-    <string name="dialog_delete_stations">Delete stations</string>
-    <string name="button_save">Save</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="button_import">Import</string>
-    <string name="button_export">Export</string>
-    <string name="button_open">Open</string>
-    <string name="button_configure">Configure</string>
-    <string name="button_apply">Apply</string>
-    <string name="button_reset">Reset</string>
-    <string name="button_change">Change</string>
-    <string name="button_start">Start</string>
-    <string name="button_test_connection">Test Connection</string>
-    <string name="hint_test_connection_disclaimer">Note: Testing will connect to httpbin.org via your proxy</string>
-    <string name="button_choose_image">Choose Image</string>
-    <string name="button_clear">Clear</string>
+    <string name="dialog_add_station">Ajouter une station</string>
+    <string name="dialog_edit_station">Modifier la station</string>
+    <string name="dialog_sort_stations">Trier les stations</string>
+    <string name="dialog_delete_stations">Supprimer les stations</string>
+    <string name="button_save">Enregistrer</string>
+    <string name="button_cancel">Annuler</string>
+    <string name="button_import">Importer</string>
+    <string name="button_export">Exporter</string>
+    <string name="button_open">Ouvrir</string>
+    <string name="button_configure">Configurer</string>
+    <string name="button_apply">Appliquer</string>
+    <string name="button_reset">Réinitialiser</string>
+    <string name="button_change">Modifier</string>
+    <string name="button_start">Démarrer</string>
+    <string name="button_test_connection">Tester la connexion</string>
+    <string name="hint_test_connection_disclaimer">Remarque : Le test se connectera à httpbin.org via votre proxy</string>
+    <string name="button_choose_image">Choisir une image</string>
+    <string name="button_clear">Effacer</string>
 
     <!-- Settings - Appearance -->
-    <string name="settings_appearance">Appearance</string>
-    <string name="settings_theme">Theme</string>
-    <string name="settings_theme_description">Choose light, dark, or system</string>
-    <string name="settings_theme_system_default">System Default</string>
-    <string name="settings_theme_light">Light</string>
-    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_appearance">Apparence</string>
+    <string name="settings_theme">Thème</string>
+    <string name="settings_theme_description">Choisissez clair, sombre ou système</string>
+    <string name="settings_theme_system_default">Par défaut du système</string>
+    <string name="settings_theme_light">Clair</string>
+    <string name="settings_theme_dark">Sombre</string>
     <string name="settings_material_you">Material You</string>
-    <string name="settings_material_you_description">Use wallpaper-based dynamic colors</string>
-    <string name="settings_color_scheme">Color Scheme</string>
-    <string name="settings_color_scheme_description">Choose your preferred color</string>
-    <string name="settings_color_blue">Blue</string>
-    <string name="settings_color_blue_default">Blue (Default)</string>
-    <string name="settings_color_peach">Peach</string>
-    <string name="settings_color_green">Green</string>
-    <string name="settings_color_purple">Purple</string>
+    <string name="settings_material_you_description">Utiliser les couleurs dynamiques basées sur le fond d\'écran</string>
+    <string name="settings_color_scheme">Schéma de couleurs</string>
+    <string name="settings_color_scheme_description">Choisissez votre couleur préférée</string>
+    <string name="settings_color_blue">Bleu</string>
+    <string name="settings_color_blue_default">Bleu (par défaut)</string>
+    <string name="settings_color_peach">Pêche</string>
+    <string name="settings_color_green">Vert</string>
+    <string name="settings_color_purple">Violet</string>
     <string name="settings_color_orange">Orange</string>
-    <string name="settings_language">Language</string>
-    <string name="settings_language_description">Choose your preferred language</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_language_description">Choisissez votre langue préférée</string>
 
     <!-- Language Names -->
-    <string name="language_choose">Choose Language</string>
-    <string name="language_system_default">System Default</string>
+    <string name="language_choose">Choisir la langue</string>
+    <string name="language_system_default">Par défaut du système</string>
     <string name="language_arabic">العربية</string>
     <string name="language_german">Deutsch</string>
     <string name="language_english">English</string>
@@ -191,192 +191,192 @@
     <string name="language_chinese">中文</string>
 
     <!-- Settings - Tor Network -->
-    <string name="settings_tor_network">Tor Network</string>
-    <string name="settings_enable_tor">Enable Tor (via Orbot)</string>
-    <string name="settings_enable_tor_description">Connect through the Tor network</string>
-    <string name="settings_tor_disconnected">Disconnected</string>
-    <string name="settings_tor_not_running">Tor is not running</string>
-    <string name="settings_force_tor">Force Tor Over Everything</string>
-    <string name="settings_force_tor_description">Route all streams through Tor. Won\'t connect without Tor.</string>
-    <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
-    <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
-    <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_network">Réseau Tor</string>
+    <string name="settings_enable_tor">Activer Tor (via Orbot)</string>
+    <string name="settings_enable_tor_description">Se connecter via le réseau Tor</string>
+    <string name="settings_tor_disconnected">Déconnecté</string>
+    <string name="settings_tor_not_running">Tor n\'est pas en cours d\'exécution</string>
+    <string name="settings_force_tor">Forcer Tor pour tout</string>
+    <string name="settings_force_tor_description">Acheminer tous les flux via Tor. Ne se connectera pas sans Tor.</string>
+    <string name="settings_force_tor_except_i2p">Forcer Tor sauf I2P</string>
+    <string name="settings_force_tor_except_i2p_description">Acheminer le clearnet via Tor, flux I2P directement vers le proxy I2P.</string>
+    <string name="settings_tor_info">Nécessite Orbot (gratuit sur Play Store ou F-Droid). Appuyez sur l\'icône Tor dans la barre d\'outils pour un accès rapide.\n\nLes modes forcés bloquent les connexions lorsque Tor n\'est pas disponible.</string>
 
     <!-- Settings - Custom Proxy -->
-    <string name="settings_custom_proxy">Custom Proxy</string>
-    <string name="settings_enable_custom_proxy">Enable Custom Proxy</string>
-    <string name="settings_enable_custom_proxy_description">Use custom proxy for connections</string>
-    <string name="settings_configure_proxy">Configure Global Proxy</string>
-    <string name="settings_configure_proxy_description">Set up your custom proxy settings</string>
-    <string name="settings_force_custom_proxy">Force Custom Proxy</string>
-    <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
+    <string name="settings_custom_proxy">Proxy personnalisé</string>
+    <string name="settings_enable_custom_proxy">Activer le proxy personnalisé</string>
+    <string name="settings_enable_custom_proxy_description">Utiliser un proxy personnalisé pour les connexions</string>
+    <string name="settings_configure_proxy">Configurer le proxy global</string>
+    <string name="settings_configure_proxy_description">Configurer vos paramètres de proxy personnalisé</string>
+    <string name="settings_force_custom_proxy">Forcer le proxy personnalisé</string>
+    <string name="settings_force_custom_proxy_description">Acheminer tout le trafic via le proxy personnalisé. Ne se connectera pas sans proxy.</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Forcer le proxy personnalisé sauf stations Tor/I2P</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">Acheminer tout le trafic clearnet via le proxy personnalisé, mais autoriser les stations Tor et I2P à utiliser leurs proxys natifs.</string>
 
     <!-- Settings - Bandwidth -->
-    <string name="settings_bandwidth_usage">Bandwidth Usage</string>
-    <string name="settings_total_usage">Total Usage (Lifetime)</string>
-    <string name="settings_session_usage">Session Usage</string>
-    <string name="settings_bandwidth_zero">0 B</string>
+    <string name="settings_bandwidth_usage">Utilisation de la bande passante</string>
+    <string name="settings_total_usage">Utilisation totale (à vie)</string>
+    <string name="settings_session_usage">Utilisation de la session</string>
+    <string name="settings_bandwidth_zero">0 o</string>
 
     <!-- Settings - Playback -->
-    <string name="settings_playback">Playback</string>
-    <string name="settings_sleep_timer">Sleep Timer</string>
-    <string name="settings_sleep_timer_description">Auto-stop playback after set time</string>
-    <string name="settings_sleep_timer_off">Off</string>
+    <string name="settings_playback">Lecture</string>
+    <string name="settings_sleep_timer">Minuteur de veille</string>
+    <string name="settings_sleep_timer_description">Arrêter automatiquement la lecture après le temps défini</string>
+    <string name="settings_sleep_timer_off">Désactivé</string>
     <string name="settings_sleep_timer_15min">15 minutes</string>
     <string name="settings_sleep_timer_30min">30 minutes</string>
     <string name="settings_sleep_timer_45min">45 minutes</string>
     <string name="settings_sleep_timer_60min">60 minutes</string>
     <string name="settings_sleep_timer_90min">90 minutes</string>
-    <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
-    <string name="settings_recording_directory">Recording Directory</string>
-    <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
-    <string name="settings_recording_directory_choose">Choose custom folder...</string>
-    <string name="settings_recording_directory_clear">Clear custom folder</string>
-    <string name="settings_record_across_stations">Record Across Stations</string>
-    <string name="settings_record_across_stations_description">Keep recording when switching stations</string>
-    <string name="settings_record_all_stations">Record All Stations</string>
-    <string name="settings_record_all_stations_description">Switch to new station\'s stream in same file</string>
+    <string name="settings_equalizer_description">Ajuster les bandes de fréquence audio et les effets</string>
+    <string name="settings_recording_directory">Répertoire d\'enregistrement</string>
+    <string name="settings_recording_directory_default">Par défaut (Musique/deutsia_radio)</string>
+    <string name="settings_recording_directory_choose">Choisir un dossier personnalisé...</string>
+    <string name="settings_recording_directory_clear">Effacer le dossier personnalisé</string>
+    <string name="settings_record_across_stations">Enregistrer entre les stations</string>
+    <string name="settings_record_across_stations_description">Continuer l\'enregistrement lors du changement de station</string>
+    <string name="settings_record_all_stations">Enregistrer toutes les stations</string>
+    <string name="settings_record_all_stations_description">Basculer vers le flux de la nouvelle station dans le même fichier</string>
 
     <!-- Settings - Station Management -->
-    <string name="settings_station_management">Station Management</string>
-    <string name="settings_import_from_file">Import from File</string>
-    <string name="settings_import_from_file_description">Import from CSV, JSON, M3U, or PLS</string>
-    <string name="settings_import_i2p_stations">Import I2P Stations</string>
-    <string name="settings_import_i2p_stations_description">14 curated I2P radio stations</string>
-    <string name="settings_import_tor_stations">Import Tor Stations</string>
-    <string name="settings_import_tor_stations_description">3 curated Tor radio stations</string>
-    <string name="settings_export_stations">Export Stations</string>
-    <string name="settings_export_stations_description">Export your stations to a file</string>
+    <string name="settings_station_management">Gestion des stations</string>
+    <string name="settings_import_from_file">Importer depuis un fichier</string>
+    <string name="settings_import_from_file_description">Importer depuis CSV, JSON, M3U ou PLS</string>
+    <string name="settings_import_i2p_stations">Importer des stations I2P</string>
+    <string name="settings_import_i2p_stations_description">14 stations radio I2P sélectionnées</string>
+    <string name="settings_import_tor_stations">Importer des stations Tor</string>
+    <string name="settings_import_tor_stations_description">3 stations radio Tor sélectionnées</string>
+    <string name="settings_export_stations">Exporter les stations</string>
+    <string name="settings_export_stations_description">Exporter vos stations vers un fichier</string>
 
     <!-- Settings - About -->
-    <string name="settings_about">About</string>
+    <string name="settings_about">À propos</string>
     <string name="settings_version">Version 1.1</string>
-    <string name="settings_view_github">View on GitHub</string>
-    <string name="settings_donate">Donate</string>
-    <string name="settings_donate_description">If this app helped you out, consider donating</string>
+    <string name="settings_view_github">Voir sur GitHub</string>
+    <string name="settings_donate">Faire un don</string>
+    <string name="settings_donate_description">Si cette application vous a aidé, envisagez de faire un don</string>
     <string name="settings_monero">Monero (XMR)</string>
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
-    <string name="settings_copy_address">Copy Address</string>
+    <string name="settings_copy_address">Copier l\'adresse</string>
 
     <!-- Tor Control Bottom Sheet -->
-    <string name="tor_connection_details">Connection Details</string>
-    <string name="tor_proxy_host">Proxy Host</string>
-    <string name="tor_socks_port">SOCKS Port</string>
-    <string name="tor_what_is_orbot">What is Orbot?</string>
-    <string name="tor_orbot_description">Orbot is the official Tor client for Android. It provides secure, encrypted access to the Tor network.</string>
-    <string name="tor_connect">Connect to Tor</string>
-    <string name="tor_open_orbot">Open Orbot</string>
+    <string name="tor_connection_details">Détails de connexion</string>
+    <string name="tor_proxy_host">Hôte proxy</string>
+    <string name="tor_socks_port">Port SOCKS</string>
+    <string name="tor_what_is_orbot">Qu\'est-ce qu\'Orbot ?</string>
+    <string name="tor_orbot_description">Orbot est le client Tor officiel pour Android. Il fournit un accès sécurisé et chiffré au réseau Tor.</string>
+    <string name="tor_connect">Se connecter à Tor</string>
+    <string name="tor_open_orbot">Ouvrir Orbot</string>
 
     <!-- Tor Status Messages -->
-    <string name="tor_status_connecting">Connecting...</string>
-    <string name="tor_status_connected">Tor Connected</string>
-    <string name="tor_status_disconnected">Tor Disconnected</string>
-    <string name="tor_status_off">Tor Off</string>
-    <string name="tor_status_error">Tor Error</string>
-    <string name="tor_status_leak_warning">Leak Warning</string>
-    <string name="tor_status_install_orbot">Install Orbot</string>
-    <string name="tor_status_connecting_message">Connecting to Tor...</string>
-    <string name="tor_status_connected_message">Connected via Tor</string>
-    <string name="tor_control_title_stopped">Tor Disconnected</string>
-    <string name="tor_control_subtitle_stopped">Tap Connect to browse anonymously via Tor</string>
-    <string name="tor_control_subtitle_connecting">Establishing secure connection via Orbot</string>
-    <string name="tor_control_title_connecting">Connecting to Tor...</string>
-    <string name="tor_control_title_connected">Connected to Tor</string>
-    <string name="tor_control_title_connected_force">Connected to Tor (Force Mode)</string>
-    <string name="tor_control_subtitle_connected">Your connection is private and anonymous</string>
-    <string name="tor_control_subtitle_connected_force">Disconnect via Orbot or disable Force Tor in settings</string>
-    <string name="tor_control_title_error">Connection Failed</string>
-    <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
-    <string name="tor_control_title_orbot_required">Orbot Required</string>
-    <string name="tor_control_subtitle_orbot_required">Install Orbot to connect to the Tor network</string>
-    <string name="tor_control_button_connecting">Connecting...</string>
-    <string name="tor_control_button_disconnect">Disconnect</string>
-    <string name="tor_control_button_cancel">Cancel</string>
-    <string name="tor_control_button_retry">Retry Connection</string>
-    <string name="tor_control_button_install">Install Orbot</string>
-    <string name="tor_control_button_open_orbot">Open Orbot</string>
+    <string name="tor_status_connecting">Connexion...</string>
+    <string name="tor_status_connected">Tor connecté</string>
+    <string name="tor_status_disconnected">Tor déconnecté</string>
+    <string name="tor_status_off">Tor désactivé</string>
+    <string name="tor_status_error">Erreur Tor</string>
+    <string name="tor_status_leak_warning">Alerte de fuite</string>
+    <string name="tor_status_install_orbot">Installer Orbot</string>
+    <string name="tor_status_connecting_message">Connexion à Tor...</string>
+    <string name="tor_status_connected_message">Connecté via Tor</string>
+    <string name="tor_control_title_stopped">Tor déconnecté</string>
+    <string name="tor_control_subtitle_stopped">Appuyez sur Connecter pour naviguer anonymement via Tor</string>
+    <string name="tor_control_subtitle_connecting">Établissement d\'une connexion sécurisée via Orbot</string>
+    <string name="tor_control_title_connecting">Connexion à Tor...</string>
+    <string name="tor_control_title_connected">Connecté à Tor</string>
+    <string name="tor_control_title_connected_force">Connecté à Tor (mode forcé)</string>
+    <string name="tor_control_subtitle_connected">Votre connexion est privée et anonyme</string>
+    <string name="tor_control_subtitle_connected_force">Déconnectez-vous via Orbot ou désactivez Forcer Tor dans les paramètres</string>
+    <string name="tor_control_title_error">Échec de connexion</string>
+    <string name="tor_control_subtitle_error">Impossible de se connecter au réseau Tor</string>
+    <string name="tor_control_title_orbot_required">Orbot requis</string>
+    <string name="tor_control_subtitle_orbot_required">Installez Orbot pour vous connecter au réseau Tor</string>
+    <string name="tor_control_button_connecting">Connexion...</string>
+    <string name="tor_control_button_disconnect">Déconnecter</string>
+    <string name="tor_control_button_cancel">Annuler</string>
+    <string name="tor_control_button_retry">Réessayer la connexion</string>
+    <string name="tor_control_button_install">Installer Orbot</string>
+    <string name="tor_control_button_open_orbot">Ouvrir Orbot</string>
 
     <!-- Add/Edit Radio Dialog -->
-    <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
-    <string name="add_edit_authentication_optional">Authentication (Optional)</string>
-    <string name="add_edit_advanced_options">Advanced Options</string>
-    <string name="add_edit_cover_art">Cover Art</string>
-    <string name="add_edit_or_enter_url">Or enter image URL</string>
+    <string name="add_edit_tor_info">Utilisation de Tor intégré - aucune configuration de proxy nécessaire</string>
+    <string name="add_edit_authentication_optional">Authentification (facultatif)</string>
+    <string name="add_edit_advanced_options">Options avancées</string>
+    <string name="add_edit_cover_art">Pochette</string>
+    <string name="add_edit_or_enter_url">Ou saisir l\'URL de l\'image</string>
 
     <!-- Input Hints -->
-    <string name="hint_station_name">Station Name</string>
-    <string name="hint_stream_url">Stream URL</string>
+    <string name="hint_station_name">Nom de la station</string>
+    <string name="hint_stream_url">URL du flux</string>
     <string name="hint_genre">Genre</string>
-    <string name="hint_proxy_type">Proxy Type</string>
-    <string name="hint_proxy_host">Proxy Host</string>
-    <string name="hint_proxy_port">Proxy Port</string>
-    <string name="hint_protocol">Protocol</string>
-    <string name="hint_username_optional">Username (optional)</string>
-    <string name="hint_password_optional">Password (optional)</string>
-    <string name="hint_auth_method">Auth Method</string>
-    <string name="hint_connection_timeout">Connection Timeout (seconds)</string>
-    <string name="hint_cover_art_url">Cover Art URL (optional)</string>
-    <string name="hint_username_optional_caps">Username (Optional)</string>
-    <string name="hint_password_optional_caps">Password (Optional)</string>
-    <string name="hint_auth_type">Authentication Type</string>
+    <string name="hint_proxy_type">Type de proxy</string>
+    <string name="hint_proxy_host">Hôte proxy</string>
+    <string name="hint_proxy_port">Port proxy</string>
+    <string name="hint_protocol">Protocole</string>
+    <string name="hint_username_optional">Nom d\'utilisateur (facultatif)</string>
+    <string name="hint_password_optional">Mot de passe (facultatif)</string>
+    <string name="hint_auth_method">Méthode d\'authentification</string>
+    <string name="hint_connection_timeout">Délai de connexion (secondes)</string>
+    <string name="hint_cover_art_url">URL de la pochette (facultatif)</string>
+    <string name="hint_username_optional_caps">Nom d\'utilisateur (facultatif)</string>
+    <string name="hint_password_optional_caps">Mot de passe (facultatif)</string>
+    <string name="hint_auth_type">Type d\'authentification</string>
 
     <!-- Default Values -->
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
-    <string name="default_auth_none">None</string>
+    <string name="default_auth_none">Aucune</string>
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
     <!-- Now Playing Fragment -->
     <string name="now_playing_time_placeholder">00:00</string>
-    <string name="now_playing_live">LIVE</string>
-    <string name="now_playing_no_station">No Station Playing</string>
-    <string name="now_playing_no_station_subtitle">Select a station from the list</string>
-    <string name="now_playing_volume_title">Radio Volume</string>
-    <string name="now_playing_volume_description">Adjusts radio stream only</string>
+    <string name="now_playing_live">EN DIRECT</string>
+    <string name="now_playing_no_station">Aucune station en lecture</string>
+    <string name="now_playing_no_station_subtitle">Sélectionnez une station dans la liste</string>
+    <string name="now_playing_volume_title">Volume de la radio</string>
+    <string name="now_playing_volume_description">Ajuste uniquement le flux radio</string>
 
     <!-- Toast Messages -->
-    <string name="toast_session_bandwidth_reset">Session bandwidth reset</string>
-    <string name="toast_custom_proxy_saved">Custom proxy settings saved</string>
-    <string name="toast_custom_proxy_cleared">Custom proxy settings cleared</string>
-    <string name="toast_address_copied">Address copied to clipboard</string>
-    <string name="toast_using_default_directory">Using default directory</string>
+    <string name="toast_session_bandwidth_reset">Bande passante de session réinitialisée</string>
+    <string name="toast_custom_proxy_saved">Paramètres du proxy personnalisé enregistrés</string>
+    <string name="toast_custom_proxy_cleared">Paramètres du proxy personnalisé effacés</string>
+    <string name="toast_address_copied">Adresse copiée dans le presse-papiers</string>
+    <string name="toast_using_default_directory">Utilisation du répertoire par défaut</string>
 
     <!-- Custom Proxy Status Messages -->
-    <string name="custom_proxy_status_connected">Connected</string>
-    <string name="custom_proxy_status_configured">Proxy configured</string>
-    <string name="custom_proxy_status_not_configured">Not Configured</string>
-    <string name="custom_proxy_status_no_proxy">No proxy set</string>
-    <string name="custom_proxy_status_leak_warning">Leak Warning</string>
-    <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+    <string name="custom_proxy_status_connected">Connecté</string>
+    <string name="custom_proxy_status_configured">Proxy configuré</string>
+    <string name="custom_proxy_status_not_configured">Non configuré</string>
+    <string name="custom_proxy_status_no_proxy">Aucun proxy défini</string>
+    <string name="custom_proxy_status_leak_warning">Alerte de fuite</string>
+    <string name="custom_proxy_status_leak_detail">Force activée mais non configurée</string>
 
     <!-- Tor Service Notification Messages -->
-    <string name="tor_channel_name">Tor Connection</string>
-    <string name="tor_channel_description">Shows Tor connection status</string>
-    <string name="tor_notification_disconnected">Tor Disconnected</string>
-    <string name="tor_notification_tap_to_open">Tap to open app</string>
-    <string name="tor_notification_connecting">Connecting via Orbot...</string>
-    <string name="tor_notification_please_wait">Please wait</string>
-    <string name="tor_notification_connected">Tor Connected</string>
-    <string name="tor_notification_error">Tor Error</string>
-    <string name="tor_notification_connection_failed">Connection failed</string>
-    <string name="tor_notification_orbot_required">Orbot Required</string>
-    <string name="tor_notification_install_orbot">Please install Orbot for Tor support</string>
-    <string name="tor_notification_action_stop">Stop Tor</string>
+    <string name="tor_channel_name">Connexion Tor</string>
+    <string name="tor_channel_description">Affiche l\'état de connexion Tor</string>
+    <string name="tor_notification_disconnected">Tor déconnecté</string>
+    <string name="tor_notification_tap_to_open">Appuyez pour ouvrir l\'application</string>
+    <string name="tor_notification_connecting">Connexion via Orbot...</string>
+    <string name="tor_notification_please_wait">Veuillez patienter</string>
+    <string name="tor_notification_connected">Tor connecté</string>
+    <string name="tor_notification_error">Erreur Tor</string>
+    <string name="tor_notification_connection_failed">Échec de connexion</string>
+    <string name="tor_notification_orbot_required">Orbot requis</string>
+    <string name="tor_notification_install_orbot">Veuillez installer Orbot pour le support Tor</string>
+    <string name="tor_notification_action_stop">Arrêter Tor</string>
 
     <!-- Other Error Messages -->
-    <string name="error_unknown">Unknown error</string>
-    <string name="folder_custom">Custom folder</string>
+    <string name="error_unknown">Erreur inconnue</string>
+    <string name="folder_custom">Dossier personnalisé</string>
 
     <!-- AddEditRadioDialog Default Values -->
-    <string name="default_genre_other">Other</string>
-    <string name="default_proxy_none">None</string>
+    <string name="default_genre_other">Autre</string>
+    <string name="default_proxy_none">Aucun</string>
     <string name="default_proxy_i2p">I2P</string>
     <string name="default_proxy_tor">Tor</string>
-    <string name="default_proxy_custom">Custom</string>
+    <string name="default_proxy_custom">Personnalisé</string>
     <string name="default_protocol_http">HTTP</string>
     <string name="default_protocol_https">HTTPS</string>
     <string name="default_protocol_socks4">SOCKS4</string>
@@ -387,58 +387,58 @@
     <string name="default_timeout_30">30</string>
 
     <!-- Security & Privacy -->
-    <string name="settings_security_privacy">Security &amp; Privacy</string>
-    <string name="settings_app_lock">App Lock</string>
-    <string name="settings_app_lock_description">Require password or biometric to unlock app</string>
-    <string name="settings_biometric_auth">Biometric Authentication</string>
-    <string name="settings_biometric_auth_description">Use fingerprint or face unlock</string>
-    <string name="settings_require_auth_on_launch">Require Auth on Launch</string>
-    <string name="settings_require_auth_on_launch_description">Always require authentication when opening app</string>
-    <string name="settings_set_password">Set Password</string>
-    <string name="settings_change_password">Change Password</string>
-    <string name="settings_database_encryption">Database Encryption</string>
-    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher using your app password (requires restart)</string>
-    <string name="settings_database_encryption_warning">Warning: This is an experimental feature. Make sure you have a backup before enabling!</string>
-    <string name="settings_database_encryption_enable_title">Enable Database Encryption?</string>
-    <string name="settings_database_encryption_enable_message">This will encrypt your entire radio database using your app password. The app will restart to apply changes.\n\nWARNING: This is experimental. Make sure you have a backup!</string>
-    <string name="settings_database_encryption_disable_title">Disable Database Encryption?</string>
-    <string name="settings_database_encryption_disable_message">This will decrypt your database and remove encryption. The app will restart to apply changes.</string>
-    <string name="settings_database_encryption_enabled">Database encryption enabled</string>
-    <string name="settings_database_encryption_disabled">Database encryption disabled</string>
-    <string name="settings_database_encryption_error">Failed to change encryption setting</string>
-    <string name="settings_database_encryption_password_required_title">App Password Required</string>
-    <string name="settings_database_encryption_password_required_message">Database encryption uses your app password to generate the encryption key. Please set an app password first by enabling \"App Lock\" above.\n\nOnce set, you can enable database encryption using the same password - no separate password needed.</string>
+    <string name="settings_security_privacy">Sécurité &amp; confidentialité</string>
+    <string name="settings_app_lock">Verrouillage de l\'application</string>
+    <string name="settings_app_lock_description">Exiger un mot de passe ou une biométrie pour déverrouiller l\'application</string>
+    <string name="settings_biometric_auth">Authentification biométrique</string>
+    <string name="settings_biometric_auth_description">Utiliser l\'empreinte digitale ou la reconnaissance faciale</string>
+    <string name="settings_require_auth_on_launch">Exiger l\'authentification au lancement</string>
+    <string name="settings_require_auth_on_launch_description">Toujours exiger l\'authentification lors de l\'ouverture de l\'application</string>
+    <string name="settings_set_password">Définir le mot de passe</string>
+    <string name="settings_change_password">Changer le mot de passe</string>
+    <string name="settings_database_encryption">Chiffrement de la base de données</string>
+    <string name="settings_database_encryption_description">Chiffrer toute la base de données avec SQLCipher en utilisant votre mot de passe d\'application (nécessite un redémarrage)</string>
+    <string name="settings_database_encryption_warning">Attention : Il s\'agit d\'une fonctionnalité expérimentale. Assurez-vous d\'avoir une sauvegarde avant de l\'activer !</string>
+    <string name="settings_database_encryption_enable_title">Activer le chiffrement de la base de données ?</string>
+    <string name="settings_database_encryption_enable_message">Cela chiffrera toute votre base de données radio en utilisant votre mot de passe d\'application. L\'application redémarrera pour appliquer les modifications.\n\nATTENTION : C\'est expérimental. Assurez-vous d\'avoir une sauvegarde !</string>
+    <string name="settings_database_encryption_disable_title">Désactiver le chiffrement de la base de données ?</string>
+    <string name="settings_database_encryption_disable_message">Cela déchiffrera votre base de données et supprimera le chiffrement. L\'application redémarrera pour appliquer les modifications.</string>
+    <string name="settings_database_encryption_enabled">Chiffrement de la base de données activé</string>
+    <string name="settings_database_encryption_disabled">Chiffrement de la base de données désactivé</string>
+    <string name="settings_database_encryption_error">Échec de modification du paramètre de chiffrement</string>
+    <string name="settings_database_encryption_password_required_title">Mot de passe d\'application requis</string>
+    <string name="settings_database_encryption_password_required_message">Le chiffrement de la base de données utilise votre mot de passe d\'application pour générer la clé de chiffrement. Veuillez d\'abord définir un mot de passe d\'application en activant « Verrouillage de l\'application » ci-dessus.\n\nUne fois défini, vous pouvez activer le chiffrement de la base de données en utilisant le même mot de passe - aucun mot de passe séparé n\'est nécessaire.</string>
 
     <!-- Authentication Dialog -->
-    <string name="auth_dialog_title">Set App Password</string>
-    <string name="auth_dialog_change_title">Change Password</string>
-    <string name="auth_dialog_change_message">Note: If database encryption is enabled, it will be automatically updated to use the new password.</string>
-    <string name="auth_dialog_current_password">Current Password</string>
-    <string name="auth_dialog_new_password">New Password</string>
-    <string name="auth_dialog_confirm_password">Confirm Password</string>
-    <string name="auth_dialog_set">Set Password</string>
-    <string name="auth_dialog_change">Change Password</string>
-    <string name="auth_error_passwords_dont_match">Passwords don\'t match</string>
-    <string name="auth_error_password_too_short">Password must be at least 4 characters</string>
-    <string name="auth_error_current_password_wrong">Current password is incorrect</string>
-    <string name="auth_password_set">Password set successfully</string>
-    <string name="auth_password_changed">Password changed successfully</string>
-    <string name="auth_enter_password_to_encrypt">Verify Your App Password</string>
-    <string name="auth_enter_password_to_decrypt">Verify Your App Password</string>
-    <string name="auth_password_for_encryption">Enter your existing app password to enable database encryption.\n\nYour app password will be used to derive the encryption key. No separate password is needed.</string>
-    <string name="auth_password_for_decryption">Enter your app password to verify and decrypt the database before disabling encryption.</string>
-    <string name="auth_encrypting_database">Encrypting database with your app password…</string>
-    <string name="auth_decrypting_database">Decrypting database…</string>
-    <string name="auth_rekeying_database">Updating database encryption with new password…</string>
+    <string name="auth_dialog_title">Définir le mot de passe de l\'application</string>
+    <string name="auth_dialog_change_title">Changer le mot de passe</string>
+    <string name="auth_dialog_change_message">Remarque : Si le chiffrement de la base de données est activé, il sera automatiquement mis à jour pour utiliser le nouveau mot de passe.</string>
+    <string name="auth_dialog_current_password">Mot de passe actuel</string>
+    <string name="auth_dialog_new_password">Nouveau mot de passe</string>
+    <string name="auth_dialog_confirm_password">Confirmer le mot de passe</string>
+    <string name="auth_dialog_set">Définir le mot de passe</string>
+    <string name="auth_dialog_change">Changer le mot de passe</string>
+    <string name="auth_error_passwords_dont_match">Les mots de passe ne correspondent pas</string>
+    <string name="auth_error_password_too_short">Le mot de passe doit contenir au moins 4 caractères</string>
+    <string name="auth_error_current_password_wrong">Le mot de passe actuel est incorrect</string>
+    <string name="auth_password_set">Mot de passe défini avec succès</string>
+    <string name="auth_password_changed">Mot de passe modifié avec succès</string>
+    <string name="auth_enter_password_to_encrypt">Vérifiez votre mot de passe d\'application</string>
+    <string name="auth_enter_password_to_decrypt">Vérifiez votre mot de passe d\'application</string>
+    <string name="auth_password_for_encryption">Entrez votre mot de passe d\'application existant pour activer le chiffrement de la base de données.\n\nVotre mot de passe d\'application sera utilisé pour dériver la clé de chiffrement. Aucun mot de passe séparé n\'est nécessaire.</string>
+    <string name="auth_password_for_decryption">Entrez votre mot de passe d\'application pour vérifier et déchiffrer la base de données avant de désactiver le chiffrement.</string>
+    <string name="auth_encrypting_database">Chiffrement de la base de données avec votre mot de passe d\'application…</string>
+    <string name="auth_decrypting_database">Déchiffrement de la base de données…</string>
+    <string name="auth_rekeying_database">Mise à jour du chiffrement de la base de données avec le nouveau mot de passe…</string>
 
     <!-- Authentication Activity -->
-    <string name="auth_unlock_app">Unlock deutsia radio</string>
-    <string name="auth_enter_password">Enter your password</string>
-    <string name="auth_password_hint">Password</string>
-    <string name="auth_unlock_button">Unlock</string>
-    <string name="auth_use_biometric">Use Biometric</string>
-    <string name="auth_error_wrong_password">Wrong password</string>
-    <string name="auth_biometric_title">Unlock deutsia radio</string>
-    <string name="auth_biometric_subtitle">Authenticate to continue</string>
-    <string name="auth_biometric_negative">Use Password</string>
+    <string name="auth_unlock_app">Déverrouiller deutsia radio</string>
+    <string name="auth_enter_password">Entrez votre mot de passe</string>
+    <string name="auth_password_hint">Mot de passe</string>
+    <string name="auth_unlock_button">Déverrouiller</string>
+    <string name="auth_use_biometric">Utiliser la biométrie</string>
+    <string name="auth_error_wrong_password">Mot de passe incorrect</string>
+    <string name="auth_biometric_title">Déverrouiller deutsia radio</string>
+    <string name="auth_biometric_subtitle">Authentifiez-vous pour continuer</string>
+    <string name="auth_biometric_negative">Utiliser le mot de passe</string>
 </resources>

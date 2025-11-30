@@ -1,35 +1,35 @@
 <resources>
     <string name="app_name">deutsia radio</string>
-    <string name="tab_radios">Library</string>
-    <string name="tab_now_playing">Now Playing</string>
-    <string name="tab_settings">Settings</string>
+    <string name="tab_radios">लाइब्रेरी</string>
+    <string name="tab_now_playing">अभी चल रहा है</string>
+    <string name="tab_settings">सेटिंग्स</string>
 
     <!-- Equalizer -->
-    <string name="equalizer">Equalizer</string>
-    <string name="equalizer_no_audio">Start playing a station first</string>
-    <string name="equalizer_not_found">No equalizer app found. Install an equalizer app like Wavelet.</string>
-    <string name="equalizer_preset">Preset</string>
-    <string name="equalizer_custom">Custom</string>
-    <string name="equalizer_reset">Reset to Flat</string>
-    <string name="equalizer_init_failed">Could not initialize equalizer</string>
-    <string name="equalizer_bass_boost">Bass Booster</string>
-    <string name="equalizer_surround_sound">Surround Sound</string>
+    <string name="equalizer">इक्वलाइज़र</string>
+    <string name="equalizer_no_audio">पहले एक स्टेशन चलाएं</string>
+    <string name="equalizer_not_found">कोई इक्वलाइज़र ऐप नहीं मिला। Wavelet जैसा इक्वलाइज़र ऐप इंस्टॉल करें।</string>
+    <string name="equalizer_preset">प्रीसेट</string>
+    <string name="equalizer_custom">कस्टम</string>
+    <string name="equalizer_reset">फ्लैट पर रीसेट करें</string>
+    <string name="equalizer_init_failed">इक्वलाइज़र को इनिशियलाइज़ नहीं किया जा सका</string>
+    <string name="equalizer_bass_boost">बास बूस्टर</string>
+    <string name="equalizer_surround_sound">सराउंड साउंड</string>
 
     <!-- Sort options -->
-    <string name="sort_default">Default</string>
-    <string name="sort_name">Name</string>
-    <string name="sort_recent">Recent</string>
-    <string name="sort_liked">Liked</string>
-    <string name="sort_genre">Genre</string>
+    <string name="sort_default">डिफ़ॉल्ट</string>
+    <string name="sort_name">नाम</string>
+    <string name="sort_recent">हाल के</string>
+    <string name="sort_liked">पसंदीदा</string>
+    <string name="sort_genre">शैली</string>
 
     <!-- Search -->
-    <string name="search_stations">Search library</string>
-    <string name="search_countries">Search countries…</string>
-    <string name="search_genres">Search genres…</string>
+    <string name="search_stations">लाइब्रेरी खोजें</string>
+    <string name="search_countries">देश खोजें…</string>
+    <string name="search_genres">शैली खोजें…</string>
 
     <!-- Genre filter -->
-    <string name="genre_all">All Genres</string>
-    <string name="filter_by_genre">Filter by Genre</string>
+    <string name="genre_all">सभी शैलियां</string>
+    <string name="filter_by_genre">शैली के अनुसार फ़िल्टर करें</string>
 
     <!-- Genre Names -->
     <string name="genre_alternative">Alternative</string>
@@ -52,7 +52,7 @@
     <string name="genre_latin">Latin</string>
     <string name="genre_lo_fi">Lo-Fi</string>
     <string name="genre_metal">Metal</string>
-    <string name="genre_news">News</string>
+    <string name="genre_news">समाचार</string>
     <string name="genre_oldies">Oldies</string>
     <string name="genre_pop">Pop</string>
     <string name="genre_punk">Punk</string>
@@ -60,108 +60,108 @@
     <string name="genre_reggae">Reggae</string>
     <string name="genre_rock">Rock</string>
     <string name="genre_soul">Soul</string>
-    <string name="genre_sports">Sports</string>
-    <string name="genre_talk">Talk</string>
-    <string name="genre_world">World</string>
-    <string name="genre_other">Other</string>
+    <string name="genre_sports">खेल</string>
+    <string name="genre_talk">बातचीत</string>
+    <string name="genre_world">विश्व</string>
+    <string name="genre_other">अन्य</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with Orbot integration and configurable leak prevention</string>
+    <string name="about_description">deutsia radio एक मुफ़्त और ओपन-सोर्स मल्टीनेट रेडियो प्लेयर है जो clearnet, Tor (.onion) और I2P नेटवर्क से स्ट्रीम को एक साथ लाता है। Material You इंटरफ़ेस में Orbot एकीकरण और कॉन्फ़िगर करने योग्य लीक रोकथाम के साथ अपने पसंदीदा स्टेशनों का आनंद लें</string>
 
     <!-- Browse/Discover Stations -->
-    <string name="tab_browse">Browse</string>
-    <string name="search_radio_browser">Search thousands of stations…</string>
-    <string name="browse_top_voted">Top Voted</string>
-    <string name="browse_popular">Popular</string>
-    <string name="browse_random">Random</string>
-    <string name="browse_history">History</string>
-    <string name="browse_no_results">No Stations Found</string>
-    <string name="browse_no_results_hint">Try a different search or filter</string>
-    <string name="filter_country">Country</string>
-    <string name="filter_genre">Genre</string>
-    <string name="filter_language">Language</string>
-    <string name="filter_all_countries">All Countries</string>
-    <string name="filter_all_genres">All Genres</string>
-    <string name="filter_all_languages">All Languages</string>
-    <string name="select_country">Select Country</string>
-    <string name="select_genre">Select Genre</string>
-    <string name="select_language">Select Language</string>
-    <string name="loading_countries">Loading countries…</string>
-    <string name="loading_genres">Loading genres…</string>
-    <string name="loading_languages">Loading languages…</string>
-    <string name="search_languages">Search languages…</string>
-    <string name="station_saved">%s added to library</string>
-    <string name="station_removed">%s removed from library</string>
-    <string name="station_added_to_favorites">%s added to favorites</string>
-    <string name="station_removed_from_favorites">%s removed from favorites</string>
-    <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
+    <string name="tab_browse">ब्राउज़ करें</string>
+    <string name="search_radio_browser">हजारों स्टेशनों को खोजें…</string>
+    <string name="browse_top_voted">सबसे अधिक वोट वाले</string>
+    <string name="browse_popular">लोकप्रिय</string>
+    <string name="browse_random">यादृच्छिक</string>
+    <string name="browse_history">इतिहास</string>
+    <string name="browse_no_results">कोई स्टेशन नहीं मिला</string>
+    <string name="browse_no_results_hint">एक अलग खोज या फ़िल्टर आज़माएं</string>
+    <string name="filter_country">देश</string>
+    <string name="filter_genre">शैली</string>
+    <string name="filter_language">भाषा</string>
+    <string name="filter_all_countries">सभी देश</string>
+    <string name="filter_all_genres">सभी शैलियां</string>
+    <string name="filter_all_languages">सभी भाषाएं</string>
+    <string name="select_country">देश चुनें</string>
+    <string name="select_genre">शैली चुनें</string>
+    <string name="select_language">भाषा चुनें</string>
+    <string name="loading_countries">देश लोड हो रहे हैं…</string>
+    <string name="loading_genres">शैलियां लोड हो रही हैं…</string>
+    <string name="loading_languages">भाषाएं लोड हो रही हैं…</string>
+    <string name="search_languages">भाषाएं खोजें…</string>
+    <string name="station_saved">%s लाइब्रेरी में जोड़ा गया</string>
+    <string name="station_removed">%s लाइब्रेरी से हटाया गया</string>
+    <string name="station_added_to_favorites">%s पसंदीदा में जोड़ा गया</string>
+    <string name="station_removed_from_favorites">%s पसंदीदा से हटाया गया</string>
+    <string name="tor_required_warning">Tor को फ़ोर्स करें सक्षम है लेकिन Tor कनेक्ट नहीं है। स्टेशनों को ब्राउज़ करने के लिए Tor से कनेक्ट करें।</string>
 
     <!-- Notification and Status Messages -->
-    <string name="notification_connecting">Connecting...</string>
-    <string name="notification_paused">Paused</string>
-    <string name="notification_playing">Playing</string>
-    <string name="notification_playing_recording">Playing • Recording</string>
-    <string name="notification_buffering">Buffering...</string>
-    <string name="notification_reconnecting">Reconnecting...</string>
-    <string name="notification_connection_failed">Connection failed</string>
-    <string name="notification_tor_blocked">Tor not connected - stream blocked</string>
-    <string name="notification_audio_focus_denied">Audio focus denied</string>
-    <string name="notification_channel_name">deutsia radio Playback</string>
-    <string name="notification_channel_description">Shows radio playback status</string>
-    <string name="notification_action_pause">Pause</string>
-    <string name="notification_action_stop">Stop</string>
+    <string name="notification_connecting">कनेक्ट हो रहा है...</string>
+    <string name="notification_paused">रोका गया</string>
+    <string name="notification_playing">चल रहा है</string>
+    <string name="notification_playing_recording">चल रहा है • रिकॉर्डिंग</string>
+    <string name="notification_buffering">बफ़र हो रहा है...</string>
+    <string name="notification_reconnecting">फिर से कनेक्ट हो रहा है...</string>
+    <string name="notification_connection_failed">कनेक्शन विफल</string>
+    <string name="notification_tor_blocked">Tor कनेक्ट नहीं है - स्ट्रीम ब्लॉक हुई</string>
+    <string name="notification_audio_focus_denied">ऑडियो फ़ोकस अस्वीकृत</string>
+    <string name="notification_channel_name">deutsia radio प्लेबैक</string>
+    <string name="notification_channel_description">रेडियो प्लेबैक स्थिति दिखाता है</string>
+    <string name="notification_action_pause">रोकें</string>
+    <string name="notification_action_stop">बंद करें</string>
 
     <!-- Recording Messages -->
-    <string name="recording_failed">Recording failed: %s</string>
-    <string name="recording_saved">Recording saved: %s (%dKB)</string>
-    <string name="recording_stopping">Stopping recording...</string>
-    <string name="recording_starting">Starting recording...</string>
-    <string name="recording_no_station">No station playing</string>
-    <string name="recording_directory_updated">Recording directory updated</string>
+    <string name="recording_failed">रिकॉर्डिंग विफल: %s</string>
+    <string name="recording_saved">रिकॉर्डिंग सहेजी गई: %s (%dKB)</string>
+    <string name="recording_stopping">रिकॉर्डिंग बंद हो रही है...</string>
+    <string name="recording_starting">रिकॉर्डिंग शुरू हो रही है...</string>
+    <string name="recording_no_station">कोई स्टेशन नहीं चल रहा</string>
+    <string name="recording_directory_updated">रिकॉर्डिंग निर्देशिका अपडेट हुई</string>
 
     <!-- Dialog Titles and Buttons -->
-    <string name="dialog_add_station">Add Radio Station</string>
-    <string name="dialog_edit_station">Edit Radio Station</string>
-    <string name="dialog_sort_stations">Sort Stations</string>
-    <string name="dialog_delete_stations">Delete stations</string>
-    <string name="button_save">Save</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="button_import">Import</string>
-    <string name="button_export">Export</string>
-    <string name="button_open">Open</string>
-    <string name="button_configure">Configure</string>
-    <string name="button_apply">Apply</string>
-    <string name="button_reset">Reset</string>
-    <string name="button_change">Change</string>
-    <string name="button_start">Start</string>
-    <string name="button_test_connection">Test Connection</string>
-    <string name="hint_test_connection_disclaimer">Note: Testing will connect to httpbin.org via your proxy</string>
-    <string name="button_choose_image">Choose Image</string>
-    <string name="button_clear">Clear</string>
+    <string name="dialog_add_station">रेडियो स्टेशन जोड़ें</string>
+    <string name="dialog_edit_station">रेडियो स्टेशन संपादित करें</string>
+    <string name="dialog_sort_stations">स्टेशन क्रमबद्ध करें</string>
+    <string name="dialog_delete_stations">स्टेशन हटाएं</string>
+    <string name="button_save">सहेजें</string>
+    <string name="button_cancel">रद्द करें</string>
+    <string name="button_import">आयात करें</string>
+    <string name="button_export">निर्यात करें</string>
+    <string name="button_open">खोलें</string>
+    <string name="button_configure">कॉन्फ़िगर करें</string>
+    <string name="button_apply">लागू करें</string>
+    <string name="button_reset">रीसेट करें</string>
+    <string name="button_change">बदलें</string>
+    <string name="button_start">शुरू करें</string>
+    <string name="button_test_connection">कनेक्शन परीक्षण करें</string>
+    <string name="hint_test_connection_disclaimer">नोट: परीक्षण आपके प्रॉक्सी के माध्यम से httpbin.org से कनेक्ट होगा</string>
+    <string name="button_choose_image">छवि चुनें</string>
+    <string name="button_clear">साफ़ करें</string>
 
     <!-- Settings - Appearance -->
-    <string name="settings_appearance">Appearance</string>
-    <string name="settings_theme">Theme</string>
-    <string name="settings_theme_description">Choose light, dark, or system</string>
-    <string name="settings_theme_system_default">System Default</string>
-    <string name="settings_theme_light">Light</string>
-    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_appearance">दिखावट</string>
+    <string name="settings_theme">थीम</string>
+    <string name="settings_theme_description">हल्का, गहरा या सिस्टम चुनें</string>
+    <string name="settings_theme_system_default">सिस्टम डिफ़ॉल्ट</string>
+    <string name="settings_theme_light">हल्का</string>
+    <string name="settings_theme_dark">गहरा</string>
     <string name="settings_material_you">Material You</string>
-    <string name="settings_material_you_description">Use wallpaper-based dynamic colors</string>
-    <string name="settings_color_scheme">Color Scheme</string>
-    <string name="settings_color_scheme_description">Choose your preferred color</string>
-    <string name="settings_color_blue">Blue</string>
-    <string name="settings_color_blue_default">Blue (Default)</string>
-    <string name="settings_color_peach">Peach</string>
-    <string name="settings_color_green">Green</string>
-    <string name="settings_color_purple">Purple</string>
-    <string name="settings_color_orange">Orange</string>
-    <string name="settings_language">Language</string>
-    <string name="settings_language_description">Choose your preferred language</string>
+    <string name="settings_material_you_description">वॉलपेपर-आधारित डायनामिक रंगों का उपयोग करें</string>
+    <string name="settings_color_scheme">रंग योजना</string>
+    <string name="settings_color_scheme_description">अपना पसंदीदा रंग चुनें</string>
+    <string name="settings_color_blue">नीला</string>
+    <string name="settings_color_blue_default">नीला (डिफ़ॉल्ट)</string>
+    <string name="settings_color_peach">आड़ू</string>
+    <string name="settings_color_green">हरा</string>
+    <string name="settings_color_purple">बैंगनी</string>
+    <string name="settings_color_orange">नारंगी</string>
+    <string name="settings_language">भाषा</string>
+    <string name="settings_language_description">अपनी पसंदीदा भाषा चुनें</string>
 
     <!-- Language Names -->
-    <string name="language_choose">Choose Language</string>
-    <string name="language_system_default">System Default</string>
+    <string name="language_choose">भाषा चुनें</string>
+    <string name="language_system_default">सिस्टम डिफ़ॉल्ट</string>
     <string name="language_arabic">العربية</string>
     <string name="language_german">Deutsch</string>
     <string name="language_english">English</string>
@@ -181,192 +181,192 @@
     <string name="language_chinese">中文</string>
 
     <!-- Settings - Tor Network -->
-    <string name="settings_tor_network">Tor Network</string>
-    <string name="settings_enable_tor">Enable Tor (via Orbot)</string>
-    <string name="settings_enable_tor_description">Connect through the Tor network</string>
-    <string name="settings_tor_disconnected">Disconnected</string>
-    <string name="settings_tor_not_running">Tor is not running</string>
-    <string name="settings_force_tor">Force Tor Over Everything</string>
-    <string name="settings_force_tor_description">Route all streams through Tor. Won\'t connect without Tor.</string>
-    <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
-    <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
-    <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_network">Tor नेटवर्क</string>
+    <string name="settings_enable_tor">Tor सक्षम करें (Orbot के माध्यम से)</string>
+    <string name="settings_enable_tor_description">Tor नेटवर्क के माध्यम से कनेक्ट करें</string>
+    <string name="settings_tor_disconnected">डिसकनेक्ट किया गया</string>
+    <string name="settings_tor_not_running">Tor चल नहीं रहा है</string>
+    <string name="settings_force_tor">सब कुछ के लिए Tor फ़ोर्स करें</string>
+    <string name="settings_force_tor_description">सभी स्ट्रीम को Tor के माध्यम से रूट करें। Tor के बिना कनेक्ट नहीं होगा।</string>
+    <string name="settings_force_tor_except_i2p">I2P को छोड़कर Tor फ़ोर्स करें</string>
+    <string name="settings_force_tor_except_i2p_description">clearnet को Tor के माध्यम से रूट करें, I2P स्ट्रीम सीधे I2P प्रॉक्सी पर।</string>
+    <string name="settings_tor_info">Orbot की आवश्यकता है (Play Store या F-Droid से मुफ़्त)। त्वरित पहुंच के लिए टूलबार में Tor आइकन पर टैप करें।\n\nफ़ोर्स मोड Tor उपलब्ध न होने पर कनेक्शन ब्लॉक करते हैं।</string>
 
     <!-- Settings - Custom Proxy -->
-    <string name="settings_custom_proxy">Custom Proxy</string>
-    <string name="settings_enable_custom_proxy">Enable Custom Proxy</string>
-    <string name="settings_enable_custom_proxy_description">Use custom proxy for connections</string>
-    <string name="settings_configure_proxy">Configure Global Proxy</string>
-    <string name="settings_configure_proxy_description">Set up your custom proxy settings</string>
-    <string name="settings_force_custom_proxy">Force Custom Proxy</string>
-    <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
+    <string name="settings_custom_proxy">कस्टम प्रॉक्सी</string>
+    <string name="settings_enable_custom_proxy">कस्टम प्रॉक्सी सक्षम करें</string>
+    <string name="settings_enable_custom_proxy_description">कनेक्शन के लिए कस्टम प्रॉक्सी का उपयोग करें</string>
+    <string name="settings_configure_proxy">ग्लोबल प्रॉक्सी कॉन्फ़िगर करें</string>
+    <string name="settings_configure_proxy_description">अपनी कस्टम प्रॉक्सी सेटिंग्स सेट करें</string>
+    <string name="settings_force_custom_proxy">कस्टम प्रॉक्सी फ़ोर्स करें</string>
+    <string name="settings_force_custom_proxy_description">सभी ट्रैफ़िक को कस्टम प्रॉक्सी के माध्यम से रूट करें। प्रॉक्सी के बिना कनेक्ट नहीं होगा।</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2P स्टेशनों को छोड़कर कस्टम प्रॉक्सी फ़ोर्स करें</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">सभी clearnet ट्रैफ़िक को कस्टम प्रॉक्सी के माध्यम से रूट करें, लेकिन Tor और I2P स्टेशनों को उनके मूल प्रॉक्सी का उपयोग करने दें।</string>
 
     <!-- Settings - Bandwidth -->
-    <string name="settings_bandwidth_usage">Bandwidth Usage</string>
-    <string name="settings_total_usage">Total Usage (Lifetime)</string>
-    <string name="settings_session_usage">Session Usage</string>
+    <string name="settings_bandwidth_usage">बैंडविड्थ उपयोग</string>
+    <string name="settings_total_usage">कुल उपयोग (जीवनकाल)</string>
+    <string name="settings_session_usage">सत्र उपयोग</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
     <!-- Settings - Playback -->
-    <string name="settings_playback">Playback</string>
-    <string name="settings_sleep_timer">Sleep Timer</string>
-    <string name="settings_sleep_timer_description">Auto-stop playback after set time</string>
-    <string name="settings_sleep_timer_off">Off</string>
-    <string name="settings_sleep_timer_15min">15 minutes</string>
-    <string name="settings_sleep_timer_30min">30 minutes</string>
-    <string name="settings_sleep_timer_45min">45 minutes</string>
-    <string name="settings_sleep_timer_60min">60 minutes</string>
-    <string name="settings_sleep_timer_90min">90 minutes</string>
-    <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
-    <string name="settings_recording_directory">Recording Directory</string>
-    <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
-    <string name="settings_recording_directory_choose">Choose custom folder...</string>
-    <string name="settings_recording_directory_clear">Clear custom folder</string>
-    <string name="settings_record_across_stations">Record Across Stations</string>
-    <string name="settings_record_across_stations_description">Keep recording when switching stations</string>
-    <string name="settings_record_all_stations">Record All Stations</string>
-    <string name="settings_record_all_stations_description">Switch to new station\'s stream in same file</string>
+    <string name="settings_playback">प्लेबैक</string>
+    <string name="settings_sleep_timer">स्लीप टाइमर</string>
+    <string name="settings_sleep_timer_description">निर्धारित समय के बाद स्वचालित रूप से प्लेबैक बंद करें</string>
+    <string name="settings_sleep_timer_off">बंद</string>
+    <string name="settings_sleep_timer_15min">15 मिनट</string>
+    <string name="settings_sleep_timer_30min">30 मिनट</string>
+    <string name="settings_sleep_timer_45min">45 मिनट</string>
+    <string name="settings_sleep_timer_60min">60 मिनट</string>
+    <string name="settings_sleep_timer_90min">90 मिनट</string>
+    <string name="settings_equalizer_description">ऑडियो फ़्रीक्वेंसी बैंड और प्रभाव समायोजित करें</string>
+    <string name="settings_recording_directory">रिकॉर्डिंग निर्देशिका</string>
+    <string name="settings_recording_directory_default">डिफ़ॉल्ट (संगीत/deutsia_radio)</string>
+    <string name="settings_recording_directory_choose">कस्टम फ़ोल्डर चुनें...</string>
+    <string name="settings_recording_directory_clear">कस्टम फ़ोल्डर साफ़ करें</string>
+    <string name="settings_record_across_stations">स्टेशनों में रिकॉर्ड करें</string>
+    <string name="settings_record_across_stations_description">स्टेशन बदलते समय रिकॉर्डिंग जारी रखें</string>
+    <string name="settings_record_all_stations">सभी स्टेशन रिकॉर्ड करें</string>
+    <string name="settings_record_all_stations_description">एक ही फ़ाइल में नए स्टेशन की स्ट्रीम पर स्विच करें</string>
 
     <!-- Settings - Station Management -->
-    <string name="settings_station_management">Station Management</string>
-    <string name="settings_import_from_file">Import from File</string>
-    <string name="settings_import_from_file_description">Import from CSV, JSON, M3U, or PLS</string>
-    <string name="settings_import_i2p_stations">Import I2P Stations</string>
-    <string name="settings_import_i2p_stations_description">14 curated I2P radio stations</string>
-    <string name="settings_import_tor_stations">Import Tor Stations</string>
-    <string name="settings_import_tor_stations_description">3 curated Tor radio stations</string>
-    <string name="settings_export_stations">Export Stations</string>
-    <string name="settings_export_stations_description">Export your stations to a file</string>
+    <string name="settings_station_management">स्टेशन प्रबंधन</string>
+    <string name="settings_import_from_file">फ़ाइल से आयात करें</string>
+    <string name="settings_import_from_file_description">CSV, JSON, M3U या PLS से आयात करें</string>
+    <string name="settings_import_i2p_stations">I2P स्टेशन आयात करें</string>
+    <string name="settings_import_i2p_stations_description">14 चुनिंदा I2P रेडियो स्टेशन</string>
+    <string name="settings_import_tor_stations">Tor स्टेशन आयात करें</string>
+    <string name="settings_import_tor_stations_description">3 चुनिंदा Tor रेडियो स्टेशन</string>
+    <string name="settings_export_stations">स्टेशन निर्यात करें</string>
+    <string name="settings_export_stations_description">अपने स्टेशनों को फ़ाइल में निर्यात करें</string>
 
     <!-- Settings - About -->
-    <string name="settings_about">About</string>
-    <string name="settings_version">Version 1.1</string>
-    <string name="settings_view_github">View on GitHub</string>
-    <string name="settings_donate">Donate</string>
-    <string name="settings_donate_description">If this app helped you out, consider donating</string>
+    <string name="settings_about">के बारे में</string>
+    <string name="settings_version">संस्करण 1.1</string>
+    <string name="settings_view_github">GitHub पर देखें</string>
+    <string name="settings_donate">दान करें</string>
+    <string name="settings_donate_description">यदि इस ऐप ने आपकी मदद की, तो दान करने पर विचार करें</string>
     <string name="settings_monero">Monero (XMR)</string>
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
-    <string name="settings_copy_address">Copy Address</string>
+    <string name="settings_copy_address">पता कॉपी करें</string>
 
     <!-- Tor Control Bottom Sheet -->
-    <string name="tor_connection_details">Connection Details</string>
-    <string name="tor_proxy_host">Proxy Host</string>
-    <string name="tor_socks_port">SOCKS Port</string>
-    <string name="tor_what_is_orbot">What is Orbot?</string>
-    <string name="tor_orbot_description">Orbot is the official Tor client for Android. It provides secure, encrypted access to the Tor network.</string>
-    <string name="tor_connect">Connect to Tor</string>
-    <string name="tor_open_orbot">Open Orbot</string>
+    <string name="tor_connection_details">कनेक्शन विवरण</string>
+    <string name="tor_proxy_host">प्रॉक्सी होस्ट</string>
+    <string name="tor_socks_port">SOCKS पोर्ट</string>
+    <string name="tor_what_is_orbot">Orbot क्या है?</string>
+    <string name="tor_orbot_description">Orbot Android के लिए आधिकारिक Tor क्लाइंट है। यह Tor नेटवर्क तक सुरक्षित, एन्क्रिप्टेड पहुंच प्रदान करता है।</string>
+    <string name="tor_connect">Tor से कनेक्ट करें</string>
+    <string name="tor_open_orbot">Orbot खोलें</string>
 
     <!-- Tor Status Messages -->
-    <string name="tor_status_connecting">Connecting...</string>
-    <string name="tor_status_connected">Tor Connected</string>
-    <string name="tor_status_disconnected">Tor Disconnected</string>
-    <string name="tor_status_off">Tor Off</string>
-    <string name="tor_status_error">Tor Error</string>
-    <string name="tor_status_leak_warning">Leak Warning</string>
-    <string name="tor_status_install_orbot">Install Orbot</string>
-    <string name="tor_status_connecting_message">Connecting to Tor...</string>
-    <string name="tor_status_connected_message">Connected via Tor</string>
-    <string name="tor_control_title_stopped">Tor Disconnected</string>
-    <string name="tor_control_subtitle_stopped">Tap Connect to browse anonymously via Tor</string>
-    <string name="tor_control_subtitle_connecting">Establishing secure connection via Orbot</string>
-    <string name="tor_control_title_connecting">Connecting to Tor...</string>
-    <string name="tor_control_title_connected">Connected to Tor</string>
-    <string name="tor_control_title_connected_force">Connected to Tor (Force Mode)</string>
-    <string name="tor_control_subtitle_connected">Your connection is private and anonymous</string>
-    <string name="tor_control_subtitle_connected_force">Disconnect via Orbot or disable Force Tor in settings</string>
-    <string name="tor_control_title_error">Connection Failed</string>
-    <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
-    <string name="tor_control_title_orbot_required">Orbot Required</string>
-    <string name="tor_control_subtitle_orbot_required">Install Orbot to connect to the Tor network</string>
-    <string name="tor_control_button_connecting">Connecting...</string>
-    <string name="tor_control_button_disconnect">Disconnect</string>
-    <string name="tor_control_button_cancel">Cancel</string>
-    <string name="tor_control_button_retry">Retry Connection</string>
-    <string name="tor_control_button_install">Install Orbot</string>
-    <string name="tor_control_button_open_orbot">Open Orbot</string>
+    <string name="tor_status_connecting">कनेक्ट हो रहा है...</string>
+    <string name="tor_status_connected">Tor कनेक्ट किया गया</string>
+    <string name="tor_status_disconnected">Tor डिसकनेक्ट किया गया</string>
+    <string name="tor_status_off">Tor बंद</string>
+    <string name="tor_status_error">Tor त्रुटि</string>
+    <string name="tor_status_leak_warning">लीक चेतावनी</string>
+    <string name="tor_status_install_orbot">Orbot इंस्टॉल करें</string>
+    <string name="tor_status_connecting_message">Tor से कनेक्ट हो रहा है...</string>
+    <string name="tor_status_connected_message">Tor के माध्यम से कनेक्ट किया गया</string>
+    <string name="tor_control_title_stopped">Tor डिसकनेक्ट किया गया</string>
+    <string name="tor_control_subtitle_stopped">Tor के माध्यम से गुमनाम रूप से ब्राउज़ करने के लिए कनेक्ट पर टैप करें</string>
+    <string name="tor_control_subtitle_connecting">Orbot के माध्यम से सुरक्षित कनेक्शन स्थापित हो रहा है</string>
+    <string name="tor_control_title_connecting">Tor से कनेक्ट हो रहा है...</string>
+    <string name="tor_control_title_connected">Tor से कनेक्ट किया गया</string>
+    <string name="tor_control_title_connected_force">Tor से कनेक्ट किया गया (फ़ोर्स मोड)</string>
+    <string name="tor_control_subtitle_connected">आपका कनेक्शन निजी और गुमनाम है</string>
+    <string name="tor_control_subtitle_connected_force">Orbot के माध्यम से डिसकनेक्ट करें या सेटिंग्स में Tor फ़ोर्स करें अक्षम करें</string>
+    <string name="tor_control_title_error">कनेक्शन विफल</string>
+    <string name="tor_control_subtitle_error">Tor नेटवर्क से कनेक्ट नहीं हो सका</string>
+    <string name="tor_control_title_orbot_required">Orbot आवश्यक</string>
+    <string name="tor_control_subtitle_orbot_required">Tor नेटवर्क से कनेक्ट करने के लिए Orbot इंस्टॉल करें</string>
+    <string name="tor_control_button_connecting">कनेक्ट हो रहा है...</string>
+    <string name="tor_control_button_disconnect">डिसकनेक्ट करें</string>
+    <string name="tor_control_button_cancel">रद्द करें</string>
+    <string name="tor_control_button_retry">कनेक्शन पुनः प्रयास करें</string>
+    <string name="tor_control_button_install">Orbot इंस्टॉल करें</string>
+    <string name="tor_control_button_open_orbot">Orbot खोलें</string>
 
-    
-    <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
-    <string name="add_edit_authentication_optional">Authentication (Optional)</string>
-    <string name="add_edit_advanced_options">Advanced Options</string>
-    <string name="add_edit_cover_art">Cover Art</string>
-    <string name="add_edit_or_enter_url">Or enter image URL</string>
+    <!-- Add/Edit Radio Dialog -->
+    <string name="add_edit_tor_info">एम्बेडेड Tor का उपयोग - कोई प्रॉक्सी कॉन्फ़िगरेशन आवश्यक नहीं</string>
+    <string name="add_edit_authentication_optional">प्रमाणीकरण (वैकल्पिक)</string>
+    <string name="add_edit_advanced_options">उन्नत विकल्प</string>
+    <string name="add_edit_cover_art">कवर आर्ट</string>
+    <string name="add_edit_or_enter_url">या छवि URL दर्ज करें</string>
 
     <!-- Input Hints -->
-    <string name="hint_station_name">Station Name</string>
-    <string name="hint_stream_url">Stream URL</string>
-    <string name="hint_genre">Genre</string>
-    <string name="hint_proxy_type">Proxy Type</string>
-    <string name="hint_proxy_host">Proxy Host</string>
-    <string name="hint_proxy_port">Proxy Port</string>
-    <string name="hint_protocol">Protocol</string>
-    <string name="hint_username_optional">Username (optional)</string>
-    <string name="hint_password_optional">Password (optional)</string>
-    <string name="hint_auth_method">Auth Method</string>
-    <string name="hint_connection_timeout">Connection Timeout (seconds)</string>
-    <string name="hint_cover_art_url">Cover Art URL (optional)</string>
-    <string name="hint_username_optional_caps">Username (Optional)</string>
-    <string name="hint_password_optional_caps">Password (Optional)</string>
-    <string name="hint_auth_type">Authentication Type</string>
+    <string name="hint_station_name">स्टेशन का नाम</string>
+    <string name="hint_stream_url">स्ट्रीम URL</string>
+    <string name="hint_genre">शैली</string>
+    <string name="hint_proxy_type">प्रॉक्सी प्रकार</string>
+    <string name="hint_proxy_host">प्रॉक्सी होस्ट</string>
+    <string name="hint_proxy_port">प्रॉक्सी पोर्ट</string>
+    <string name="hint_protocol">प्रोटोकॉल</string>
+    <string name="hint_username_optional">उपयोगकर्ता नाम (वैकल्पिक)</string>
+    <string name="hint_password_optional">पासवर्ड (वैकल्पिक)</string>
+    <string name="hint_auth_method">प्रमाणीकरण विधि</string>
+    <string name="hint_connection_timeout">कनेक्शन टाइमआउट (सेकंड)</string>
+    <string name="hint_cover_art_url">कवर आर्ट URL (वैकल्पिक)</string>
+    <string name="hint_username_optional_caps">उपयोगकर्ता नाम (वैकल्पिक)</string>
+    <string name="hint_password_optional_caps">पासवर्ड (वैकल्पिक)</string>
+    <string name="hint_auth_type">प्रमाणीकरण प्रकार</string>
 
     <!-- Default Values -->
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
-    <string name="default_auth_none">None</string>
+    <string name="default_auth_none">कोई नहीं</string>
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
     <!-- Now Playing Fragment -->
     <string name="now_playing_time_placeholder">00:00</string>
-    <string name="now_playing_live">LIVE</string>
-    <string name="now_playing_no_station">No Station Playing</string>
-    <string name="now_playing_no_station_subtitle">Select a station from the list</string>
-    <string name="now_playing_volume_title">Radio Volume</string>
-    <string name="now_playing_volume_description">Adjusts radio stream only</string>
+    <string name="now_playing_live">लाइव</string>
+    <string name="now_playing_no_station">कोई स्टेशन नहीं चल रहा</string>
+    <string name="now_playing_no_station_subtitle">सूची से एक स्टेशन चुनें</string>
+    <string name="now_playing_volume_title">रेडियो वॉल्यूम</string>
+    <string name="now_playing_volume_description">केवल रेडियो स्ट्रीम समायोजित करता है</string>
 
     <!-- Toast Messages -->
-    <string name="toast_session_bandwidth_reset">Session bandwidth reset</string>
-    <string name="toast_custom_proxy_saved">Custom proxy settings saved</string>
-    <string name="toast_custom_proxy_cleared">Custom proxy settings cleared</string>
-    <string name="toast_address_copied">Address copied to clipboard</string>
-    <string name="toast_using_default_directory">Using default directory</string>
+    <string name="toast_session_bandwidth_reset">सत्र बैंडविड्थ रीसेट</string>
+    <string name="toast_custom_proxy_saved">कस्टम प्रॉक्सी सेटिंग्स सहेजी गईं</string>
+    <string name="toast_custom_proxy_cleared">कस्टम प्रॉक्सी सेटिंग्स साफ़ हुईं</string>
+    <string name="toast_address_copied">पता क्लिपबोर्ड पर कॉपी किया गया</string>
+    <string name="toast_using_default_directory">डिफ़ॉल्ट निर्देशिका का उपयोग किया जा रहा है</string>
 
     <!-- Custom Proxy Status Messages -->
-    <string name="custom_proxy_status_connected">Connected</string>
-    <string name="custom_proxy_status_configured">Proxy configured</string>
-    <string name="custom_proxy_status_not_configured">Not Configured</string>
-    <string name="custom_proxy_status_no_proxy">No proxy set</string>
-    <string name="custom_proxy_status_leak_warning">Leak Warning</string>
-    <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+    <string name="custom_proxy_status_connected">कनेक्ट किया गया</string>
+    <string name="custom_proxy_status_configured">प्रॉक्सी कॉन्फ़िगर किया गया</string>
+    <string name="custom_proxy_status_not_configured">कॉन्फ़िगर नहीं किया गया</string>
+    <string name="custom_proxy_status_no_proxy">कोई प्रॉक्सी सेट नहीं</string>
+    <string name="custom_proxy_status_leak_warning">लीक चेतावनी</string>
+    <string name="custom_proxy_status_leak_detail">फ़ोर्स सक्षम लेकिन कॉन्फ़िगर नहीं</string>
 
     <!-- Tor Service Notification Messages -->
-    <string name="tor_channel_name">Tor Connection</string>
-    <string name="tor_channel_description">Shows Tor connection status</string>
-    <string name="tor_notification_disconnected">Tor Disconnected</string>
-    <string name="tor_notification_tap_to_open">Tap to open app</string>
-    <string name="tor_notification_connecting">Connecting via Orbot...</string>
-    <string name="tor_notification_please_wait">Please wait</string>
-    <string name="tor_notification_connected">Tor Connected</string>
-    <string name="tor_notification_error">Tor Error</string>
-    <string name="tor_notification_connection_failed">Connection failed</string>
-    <string name="tor_notification_orbot_required">Orbot Required</string>
-    <string name="tor_notification_install_orbot">Please install Orbot for Tor support</string>
-    <string name="tor_notification_action_stop">Stop Tor</string>
+    <string name="tor_channel_name">Tor कनेक्शन</string>
+    <string name="tor_channel_description">Tor कनेक्शन स्थिति दिखाता है</string>
+    <string name="tor_notification_disconnected">Tor डिसकनेक्ट किया गया</string>
+    <string name="tor_notification_tap_to_open">ऐप खोलने के लिए टैप करें</string>
+    <string name="tor_notification_connecting">Orbot के माध्यम से कनेक्ट हो रहा है...</string>
+    <string name="tor_notification_please_wait">कृपया प्रतीक्षा करें</string>
+    <string name="tor_notification_connected">Tor कनेक्ट किया गया</string>
+    <string name="tor_notification_error">Tor त्रुटि</string>
+    <string name="tor_notification_connection_failed">कनेक्शन विफल</string>
+    <string name="tor_notification_orbot_required">Orbot आवश्यक</string>
+    <string name="tor_notification_install_orbot">कृपया Tor समर्थन के लिए Orbot इंस्टॉल करें</string>
+    <string name="tor_notification_action_stop">Tor बंद करें</string>
 
     <!-- Other Error Messages -->
-    <string name="error_unknown">Unknown error</string>
-    <string name="folder_custom">Custom folder</string>
+    <string name="error_unknown">अज्ञात त्रुटि</string>
+    <string name="folder_custom">कस्टम फ़ोल्डर</string>
 
     <!-- AddEditRadioDialog Default Values -->
-    <string name="default_genre_other">Other</string>
-    <string name="default_proxy_none">None</string>
+    <string name="default_genre_other">अन्य</string>
+    <string name="default_proxy_none">कोई नहीं</string>
     <string name="default_proxy_i2p">I2P</string>
     <string name="default_proxy_tor">Tor</string>
-    <string name="default_proxy_custom">Custom</string>
+    <string name="default_proxy_custom">कस्टम</string>
     <string name="default_protocol_http">HTTP</string>
     <string name="default_protocol_https">HTTPS</string>
     <string name="default_protocol_socks4">SOCKS4</string>
@@ -377,58 +377,58 @@
     <string name="default_timeout_30">30</string>
 
     <!-- Security & Privacy -->
-    <string name="settings_security_privacy">Security &amp; Privacy</string>
-    <string name="settings_app_lock">App Lock</string>
-    <string name="settings_app_lock_description">Require password or biometric to unlock app</string>
-    <string name="settings_biometric_auth">Biometric Authentication</string>
-    <string name="settings_biometric_auth_description">Use fingerprint or face unlock</string>
-    <string name="settings_require_auth_on_launch">Require Auth on Launch</string>
-    <string name="settings_require_auth_on_launch_description">Always require authentication when opening app</string>
-    <string name="settings_set_password">Set Password</string>
-    <string name="settings_change_password">Change Password</string>
-    <string name="settings_database_encryption">Database Encryption</string>
-    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher using your app password (requires restart)</string>
-    <string name="settings_database_encryption_warning">Warning: This is an experimental feature. Make sure you have a backup before enabling!</string>
-    <string name="settings_database_encryption_enable_title">Enable Database Encryption?</string>
-    <string name="settings_database_encryption_enable_message">This will encrypt your entire radio database using your app password. The app will restart to apply changes.\n\nWARNING: This is experimental. Make sure you have a backup!</string>
-    <string name="settings_database_encryption_disable_title">Disable Database Encryption?</string>
-    <string name="settings_database_encryption_disable_message">This will decrypt your database and remove encryption. The app will restart to apply changes.</string>
-    <string name="settings_database_encryption_enabled">Database encryption enabled</string>
-    <string name="settings_database_encryption_disabled">Database encryption disabled</string>
-    <string name="settings_database_encryption_error">Failed to change encryption setting</string>
-    <string name="settings_database_encryption_password_required_title">App Password Required</string>
-    <string name="settings_database_encryption_password_required_message">Database encryption uses your app password to generate the encryption key. Please set an app password first by enabling \"App Lock\" above.\n\nOnce set, you can enable database encryption using the same password - no separate password needed.</string>
+    <string name="settings_security_privacy">सुरक्षा और गोपनीयता</string>
+    <string name="settings_app_lock">ऐप लॉक</string>
+    <string name="settings_app_lock_description">ऐप अनलॉक करने के लिए पासवर्ड या बायोमेट्रिक चाहिए</string>
+    <string name="settings_biometric_auth">बायोमेट्रिक प्रमाणीकरण</string>
+    <string name="settings_biometric_auth_description">फ़िंगरप्रिंट या फ़ेस अनलॉक का उपयोग करें</string>
+    <string name="settings_require_auth_on_launch">लॉन्च पर प्रमाणीकरण आवश्यक</string>
+    <string name="settings_require_auth_on_launch_description">ऐप खोलते समय हमेशा प्रमाणीकरण आवश्यक</string>
+    <string name="settings_set_password">पासवर्ड सेट करें</string>
+    <string name="settings_change_password">पासवर्ड बदलें</string>
+    <string name="settings_database_encryption">डेटाबेस एन्क्रिप्शन</string>
+    <string name="settings_database_encryption_description">अपने ऐप पासवर्ड का उपयोग करके SQLCipher के साथ संपूर्ण डेटाबेस एन्क्रिप्ट करें (पुनरारंभ आवश्यक)</string>
+    <string name="settings_database_encryption_warning">चेतावनी: यह एक प्रायोगिक सुविधा है। सक्षम करने से पहले सुनिश्चित करें कि आपके पास बैकअप है!</string>
+    <string name="settings_database_encryption_enable_title">डेटाबेस एन्क्रिप्शन सक्षम करें?</string>
+    <string name="settings_database_encryption_enable_message">यह आपके ऐप पासवर्ड का उपयोग करके आपके संपूर्ण रेडियो डेटाबेस को एन्क्रिप्ट करेगा। परिवर्तन लागू करने के लिए ऐप पुनरारंभ होगा।\n\nचेतावनी: यह प्रायोगिक है। सुनिश्चित करें कि आपके पास बैकअप है!</string>
+    <string name="settings_database_encryption_disable_title">डेटाबेस एन्क्रिप्शन अक्षम करें?</string>
+    <string name="settings_database_encryption_disable_message">यह आपके डेटाबेस को डिक्रिप्ट करेगा और एन्क्रिप्शन हटा देगा। परिवर्तन लागू करने के लिए ऐप पुनरारंभ होगा।</string>
+    <string name="settings_database_encryption_enabled">डेटाबेस एन्क्रिप्शन सक्षम</string>
+    <string name="settings_database_encryption_disabled">डेटाबेस एन्क्रिप्शन अक्षम</string>
+    <string name="settings_database_encryption_error">एन्क्रिप्शन सेटिंग बदलने में विफल</string>
+    <string name="settings_database_encryption_password_required_title">ऐप पासवर्ड आवश्यक</string>
+    <string name="settings_database_encryption_password_required_message">डेटाबेस एन्क्रिप्शन एन्क्रिप्शन कुंजी उत्पन्न करने के लिए आपके ऐप पासवर्ड का उपयोग करता है। कृपया पहले ऊपर \"ऐप लॉक\" सक्षम करके एक ऐप पासवर्ड सेट करें।\n\nएक बार सेट हो जाने पर, आप उसी पासवर्ड का उपयोग करके डेटाबेस एन्क्रिप्शन सक्षम कर सकते हैं - कोई अलग पासवर्ड आवश्यक नहीं।</string>
 
     <!-- Authentication Dialog -->
-    <string name="auth_dialog_title">Set App Password</string>
-    <string name="auth_dialog_change_title">Change Password</string>
-    <string name="auth_dialog_change_message">Note: If database encryption is enabled, it will be automatically updated to use the new password.</string>
-    <string name="auth_dialog_current_password">Current Password</string>
-    <string name="auth_dialog_new_password">New Password</string>
-    <string name="auth_dialog_confirm_password">Confirm Password</string>
-    <string name="auth_dialog_set">Set Password</string>
-    <string name="auth_dialog_change">Change Password</string>
-    <string name="auth_error_passwords_dont_match">Passwords don\'t match</string>
-    <string name="auth_error_password_too_short">Password must be at least 4 characters</string>
-    <string name="auth_error_current_password_wrong">Current password is incorrect</string>
-    <string name="auth_password_set">Password set successfully</string>
-    <string name="auth_password_changed">Password changed successfully</string>
-    <string name="auth_enter_password_to_encrypt">Verify Your App Password</string>
-    <string name="auth_enter_password_to_decrypt">Verify Your App Password</string>
-    <string name="auth_password_for_encryption">Enter your existing app password to enable database encryption.\n\nYour app password will be used to derive the encryption key. No separate password is needed.</string>
-    <string name="auth_password_for_decryption">Enter your app password to verify and decrypt the database before disabling encryption.</string>
-    <string name="auth_encrypting_database">Encrypting database with your app password…</string>
-    <string name="auth_decrypting_database">Decrypting database…</string>
-    <string name="auth_rekeying_database">Updating database encryption with new password…</string>
+    <string name="auth_dialog_title">ऐप पासवर्ड सेट करें</string>
+    <string name="auth_dialog_change_title">पासवर्ड बदलें</string>
+    <string name="auth_dialog_change_message">नोट: यदि डेटाबेस एन्क्रिप्शन सक्षम है, तो इसे स्वचालित रूप से नए पासवर्ड का उपयोग करने के लिए अपडेट किया जाएगा।</string>
+    <string name="auth_dialog_current_password">वर्तमान पासवर्ड</string>
+    <string name="auth_dialog_new_password">नया पासवर्ड</string>
+    <string name="auth_dialog_confirm_password">पासवर्ड पुष्टि करें</string>
+    <string name="auth_dialog_set">पासवर्ड सेट करें</string>
+    <string name="auth_dialog_change">पासवर्ड बदलें</string>
+    <string name="auth_error_passwords_dont_match">पासवर्ड मेल नहीं खाते</string>
+    <string name="auth_error_password_too_short">पासवर्ड कम से कम 4 वर्ण का होना चाहिए</string>
+    <string name="auth_error_current_password_wrong">वर्तमान पासवर्ड गलत है</string>
+    <string name="auth_password_set">पासवर्ड सफलतापूर्वक सेट किया गया</string>
+    <string name="auth_password_changed">पासवर्ड सफलतापूर्वक बदला गया</string>
+    <string name="auth_enter_password_to_encrypt">अपने ऐप पासवर्ड की पुष्टि करें</string>
+    <string name="auth_enter_password_to_decrypt">अपने ऐप पासवर्ड की पुष्टि करें</string>
+    <string name="auth_password_for_encryption">डेटाबेस एन्क्रिप्शन सक्षम करने के लिए अपना मौजूदा ऐप पासवर्ड दर्ज करें।\n\nआपके ऐप पासवर्ड का उपयोग एन्क्रिप्शन कुंजी प्राप्त करने के लिए किया जाएगा। कोई अलग पासवर्ड आवश्यक नहीं।</string>
+    <string name="auth_password_for_decryption">एन्क्रिप्शन अक्षम करने से पहले डेटाबेस को सत्यापित और डिक्रिप्ट करने के लिए अपना ऐप पासवर्ड दर्ज करें।</string>
+    <string name="auth_encrypting_database">आपके ऐप पासवर्ड के साथ डेटाबेस एन्क्रिप्ट हो रहा है…</string>
+    <string name="auth_decrypting_database">डेटाबेस डिक्रिप्ट हो रहा है…</string>
+    <string name="auth_rekeying_database">नए पासवर्ड के साथ डेटाबेस एन्क्रिप्शन अपडेट हो रहा है…</string>
 
     <!-- Authentication Activity -->
-    <string name="auth_unlock_app">Unlock deutsia radio</string>
-    <string name="auth_enter_password">Enter your password</string>
-    <string name="auth_password_hint">Password</string>
-    <string name="auth_unlock_button">Unlock</string>
-    <string name="auth_use_biometric">Use Biometric</string>
-    <string name="auth_error_wrong_password">Wrong password</string>
-    <string name="auth_biometric_title">Unlock deutsia radio</string>
-    <string name="auth_biometric_subtitle">Authenticate to continue</string>
-    <string name="auth_biometric_negative">Use Password</string>
+    <string name="auth_unlock_app">deutsia radio अनलॉक करें</string>
+    <string name="auth_enter_password">अपना पासवर्ड दर्ज करें</string>
+    <string name="auth_password_hint">पासवर्ड</string>
+    <string name="auth_unlock_button">अनलॉक करें</string>
+    <string name="auth_use_biometric">बायोमेट्रिक उपयोग करें</string>
+    <string name="auth_error_wrong_password">गलत पासवर्ड</string>
+    <string name="auth_biometric_title">deutsia radio अनलॉक करें</string>
+    <string name="auth_biometric_subtitle">जारी रखने के लिए प्रमाणीकरण करें</string>
+    <string name="auth_biometric_negative">पासवर्ड उपयोग करें</string>
 </resources>

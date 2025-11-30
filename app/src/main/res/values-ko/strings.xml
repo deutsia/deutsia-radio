@@ -160,11 +160,11 @@
     <string name="settings_color_purple">보라</string>
     <string name="settings_color_orange">주황</string>
     <string name="settings_language">언어</string>
-    <string name="settings_language_description">Choose your preferred language</string>
+    <string name="settings_language_description">원하는 언어를 선택하세요</string>
 
     <!-- Language Names -->
-    <string name="language_choose">Choose Language</string>
-    <string name="language_system_default">System Default</string>
+    <string name="language_choose">언어 선택</string>
+    <string name="language_system_default">시스템 기본값</string>
     <string name="language_arabic">العربية</string>
     <string name="language_german">Deutsch</string>
     <string name="language_english">English</string>
@@ -225,8 +225,8 @@
     <string name="settings_equalizer_description">오디오 주파수 대역 및 효과 조정</string>
     <string name="settings_recording_directory">녹음 디렉토리</string>
     <string name="settings_recording_directory_default">기본값 (Music/deutsia_radio)</string>
-    <string name="settings_recording_directory_choose">사용자 정의 폴더 선택...</string>
-    <string name="settings_recording_directory_clear">사용자 정의 폴더 지우기</string>
+    <string name="settings_recording_directory_choose">사용자 지정 폴더 선택...</string>
+    <string name="settings_recording_directory_clear">사용자 지정 폴더 지우기</string>
     <string name="settings_record_across_stations">방송국 간 녹음</string>
     <string name="settings_record_across_stations_description">방송국을 전환할 때 녹음 계속</string>
     <string name="settings_record_all_stations">모든 방송국 녹음</string>
