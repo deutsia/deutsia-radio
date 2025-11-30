@@ -54,8 +54,10 @@ class AuthenticationActivity : AppCompatActivity() {
         // Setup biometric button
         val isBiometricEnabled = PreferencesHelper.isBiometricEnabled(this)
         val isBiometricAvailable = BiometricAuthManager.isBiometricAvailable(this)
+        val isDbEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)
 
-        if (isBiometricEnabled && isBiometricAvailable) {
+        // Disable biometric auth if database encryption is enabled (requires password for key derivation)
+        if (isBiometricEnabled && isBiometricAvailable && !isDbEncryptionEnabled) {
             biometricButton.visibility = View.VISIBLE
             biometricButton.setOnClickListener {
                 showBiometricPrompt()
@@ -83,6 +85,8 @@ class AuthenticationActivity : AppCompatActivity() {
         }
 
         if (BiometricAuthManager.verifyPassword(this, password)) {
+            // Set session password for database decryption
+            com.opensource.i2pradio.data.RadioDatabase.setSessionPassword(password)
             unlockSuccess()
         } else {
             showError(getString(R.string.auth_error_wrong_password))

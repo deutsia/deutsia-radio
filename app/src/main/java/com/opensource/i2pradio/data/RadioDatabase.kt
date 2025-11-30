@@ -17,6 +17,9 @@ abstract class RadioDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: RadioDatabase? = null
 
+        @Volatile
+        private var sessionPassword: String? = null  // Stores password during session for encrypted databases
+
         // Migration from version 1 to 2: Add proxyType column
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -168,6 +171,28 @@ abstract class RadioDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Set the session password for database encryption
+         * Must be called after successful authentication, before accessing database
+         *
+         * @param password The user's app password
+         */
+        fun setSessionPassword(password: String) {
+            synchronized(this) {
+                sessionPassword = password
+            }
+        }
+
+        /**
+         * Clear the session password
+         * Should be called when app backgrounds or user logs out
+         */
+        fun clearSessionPassword() {
+            synchronized(this) {
+                sessionPassword = null
+            }
+        }
+
         fun getDatabase(context: Context): RadioDatabase {
             // First check without synchronization for performance
             INSTANCE?.let { return it }
@@ -179,8 +204,17 @@ abstract class RadioDatabase : RoomDatabase() {
                     // Initialize SQLCipher
                     DatabaseEncryptionManager.initializeSQLCipher(context)
 
-                    // Get SupportFactory for encryption (null if encryption disabled)
-                    val supportFactory = DatabaseEncryptionManager.getSupportFactory(context)
+                    // Get SupportFactory for encryption (null if encryption disabled or no password set)
+                    val supportFactory = if (DatabaseEncryptionManager.isDatabaseEncryptionEnabled(context)) {
+                        val password = sessionPassword
+                            ?: throw IllegalStateException(
+                                "Database encryption is enabled but session password not set. " +
+                                "Call RadioDatabase.setSessionPassword() after authentication."
+                            )
+                        DatabaseEncryptionManager.getSupportFactory(context, password)
+                    } else {
+                        null
+                    }
 
                     val builder = Room.databaseBuilder(
                         context.applicationContext,

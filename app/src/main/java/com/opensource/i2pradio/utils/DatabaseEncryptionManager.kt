@@ -12,15 +12,22 @@ import java.security.SecureRandom
  * Manager for optional database-level encryption using SQLCipher.
  *
  * Provides functionality to:
- * - Enable/disable database encryption
- * - Generate and store secure database passphrases
+ * - Enable/disable database encryption with password-derived keys
+ * - Derive encryption keys from user password using PBKDF2
  * - Migrate between encrypted and unencrypted databases
- * - Use hardware-backed keystore when available
+ * - Re-key database when password changes
+ * - Use hardware-backed keystore for salt storage
+ *
+ * SECURITY MODEL:
+ * - Database encryption key is derived from user's app password
+ * - Salt is stored in EncryptedSharedPreferences (hardware-backed)
+ * - Database can only be decrypted with correct password
+ * - Password changes require database re-keying
  */
 object DatabaseEncryptionManager {
     private const val ENCRYPTED_PREFS_NAME = "db_encryption_prefs"
     private const val KEY_DB_ENCRYPTION_ENABLED = "db_encryption_enabled"
-    private const val KEY_DB_PASSPHRASE = "db_passphrase"
+    private const val KEY_DB_SALT = "db_salt"  // Changed from KEY_DB_PASSPHRASE
     private const val PASSPHRASE_LENGTH = 32 // 256 bits
 
     /**
@@ -58,25 +65,26 @@ object DatabaseEncryptionManager {
     }
 
     /**
-     * Enable database encryption
-     * Generates a new secure passphrase and stores it in EncryptedSharedPreferences
+     * Enable database encryption with password-derived key
+     * Generates a new random salt and derives encryption key from password
      *
-     * @return The generated passphrase (do NOT store this anywhere else)
+     * @param password The user's app password
+     * @return The derived passphrase for database encryption
      */
-    fun enableDatabaseEncryption(context: Context): ByteArray {
-        // Generate a cryptographically secure random passphrase
-        val passphrase = ByteArray(PASSPHRASE_LENGTH)
-        SecureRandom().nextBytes(passphrase)
+    fun enableDatabaseEncryption(context: Context, password: String): ByteArray {
+        // Generate a cryptographically secure random salt
+        val salt = PasswordHashUtil.generateSalt()
 
-        // Store passphrase securely in EncryptedSharedPreferences
-        val passphraseHex = passphrase.toHexString()
+        // Store salt securely in EncryptedSharedPreferences
+        val saltHex = salt.toHexString()
         getEncryptedPreferences(context)
             .edit()
-            .putString(KEY_DB_PASSPHRASE, passphraseHex)
+            .putString(KEY_DB_SALT, saltHex)
             .putBoolean(KEY_DB_ENCRYPTION_ENABLED, true)
             .apply()
 
-        return passphrase
+        // Derive encryption key from password + salt
+        return PasswordHashUtil.deriveKey(password, salt)
     }
 
     /**
@@ -86,34 +94,41 @@ object DatabaseEncryptionManager {
     fun disableDatabaseEncryption(context: Context) {
         getEncryptedPreferences(context)
             .edit()
-            .remove(KEY_DB_PASSPHRASE)
+            .remove(KEY_DB_SALT)
             .putBoolean(KEY_DB_ENCRYPTION_ENABLED, false)
             .apply()
     }
 
     /**
-     * Get the database passphrase for opening encrypted database
+     * Get the database passphrase by deriving it from user password
+     * This method requires the user's password to decrypt the database
      *
-     * @return The passphrase as ByteArray, or null if encryption is not enabled
+     * @param password The user's app password
+     * @return The derived passphrase as ByteArray, or null if encryption is not enabled
      */
-    fun getDatabasePassphrase(context: Context): ByteArray? {
+    fun getDatabasePassphrase(context: Context, password: String): ByteArray? {
         if (!isDatabaseEncryptionEnabled(context)) {
             return null
         }
 
-        val passphraseHex = getEncryptedPreferences(context)
-            .getString(KEY_DB_PASSPHRASE, null) ?: return null
+        val saltHex = getEncryptedPreferences(context)
+            .getString(KEY_DB_SALT, null) ?: return null
 
-        return passphraseHex.hexToByteArray()
+        val salt = saltHex.hexToByteArray()
+
+        // Derive encryption key from password + salt
+        return PasswordHashUtil.deriveKey(password, salt)
     }
 
     /**
-     * Get SupportFactory for Room database with optional encryption
+     * Get SupportFactory for Room database with password-derived encryption
+     * Requires user password to derive the encryption key
      *
+     * @param password The user's app password
      * @return SupportFactory for encrypted database, or null for unencrypted
      */
-    fun getSupportFactory(context: Context): SupportFactory? {
-        val passphrase = getDatabasePassphrase(context) ?: return null
+    fun getSupportFactory(context: Context, password: String): SupportFactory? {
+        val passphrase = getDatabasePassphrase(context, password) ?: return null
 
         // Use clearPassphrase = false to prevent SupportFactory from automatically
         // clearing the passphrase after first use. This is required for Room which
@@ -310,6 +325,62 @@ object DatabaseEncryptionManager {
         } finally {
             encryptedDb?.close()
             passphrase.fill(0)
+        }
+    }
+
+    /**
+     * Re-key the database with a new password
+     * This is required when the user changes their app password
+     *
+     * @param context Application context
+     * @param dbName Database name
+     * @param oldPassword Old user password
+     * @param newPassword New user password
+     */
+    fun rekeyDatabase(context: Context, dbName: String, oldPassword: String, newPassword: String) {
+        val dbPath = context.getDatabasePath(dbName).absolutePath
+
+        var db: SQLiteDatabase? = null
+        try {
+            // Clean up WAL and SHM files from Room's WAL mode
+            deleteWalFiles(dbPath)
+
+            // Get old passphrase
+            val oldPassphrase = getDatabasePassphrase(context, oldPassword)
+                ?: throw IllegalStateException("No encryption salt found")
+
+            // Open database with old passphrase
+            val oldPassphraseHex = oldPassphrase.toHexString()
+            db = SQLiteDatabase.openOrCreateDatabase(dbPath, oldPassphraseHex, null, null)
+
+            // Verify we can read the database
+            db.rawExecSQL("SELECT count(*) FROM sqlite_master;")
+
+            // Generate new salt and derive new passphrase
+            val newSalt = PasswordHashUtil.generateSalt()
+            val newPassphrase = PasswordHashUtil.deriveKey(newPassword, newSalt)
+            val newPassphraseHex = newPassphrase.toHexString()
+
+            // Re-key the database using SQLCipher PRAGMA
+            db.rawExecSQL("PRAGMA rekey = x'$newPassphraseHex';")
+
+            // Update stored salt
+            val newSaltHex = newSalt.toHexString()
+            getEncryptedPreferences(context)
+                .edit()
+                .putString(KEY_DB_SALT, newSaltHex)
+                .apply()
+
+            // Clean up sensitive data
+            oldPassphrase.fill(0)
+            newPassphrase.fill(0)
+
+            android.util.Log.i("DatabaseEncryption", "Database re-keyed successfully")
+        } catch (e: Exception) {
+            android.util.Log.e("DatabaseEncryption", "Failed to re-key database", e)
+            throw e
+        } finally {
+            db?.close()
         }
     }
 

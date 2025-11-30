@@ -23,8 +23,9 @@ object PasswordHashUtil {
 
     /**
      * Generate a cryptographically secure random salt
+     * Used for both password hashing and database encryption
      */
-    private fun generateSalt(): ByteArray {
+    fun generateSalt(): ByteArray {
         val salt = ByteArray(SALT_LENGTH)
         SecureRandom().nextBytes(salt)
         return salt
@@ -69,6 +70,26 @@ object PasswordHashUtil {
             hash.fill(0)
 
             "$saltB64\$$hashB64"
+        } finally {
+            // Clear password from memory
+            passwordChars.fill('\u0000')
+        }
+    }
+
+    /**
+     * Derive a cryptographic key from a password and salt
+     * This is used for database encryption key derivation
+     *
+     * @param password The password to derive from
+     * @param salt The salt (must be 32 bytes)
+     * @return 32-byte derived key suitable for AES-256 encryption
+     */
+    fun deriveKey(password: String, salt: ByteArray): ByteArray {
+        require(salt.size == SALT_LENGTH) { "Salt must be $SALT_LENGTH bytes" }
+
+        val passwordChars = password.toCharArray()
+        return try {
+            hashPassword(passwordChars, salt)
         } finally {
             // Clear password from memory
             passwordChars.fill('\u0000')
