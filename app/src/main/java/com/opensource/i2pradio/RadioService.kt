@@ -46,6 +46,7 @@ import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import com.opensource.i2pradio.util.BandwidthTrackingInterceptor
 import com.opensource.i2pradio.util.SecureImageLoader
+import com.opensource.i2pradio.utils.DigestAuthenticator
 import okhttp3.Call
 import okhttp3.Request
 import okhttp3.Response
@@ -1165,12 +1166,37 @@ class RadioService : Service() {
 
             // Add proxy authentication if custom proxy with credentials
             if (effectiveProxyType == ProxyType.CUSTOM && currentProxyUsername.isNotEmpty() && currentProxyPassword.isNotEmpty()) {
-                android.util.Log.d("RadioService", "Adding proxy authentication for recording client")
+                android.util.Log.d("RadioService", "Adding proxy authentication for recording client (auth type: $currentProxyAuthType)")
                 builder.proxyAuthenticator { route, response ->
-                    val credential = okhttp3.Credentials.basic(currentProxyUsername, currentProxyPassword)
-                    response.request.newBuilder()
-                        .header("Proxy-Authorization", credential)
-                        .build()
+                    android.util.Log.d("RadioService", "Recording client authentication challenge received (${response.code})")
+
+                    // Check if we've already tried authentication to avoid infinite loops
+                    val previousAuth = response.request.header("Proxy-Authorization")
+                    if (previousAuth != null) {
+                        android.util.Log.w("RadioService", "Recording client authentication already attempted - credentials may be incorrect")
+                        return@proxyAuthenticator null
+                    }
+
+                    when (currentProxyAuthType.uppercase()) {
+                        "BASIC" -> {
+                            android.util.Log.d("RadioService", "Recording client using Basic authentication")
+                            val credential = okhttp3.Credentials.basic(currentProxyUsername, currentProxyPassword)
+                            response.request.newBuilder()
+                                .header("Proxy-Authorization", credential)
+                                .build()
+                        }
+                        "DIGEST" -> {
+                            android.util.Log.d("RadioService", "Recording client using Digest authentication")
+                            DigestAuthenticator.authenticate(response, currentProxyUsername, currentProxyPassword)
+                        }
+                        else -> {
+                            android.util.Log.w("RadioService", "Recording client unknown auth type: $currentProxyAuthType, falling back to Basic")
+                            val credential = okhttp3.Credentials.basic(currentProxyUsername, currentProxyPassword)
+                            response.request.newBuilder()
+                                .header("Proxy-Authorization", credential)
+                                .build()
+                        }
+                    }
                 }
             }
 
@@ -1607,13 +1633,37 @@ class RadioService : Service() {
 
                     // Add proxy authentication if custom proxy with credentials
                     if (effectiveProxyType == ProxyType.CUSTOM && proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()) {
-                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy (user: $proxyUsername)")
+                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy (user: $proxyUsername, auth type: $proxyAuthType)")
                         builder.proxyAuthenticator { route, response ->
                             android.util.Log.d("RadioService", "Proxy authentication challenge received (${response.code})")
-                            val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
-                            response.request.newBuilder()
-                                .header("Proxy-Authorization", credential)
-                                .build()
+
+                            // Check if we've already tried authentication to avoid infinite loops
+                            val previousAuth = response.request.header("Proxy-Authorization")
+                            if (previousAuth != null) {
+                                android.util.Log.w("RadioService", "Authentication already attempted - credentials may be incorrect")
+                                return@proxyAuthenticator null
+                            }
+
+                            when (proxyAuthType.uppercase()) {
+                                "BASIC" -> {
+                                    android.util.Log.d("RadioService", "Using Basic authentication")
+                                    val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
+                                    response.request.newBuilder()
+                                        .header("Proxy-Authorization", credential)
+                                        .build()
+                                }
+                                "DIGEST" -> {
+                                    android.util.Log.d("RadioService", "Using Digest authentication")
+                                    DigestAuthenticator.authenticate(response, proxyUsername, proxyPassword)
+                                }
+                                else -> {
+                                    android.util.Log.w("RadioService", "Unknown auth type: $proxyAuthType, falling back to Basic")
+                                    val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
+                                    response.request.newBuilder()
+                                        .header("Proxy-Authorization", credential)
+                                        .build()
+                                }
+                            }
                         }
                     }
 
