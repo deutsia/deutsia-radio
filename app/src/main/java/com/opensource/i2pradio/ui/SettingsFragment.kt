@@ -41,6 +41,7 @@ import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 import com.opensource.i2pradio.util.StationImportExport
 import com.opensource.i2pradio.utils.BiometricAuthManager
+import com.opensource.i2pradio.utils.DigestAuthenticator
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -1667,6 +1668,7 @@ class SettingsFragment : Fragment() {
             val protocol = protocolInput.text?.toString()?.uppercase() ?: "HTTP"
             val username = usernameInput.text?.toString() ?: ""
             val password = passwordInput.text?.toString() ?: ""
+            val authType = authTypeInput.text?.toString()?.uppercase() ?: "NONE"
 
             if (host.isEmpty()) {
                 testResultText.text = "❌ Please enter a proxy host"
@@ -1682,7 +1684,7 @@ class SettingsFragment : Fragment() {
 
             // Test proxy connection in background
             lifecycleScope.launch(Dispatchers.IO) {
-                val result = testProxyConnection(host, port, protocol, username, password)
+                val result = testProxyConnection(host, port, protocol, username, password, authType)
                 withContext(Dispatchers.Main) {
                     testButton.isEnabled = true
                     testResultText.text = result.message
@@ -1793,11 +1795,12 @@ class SettingsFragment : Fragment() {
         port: Int,
         protocol: String,
         username: String,
-        password: String
+        password: String,
+        authType: String
     ): TestResult {
         android.util.Log.d("ProxyTest", "===== PROXY CONNECTION TEST START =====")
         android.util.Log.d("ProxyTest", "Proxy: $protocol://$host:$port")
-        android.util.Log.d("ProxyTest", "Auth: ${if (username.isNotEmpty()) "enabled (user: $username)" else "disabled"}")
+        android.util.Log.d("ProxyTest", "Auth: ${if (username.isNotEmpty()) "enabled (user: $username, type: $authType)" else "disabled"}")
 
         return try {
             // Create OkHttp client with proxy configuration
@@ -1829,13 +1832,37 @@ class SettingsFragment : Fragment() {
 
             // Add authentication if credentials are provided
             if (username.isNotEmpty() && password.isNotEmpty()) {
-                android.util.Log.d("ProxyTest", "Adding proxy authentication")
+                android.util.Log.d("ProxyTest", "Adding proxy authentication (type: $authType)")
                 clientBuilder.proxyAuthenticator { _, response ->
                     android.util.Log.d("ProxyTest", "Proxy authentication requested (${response.code})")
-                    val credential = okhttp3.Credentials.basic(username, password)
-                    response.request.newBuilder()
-                        .header("Proxy-Authorization", credential)
-                        .build()
+
+                    // Check if we've already tried authentication to avoid infinite loops
+                    val previousAuth = response.request.header("Proxy-Authorization")
+                    if (previousAuth != null) {
+                        android.util.Log.w("ProxyTest", "Authentication already attempted - credentials may be incorrect")
+                        return@proxyAuthenticator null
+                    }
+
+                    when (authType.uppercase()) {
+                        "BASIC" -> {
+                            android.util.Log.d("ProxyTest", "Using Basic authentication")
+                            val credential = okhttp3.Credentials.basic(username, password)
+                            response.request.newBuilder()
+                                .header("Proxy-Authorization", credential)
+                                .build()
+                        }
+                        "DIGEST" -> {
+                            android.util.Log.d("ProxyTest", "Using Digest authentication")
+                            DigestAuthenticator.authenticate(response, username, password)
+                        }
+                        else -> {
+                            android.util.Log.w("ProxyTest", "Unknown auth type: $authType, falling back to Basic")
+                            val credential = okhttp3.Credentials.basic(username, password)
+                            response.request.newBuilder()
+                                .header("Proxy-Authorization", credential)
+                                .build()
+                        }
+                    }
                 }
             }
 
