@@ -432,7 +432,7 @@ class LibraryFragment : Fragment() {
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     // Apply the selection when OK is clicked
                     // Store English genre name for language portability
-                    currentGenreFilter = if (tempSelectedGenre == allGenresText) {
+                    currentGenreFilter = if (tempSelectedGenre == allGenresText || tempSelectedGenre == null) {
                         null
                     } else {
                         getEnglishGenreName(tempSelectedGenre)
