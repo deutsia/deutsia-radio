@@ -270,6 +270,16 @@
     <string name="tor_status_error">Tor Error</string>
     <string name="tor_status_leak_warning">Leak Warning</string>
     <string name="tor_status_install_orbot">Install Orbot</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">Tor ist getrennt. Tippen zum Verbinden.</string>
+    <string name="tor_status_connecting_description">Tor verbindet...</string>
+    <string name="tor_status_connected_description">Tor ist verbunden. Tippen für Details.</string>
+    <string name="tor_status_connected_force_description">Tor ist verbunden (Zwangsmodus). Tippen für Details.</string>
+    <string name="tor_status_error_description">Tor-Verbindung fehlgeschlagen. Tippen zum Wiederholen.</string>
+    <string name="tor_status_install_orbot_description">Orbot ist nicht installiert. Tippen zum Installieren.</string>
+    <string name="tor_status_leak_warning_description">Tor-Zwangsmodus ist aktiviert, aber nicht verbunden. Privatsphäre könnte gefährdet sein.</string>
+
     <string name="tor_status_connecting_message">Connecting to Tor...</string>
     <string name="tor_status_connected_message">Connected via Tor</string>
     <string name="tor_control_title_stopped">Tor Disconnected</string>

@@ -270,6 +270,16 @@
     <string name="tor_status_error">Помилка Tor</string>
     <string name="tor_status_leak_warning">Попередження про витік</string>
     <string name="tor_status_install_orbot">Встановити Orbot</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">Tor відключено. Натисніть для підключення.</string>
+    <string name="tor_status_connecting_description">Tor підключається...</string>
+    <string name="tor_status_connected_description">Tor підключено. Натисніть для перегляду деталей.</string>
+    <string name="tor_status_connected_force_description">Tor підключено (Примусовий режим). Натисніть для перегляду деталей.</string>
+    <string name="tor_status_error_description">Підключення до Tor не вдалося. Натисніть для повтору.</string>
+    <string name="tor_status_install_orbot_description">Orbot не встановлено. Натисніть для встановлення.</string>
+    <string name="tor_status_leak_warning_description">Примусовий режим Tor увімкнено, але не підключено. Конфіденційність може бути під загрозою.</string>
+
     <string name="tor_status_connecting_message">Підключення до Tor...</string>
     <string name="tor_status_connected_message">Підключено через Tor</string>
     <string name="tor_control_title_stopped">Tor відключено</string>

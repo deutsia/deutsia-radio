@@ -87,7 +87,7 @@ class TorStatusView @JvmOverloads constructor(
                     statusIcon.alpha = 0.5f
                     statusText.text = context.getString(R.string.tor_status_off)
                     statusText.setTextColor(context.getColor(R.color.tor_disconnected))
-                    contentDescription = "Tor is disconnected. Tap to connect."
+                    contentDescription = context.getString(R.string.tor_status_off_description)
                 }
             }
             TorManager.TorState.STARTING -> {
@@ -95,7 +95,7 @@ class TorStatusView @JvmOverloads constructor(
                 statusIcon.alpha = 1f
                 statusText.text = context.getString(R.string.tor_status_connecting)
                 statusText.setTextColor(context.getColor(R.color.tor_connecting))
-                contentDescription = "Tor is connecting..."
+                contentDescription = context.getString(R.string.tor_status_connecting_description)
                 startConnectingAnimation()
             }
             TorManager.TorState.CONNECTED -> {
@@ -103,7 +103,7 @@ class TorStatusView @JvmOverloads constructor(
                 statusIcon.alpha = 1f
                 statusText.text = context.getString(R.string.tor_status_connected)
                 statusText.setTextColor(context.getColor(R.color.tor_connected))
-                contentDescription = "Tor is connected. Tap to view details."
+                contentDescription = context.getString(R.string.tor_status_connected_description)
                 showConnectedAnimation()
             }
             TorManager.TorState.ERROR -> {
@@ -115,7 +115,7 @@ class TorStatusView @JvmOverloads constructor(
                     statusIcon.alpha = 1f
                     statusText.text = context.getString(R.string.tor_status_error)
                     statusText.setTextColor(context.getColor(R.color.tor_error))
-                    contentDescription = "Tor connection failed. Tap to retry."
+                    contentDescription = context.getString(R.string.tor_status_error_description)
                     showErrorAnimation()
                 }
             }
@@ -131,7 +131,7 @@ class TorStatusView @JvmOverloads constructor(
                     statusIcon.alpha = 0.5f
                     statusText.text = context.getString(R.string.tor_status_install_orbot)
                     statusText.setTextColor(context.getColor(R.color.tor_disconnected))
-                    contentDescription = "Orbot is not installed. Tap to install."
+                    contentDescription = context.getString(R.string.tor_status_install_orbot_description)
                 }
             }
         }
@@ -142,7 +142,7 @@ class TorStatusView @JvmOverloads constructor(
         statusIcon.alpha = 1f
         statusText.text = context.getString(R.string.tor_status_connected)
         statusText.setTextColor(context.getColor(R.color.tor_connected))
-        contentDescription = "Tor is connected (Force Mode). Tap to view details."
+        contentDescription = context.getString(R.string.tor_status_connected_force_description)
         showConnectedAnimation()
     }
 
@@ -151,7 +151,7 @@ class TorStatusView @JvmOverloads constructor(
         statusIcon.alpha = 1f
         statusText.text = context.getString(R.string.tor_status_leak_warning)
         statusText.setTextColor(context.getColor(R.color.tor_error))
-        contentDescription = "Force Tor is enabled but not connected. Privacy may be compromised."
+        contentDescription = context.getString(R.string.tor_status_leak_warning_description)
         showErrorAnimation()
     }
 

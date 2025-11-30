@@ -270,6 +270,16 @@
     <string name="tor_status_error">خطای Tor</string>
     <string name="tor_status_leak_warning">هشدار نشت</string>
     <string name="tor_status_install_orbot">نصب Orbot</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">Tor قطع است. برای اتصال لمس کنید.</string>
+    <string name="tor_status_connecting_description">Tor در حال اتصال است...</string>
+    <string name="tor_status_connected_description">Tor متصل است. برای مشاهده جزئیات لمس کنید.</string>
+    <string name="tor_status_connected_force_description">Tor متصل است (حالت اجباری). برای مشاهده جزئیات لمس کنید.</string>
+    <string name="tor_status_error_description">اتصال Tor ناموفق بود. برای تلاش مجدد لمس کنید.</string>
+    <string name="tor_status_install_orbot_description">Orbot نصب نشده است. برای نصب لمس کنید.</string>
+    <string name="tor_status_leak_warning_description">حالت اجباری Tor فعال است اما متصل نیست. حریم خصوصی ممکن است به خطر افتاده باشد.</string>
+
     <string name="tor_status_connecting_message">در حال اتصال به Tor...</string>
     <string name="tor_status_connected_message">از طریق Tor متصل شد</string>
     <string name="tor_control_title_stopped">Tor قطع شد</string>
