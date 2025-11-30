@@ -1,334 +1,337 @@
+<!--
+    Vietnamese (Tiếng Việt) Translation
+-->
 <resources>
     <string name="app_name">deutsia radio</string>
-    <string name="tab_radios">Library</string>
-    <string name="tab_now_playing">Now Playing</string>
-    <string name="tab_settings">Settings</string>
+    <string name="tab_radios">Thư viện</string>
+    <string name="tab_now_playing">Đang phát</string>
+    <string name="tab_settings">Cài đặt</string>
 
     <!-- Equalizer -->
-    <string name="equalizer">Equalizer</string>
-    <string name="equalizer_no_audio">Start playing a station first</string>
-    <string name="equalizer_not_found">No equalizer app found. Install an equalizer app like Wavelet.</string>
-    <string name="equalizer_preset">Preset</string>
-    <string name="equalizer_custom">Custom</string>
-    <string name="equalizer_reset">Reset to Flat</string>
-    <string name="equalizer_init_failed">Could not initialize equalizer</string>
-    <string name="equalizer_bass_boost">Bass Booster</string>
-    <string name="equalizer_surround_sound">Surround Sound</string>
+    <string name="equalizer">Bộ cân bằng</string>
+    <string name="equalizer_no_audio">Vui lòng phát một trạm trước</string>
+    <string name="equalizer_not_found">Không tìm thấy ứng dụng cân bằng. Hãy cài đặt ứng dụng cân bằng như Wavelet.</string>
+    <string name="equalizer_preset">Cài đặt sẵn</string>
+    <string name="equalizer_custom">Tùy chỉnh</string>
+    <string name="equalizer_reset">Đặt lại về phẳng</string>
+    <string name="equalizer_init_failed">Không thể khởi tạo bộ cân bằng</string>
+    <string name="equalizer_bass_boost">Tăng bass</string>
+    <string name="equalizer_surround_sound">Âm thanh vòm</string>
 
     <!-- Sort options -->
-    <string name="sort_default">Default</string>
-    <string name="sort_name">Name</string>
-    <string name="sort_recent">Recent</string>
-    <string name="sort_liked">Liked</string>
-    <string name="sort_genre">Genre</string>
+    <string name="sort_default">Mặc định</string>
+    <string name="sort_name">Tên</string>
+    <string name="sort_recent">Gần đây</string>
+    <string name="sort_liked">Đã thích</string>
+    <string name="sort_genre">Thể loại</string>
 
     <!-- Search -->
-    <string name="search_stations">Search library</string>
-    <string name="search_countries">Search countries…</string>
-    <string name="search_genres">Search genres…</string>
+    <string name="search_stations">Tìm kiếm thư viện</string>
+    <string name="search_countries">Tìm kiếm quốc gia…</string>
+    <string name="search_genres">Tìm kiếm thể loại…</string>
 
     <!-- Genre filter -->
-    <string name="genre_all">All Genres</string>
-    <string name="filter_by_genre">Filter by Genre</string>
+    <string name="genre_all">Tất cả thể loại</string>
+    <string name="filter_by_genre">Lọc theo thể loại</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with Orbot integration and configurable leak prevention</string>
+    <string name="about_description">deutsia radio là trình phát radio đa mạng miễn phí và mã nguồn mở, tập hợp các luồng từ mạng clearnet, Tor (.onion) và I2P. Tận hưởng các trạm yêu thích của bạn trong giao diện Material You với tích hợp Orbot và ngăn chặn rò rỉ có thể cấu hình</string>
 
     <!-- Browse/Discover Stations -->
-    <string name="tab_browse">Browse</string>
-    <string name="search_radio_browser">Search thousands of stations…</string>
-    <string name="browse_top_voted">Top Voted</string>
-    <string name="browse_popular">Popular</string>
-    <string name="browse_random">Random</string>
-    <string name="browse_history">History</string>
-    <string name="browse_no_results">No Stations Found</string>
-    <string name="browse_no_results_hint">Try a different search or filter</string>
-    <string name="filter_country">Country</string>
-    <string name="filter_genre">Genre</string>
-    <string name="filter_language">Language</string>
-    <string name="filter_all_countries">All Countries</string>
-    <string name="filter_all_genres">All Genres</string>
-    <string name="filter_all_languages">All Languages</string>
-    <string name="select_country">Select Country</string>
-    <string name="select_genre">Select Genre</string>
-    <string name="select_language">Select Language</string>
-    <string name="loading_countries">Loading countries…</string>
-    <string name="loading_genres">Loading genres…</string>
-    <string name="loading_languages">Loading languages…</string>
-    <string name="search_languages">Search languages…</string>
-    <string name="station_saved">%s added to library</string>
-    <string name="station_removed">%s removed from library</string>
-    <string name="station_added_to_favorites">%s added to favorites</string>
-    <string name="station_removed_from_favorites">%s removed from favorites</string>
-    <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
+    <string name="tab_browse">Duyệt</string>
+    <string name="search_radio_browser">Tìm kiếm hàng nghìn trạm…</string>
+    <string name="browse_top_voted">Nhiều bình chọn nhất</string>
+    <string name="browse_popular">Phổ biến</string>
+    <string name="browse_random">Ngẫu nhiên</string>
+    <string name="browse_history">Lịch sử</string>
+    <string name="browse_no_results">Không tìm thấy trạm</string>
+    <string name="browse_no_results_hint">Thử tìm kiếm hoặc lọc khác</string>
+    <string name="filter_country">Quốc gia</string>
+    <string name="filter_genre">Thể loại</string>
+    <string name="filter_language">Ngôn ngữ</string>
+    <string name="filter_all_countries">Tất cả quốc gia</string>
+    <string name="filter_all_genres">Tất cả thể loại</string>
+    <string name="filter_all_languages">Tất cả ngôn ngữ</string>
+    <string name="select_country">Chọn quốc gia</string>
+    <string name="select_genre">Chọn thể loại</string>
+    <string name="select_language">Chọn ngôn ngữ</string>
+    <string name="loading_countries">Đang tải quốc gia…</string>
+    <string name="loading_genres">Đang tải thể loại…</string>
+    <string name="loading_languages">Đang tải ngôn ngữ…</string>
+    <string name="search_languages">Tìm kiếm ngôn ngữ…</string>
+    <string name="station_saved">Đã thêm %s vào thư viện</string>
+    <string name="station_removed">Đã xóa %s khỏi thư viện</string>
+    <string name="station_added_to_favorites">Đã thêm %s vào yêu thích</string>
+    <string name="station_removed_from_favorites">Đã xóa %s khỏi yêu thích</string>
+    <string name="tor_required_warning">Bắt buộc Tor đã bật nhưng Tor chưa kết nối. Kết nối với Tor để duyệt các trạm.</string>
 
     <!-- Notification and Status Messages -->
-    <string name="notification_connecting">Connecting...</string>
-    <string name="notification_paused">Paused</string>
-    <string name="notification_playing">Playing</string>
-    <string name="notification_playing_recording">Playing • Recording</string>
-    <string name="notification_buffering">Buffering...</string>
-    <string name="notification_reconnecting">Reconnecting...</string>
-    <string name="notification_connection_failed">Connection failed</string>
-    <string name="notification_tor_blocked">Tor not connected - stream blocked</string>
-    <string name="notification_audio_focus_denied">Audio focus denied</string>
-    <string name="notification_channel_name">deutsia radio Playback</string>
-    <string name="notification_channel_description">Shows radio playback status</string>
-    <string name="notification_action_pause">Pause</string>
-    <string name="notification_action_stop">Stop</string>
+    <string name="notification_connecting">Đang kết nối...</string>
+    <string name="notification_paused">Đã tạm dừng</string>
+    <string name="notification_playing">Đang phát</string>
+    <string name="notification_playing_recording">Đang phát • Đang ghi</string>
+    <string name="notification_buffering">Đang lưu trữ...</string>
+    <string name="notification_reconnecting">Đang kết nối lại...</string>
+    <string name="notification_connection_failed">Kết nối thất bại</string>
+    <string name="notification_tor_blocked">Tor chưa kết nối - luồng bị chặn</string>
+    <string name="notification_audio_focus_denied">Từ chối lấy nét âm thanh</string>
+    <string name="notification_channel_name">Phát deutsia radio</string>
+    <string name="notification_channel_description">Hiển thị trạng thái phát radio</string>
+    <string name="notification_action_pause">Tạm dừng</string>
+    <string name="notification_action_stop">Dừng</string>
 
     <!-- Recording Messages -->
-    <string name="recording_failed">Recording failed: %s</string>
-    <string name="recording_saved">Recording saved: %s (%dKB)</string>
-    <string name="recording_stopping">Stopping recording...</string>
-    <string name="recording_starting">Starting recording...</string>
-    <string name="recording_no_station">No station playing</string>
-    <string name="recording_directory_updated">Recording directory updated</string>
+    <string name="recording_failed">Ghi thất bại: %s</string>
+    <string name="recording_saved">Đã lưu bản ghi: %s (%dKB)</string>
+    <string name="recording_stopping">Đang dừng ghi...</string>
+    <string name="recording_starting">Đang bắt đầu ghi...</string>
+    <string name="recording_no_station">Không có trạm đang phát</string>
+    <string name="recording_directory_updated">Đã cập nhật thư mục ghi</string>
 
     <!-- Dialog Titles and Buttons -->
-    <string name="dialog_add_station">Add Radio Station</string>
-    <string name="dialog_edit_station">Edit Radio Station</string>
-    <string name="dialog_sort_stations">Sort Stations</string>
-    <string name="dialog_delete_stations">Delete stations</string>
-    <string name="button_save">Save</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="button_import">Import</string>
-    <string name="button_export">Export</string>
-    <string name="button_open">Open</string>
-    <string name="button_configure">Configure</string>
-    <string name="button_apply">Apply</string>
-    <string name="button_reset">Reset</string>
-    <string name="button_change">Change</string>
-    <string name="button_start">Start</string>
-    <string name="button_test_connection">Test Connection</string>
-    <string name="hint_test_connection_disclaimer">Note: Testing will connect to httpbin.org via your proxy</string>
-    <string name="button_choose_image">Choose Image</string>
-    <string name="button_clear">Clear</string>
+    <string name="dialog_add_station">Thêm trạm radio</string>
+    <string name="dialog_edit_station">Sửa trạm radio</string>
+    <string name="dialog_sort_stations">Sắp xếp trạm</string>
+    <string name="dialog_delete_stations">Xóa trạm</string>
+    <string name="button_save">Lưu</string>
+    <string name="button_cancel">Hủy</string>
+    <string name="button_import">Nhập</string>
+    <string name="button_export">Xuất</string>
+    <string name="button_open">Mở</string>
+    <string name="button_configure">Cấu hình</string>
+    <string name="button_apply">Áp dụng</string>
+    <string name="button_reset">Đặt lại</string>
+    <string name="button_change">Thay đổi</string>
+    <string name="button_start">Bắt đầu</string>
+    <string name="button_test_connection">Kiểm tra kết nối</string>
+    <string name="hint_test_connection_disclaimer">Lưu ý: Kiểm tra sẽ kết nối đến httpbin.org qua proxy của bạn</string>
+    <string name="button_choose_image">Chọn hình ảnh</string>
+    <string name="button_clear">Xóa</string>
 
     <!-- Settings - Appearance -->
-    <string name="settings_appearance">Appearance</string>
-    <string name="settings_theme">Theme</string>
-    <string name="settings_theme_description">Choose light, dark, or system</string>
-    <string name="settings_theme_system_default">System Default</string>
+    <string name="settings_appearance">Giao diện</string>
+    <string name="settings_theme">Chủ đề</string>
+    <string name="settings_theme_description">Chọn sáng, tối hoặc hệ thống</string>
+    <string name="settings_theme_system_default">Mặc định hệ thống</string>
     <string name="settings_material_you">Material You</string>
-    <string name="settings_material_you_description">Use wallpaper-based dynamic colors</string>
-    <string name="settings_color_scheme">Color Scheme</string>
-    <string name="settings_color_scheme_description">Choose your preferred color</string>
-    <string name="settings_color_blue">Blue</string>
+    <string name="settings_material_you_description">Sử dụng màu động dựa trên hình nền</string>
+    <string name="settings_color_scheme">Bảng màu</string>
+    <string name="settings_color_scheme_description">Chọn màu ưa thích của bạn</string>
+    <string name="settings_color_blue">Xanh dương</string>
 
     <!-- Settings - Tor Network -->
-    <string name="settings_tor_network">Tor Network</string>
-    <string name="settings_enable_tor">Enable Tor (via Orbot)</string>
-    <string name="settings_enable_tor_description">Connect through the Tor network</string>
-    <string name="settings_tor_disconnected">Disconnected</string>
-    <string name="settings_tor_not_running">Tor is not running</string>
-    <string name="settings_force_tor">Force Tor Over Everything</string>
-    <string name="settings_force_tor_description">Route all streams through Tor. Won\'t connect without Tor.</string>
-    <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
-    <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
-    <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_network">Mạng Tor</string>
+    <string name="settings_enable_tor">Bật Tor (qua Orbot)</string>
+    <string name="settings_enable_tor_description">Kết nối qua mạng Tor</string>
+    <string name="settings_tor_disconnected">Đã ngắt kết nối</string>
+    <string name="settings_tor_not_running">Tor không chạy</string>
+    <string name="settings_force_tor">Bắt buộc Tor cho mọi thứ</string>
+    <string name="settings_force_tor_description">Định tuyến tất cả luồng qua Tor. Không kết nối nếu không có Tor.</string>
+    <string name="settings_force_tor_except_i2p">Bắt buộc Tor trừ I2P</string>
+    <string name="settings_force_tor_except_i2p_description">Định tuyến clearnet qua Tor, luồng I2P trực tiếp đến proxy I2P.</string>
+    <string name="settings_tor_info">Yêu cầu Orbot (miễn phí từ Play Store hoặc F-Droid). Nhấn vào biểu tượng Tor trên thanh công cụ để truy cập nhanh.\n\nChế độ bắt buộc chặn kết nối khi Tor không khả dụng.</string>
 
     <!-- Settings - Custom Proxy -->
-    <string name="settings_custom_proxy">Custom Proxy</string>
-    <string name="settings_enable_custom_proxy">Enable Custom Proxy</string>
-    <string name="settings_enable_custom_proxy_description">Use custom proxy for connections</string>
-    <string name="settings_configure_proxy">Configure Global Proxy</string>
-    <string name="settings_configure_proxy_description">Set up your custom proxy settings</string>
-    <string name="settings_force_custom_proxy">Force Custom Proxy</string>
-    <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
+    <string name="settings_custom_proxy">Proxy tùy chỉnh</string>
+    <string name="settings_enable_custom_proxy">Bật proxy tùy chỉnh</string>
+    <string name="settings_enable_custom_proxy_description">Sử dụng proxy tùy chỉnh cho kết nối</string>
+    <string name="settings_configure_proxy">Cấu hình proxy toàn cục</string>
+    <string name="settings_configure_proxy_description">Thiết lập cài đặt proxy tùy chỉnh của bạn</string>
+    <string name="settings_force_custom_proxy">Bắt buộc proxy tùy chỉnh</string>
+    <string name="settings_force_custom_proxy_description">Định tuyến tất cả lưu lượng qua proxy tùy chỉnh. Không kết nối nếu không có proxy.</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Bắt buộc proxy tùy chỉnh trừ trạm Tor/I2P</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">Định tuyến tất cả lưu lượng clearnet qua proxy tùy chỉnh, nhưng cho phép các trạm Tor và I2P sử dụng proxy gốc của chúng.</string>
 
     <!-- Settings - Bandwidth -->
-    <string name="settings_bandwidth_usage">Bandwidth Usage</string>
-    <string name="settings_total_usage">Total Usage (Lifetime)</string>
-    <string name="settings_session_usage">Session Usage</string>
+    <string name="settings_bandwidth_usage">Sử dụng băng thông</string>
+    <string name="settings_total_usage">Tổng sử dụng (Suốt đời)</string>
+    <string name="settings_session_usage">Sử dụng phiên</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
     <!-- Settings - Playback -->
-    <string name="settings_playback">Playback</string>
-    <string name="settings_sleep_timer">Sleep Timer</string>
-    <string name="settings_sleep_timer_description">Auto-stop playback after set time</string>
-    <string name="settings_sleep_timer_off">Off</string>
-    <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
-    <string name="settings_recording_directory">Recording Directory</string>
-    <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
-    <string name="settings_record_across_stations">Record Across Stations</string>
-    <string name="settings_record_across_stations_description">Keep recording when switching stations</string>
-    <string name="settings_record_all_stations">Record All Stations</string>
-    <string name="settings_record_all_stations_description">Switch to new station\'s stream in same file</string>
+    <string name="settings_playback">Phát</string>
+    <string name="settings_sleep_timer">Hẹn giờ ngủ</string>
+    <string name="settings_sleep_timer_description">Tự động dừng phát sau thời gian đã đặt</string>
+    <string name="settings_sleep_timer_off">Tắt</string>
+    <string name="settings_equalizer_description">Điều chỉnh dải tần âm thanh và hiệu ứng</string>
+    <string name="settings_recording_directory">Thư mục ghi</string>
+    <string name="settings_recording_directory_default">Mặc định (Music/deutsia_radio)</string>
+    <string name="settings_record_across_stations">Ghi xuyên các trạm</string>
+    <string name="settings_record_across_stations_description">Tiếp tục ghi khi chuyển trạm</string>
+    <string name="settings_record_all_stations">Ghi tất cả trạm</string>
+    <string name="settings_record_all_stations_description">Chuyển sang luồng trạm mới trong cùng tệp</string>
 
     <!-- Settings - Station Management -->
-    <string name="settings_station_management">Station Management</string>
-    <string name="settings_import_from_file">Import from File</string>
-    <string name="settings_import_from_file_description">Import from CSV, JSON, M3U, or PLS</string>
-    <string name="settings_import_i2p_stations">Import I2P Stations</string>
-    <string name="settings_import_i2p_stations_description">14 curated I2P radio stations</string>
-    <string name="settings_import_tor_stations">Import Tor Stations</string>
-    <string name="settings_import_tor_stations_description">3 curated Tor radio stations</string>
-    <string name="settings_export_stations">Export Stations</string>
-    <string name="settings_export_stations_description">Export your stations to a file</string>
+    <string name="settings_station_management">Quản lý trạm</string>
+    <string name="settings_import_from_file">Nhập từ tệp</string>
+    <string name="settings_import_from_file_description">Nhập từ CSV, JSON, M3U hoặc PLS</string>
+    <string name="settings_import_i2p_stations">Nhập trạm I2P</string>
+    <string name="settings_import_i2p_stations_description">14 trạm radio I2P được tuyển chọn</string>
+    <string name="settings_import_tor_stations">Nhập trạm Tor</string>
+    <string name="settings_import_tor_stations_description">3 trạm radio Tor được tuyển chọn</string>
+    <string name="settings_export_stations">Xuất trạm</string>
+    <string name="settings_export_stations_description">Xuất các trạm của bạn ra tệp</string>
 
     <!-- Settings - About -->
-    <string name="settings_about">About</string>
-    <string name="settings_version">Version 1.1</string>
-    <string name="settings_view_github">View on GitHub</string>
-    <string name="settings_donate">Donate</string>
-    <string name="settings_donate_description">If this app helped you out, consider donating</string>
+    <string name="settings_about">Giới thiệu</string>
+    <string name="settings_version">Phiên bản 1.1</string>
+    <string name="settings_view_github">Xem trên GitHub</string>
+    <string name="settings_donate">Quyên góp</string>
+    <string name="settings_donate_description">Nếu ứng dụng này hữu ích cho bạn, hãy xem xét quyên góp</string>
     <string name="settings_monero">Monero (XMR)</string>
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
-    <string name="settings_copy_address">Copy Address</string>
+    <string name="settings_copy_address">Sao chép địa chỉ</string>
 
     <!-- Tor Control Bottom Sheet -->
-    <string name="tor_connection_details">Connection Details</string>
-    <string name="tor_proxy_host">Proxy Host</string>
-    <string name="tor_socks_port">SOCKS Port</string>
-    <string name="tor_what_is_orbot">What is Orbot?</string>
-    <string name="tor_orbot_description">Orbot is the official Tor client for Android. It provides secure, encrypted access to the Tor network.</string>
-    <string name="tor_connect">Connect to Tor</string>
-    <string name="tor_open_orbot">Open Orbot</string>
+    <string name="tor_connection_details">Chi tiết kết nối</string>
+    <string name="tor_proxy_host">Máy chủ proxy</string>
+    <string name="tor_socks_port">Cổng SOCKS</string>
+    <string name="tor_what_is_orbot">Orbot là gì?</string>
+    <string name="tor_orbot_description">Orbot là ứng dụng Tor chính thức cho Android. Nó cung cấp truy cập an toàn, được mã hóa đến mạng Tor.</string>
+    <string name="tor_connect">Kết nối với Tor</string>
+    <string name="tor_open_orbot">Mở Orbot</string>
 
     <!-- Add/Edit Radio Dialog -->
-    <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
-    <string name="add_edit_authentication_optional">Authentication (Optional)</string>
-    <string name="add_edit_advanced_options">Advanced Options</string>
-    <string name="add_edit_cover_art">Cover Art</string>
-    <string name="add_edit_or_enter_url">Or enter image URL</string>
+    <string name="add_edit_tor_info">Sử dụng Tor nhúng - không cần cấu hình proxy</string>
+    <string name="add_edit_authentication_optional">Xác thực (Tùy chọn)</string>
+    <string name="add_edit_advanced_options">Tùy chọn nâng cao</string>
+    <string name="add_edit_cover_art">Ảnh bìa</string>
+    <string name="add_edit_or_enter_url">Hoặc nhập URL hình ảnh</string>
 
     <!-- Input Hints -->
-    <string name="hint_station_name">Station Name</string>
-    <string name="hint_stream_url">Stream URL</string>
-    <string name="hint_genre">Genre</string>
-    <string name="hint_proxy_type">Proxy Type</string>
-    <string name="hint_proxy_host">Proxy Host</string>
-    <string name="hint_proxy_port">Proxy Port</string>
-    <string name="hint_protocol">Protocol</string>
-    <string name="hint_username_optional">Username (optional)</string>
-    <string name="hint_password_optional">Password (optional)</string>
-    <string name="hint_auth_method">Auth Method</string>
-    <string name="hint_connection_timeout">Connection Timeout (seconds)</string>
-    <string name="hint_cover_art_url">Cover Art URL (optional)</string>
-    <string name="hint_username_optional_caps">Username (Optional)</string>
-    <string name="hint_password_optional_caps">Password (Optional)</string>
-    <string name="hint_auth_type">Authentication Type</string>
+    <string name="hint_station_name">Tên trạm</string>
+    <string name="hint_stream_url">URL luồng</string>
+    <string name="hint_genre">Thể loại</string>
+    <string name="hint_proxy_type">Loại proxy</string>
+    <string name="hint_proxy_host">Máy chủ proxy</string>
+    <string name="hint_proxy_port">Cổng proxy</string>
+    <string name="hint_protocol">Giao thức</string>
+    <string name="hint_username_optional">Tên người dùng (tùy chọn)</string>
+    <string name="hint_password_optional">Mật khẩu (tùy chọn)</string>
+    <string name="hint_auth_method">Phương thức xác thực</string>
+    <string name="hint_connection_timeout">Hết thời gian kết nối (giây)</string>
+    <string name="hint_cover_art_url">URL ảnh bìa (tùy chọn)</string>
+    <string name="hint_username_optional_caps">Tên người dùng (Tùy chọn)</string>
+    <string name="hint_password_optional_caps">Mật khẩu (Tùy chọn)</string>
+    <string name="hint_auth_type">Loại xác thực</string>
 
     <!-- Default Values -->
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
-    <string name="default_auth_none">None</string>
+    <string name="default_auth_none">Không</string>
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
     <!-- Now Playing Fragment -->
     <string name="now_playing_time_placeholder">00:00</string>
-    <string name="now_playing_live">LIVE</string>
-    <string name="now_playing_no_station">No Station Playing</string>
-    <string name="now_playing_no_station_subtitle">Select a station from the list</string>
-    <string name="now_playing_volume_title">Radio Volume</string>
-    <string name="now_playing_volume_description">Adjusts radio stream only</string>
+    <string name="now_playing_live">TRỰC TIẾP</string>
+    <string name="now_playing_no_station">Không có trạm đang phát</string>
+    <string name="now_playing_no_station_subtitle">Chọn trạm từ danh sách</string>
+    <string name="now_playing_volume_title">Âm lượng radio</string>
+    <string name="now_playing_volume_description">Chỉ điều chỉnh luồng radio</string>
 
     <!-- Toast Messages -->
-    <string name="toast_session_bandwidth_reset">Session bandwidth reset</string>
-    <string name="toast_custom_proxy_saved">Custom proxy settings saved</string>
-    <string name="toast_custom_proxy_cleared">Custom proxy settings cleared</string>
-    <string name="toast_address_copied">Address copied to clipboard</string>
-    <string name="toast_using_default_directory">Using default directory</string>
+    <string name="toast_session_bandwidth_reset">Đã đặt lại băng thông phiên</string>
+    <string name="toast_custom_proxy_saved">Đã lưu cài đặt proxy tùy chỉnh</string>
+    <string name="toast_custom_proxy_cleared">Đã xóa cài đặt proxy tùy chỉnh</string>
+    <string name="toast_address_copied">Đã sao chép địa chỉ vào clipboard</string>
+    <string name="toast_using_default_directory">Đang sử dụng thư mục mặc định</string>
 
     <!-- Custom Proxy Status Messages -->
-    <string name="custom_proxy_status_connected">Connected</string>
-    <string name="custom_proxy_status_configured">Proxy configured</string>
-    <string name="custom_proxy_status_not_configured">Not Configured</string>
-    <string name="custom_proxy_status_no_proxy">No proxy set</string>
-    <string name="custom_proxy_status_leak_warning">Leak Warning</string>
-    <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+    <string name="custom_proxy_status_connected">Đã kết nối</string>
+    <string name="custom_proxy_status_configured">Đã cấu hình proxy</string>
+    <string name="custom_proxy_status_not_configured">Chưa cấu hình</string>
+    <string name="custom_proxy_status_no_proxy">Chưa đặt proxy</string>
+    <string name="custom_proxy_status_leak_warning">Cảnh báo rò rỉ</string>
+    <string name="custom_proxy_status_leak_detail">Đã bắt buộc nhưng chưa cấu hình</string>
 
     <!-- Tor Service Notification Messages -->
-    <string name="tor_channel_name">Tor Connection</string>
-    <string name="tor_channel_description">Shows Tor connection status</string>
-    <string name="tor_notification_disconnected">Tor Disconnected</string>
-    <string name="tor_notification_tap_to_open">Tap to open app</string>
-    <string name="tor_notification_connecting">Connecting via Orbot...</string>
-    <string name="tor_notification_please_wait">Please wait</string>
-    <string name="tor_notification_connected">Tor Connected</string>
-    <string name="tor_notification_error">Tor Error</string>
-    <string name="tor_notification_connection_failed">Connection failed</string>
-    <string name="tor_notification_orbot_required">Orbot Required</string>
-    <string name="tor_notification_install_orbot">Please install Orbot for Tor support</string>
-    <string name="tor_notification_action_stop">Stop Tor</string>
+    <string name="tor_channel_name">Kết nối Tor</string>
+    <string name="tor_channel_description">Hiển thị trạng thái kết nối Tor</string>
+    <string name="tor_notification_disconnected">Đã ngắt kết nối Tor</string>
+    <string name="tor_notification_tap_to_open">Nhấn để mở ứng dụng</string>
+    <string name="tor_notification_connecting">Đang kết nối qua Orbot...</string>
+    <string name="tor_notification_please_wait">Vui lòng đợi</string>
+    <string name="tor_notification_connected">Đã kết nối Tor</string>
+    <string name="tor_notification_error">Lỗi Tor</string>
+    <string name="tor_notification_connection_failed">Kết nối thất bại</string>
+    <string name="tor_notification_orbot_required">Yêu cầu Orbot</string>
+    <string name="tor_notification_install_orbot">Vui lòng cài đặt Orbot để hỗ trợ Tor</string>
+    <string name="tor_notification_action_stop">Dừng Tor</string>
 
     <!-- Other Error Messages -->
-    <string name="error_unknown">Unknown error</string>
-    <string name="folder_custom">Custom folder</string>
+    <string name="error_unknown">Lỗi không xác định</string>
+    <string name="folder_custom">Thư mục tùy chỉnh</string>
 
     <!-- AddEditRadioDialog Default Values -->
-    <string name="default_genre_other">Other</string>
-    <string name="default_proxy_none">None</string>
+    <string name="default_genre_other">Khác</string>
+    <string name="default_proxy_none">Không</string>
     <string name="default_proxy_i2p">I2P</string>
     <string name="default_proxy_tor">Tor</string>
-    <string name="default_proxy_custom">Custom</string>
+    <string name="default_proxy_custom">Tùy chỉnh</string>
     <string name="default_protocol_http">HTTP</string>
     <string name="default_protocol_https">HTTPS</string>
     <string name="default_protocol_socks4">SOCKS4</string>
     <string name="default_protocol_socks5">SOCKS5</string>
-    <string name="default_auth_basic">Basic</string>
-    <string name="default_auth_digest">Digest</string>
+    <string name="default_auth_basic">Cơ bản</string>
+    <string name="default_auth_digest">Tóm tắt</string>
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
     <!-- Security & Privacy -->
-    <string name="settings_security_privacy">Security &amp; Privacy</string>
-    <string name="settings_app_lock">App Lock</string>
-    <string name="settings_app_lock_description">Require password or biometric to unlock app</string>
-    <string name="settings_biometric_auth">Biometric Authentication</string>
-    <string name="settings_biometric_auth_description">Use fingerprint or face unlock</string>
-    <string name="settings_require_auth_on_launch">Require Auth on Launch</string>
-    <string name="settings_require_auth_on_launch_description">Always require authentication when opening app</string>
-    <string name="settings_set_password">Set Password</string>
-    <string name="settings_change_password">Change Password</string>
-    <string name="settings_database_encryption">Database Encryption</string>
-    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher using your app password (requires restart)</string>
-    <string name="settings_database_encryption_warning">Warning: This is an experimental feature. Make sure you have a backup before enabling!</string>
-    <string name="settings_database_encryption_enable_title">Enable Database Encryption?</string>
-    <string name="settings_database_encryption_enable_message">This will encrypt your entire radio database using your app password. The app will restart to apply changes.\n\nWARNING: This is experimental. Make sure you have a backup!</string>
-    <string name="settings_database_encryption_disable_title">Disable Database Encryption?</string>
-    <string name="settings_database_encryption_disable_message">This will decrypt your database and remove encryption. The app will restart to apply changes.</string>
-    <string name="settings_database_encryption_enabled">Database encryption enabled</string>
-    <string name="settings_database_encryption_disabled">Database encryption disabled</string>
-    <string name="settings_database_encryption_error">Failed to change encryption setting</string>
-    <string name="settings_database_encryption_password_required_title">App Password Required</string>
-    <string name="settings_database_encryption_password_required_message">Database encryption uses your app password to generate the encryption key. Please set an app password first by enabling \"App Lock\" above.\n\nOnce set, you can enable database encryption using the same password - no separate password needed.</string>
+    <string name="settings_security_privacy">Bảo mật &amp; Quyền riêng tư</string>
+    <string name="settings_app_lock">Khóa ứng dụng</string>
+    <string name="settings_app_lock_description">Yêu cầu mật khẩu hoặc sinh trắc học để mở khóa ứng dụng</string>
+    <string name="settings_biometric_auth">Xác thực sinh trắc học</string>
+    <string name="settings_biometric_auth_description">Sử dụng vân tay hoặc mở khóa khuôn mặt</string>
+    <string name="settings_require_auth_on_launch">Yêu cầu xác thực khi khởi chạy</string>
+    <string name="settings_require_auth_on_launch_description">Luôn yêu cầu xác thực khi mở ứng dụng</string>
+    <string name="settings_set_password">Đặt mật khẩu</string>
+    <string name="settings_change_password">Thay đổi mật khẩu</string>
+    <string name="settings_database_encryption">Mã hóa cơ sở dữ liệu</string>
+    <string name="settings_database_encryption_description">Mã hóa toàn bộ cơ sở dữ liệu bằng SQLCipher sử dụng mật khẩu ứng dụng của bạn (yêu cầu khởi động lại)</string>
+    <string name="settings_database_encryption_warning">Cảnh báo: Đây là tính năng thử nghiệm. Đảm bảo bạn có bản sao lưu trước khi bật!</string>
+    <string name="settings_database_encryption_enable_title">Bật mã hóa cơ sở dữ liệu?</string>
+    <string name="settings_database_encryption_enable_message">Điều này sẽ mã hóa toàn bộ cơ sở dữ liệu radio của bạn bằng mật khẩu ứng dụng. Ứng dụng sẽ khởi động lại để áp dụng thay đổi.\n\nCẢNH BÁO: Đây là thử nghiệm. Đảm bảo bạn có bản sao lưu!</string>
+    <string name="settings_database_encryption_disable_title">Tắt mã hóa cơ sở dữ liệu?</string>
+    <string name="settings_database_encryption_disable_message">Điều này sẽ giải mã cơ sở dữ liệu và xóa mã hóa của bạn. Ứng dụng sẽ khởi động lại để áp dụng thay đổi.</string>
+    <string name="settings_database_encryption_enabled">Đã bật mã hóa cơ sở dữ liệu</string>
+    <string name="settings_database_encryption_disabled">Đã tắt mã hóa cơ sở dữ liệu</string>
+    <string name="settings_database_encryption_error">Thất bại khi thay đổi cài đặt mã hóa</string>
+    <string name="settings_database_encryption_password_required_title">Yêu cầu mật khẩu ứng dụng</string>
+    <string name="settings_database_encryption_password_required_message">Mã hóa cơ sở dữ liệu sử dụng mật khẩu ứng dụng của bạn để tạo khóa mã hóa. Vui lòng đặt mật khẩu ứng dụng trước bằng cách bật \"Khóa ứng dụng\" ở trên.\n\nSau khi đặt, bạn có thể bật mã hóa cơ sở dữ liệu bằng cùng mật khẩu - không cần mật khẩu riêng.</string>
 
     <!-- Authentication Dialog -->
-    <string name="auth_dialog_title">Set App Password</string>
-    <string name="auth_dialog_change_title">Change Password</string>
-    <string name="auth_dialog_change_message">Note: If database encryption is enabled, it will be automatically updated to use the new password.</string>
-    <string name="auth_dialog_current_password">Current Password</string>
-    <string name="auth_dialog_new_password">New Password</string>
-    <string name="auth_dialog_confirm_password">Confirm Password</string>
-    <string name="auth_dialog_set">Set Password</string>
-    <string name="auth_dialog_change">Change Password</string>
-    <string name="auth_error_passwords_dont_match">Passwords don\'t match</string>
-    <string name="auth_error_password_too_short">Password must be at least 4 characters</string>
-    <string name="auth_error_current_password_wrong">Current password is incorrect</string>
-    <string name="auth_password_set">Password set successfully</string>
-    <string name="auth_password_changed">Password changed successfully</string>
-    <string name="auth_enter_password_to_encrypt">Verify Your App Password</string>
-    <string name="auth_enter_password_to_decrypt">Verify Your App Password</string>
-    <string name="auth_password_for_encryption">Enter your existing app password to enable database encryption.\n\nYour app password will be used to derive the encryption key. No separate password is needed.</string>
-    <string name="auth_password_for_decryption">Enter your app password to verify and decrypt the database before disabling encryption.</string>
-    <string name="auth_encrypting_database">Encrypting database with your app password…</string>
-    <string name="auth_decrypting_database">Decrypting database…</string>
-    <string name="auth_rekeying_database">Updating database encryption with new password…</string>
+    <string name="auth_dialog_title">Đặt mật khẩu ứng dụng</string>
+    <string name="auth_dialog_change_title">Thay đổi mật khẩu</string>
+    <string name="auth_dialog_change_message">Lưu ý: Nếu mã hóa cơ sở dữ liệu được bật, nó sẽ tự động cập nhật để sử dụng mật khẩu mới.</string>
+    <string name="auth_dialog_current_password">Mật khẩu hiện tại</string>
+    <string name="auth_dialog_new_password">Mật khẩu mới</string>
+    <string name="auth_dialog_confirm_password">Xác nhận mật khẩu</string>
+    <string name="auth_dialog_set">Đặt mật khẩu</string>
+    <string name="auth_dialog_change">Thay đổi mật khẩu</string>
+    <string name="auth_error_passwords_dont_match">Mật khẩu không khớp</string>
+    <string name="auth_error_password_too_short">Mật khẩu phải có ít nhất 4 ký tự</string>
+    <string name="auth_error_current_password_wrong">Mật khẩu hiện tại không đúng</string>
+    <string name="auth_password_set">Đã đặt mật khẩu thành công</string>
+    <string name="auth_password_changed">Đã thay đổi mật khẩu thành công</string>
+    <string name="auth_enter_password_to_encrypt">Xác minh mật khẩu ứng dụng của bạn</string>
+    <string name="auth_enter_password_to_decrypt">Xác minh mật khẩu ứng dụng của bạn</string>
+    <string name="auth_password_for_encryption">Nhập mật khẩu ứng dụng hiện có của bạn để bật mã hóa cơ sở dữ liệu.\n\nMật khẩu ứng dụng của bạn sẽ được sử dụng để tạo khóa mã hóa. Không cần mật khẩu riêng.</string>
+    <string name="auth_password_for_decryption">Nhập mật khẩu ứng dụng của bạn để xác minh và giải mã cơ sở dữ liệu trước khi tắt mã hóa.</string>
+    <string name="auth_encrypting_database">Đang mã hóa cơ sở dữ liệu bằng mật khẩu ứng dụng của bạn…</string>
+    <string name="auth_decrypting_database">Đang giải mã cơ sở dữ liệu…</string>
+    <string name="auth_rekeying_database">Đang cập nhật mã hóa cơ sở dữ liệu bằng mật khẩu mới…</string>
 
     <!-- Authentication Activity -->
-    <string name="auth_unlock_app">Unlock deutsia radio</string>
-    <string name="auth_enter_password">Enter your password</string>
-    <string name="auth_password_hint">Password</string>
-    <string name="auth_unlock_button">Unlock</string>
-    <string name="auth_use_biometric">Use Biometric</string>
-    <string name="auth_error_wrong_password">Wrong password</string>
-    <string name="auth_biometric_title">Unlock deutsia radio</string>
-    <string name="auth_biometric_subtitle">Authenticate to continue</string>
-    <string name="auth_biometric_negative">Use Password</string>
+    <string name="auth_unlock_app">Mở khóa deutsia radio</string>
+    <string name="auth_enter_password">Nhập mật khẩu của bạn</string>
+    <string name="auth_password_hint">Mật khẩu</string>
+    <string name="auth_unlock_button">Mở khóa</string>
+    <string name="auth_use_biometric">Sử dụng sinh trắc học</string>
+    <string name="auth_error_wrong_password">Mật khẩu sai</string>
+    <string name="auth_biometric_title">Mở khóa deutsia radio</string>
+    <string name="auth_biometric_subtitle">Xác thực để tiếp tục</string>
+    <string name="auth_biometric_negative">Sử dụng mật khẩu</string>
 </resources>
