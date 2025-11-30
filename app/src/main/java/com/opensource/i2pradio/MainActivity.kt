@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var repository: RadioRepository
     private lateinit var radioBrowserRepository: RadioBrowserRepository
     private val viewModel: RadioViewModel by viewModels()
+    private var repositoriesInitialized = false  // Track if repositories have been initialized
 
     private var radioService: RadioService? = null
     private var isServiceBound = false
@@ -135,6 +136,25 @@ class MainActivity : AppCompatActivity() {
         viewPager.currentItem = 0
     }
 
+    /**
+     * Initialize repositories and load preset stations
+     * This is called either immediately in onCreate() if no encryption,
+     * or after authentication in onResume() if database encryption is enabled
+     */
+    private fun initializeRepositories() {
+        if (repositoriesInitialized) {
+            return  // Already initialized
+        }
+
+        repository = RadioRepository(this)
+        radioBrowserRepository = RadioBrowserRepository(this)
+        repositoriesInitialized = true
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            repository.initializePresetStations(this@MainActivity)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply saved theme BEFORE super.onCreate
         val savedTheme = PreferencesHelper.getThemeMode(this)
@@ -164,11 +184,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        repository = RadioRepository(this)
-        radioBrowserRepository = RadioBrowserRepository(this)
+        // Check if database encryption is enabled
+        val isDbEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            repository.initializePresetStations(this@MainActivity)  // Pass context
+        // If database encryption is NOT enabled, initialize repositories immediately
+        // If it IS enabled, we'll initialize after authentication in onResume()
+        if (!isDbEncryptionEnabled) {
+            initializeRepositories()
         }
 
         toolbar = findViewById(R.id.toolbar)
@@ -512,13 +534,16 @@ class MainActivity : AppCompatActivity() {
         val isAppLockEnabled = PreferencesHelper.isAppLockEnabled(this)
         val requireAuthOnLaunch = PreferencesHelper.isRequireAuthOnLaunch(this)
         val hasPassword = BiometricAuthManager.hasPassword(this)
+        val isDbEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)
 
         // Show authentication if:
-        // 1. App lock is enabled
+        // 1. App lock is enabled OR database encryption is enabled
         // 2. Password is set
         // 3. Either this is first launch (and require on launch is enabled) OR app is resuming and not already authenticated
-        val shouldAuthenticate = isAppLockEnabled && hasPassword &&
-            ((isFirstLaunch && requireAuthOnLaunch) || (!isFirstLaunch && !isAuthenticated))
+        // Note: Database encryption ALWAYS requires authentication on launch
+        val shouldAuthenticate = hasPassword &&
+            ((isAppLockEnabled && ((isFirstLaunch && requireAuthOnLaunch) || (!isFirstLaunch && !isAuthenticated))) ||
+             (isDbEncryptionEnabled && !isAuthenticated))
 
         if (shouldAuthenticate) {
             // Launch authentication activity
@@ -527,6 +552,8 @@ class MainActivity : AppCompatActivity() {
         } else if (isFirstLaunch) {
             // Mark as authenticated on first launch if no auth required
             isAuthenticated = true
+            // Initialize repositories if not already done (for non-encrypted case on first launch)
+            initializeRepositories()
         }
 
         // Mark first launch as complete
@@ -549,6 +576,8 @@ class MainActivity : AppCompatActivity() {
         // Close database to ensure it's re-opened with fresh authentication next time
         if (com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)) {
             com.opensource.i2pradio.data.RadioDatabase.closeDatabase()
+            // Reset repositories flag so they get re-initialized after authentication on resume
+            repositoriesInitialized = false
         }
     }
 
@@ -557,6 +586,10 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_AUTHENTICATION) {
             // If authentication activity finished, mark as authenticated
             isAuthenticated = true
+
+            // Initialize repositories now that user is authenticated
+            // This is especially important for database encryption case
+            initializeRepositories()
         }
     }
 
