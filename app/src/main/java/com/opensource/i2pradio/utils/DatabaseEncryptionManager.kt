@@ -201,7 +201,7 @@ object DatabaseEncryptionManager {
             )
 
             // Export to encrypted database
-            unencryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS encrypted KEY '${passphrase.toHexString()}'")
+            unencryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS encrypted KEY x'${passphrase.toHexString()}'")
             unencryptedDb.rawExecSQL("SELECT sqlcipher_export('encrypted')")
             unencryptedDb.rawExecSQL("DETACH DATABASE encrypted")
             unencryptedDb.close()
