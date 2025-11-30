@@ -277,6 +277,15 @@
     <string name="tor_status_error">Errore Tor</string>
     <string name="tor_status_leak_warning">Avviso fuga</string>
     <string name="tor_status_install_orbot">Installa Orbot</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">Tor è disconnesso. Tocca per connetterti.</string>
+    <string name="tor_status_connecting_description">Tor si sta connettendo...</string>
+    <string name="tor_status_connected_description">Tor è connesso. Tocca per visualizzare i dettagli.</string>
+    <string name="tor_status_connected_force_description">Tor è connesso (Modalità Forzata). Tocca per visualizzare i dettagli.</string>
+    <string name="tor_status_error_description">Connessione Tor non riuscita. Tocca per riprovare.</string>
+    <string name="tor_status_install_orbot_description">Orbot non è installato. Tocca per installare.</string>
+    <string name="tor_status_leak_warning_description">La modalità Tor forzata è abilitata ma non connessa. La privacy potrebbe essere compromessa.</string>
     <string name="tor_status_connecting_message">Connessione a Tor...</string>
     <string name="tor_status_connected_message">Connesso tramite Tor</string>
     <string name="tor_control_title_stopped">Tor disconnesso</string>

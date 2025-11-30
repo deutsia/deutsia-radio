@@ -270,6 +270,16 @@
     <string name="tor_status_error">خطأ في Tor</string>
     <string name="tor_status_leak_warning">تحذير من التسرب</string>
     <string name="tor_status_install_orbot">تثبيت Orbot</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">تم قطع اتصال Tor. انقر للاتصال.</string>
+    <string name="tor_status_connecting_description">جارٍ الاتصال بـ Tor...</string>
+    <string name="tor_status_connected_description">متصل بـ Tor. انقر لعرض التفاصيل.</string>
+    <string name="tor_status_connected_force_description">متصل بـ Tor (الوضع الإجباري). انقر لعرض التفاصيل.</string>
+    <string name="tor_status_error_description">فشل اتصال Tor. انقر لإعادة المحاولة.</string>
+    <string name="tor_status_install_orbot_description">Orbot غير مثبت. انقر للتثبيت.</string>
+    <string name="tor_status_leak_warning_description">تم تمكين وضع Tor الإجباري ولكن غير متصل. قد تكون الخصوصية معرضة للخطر.</string>
+
     <string name="tor_status_connecting_message">جارٍ الاتصال بـ Tor...</string>
     <string name="tor_status_connected_message">متصل عبر Tor</string>
     <string name="tor_control_title_stopped">تم قطع اتصال Tor</string>

@@ -270,6 +270,16 @@
     <string name="tor_status_error">Lỗi Tor</string>
     <string name="tor_status_leak_warning">Cảnh báo rò rỉ</string>
     <string name="tor_status_install_orbot">Cài đặt Orbot</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">Tor đã ngắt kết nối. Nhấn để kết nối.</string>
+    <string name="tor_status_connecting_description">Tor đang kết nối...</string>
+    <string name="tor_status_connected_description">Tor đã kết nối. Nhấn để xem chi tiết.</string>
+    <string name="tor_status_connected_force_description">Tor đã kết nối (Chế độ Bắt buộc). Nhấn để xem chi tiết.</string>
+    <string name="tor_status_error_description">Kết nối Tor thất bại. Nhấn để thử lại.</string>
+    <string name="tor_status_install_orbot_description">Orbot chưa được cài đặt. Nhấn để cài đặt.</string>
+    <string name="tor_status_leak_warning_description">Chế độ Tor bắt buộc đã bật nhưng chưa kết nối. Quyền riêng tư có thể bị ảnh hưởng.</string>
+
     <string name="tor_status_connecting_message">Đang kết nối với Tor...</string>
     <string name="tor_status_connected_message">Đã kết nối qua Tor</string>
     <string name="tor_control_title_stopped">Tor đã ngắt kết nối</string>

@@ -267,6 +267,16 @@
     <string name="tor_status_error">Tor त्रुटि</string>
     <string name="tor_status_leak_warning">लीक चेतावनी</string>
     <string name="tor_status_install_orbot">Orbot इंस्टॉल करें</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">Tor डिसकनेक्ट है। कनेक्ट करने के लिए टैप करें।</string>
+    <string name="tor_status_connecting_description">Tor कनेक्ट हो रहा है...</string>
+    <string name="tor_status_connected_description">Tor कनेक्ट है। विवरण देखने के लिए टैप करें।</string>
+    <string name="tor_status_connected_force_description">Tor कनेक्ट है (फ़ोर्स मोड)। विवरण देखने के लिए टैप करें।</string>
+    <string name="tor_status_error_description">Tor कनेक्शन विफल रहा। पुनः प्रयास के लिए टैप करें।</string>
+    <string name="tor_status_install_orbot_description">Orbot इंस्टॉल नहीं है। इंस्टॉल करने के लिए टैप करें।</string>
+    <string name="tor_status_leak_warning_description">फ़ोर्स Tor मोड सक्षम है लेकिन कनेक्ट नहीं है। गोपनीयता खतरे में हो सकती है।</string>
+
     <string name="tor_status_connecting_message">Tor से कनेक्ट हो रहा है...</string>
     <string name="tor_status_connected_message">Tor के माध्यम से कनेक्ट किया गया</string>
     <string name="tor_control_title_stopped">Tor डिसकनेक्ट किया गया</string>

@@ -270,6 +270,16 @@
     <string name="tor_status_error">Tor Hatası</string>
     <string name="tor_status_leak_warning">Sızıntı Uyarısı</string>
     <string name="tor_status_install_orbot">Orbot\'u Yükle</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">Tor bağlantısı kesildi. Bağlanmak için dokunun.</string>
+    <string name="tor_status_connecting_description">Tor bağlanıyor...</string>
+    <string name="tor_status_connected_description">Tor bağlandı. Ayrıntıları görüntülemek için dokunun.</string>
+    <string name="tor_status_connected_force_description">Tor bağlandı (Zorunlu Mod). Ayrıntıları görüntülemek için dokunun.</string>
+    <string name="tor_status_error_description">Tor bağlantısı başarısız oldu. Yeniden denemek için dokunun.</string>
+    <string name="tor_status_install_orbot_description">Orbot yüklü değil. Yüklemek için dokunun.</string>
+    <string name="tor_status_leak_warning_description">Zorunlu Tor modu etkin ancak bağlı değil. Gizlilik tehlikeye girebilir.</string>
+
     <string name="tor_status_connecting_message">Tor\'a bağlanıyor...</string>
     <string name="tor_status_connected_message">Tor üzerinden bağlandı</string>
     <string name="tor_control_title_stopped">Tor Bağlantısı Kesildi</string>

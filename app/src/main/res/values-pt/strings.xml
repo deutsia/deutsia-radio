@@ -270,6 +270,16 @@
     <string name="tor_status_error">Tor Error</string>
     <string name="tor_status_leak_warning">Leak Warning</string>
     <string name="tor_status_install_orbot">Install Orbot</string>
+
+    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    <string name="tor_status_off_description">Tor está desconectado. Toque para conectar.</string>
+    <string name="tor_status_connecting_description">Tor está se conectando...</string>
+    <string name="tor_status_connected_description">Tor está conectado. Toque para ver detalhes.</string>
+    <string name="tor_status_connected_force_description">Tor está conectado (Modo Forçado). Toque para ver detalhes.</string>
+    <string name="tor_status_error_description">Conexão Tor falhou. Toque para tentar novamente.</string>
+    <string name="tor_status_install_orbot_description">Orbot não está instalado. Toque para instalar.</string>
+    <string name="tor_status_leak_warning_description">Modo Tor forçado está ativado mas não conectado. A privacidade pode estar comprometida.</string>
+
     <string name="tor_status_connecting_message">Connecting to Tor...</string>
     <string name="tor_status_connected_message">Connected via Tor</string>
     <string name="tor_control_title_stopped">Tor Disconnected</string>
