@@ -36,6 +36,7 @@ import com.opensource.i2pradio.ui.LibraryFragment
 import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
 import com.opensource.i2pradio.ui.TorStatusView
 import com.opensource.i2pradio.ui.CustomProxyStatusView
+import com.opensource.i2pradio.ui.LocaleHelper
 import com.opensource.i2pradio.ui.browse.BrowseStationsFragment
 import com.opensource.i2pradio.utils.BiometricAuthManager
 import kotlinx.coroutines.Dispatchers
@@ -153,6 +154,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             repository.initializePresetStations(this@MainActivity)
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        // Apply saved language preference before activity is created
+        super.attachBaseContext(LocaleHelper.applyLanguage(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

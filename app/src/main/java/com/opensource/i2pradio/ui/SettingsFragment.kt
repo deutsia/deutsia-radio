@@ -254,6 +254,7 @@ class SettingsFragment : Fragment() {
 
         val themeButton = view.findViewById<MaterialButton>(R.id.themeButton)
         val colorSchemeButton = view.findViewById<MaterialButton>(R.id.colorSchemeButton)
+        val languageButton = view.findViewById<MaterialButton>(R.id.languageButton)
         val githubButton = view.findViewById<MaterialButton>(R.id.githubButton)
         val materialYouSwitch = view.findViewById<MaterialSwitch>(R.id.materialYouSwitch)
         val materialYouContainer = view.findViewById<View>(R.id.materialYouContainer)
@@ -315,6 +316,14 @@ class SettingsFragment : Fragment() {
         // Color scheme selector
         colorSchemeButton.setOnClickListener {
             showColorSchemeDialog(colorSchemeButton)
+        }
+
+        // Update language button text
+        updateLanguageButtonText(languageButton)
+
+        // Language selector
+        languageButton.setOnClickListener {
+            showLanguageDialog(languageButton)
         }
 
         // GitHub button
@@ -1052,6 +1061,75 @@ class SettingsFragment : Fragment() {
                 PreferencesHelper.setColorScheme(requireContext(), newScheme)
                 updateColorSchemeButtonText(colorSchemeButton)
                 // Recreate activity to apply new color scheme
+                uiHandler.postDelayed({
+                    activity?.recreate()
+                }, 300)
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun updateLanguageButtonText(button: MaterialButton) {
+        val currentLanguage = PreferencesHelper.getAppLanguage(requireContext())
+        button.text = when (currentLanguage) {
+            "ar" -> getString(R.string.language_arabic)
+            "de" -> getString(R.string.language_german)
+            "es" -> getString(R.string.language_spanish)
+            "fa" -> getString(R.string.language_farsi)
+            "fr" -> getString(R.string.language_french)
+            "hi" -> getString(R.string.language_hindi)
+            "it" -> getString(R.string.language_italian)
+            "ja" -> getString(R.string.language_japanese)
+            "ko" -> getString(R.string.language_korean)
+            "my" -> getString(R.string.language_burmese)
+            "pt" -> getString(R.string.language_portuguese)
+            "ru" -> getString(R.string.language_russian)
+            "tr" -> getString(R.string.language_turkish)
+            "uk" -> getString(R.string.language_ukrainian)
+            "vi" -> getString(R.string.language_vietnamese)
+            "zh" -> getString(R.string.language_chinese)
+            else -> getString(R.string.language_system_default)
+        }
+    }
+
+    private fun showLanguageDialog(languageButton: MaterialButton) {
+        val languages = arrayOf(
+            getString(R.string.language_system_default),
+            getString(R.string.language_arabic),
+            getString(R.string.language_german),
+            getString(R.string.language_english),
+            getString(R.string.language_spanish),
+            getString(R.string.language_farsi),
+            getString(R.string.language_french),
+            getString(R.string.language_hindi),
+            getString(R.string.language_italian),
+            getString(R.string.language_japanese),
+            getString(R.string.language_korean),
+            getString(R.string.language_burmese),
+            getString(R.string.language_portuguese),
+            getString(R.string.language_russian),
+            getString(R.string.language_turkish),
+            getString(R.string.language_ukrainian),
+            getString(R.string.language_vietnamese),
+            getString(R.string.language_chinese)
+        )
+        val languageCodes = arrayOf(
+            "system", "ar", "de", "en", "es", "fa", "fr", "hi", "it", "ja", "ko", "my", "pt", "ru", "tr", "uk", "vi", "zh"
+        )
+        val currentLanguage = PreferencesHelper.getAppLanguage(requireContext())
+        val selectedIndex = languageCodes.indexOf(currentLanguage).coerceAtLeast(0)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Choose Language")
+            .setSingleChoiceItems(languages, selectedIndex) { dialog, which ->
+                val newLanguage = languageCodes[which]
+                PreferencesHelper.setAppLanguage(requireContext(), newLanguage)
+                updateLanguageButtonText(languageButton)
+
+                // Apply the new language
+                LocaleHelper.setLocale(requireContext(), newLanguage)
+
+                // Recreate activity to apply new language
                 uiHandler.postDelayed({
                     activity?.recreate()
                 }, 300)

@@ -115,6 +115,28 @@
     <string name="settings_color_scheme">Color Scheme</string>
     <string name="settings_color_scheme_description">Choose your preferred color</string>
     <string name="settings_color_blue">Blue</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_description">Choose your preferred language</string>
+
+    <!-- Language Names -->
+    <string name="language_system_default">System Default</string>
+    <string name="language_arabic">العربية</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_farsi">فارسی</string>
+    <string name="language_french">Français</string>
+    <string name="language_hindi">हिन्दी</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_burmese">မြန်မာ</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_ukrainian">Українська</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_chinese">中文</string>
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Tor Network</string>
