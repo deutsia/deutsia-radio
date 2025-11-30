@@ -45,11 +45,11 @@
     <string name="genre_alternative">Alternative</string>
     <string name="genre_ambient">Ambient</string>
     <string name="genre_blues">Blues</string>
-    <string name="genre_christian">Christian</string>
+    <string name="genre_christian">Cristiana</string>
     <string name="genre_classical">Classica</string>
     <string name="genre_comedy">Commedia</string>
     <string name="genre_country">Country</string>
-    <string name="genre_dance">Dance</string>
+    <string name="genre_dance">Danza</string>
     <string name="genre_edm">EDM</string>
     <string name="genre_electronic">Elettronica</string>
     <string name="genre_folk">Folk</string>
@@ -71,8 +71,8 @@
     <string name="genre_rock">Rock</string>
     <string name="genre_soul">Soul</string>
     <string name="genre_sports">Sport</string>
-    <string name="genre_talk">Talk</string>
-    <string name="genre_world">World</string>
+    <string name="genre_talk">Conversazione</string>
+    <string name="genre_world">Mondo</string>
     <string name="genre_other">Altro</string>
 
      <!-- about -->

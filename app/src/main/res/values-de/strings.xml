@@ -40,9 +40,9 @@
     <string name="genre_blues">Blues</string>
     <string name="genre_christian">Christlich</string>
     <string name="genre_classical">Klassik</string>
-    <string name="genre_comedy">Comedy</string>
+    <string name="genre_comedy">Komödie</string>
     <string name="genre_country">Country</string>
-    <string name="genre_dance">Dance</string>
+    <string name="genre_dance">Tanz</string>
     <string name="genre_edm">EDM</string>
     <string name="genre_electronic">Elektronisch</string>
     <string name="genre_folk">Folk</string>
@@ -64,7 +64,7 @@
     <string name="genre_rock">Rock</string>
     <string name="genre_soul">Soul</string>
     <string name="genre_sports">Sport</string>
-    <string name="genre_talk">Talk</string>
+    <string name="genre_talk">Gespräch</string>
     <string name="genre_world">Weltmusik</string>
     <string name="genre_other">Sonstige</string>
 
