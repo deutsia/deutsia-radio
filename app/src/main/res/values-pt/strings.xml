@@ -263,13 +263,13 @@
     <string name="tor_open_orbot">Abrir Orbot</string>
 
     <!-- Tor Status Messages -->
-    <string name="tor_status_connecting">Connecting...</string>
-    <string name="tor_status_connected">Tor Connected</string>
-    <string name="tor_status_disconnected">Tor Disconnected</string>
-    <string name="tor_status_off">Tor Off</string>
-    <string name="tor_status_error">Tor Error</string>
-    <string name="tor_status_leak_warning">Leak Warning</string>
-    <string name="tor_status_install_orbot">Install Orbot</string>
+    <string name="tor_status_connecting">Conectando...</string>
+    <string name="tor_status_connected">Tor conectado</string>
+    <string name="tor_status_disconnected">Tor desconectado</string>
+    <string name="tor_status_off">Tor desligado</string>
+    <string name="tor_status_error">Erro do Tor</string>
+    <string name="tor_status_leak_warning">Aviso de vazamento</string>
+    <string name="tor_status_install_orbot">Instalar Orbot</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor está desconectado. Toque para conectar.</string>
@@ -280,26 +280,26 @@
     <string name="tor_status_install_orbot_description">Orbot não está instalado. Toque para instalar.</string>
     <string name="tor_status_leak_warning_description">Modo Tor forçado está ativado mas não conectado. A privacidade pode estar comprometida.</string>
 
-    <string name="tor_status_connecting_message">Connecting to Tor...</string>
-    <string name="tor_status_connected_message">Connected via Tor</string>
-    <string name="tor_control_title_stopped">Tor Disconnected</string>
-    <string name="tor_control_subtitle_stopped">Tap Connect to browse anonymously via Tor</string>
-    <string name="tor_control_subtitle_connecting">Establishing secure connection via Orbot</string>
-    <string name="tor_control_title_connecting">Connecting to Tor...</string>
-    <string name="tor_control_title_connected">Connected to Tor</string>
-    <string name="tor_control_title_connected_force">Connected to Tor (Force Mode)</string>
-    <string name="tor_control_subtitle_connected">Your connection is private and anonymous</string>
-    <string name="tor_control_subtitle_connected_force">Disconnect via Orbot or disable Force Tor in settings</string>
-    <string name="tor_control_title_error">Connection Failed</string>
-    <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
-    <string name="tor_control_title_orbot_required">Orbot Required</string>
-    <string name="tor_control_subtitle_orbot_required">Install Orbot to connect to the Tor network</string>
-    <string name="tor_control_button_connecting">Connecting...</string>
-    <string name="tor_control_button_disconnect">Disconnect</string>
-    <string name="tor_control_button_cancel">Cancel</string>
-    <string name="tor_control_button_retry">Retry Connection</string>
-    <string name="tor_control_button_install">Install Orbot</string>
-    <string name="tor_control_button_open_orbot">Open Orbot</string>
+    <string name="tor_status_connecting_message">Conectando ao Tor...</string>
+    <string name="tor_status_connected_message">Conectado via Tor</string>
+    <string name="tor_control_title_stopped">Tor desconectado</string>
+    <string name="tor_control_subtitle_stopped">Toque em Conectar para navegar anonimamente via Tor</string>
+    <string name="tor_control_subtitle_connecting">Estabelecendo conexão segura via Orbot</string>
+    <string name="tor_control_title_connecting">Conectando ao Tor...</string>
+    <string name="tor_control_title_connected">Conectado ao Tor</string>
+    <string name="tor_control_title_connected_force">Conectado ao Tor (Modo Forçado)</string>
+    <string name="tor_control_subtitle_connected">Sua conexão é privada e anônima</string>
+    <string name="tor_control_subtitle_connected_force">Desconecte via Orbot ou desative Forçar Tor nas configurações</string>
+    <string name="tor_control_title_error">Conexão falhou</string>
+    <string name="tor_control_subtitle_error">Não foi possível conectar à rede Tor</string>
+    <string name="tor_control_title_orbot_required">Orbot necessário</string>
+    <string name="tor_control_subtitle_orbot_required">Instale o Orbot para conectar à rede Tor</string>
+    <string name="tor_control_button_connecting">Conectando...</string>
+    <string name="tor_control_button_disconnect">Desconectar</string>
+    <string name="tor_control_button_cancel">Cancelar</string>
+    <string name="tor_control_button_retry">Tentar novamente</string>
+    <string name="tor_control_button_install">Instalar Orbot</string>
+    <string name="tor_control_button_open_orbot">Abrir Orbot</string>
 
 
     <!-- Add/Edit Radio Dialog -->
