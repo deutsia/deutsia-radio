@@ -881,6 +881,9 @@ class SettingsFragment : Fragment() {
         val isForceTorEnabled = PreferencesHelper.isForceTorAll(requireContext()) ||
                                 PreferencesHelper.isForceTorExceptI2P(requireContext())
 
+        // Hide the action button during force mode - users shouldn't be able to stop Tor manually
+        torActionButton?.visibility = if (isForceTorEnabled) View.GONE else View.VISIBLE
+
         when (state) {
             TorManager.TorState.STOPPED -> {
                 // If force Tor is enabled and we have a proxy port, assume connected
