@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.opensource.i2pradio.utils.DatabaseEncryptionManager
-import net.zetetic.database.sqlcipher.SupportFactory
+import net.sqlcipher.database.SupportFactory
 
 @Database(entities = [RadioStation::class, BrowseHistory::class], version = 8, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
