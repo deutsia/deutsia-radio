@@ -84,16 +84,25 @@ class CustomProxyStatusView @JvmOverloads constructor(
             ProxyState.CONNECTED -> {
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom_on)
                 statusIcon.alpha = 1f
-                // Main status text
+                // Main status text - using neutral color to match Tor section style
                 statusText.text = context.getString(R.string.custom_proxy_status_connected)
-                statusText.setTextColor(context.getColor(R.color.tor_connected))
+                // Use theme attribute for colorOnSurface (neutral, not green)
+                val colorOnSurface = com.google.android.material.R.attr.colorOnSurface
+                val typedValue = android.util.TypedValue()
+                context.theme.resolveAttribute(colorOnSurface, typedValue, true)
+                statusText.setTextColor(typedValue.data)
+
                 // Detail text with protocol and port (matching Tor format: "SOCKS port: 9050")
                 statusDetail.text = if (protocol.isNotEmpty() && port > 0) {
                     "$protocol port: $port"
                 } else {
                     context.getString(R.string.custom_proxy_status_configured)
                 }
-                statusDetail.setTextColor(context.getColor(R.color.tor_connected))
+                // Use theme attribute for colorOnSurfaceVariant (neutral, not green)
+                val colorOnSurfaceVariant = com.google.android.material.R.attr.colorOnSurfaceVariant
+                context.theme.resolveAttribute(colorOnSurfaceVariant, typedValue, true)
+                statusDetail.setTextColor(typedValue.data)
+
                 contentDescription = "Custom proxy is configured. Tap to view details."
                 showConnectedAnimation()
             }

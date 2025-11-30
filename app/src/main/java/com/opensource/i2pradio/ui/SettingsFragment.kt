@@ -76,6 +76,8 @@ class SettingsFragment : Fragment() {
     private lateinit var repository: RadioRepository
 
     // Custom Proxy UI elements
+    private var enableCustomProxySwitch: MaterialSwitch? = null
+    private var customProxyConfigContainer: View? = null
     private var configureProxyButton: MaterialButton? = null
     private var forceCustomProxySwitch: MaterialSwitch? = null
     private var forceCustomProxyExceptTorI2pSwitch: MaterialSwitch? = null
@@ -424,6 +426,8 @@ class SettingsFragment : Fragment() {
         }
 
         // Custom Proxy UI elements
+        enableCustomProxySwitch = view.findViewById(R.id.enableCustomProxySwitch)
+        customProxyConfigContainer = view.findViewById(R.id.customProxyConfigContainer)
         configureProxyButton = view.findViewById(R.id.configureProxyButton)
         forceCustomProxySwitch = view.findViewById(R.id.forceCustomProxySwitch)
         forceCustomProxyExceptTorI2pSwitch = view.findViewById(R.id.forceCustomProxyExceptTorI2pSwitch)
@@ -642,6 +646,10 @@ class SettingsFragment : Fragment() {
             if (isChecked) {
                 // MUTUAL EXCLUSIVITY: Disable Custom Proxy when Tor is enabled
                 // This prevents privacy leaks from having both configured but unclear routing
+                PreferencesHelper.setCustomProxyEnabled(requireContext(), false)
+                enableCustomProxySwitch?.isChecked = false
+
+                // Clear custom proxy settings
                 PreferencesHelper.setCustomProxyHost(requireContext(), "")
                 PreferencesHelper.setCustomProxyPort(requireContext(), 8080)
                 PreferencesHelper.setCustomProxyProtocol(requireContext(), "HTTP")
@@ -655,6 +663,9 @@ class SettingsFragment : Fragment() {
                 PreferencesHelper.setForceCustomProxyExceptTorI2P(requireContext(), false)
                 forceCustomProxySwitch?.isChecked = false
                 forceCustomProxyExceptTorI2pSwitch?.isChecked = false
+
+                // Update custom proxy container visibility
+                updateCustomProxyContainerVisibility(false)
 
                 // Update custom proxy status view
                 updateCustomProxyStatusView()
@@ -819,6 +830,10 @@ class SettingsFragment : Fragment() {
         torStatusContainer?.visibility = if (show) View.VISIBLE else View.GONE
         // Also update Force Tor containers visibility
         updateForceTorContainersVisibility(show)
+    }
+
+    private fun updateCustomProxyContainerVisibility(show: Boolean) {
+        customProxyConfigContainer?.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun updateTorStatusUI(state: TorManager.TorState) {
@@ -1266,6 +1281,67 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupCustomProxyControls() {
+        // Initialize Enable Custom Proxy switch state
+        val customProxyEnabled = PreferencesHelper.isCustomProxyEnabled(requireContext())
+        enableCustomProxySwitch?.isChecked = customProxyEnabled
+
+        // Show/hide config container based on switch state
+        updateCustomProxyContainerVisibility(customProxyEnabled)
+
+        // Handle Enable Custom Proxy switch toggle
+        enableCustomProxySwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setCustomProxyEnabled(requireContext(), isChecked)
+            updateCustomProxyContainerVisibility(isChecked)
+
+            if (isChecked) {
+                // MUTUAL EXCLUSIVITY: Disable Tor when Custom Proxy is enabled
+                PreferencesHelper.setEmbeddedTorEnabled(requireContext(), false)
+                embeddedTorSwitch?.isChecked = false
+
+                // Stop Tor service
+                TorService.stop(requireContext())
+
+                // Disable Force Tor switches
+                PreferencesHelper.setForceTorAll(requireContext(), false)
+                PreferencesHelper.setForceTorExceptI2P(requireContext(), false)
+                forceTorAllSwitch?.isChecked = false
+                forceTorExceptI2pSwitch?.isChecked = false
+
+                // Update Tor container visibility
+                updateTorContainerVisibility(false)
+            } else {
+                // When disabled, also disable Force Custom Proxy settings
+                PreferencesHelper.setForceCustomProxy(requireContext(), false)
+                PreferencesHelper.setForceCustomProxyExceptTorI2P(requireContext(), false)
+                forceCustomProxySwitch?.isChecked = false
+                forceCustomProxyExceptTorI2pSwitch?.isChecked = false
+            }
+
+            // Broadcast proxy mode change to update MainActivity UI
+            val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(requireContext())
+                .sendBroadcast(broadcastIntent)
+
+            // Update status view
+            updateCustomProxyStatusView()
+        }
+
         // Configure Proxy button
         configureProxyButton?.setOnClickListener {
             showConfigureProxyDialog()
@@ -1509,6 +1585,11 @@ class SettingsFragment : Fragment() {
                 // MUTUAL EXCLUSIVITY: Disable Tor when Custom Proxy is configured
                 // This prevents privacy leaks from having both configured but unclear routing
                 if (host.isNotEmpty()) {
+                    // Enable custom proxy
+                    PreferencesHelper.setCustomProxyEnabled(requireContext(), true)
+                    enableCustomProxySwitch?.isChecked = true
+                    updateCustomProxyContainerVisibility(true)
+
                     // Disable Tor integration
                     PreferencesHelper.setEmbeddedTorEnabled(requireContext(), false)
                     embeddedTorSwitch?.isChecked = false
@@ -1537,6 +1618,11 @@ class SettingsFragment : Fragment() {
                 Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_saved), Toast.LENGTH_SHORT).show()
             }
             .setNeutralButton("Clear Proxy") { _, _ ->
+                // Disable custom proxy
+                PreferencesHelper.setCustomProxyEnabled(requireContext(), false)
+                enableCustomProxySwitch?.isChecked = false
+                updateCustomProxyContainerVisibility(false)
+
                 // Clear all proxy settings
                 PreferencesHelper.setCustomProxyHost(requireContext(), "")
                 PreferencesHelper.setCustomProxyPort(requireContext(), 8080)
@@ -1546,11 +1632,11 @@ class SettingsFragment : Fragment() {
                 PreferencesHelper.setCustomProxyAuthType(requireContext(), "None")
                 PreferencesHelper.setCustomProxyConnectionTimeout(requireContext(), 30)
 
-                // Disable Force Custom Proxy if enabled
-                if (forceCustomProxySwitch?.isChecked == true) {
-                    forceCustomProxySwitch?.isChecked = false
-                    PreferencesHelper.setForceCustomProxy(requireContext(), false)
-                }
+                // Disable Force Custom Proxy switches
+                PreferencesHelper.setForceCustomProxy(requireContext(), false)
+                PreferencesHelper.setForceCustomProxyExceptTorI2P(requireContext(), false)
+                forceCustomProxySwitch?.isChecked = false
+                forceCustomProxyExceptTorI2pSwitch?.isChecked = false
 
                 // Broadcast proxy mode change to update MainActivity UI
                 val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_PROXY_MODE_CHANGED)
