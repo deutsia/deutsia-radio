@@ -120,6 +120,93 @@ class LibraryFragment : Fragment() {
         )
     }
 
+    /**
+     * Translate common genre names from English (database/API) to localized strings.
+     * Returns the translated name if available, otherwise returns the original name.
+     */
+    private fun translateGenreName(englishName: String): String {
+        // Normalize the genre name for matching (lowercase, trim)
+        val normalized = englishName.trim().lowercase()
+
+        return when (normalized) {
+            "alternative" -> getString(R.string.genre_alternative)
+            "ambient" -> getString(R.string.genre_ambient)
+            "blues" -> getString(R.string.genre_blues)
+            "christian" -> getString(R.string.genre_christian)
+            "classical" -> getString(R.string.genre_classical)
+            "comedy" -> getString(R.string.genre_comedy)
+            "country" -> getString(R.string.genre_country)
+            "dance" -> getString(R.string.genre_dance)
+            "edm" -> getString(R.string.genre_edm)
+            "electronic" -> getString(R.string.genre_electronic)
+            "folk" -> getString(R.string.genre_folk)
+            "funk" -> getString(R.string.genre_funk)
+            "gospel" -> getString(R.string.genre_gospel)
+            "hip hop", "hip-hop", "hiphop" -> getString(R.string.genre_hip_hop)
+            "indie" -> getString(R.string.genre_indie)
+            "jazz" -> getString(R.string.genre_jazz)
+            "k-pop", "kpop" -> getString(R.string.genre_k_pop)
+            "latin" -> getString(R.string.genre_latin)
+            "lo-fi", "lofi" -> getString(R.string.genre_lo_fi)
+            "metal" -> getString(R.string.genre_metal)
+            "news" -> getString(R.string.genre_news)
+            "oldies" -> getString(R.string.genre_oldies)
+            "pop" -> getString(R.string.genre_pop)
+            "punk" -> getString(R.string.genre_punk)
+            "r&b", "r and b", "rnb" -> getString(R.string.genre_r_and_b)
+            "reggae" -> getString(R.string.genre_reggae)
+            "rock" -> getString(R.string.genre_rock)
+            "soul" -> getString(R.string.genre_soul)
+            "sports" -> getString(R.string.genre_sports)
+            "talk" -> getString(R.string.genre_talk)
+            "world" -> getString(R.string.genre_world)
+            "other" -> getString(R.string.genre_other)
+            else -> englishName // Return original if no translation available
+        }
+    }
+
+    /**
+     * Get the English equivalent of a localized genre name for database queries.
+     * This checks if the genre name matches any translated string and returns the English version.
+     */
+    private fun getEnglishGenreName(localizedName: String): String {
+        return when (localizedName) {
+            getString(R.string.genre_alternative) -> "Alternative"
+            getString(R.string.genre_ambient) -> "Ambient"
+            getString(R.string.genre_blues) -> "Blues"
+            getString(R.string.genre_christian) -> "Christian"
+            getString(R.string.genre_classical) -> "Classical"
+            getString(R.string.genre_comedy) -> "Comedy"
+            getString(R.string.genre_country) -> "Country"
+            getString(R.string.genre_dance) -> "Dance"
+            getString(R.string.genre_edm) -> "EDM"
+            getString(R.string.genre_electronic) -> "Electronic"
+            getString(R.string.genre_folk) -> "Folk"
+            getString(R.string.genre_funk) -> "Funk"
+            getString(R.string.genre_gospel) -> "Gospel"
+            getString(R.string.genre_hip_hop) -> "Hip Hop"
+            getString(R.string.genre_indie) -> "Indie"
+            getString(R.string.genre_jazz) -> "Jazz"
+            getString(R.string.genre_k_pop) -> "K-Pop"
+            getString(R.string.genre_latin) -> "Latin"
+            getString(R.string.genre_lo_fi) -> "Lo-Fi"
+            getString(R.string.genre_metal) -> "Metal"
+            getString(R.string.genre_news) -> "News"
+            getString(R.string.genre_oldies) -> "Oldies"
+            getString(R.string.genre_pop) -> "Pop"
+            getString(R.string.genre_punk) -> "Punk"
+            getString(R.string.genre_r_and_b) -> "R&B"
+            getString(R.string.genre_reggae) -> "Reggae"
+            getString(R.string.genre_rock) -> "Rock"
+            getString(R.string.genre_soul) -> "Soul"
+            getString(R.string.genre_sports) -> "Sports"
+            getString(R.string.genre_talk) -> "Talk"
+            getString(R.string.genre_world) -> "World"
+            getString(R.string.genre_other) -> "Other"
+            else -> localizedName // Return as-is if not a known translated genre
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -214,6 +301,7 @@ class LibraryFragment : Fragment() {
         currentStationsObserver?.removeObservers(viewLifecycleOwner)
 
         // Get new LiveData based on sort order and genre filter
+        // currentGenreFilter is always in English for database queries
         currentStationsObserver = if (currentGenreFilter != null) {
             repository.getStationsByGenreSorted(currentGenreFilter!!, currentSortOrder)
         } else {
@@ -297,10 +385,13 @@ class LibraryFragment : Fragment() {
                 emptyList()
             }
 
-            // Merge predefined genres with database genres, keeping alphabetical order
+            // Translate database genres from English to localized strings
+            val translatedDbGenres = dbGenres.map { translateGenreName(it) }
+
+            // Merge predefined genres with translated database genres, keeping alphabetical order
             val allGenresText = getString(R.string.genre_all)
             val otherGenreText = getString(R.string.genre_other)
-            val combinedGenres = (getAllGenres() + dbGenres)
+            val combinedGenres = (getAllGenres() + translatedDbGenres)
                 .distinct()
                 .sortedWith(compareBy {
                     // "All Genres" first, "Other" last, rest alphabetically
@@ -314,11 +405,17 @@ class LibraryFragment : Fragment() {
             val currentIndex = if (currentGenreFilter == null) {
                 0 // "All Genres"
             } else {
-                combinedGenres.indexOf(currentGenreFilter).takeIf { it >= 0 } ?: 0
+                // currentGenreFilter is in English, so translate it to find in combinedGenres
+                val translatedFilter = translateGenreName(currentGenreFilter!!)
+                combinedGenres.indexOf(translatedFilter).takeIf { it >= 0 } ?: 0
             }
 
-            // Variable to hold the temporary selection
-            var tempSelectedGenre: String? = currentGenreFilter
+            // Variable to hold the temporary selection (translated for UI display)
+            var tempSelectedGenre: String? = if (currentGenreFilter != null) {
+                translateGenreName(currentGenreFilter!!)
+            } else {
+                null
+            }
 
             // Create custom dialog with search functionality
             val dialogView = LayoutInflater.from(requireContext()).inflate(
@@ -334,7 +431,12 @@ class LibraryFragment : Fragment() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     // Apply the selection when OK is clicked
-                    currentGenreFilter = if (tempSelectedGenre == allGenresText) null else tempSelectedGenre
+                    // Store English genre name for language portability
+                    currentGenreFilter = if (tempSelectedGenre == allGenresText) {
+                        null
+                    } else {
+                        getEnglishGenreName(tempSelectedGenre)
+                    }
                     PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
                     updateGenreFilterButtonText()
                     // Clear search when changing genre filter
@@ -357,7 +459,7 @@ class LibraryFragment : Fragment() {
 
         // Search input with improved styling
         val searchInput = TextInputEditText(context).apply {
-            hint = "Search genres..."
+            hint = getString(R.string.search_genres)
             inputType = android.text.InputType.TYPE_CLASS_TEXT
         }
 
@@ -489,7 +591,12 @@ class LibraryFragment : Fragment() {
     }
 
     private fun updateGenreFilterButtonText() {
-        genreFilterButton.text = currentGenreFilter ?: getString(R.string.genre_all)
+        // Display translated genre name on button
+        genreFilterButton.text = if (currentGenreFilter != null) {
+            translateGenreName(currentGenreFilter!!)
+        } else {
+            getString(R.string.genre_all)
+        }
     }
 
     private fun playStation(station: RadioStation) {
