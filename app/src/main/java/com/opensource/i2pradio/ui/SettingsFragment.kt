@@ -487,30 +487,34 @@ class SettingsFragment : Fragment() {
     }
 
     /**
-     * Opens the built-in equalizer bottom sheet.
-     * Can be opened even without an active audio session - settings will be applied when playback starts.
+     * Opens the built-in equalizer using the app's own UI.
+     * Uses Android's Equalizer API attached to the audio session.
      */
     private fun openBuiltInEqualizer() {
         val equalizerManager = radioService?.getEqualizerManager()
-        val audioSessionId = radioService?.getAudioSessionId() ?: 0
-
-        if (equalizerManager != null) {
-            // If we have an audio session, initialize the equalizer
-            if (audioSessionId != 0 && !equalizerManager.isInitialized()) {
-                equalizerManager.initialize(audioSessionId)
-            }
-
-            // Show the equalizer bottom sheet
-            val bottomSheet = EqualizerBottomSheet.newInstance(equalizerManager)
-            bottomSheet.show(parentFragmentManager, EqualizerBottomSheet.TAG)
-        } else {
-            // No service bound - create a temporary equalizer manager for settings preview
-            val tempEqualizerManager = com.opensource.i2pradio.audio.EqualizerManager(requireContext())
-            // Initialize with session 0 for preview mode (settings only, no audio effect)
-            tempEqualizerManager.initializeForPreview()
-            val bottomSheet = EqualizerBottomSheet.newInstance(tempEqualizerManager)
-            bottomSheet.show(parentFragmentManager, EqualizerBottomSheet.TAG)
+        if (equalizerManager == null) {
+            Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            return
         }
+
+        val audioSessionId = radioService?.getAudioSessionId() ?: 0
+        if (audioSessionId == 0) {
+            Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Initialize equalizer if not already done
+        if (!equalizerManager.isInitialized()) {
+            val initialized = equalizerManager.initialize(audioSessionId)
+            if (!initialized) {
+                Toast.makeText(requireContext(), getString(R.string.equalizer_init_failed), Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+
+        // Show the equalizer bottom sheet
+        val bottomSheet = EqualizerBottomSheet.newInstance(equalizerManager)
+        bottomSheet.show(parentFragmentManager, EqualizerBottomSheet.TAG)
     }
 
     private fun updateSleepTimerButtonText(button: MaterialButton) {
