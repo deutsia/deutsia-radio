@@ -147,17 +147,24 @@
     <string name="settings_theme">السمة</string>
     <string name="settings_theme_description">اختر فاتح أو داكن أو النظام</string>
     <string name="settings_theme_system_default">افتراضي النظام</string>
+    <string name="settings_theme_light">فاتح</string>
+    <string name="settings_theme_dark">داكن</string>
     <string name="settings_material_you">Material You</string>
     <string name="settings_material_you_description">استخدم الألوان الديناميكية المستندة إلى الخلفية</string>
     <string name="settings_color_scheme">نظام الألوان</string>
     <string name="settings_color_scheme_description">اختر اللون المفضل لديك</string>
     <string name="settings_color_blue">أزرق</string>
-    <string name="settings_language">Language</string>
-    <string name="settings_language_description">Choose your preferred language</string>
+    <string name="settings_color_blue_default">أزرق (افتراضي)</string>
+    <string name="settings_color_peach">خوخي</string>
+    <string name="settings_color_green">أخضر</string>
+    <string name="settings_color_purple">بنفسجي</string>
+    <string name="settings_color_orange">برتقالي</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_language_description">اختر لغتك المفضلة</string>
 
     <!-- Language Names -->
-    <string name="language_choose">Choose Language</string>
-    <string name="language_system_default">System Default</string>
+    <string name="language_choose">اختيار اللغة</string>
+    <string name="language_system_default">افتراضي النظام</string>
     <string name="language_arabic">العربية</string>
     <string name="language_german">Deutsch</string>
     <string name="language_english">English</string>
@@ -210,9 +217,16 @@
     <string name="settings_sleep_timer">مؤقت النوم</string>
     <string name="settings_sleep_timer_description">إيقاف التشغيل تلقائياً بعد الوقت المحدد</string>
     <string name="settings_sleep_timer_off">إيقاف</string>
+    <string name="settings_sleep_timer_15min">15 دقيقة</string>
+    <string name="settings_sleep_timer_30min">30 دقيقة</string>
+    <string name="settings_sleep_timer_45min">45 دقيقة</string>
+    <string name="settings_sleep_timer_60min">60 دقيقة</string>
+    <string name="settings_sleep_timer_90min">90 دقيقة</string>
     <string name="settings_equalizer_description">ضبط نطاقات تردد الصوت والتأثيرات</string>
     <string name="settings_recording_directory">دليل التسجيل</string>
     <string name="settings_recording_directory_default">افتراضي (Music/deutsia_radio)</string>
+    <string name="settings_recording_directory_choose">اختر مجلد مخصص...</string>
+    <string name="settings_recording_directory_clear">مسح المجلد المخصص</string>
     <string name="settings_record_across_stations">التسجيل عبر المحطات</string>
     <string name="settings_record_across_stations_description">الاستمرار في التسجيل عند تبديل المحطات</string>
     <string name="settings_record_all_stations">تسجيل جميع المحطات</string>
@@ -247,6 +261,35 @@
     <string name="tor_orbot_description">Orbot هو عميل Tor الرسمي لنظام Android. يوفر وصولاً آمناً ومشفراً إلى شبكة Tor.</string>
     <string name="tor_connect">الاتصال بـ Tor</string>
     <string name="tor_open_orbot">فتح Orbot</string>
+
+    <!-- Tor Status Messages -->
+    <string name="tor_status_connecting">جارٍ الاتصال...</string>
+    <string name="tor_status_connected">متصل بـ Tor</string>
+    <string name="tor_status_disconnected">تم قطع اتصال Tor</string>
+    <string name="tor_status_off">Tor متوقف</string>
+    <string name="tor_status_error">خطأ في Tor</string>
+    <string name="tor_status_leak_warning">تحذير من التسرب</string>
+    <string name="tor_status_install_orbot">تثبيت Orbot</string>
+    <string name="tor_status_connecting_message">جارٍ الاتصال بـ Tor...</string>
+    <string name="tor_status_connected_message">متصل عبر Tor</string>
+    <string name="tor_control_title_stopped">تم قطع اتصال Tor</string>
+    <string name="tor_control_subtitle_stopped">انقر على الاتصال للتصفح بشكل مجهول عبر Tor</string>
+    <string name="tor_control_subtitle_connecting">إنشاء اتصال آمن عبر Orbot</string>
+    <string name="tor_control_title_connecting">جارٍ الاتصال بـ Tor...</string>
+    <string name="tor_control_title_connected">متصل بـ Tor</string>
+    <string name="tor_control_title_connected_force">متصل بـ Tor (وضع الإجبار)</string>
+    <string name="tor_control_subtitle_connected">اتصالك خاص ومجهول</string>
+    <string name="tor_control_subtitle_connected_force">قطع الاتصال عبر Orbot أو تعطيل فرض Tor في الإعدادات</string>
+    <string name="tor_control_title_error">فشل الاتصال</string>
+    <string name="tor_control_subtitle_error">تعذر الاتصال بشبكة Tor</string>
+    <string name="tor_control_title_orbot_required">Orbot مطلوب</string>
+    <string name="tor_control_subtitle_orbot_required">قم بتثبيت Orbot للاتصال بشبكة Tor</string>
+    <string name="tor_control_button_connecting">جارٍ الاتصال...</string>
+    <string name="tor_control_button_disconnect">قطع الاتصال</string>
+    <string name="tor_control_button_cancel">إلغاء</string>
+    <string name="tor_control_button_retry">إعادة المحاولة</string>
+    <string name="tor_control_button_install">تثبيت Orbot</string>
+    <string name="tor_control_button_open_orbot">فتح Orbot</string>
 
     <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">استخدام Tor المضمن - لا حاجة لتكوين الوكيل</string>

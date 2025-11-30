@@ -147,11 +147,18 @@
     <string name="settings_theme">پوسته</string>
     <string name="settings_theme_description">روشن، تیره یا سیستم را انتخاب کنید</string>
     <string name="settings_theme_system_default">پیش‌فرض سیستم</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
     <string name="settings_material_you">Material You</string>
     <string name="settings_material_you_description">استفاده از رنگ‌های پویا مبتنی بر تصویر زمینه</string>
     <string name="settings_color_scheme">طرح رنگی</string>
     <string name="settings_color_scheme_description">رنگ مورد نظر خود را انتخاب کنید</string>
     <string name="settings_color_blue">آبی</string>
+    <string name="settings_color_blue_default">Blue (Default)</string>
+    <string name="settings_color_peach">Peach</string>
+    <string name="settings_color_green">Green</string>
+    <string name="settings_color_purple">Purple</string>
+    <string name="settings_color_orange">Orange</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_description">Choose your preferred language</string>
 
@@ -210,9 +217,16 @@
     <string name="settings_sleep_timer">تایمر خواب</string>
     <string name="settings_sleep_timer_description">توقف خودکار پخش پس از زمان تنظیم شده</string>
     <string name="settings_sleep_timer_off">خاموش</string>
+    <string name="settings_sleep_timer_15min">15 minutes</string>
+    <string name="settings_sleep_timer_30min">30 minutes</string>
+    <string name="settings_sleep_timer_45min">45 minutes</string>
+    <string name="settings_sleep_timer_60min">60 minutes</string>
+    <string name="settings_sleep_timer_90min">90 minutes</string>
     <string name="settings_equalizer_description">تنظیم باندهای فرکانس صدا و جلوه‌ها</string>
     <string name="settings_recording_directory">پوشه ضبط</string>
     <string name="settings_recording_directory_default">پیش‌فرض (Music/deutsia_radio)</string>
+    <string name="settings_recording_directory_choose">Choose custom folder...</string>
+    <string name="settings_recording_directory_clear">Clear custom folder</string>
     <string name="settings_record_across_stations">ضبط در بین ایستگاه‌ها</string>
     <string name="settings_record_across_stations_description">ادامه ضبط هنگام تغییر ایستگاه</string>
     <string name="settings_record_all_stations">ضبط همه ایستگاه‌ها</string>
@@ -248,7 +262,36 @@
     <string name="tor_connect">اتصال به Tor</string>
     <string name="tor_open_orbot">باز کردن Orbot</string>
 
-    <!-- Add/Edit Radio Dialog -->
+    <!-- Tor Status Messages -->
+    <string name="tor_status_connecting">Connecting...</string>
+    <string name="tor_status_connected">Tor Connected</string>
+    <string name="tor_status_disconnected">Tor Disconnected</string>
+    <string name="tor_status_off">Tor Off</string>
+    <string name="tor_status_error">Tor Error</string>
+    <string name="tor_status_leak_warning">Leak Warning</string>
+    <string name="tor_status_install_orbot">Install Orbot</string>
+    <string name="tor_status_connecting_message">Connecting to Tor...</string>
+    <string name="tor_status_connected_message">Connected via Tor</string>
+    <string name="tor_control_title_stopped">Tor Disconnected</string>
+    <string name="tor_control_subtitle_stopped">Tap Connect to browse anonymously via Tor</string>
+    <string name="tor_control_subtitle_connecting">Establishing secure connection via Orbot</string>
+    <string name="tor_control_title_connecting">Connecting to Tor...</string>
+    <string name="tor_control_title_connected">Connected to Tor</string>
+    <string name="tor_control_title_connected_force">Connected to Tor (Force Mode)</string>
+    <string name="tor_control_subtitle_connected">Your connection is private and anonymous</string>
+    <string name="tor_control_subtitle_connected_force">Disconnect via Orbot or disable Force Tor in settings</string>
+    <string name="tor_control_title_error">Connection Failed</string>
+    <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
+    <string name="tor_control_title_orbot_required">Orbot Required</string>
+    <string name="tor_control_subtitle_orbot_required">Install Orbot to connect to the Tor network</string>
+    <string name="tor_control_button_connecting">Connecting...</string>
+    <string name="tor_control_button_disconnect">Disconnect</string>
+    <string name="tor_control_button_cancel">Cancel</string>
+    <string name="tor_control_button_retry">Retry Connection</string>
+    <string name="tor_control_button_install">Install Orbot</string>
+    <string name="tor_control_button_open_orbot">Open Orbot</string>
+
+    
     <string name="add_edit_tor_info">استفاده از Tor تعبیه شده - نیازی به پیکربندی پروکسی نیست</string>
     <string name="add_edit_authentication_optional">احراز هویت (اختیاری)</string>
     <string name="add_edit_advanced_options">گزینه‌های پیشرفته</string>
