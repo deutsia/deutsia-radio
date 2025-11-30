@@ -38,14 +38,14 @@
     <string name="genre_alternative">Alternative</string>
     <string name="genre_ambient">Ambient</string>
     <string name="genre_blues">Blues</string>
-    <string name="genre_christian">Christian</string>
-    <string name="genre_classical">Classical</string>
-    <string name="genre_comedy">Comedy</string>
+    <string name="genre_christian">Thiên chúa giáo</string>
+    <string name="genre_classical">Cổ điển</string>
+    <string name="genre_comedy">Hài kịch</string>
     <string name="genre_country">Country</string>
     <string name="genre_dance">Dance</string>
     <string name="genre_edm">EDM</string>
-    <string name="genre_electronic">Electronic</string>
-    <string name="genre_folk">Folk</string>
+    <string name="genre_electronic">Điện tử</string>
+    <string name="genre_folk">Dân ca</string>
     <string name="genre_funk">Funk</string>
     <string name="genre_gospel">Gospel</string>
     <string name="genre_hip_hop">Hip Hop</string>
@@ -55,18 +55,18 @@
     <string name="genre_latin">Latin</string>
     <string name="genre_lo_fi">Lo-Fi</string>
     <string name="genre_metal">Metal</string>
-    <string name="genre_news">News</string>
-    <string name="genre_oldies">Oldies</string>
+    <string name="genre_news">Tin tức</string>
+    <string name="genre_oldies">Nhạc cũ</string>
     <string name="genre_pop">Pop</string>
     <string name="genre_punk">Punk</string>
     <string name="genre_r_and_b">R&amp;B</string>
     <string name="genre_reggae">Reggae</string>
     <string name="genre_rock">Rock</string>
     <string name="genre_soul">Soul</string>
-    <string name="genre_sports">Sports</string>
-    <string name="genre_talk">Talk</string>
-    <string name="genre_world">World</string>
-    <string name="genre_other">Other</string>
+    <string name="genre_sports">Thể thao</string>
+    <string name="genre_talk">Trò chuyện</string>
+    <string name="genre_world">Thế giới</string>
+    <string name="genre_other">Khác</string>
 
      <!-- about -->
     <string name="about_description">deutsia radio là trình phát radio đa mạng miễn phí và mã nguồn mở, tập hợp các luồng từ mạng clearnet, Tor (.onion) và I2P. Tận hưởng các trạm yêu thích của bạn trong giao diện Material You với tích hợp Orbot và ngăn chặn rò rỉ có thể cấu hình</string>

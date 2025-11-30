@@ -35,13 +35,13 @@
     <string name="genre_alternative">Alternative</string>
     <string name="genre_ambient">Ambient</string>
     <string name="genre_blues">Blues</string>
-    <string name="genre_christian">Christian</string>
-    <string name="genre_classical">Classical</string>
-    <string name="genre_comedy">Comedy</string>
+    <string name="genre_christian">ခရစ်ယာန်</string>
+    <string name="genre_classical">ဂန္ထဝင်</string>
+    <string name="genre_comedy">ဟာသ</string>
     <string name="genre_country">Country</string>
     <string name="genre_dance">Dance</string>
     <string name="genre_edm">EDM</string>
-    <string name="genre_electronic">Electronic</string>
+    <string name="genre_electronic">အီလက်ထရွန်နစ်</string>
     <string name="genre_folk">Folk</string>
     <string name="genre_funk">Funk</string>
     <string name="genre_gospel">Gospel</string>
@@ -52,7 +52,7 @@
     <string name="genre_latin">Latin</string>
     <string name="genre_lo_fi">Lo-Fi</string>
     <string name="genre_metal">Metal</string>
-    <string name="genre_news">News</string>
+    <string name="genre_news">သတင်း</string>
     <string name="genre_oldies">Oldies</string>
     <string name="genre_pop">Pop</string>
     <string name="genre_punk">Punk</string>
@@ -60,10 +60,10 @@
     <string name="genre_reggae">Reggae</string>
     <string name="genre_rock">Rock</string>
     <string name="genre_soul">Soul</string>
-    <string name="genre_sports">Sports</string>
-    <string name="genre_talk">Talk</string>
-    <string name="genre_world">World</string>
-    <string name="genre_other">Other</string>
+    <string name="genre_sports">အားကစား</string>
+    <string name="genre_talk">ဆွေးနွေးပွဲ</string>
+    <string name="genre_world">ကမ္ဘာ့</string>
+    <string name="genre_other">အခြား</string>
 
      <!-- about -->
     <string name="about_description">deutsia radio သည် clearnet၊ Tor (.onion) နှင့် I2P ကွန်ရက်များမှ ထုတ်လွှင့်မှုများကို ပေါင်းစည်းထားသော အခမဲ့ပွင့်လင်းအရင်းအမြစ် မာလ်တီနက် ရေဒီယိုပလေယာဖြစ်သည်။ Orbot ပေါင်းစည်းမှုနှင့် ပြင်ဆင်နိုင်သော leak ကာကွယ်မှုဖြင့် Material You အင်တာဖေ့စ်တွင် သင့်အကြိုက်ဆုံး စတေးရှင်းများကို ခံစားပါ</string>

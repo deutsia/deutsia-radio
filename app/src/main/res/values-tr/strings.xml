@@ -35,38 +35,38 @@
     <string name="filter_by_genre">Türe Göre Filtrele</string>
 
     <!-- Genre Names -->
-    <string name="genre_alternative">Alternative</string>
+    <string name="genre_alternative">Alternatif</string>
     <string name="genre_ambient">Ambient</string>
     <string name="genre_blues">Blues</string>
-    <string name="genre_christian">Christian</string>
-    <string name="genre_classical">Classical</string>
-    <string name="genre_comedy">Comedy</string>
+    <string name="genre_christian">Hristiyan</string>
+    <string name="genre_classical">Klasik</string>
+    <string name="genre_comedy">Komedi</string>
     <string name="genre_country">Country</string>
-    <string name="genre_dance">Dance</string>
+    <string name="genre_dance">Dans</string>
     <string name="genre_edm">EDM</string>
-    <string name="genre_electronic">Electronic</string>
+    <string name="genre_electronic">Elektronik</string>
     <string name="genre_folk">Folk</string>
     <string name="genre_funk">Funk</string>
     <string name="genre_gospel">Gospel</string>
     <string name="genre_hip_hop">Hip Hop</string>
     <string name="genre_indie">Indie</string>
-    <string name="genre_jazz">Jazz</string>
+    <string name="genre_jazz">Caz</string>
     <string name="genre_k_pop">K-Pop</string>
     <string name="genre_latin">Latin</string>
     <string name="genre_lo_fi">Lo-Fi</string>
     <string name="genre_metal">Metal</string>
-    <string name="genre_news">News</string>
-    <string name="genre_oldies">Oldies</string>
+    <string name="genre_news">Haberler</string>
+    <string name="genre_oldies">Nostaljik</string>
     <string name="genre_pop">Pop</string>
     <string name="genre_punk">Punk</string>
     <string name="genre_r_and_b">R&amp;B</string>
     <string name="genre_reggae">Reggae</string>
     <string name="genre_rock">Rock</string>
     <string name="genre_soul">Soul</string>
-    <string name="genre_sports">Sports</string>
-    <string name="genre_talk">Talk</string>
-    <string name="genre_world">World</string>
-    <string name="genre_other">Other</string>
+    <string name="genre_sports">Spor</string>
+    <string name="genre_talk">Sohbet</string>
+    <string name="genre_world">Dünya</string>
+    <string name="genre_other">Diğer</string>
 
      <!-- about -->
     <string name="about_description">deutsia radio, clearnet, Tor (.onion) ve I2P ağlarından yayınları bir araya getiren ücretsiz ve açık kaynaklı bir çoklu ağ radyo oynatıcısıdır. Orbot entegrasyonu ve yapılandırılabilir sızıntı önleme özellikli Material You arayüzünde favori istasyonlarınızın keyfini çıkarın</string>
