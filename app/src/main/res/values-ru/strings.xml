@@ -1,282 +1,275 @@
 <!--
     Russian (Русский) Translation
-
-    Instructions:
-    - Translate only the text between the tags, NOT the name attributes
-    - Keep formatting placeholders like %s, %d intact
-    - Escape apostrophes: don\'t
-    - Do not translate: "deutsia radio", "Orbot", "Material You", technical terms
-    - See TRANSLATION_GUIDE.md for complete guidelines
 -->
 <resources>
     <string name="app_name">deutsia radio</string>
-    <string name="tab_radios">Library</string>
-    <string name="tab_now_playing">Now Playing</string>
-    <string name="tab_settings">Settings</string>
+    <string name="tab_radios">Библиотека</string>
+    <string name="tab_now_playing">Сейчас играет</string>
+    <string name="tab_settings">Настройки</string>
 
     <!-- Equalizer -->
-    <string name="equalizer">Equalizer</string>
-    <string name="equalizer_no_audio">Start playing a station first</string>
-    <string name="equalizer_not_found">No equalizer app found. Install an equalizer app like Wavelet.</string>
-    <string name="equalizer_preset">Preset</string>
-    <string name="equalizer_custom">Custom</string>
-    <string name="equalizer_reset">Reset to Flat</string>
-    <string name="equalizer_init_failed">Could not initialize equalizer</string>
-    <string name="equalizer_bass_boost">Bass Booster</string>
-    <string name="equalizer_surround_sound">Surround Sound</string>
+    <string name="equalizer">Эквалайзер</string>
+    <string name="equalizer_no_audio">Сначала запустите станцию</string>
+    <string name="equalizer_not_found">Приложение эквалайзера не найдено. Установите эквалайзер, например Wavelet.</string>
+    <string name="equalizer_preset">Пресет</string>
+    <string name="equalizer_custom">Пользовательский</string>
+    <string name="equalizer_reset">Сбросить на плоский</string>
+    <string name="equalizer_init_failed">Не удалось инициализировать эквалайзер</string>
+    <string name="equalizer_bass_boost">Усиление басов</string>
+    <string name="equalizer_surround_sound">Объёмный звук</string>
 
     <!-- Sort options -->
-    <string name="sort_default">Default</string>
-    <string name="sort_name">Name</string>
-    <string name="sort_recent">Recent</string>
-    <string name="sort_liked">Liked</string>
-    <string name="sort_genre">Genre</string>
+    <string name="sort_default">По умолчанию</string>
+    <string name="sort_name">По названию</string>
+    <string name="sort_recent">Недавние</string>
+    <string name="sort_liked">Избранное</string>
+    <string name="sort_genre">По жанру</string>
 
     <!-- Search -->
-    <string name="search_stations">Search library</string>
-    <string name="search_countries">Search countries…</string>
-    <string name="search_genres">Search genres…</string>
+    <string name="search_stations">Поиск в библиотеке</string>
+    <string name="search_countries">Поиск стран…</string>
+    <string name="search_genres">Поиск жанров…</string>
 
     <!-- Genre filter -->
-    <string name="genre_all">All Genres</string>
-    <string name="filter_by_genre">Filter by Genre</string>
+    <string name="genre_all">Все жанры</string>
+    <string name="filter_by_genre">Фильтр по жанру</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with Orbot integration and configurable leak prevention</string>
+    <string name="about_description">deutsia radio — это бесплатный радиоплеер с открытым исходным кодом, объединяющий потоки из clearnet, Tor (.onion) и I2P сетей. Наслаждайтесь любимыми станциями в интерфейсе Material You с интеграцией Orbot и настраиваемой защитой от утечек</string>
 
     <!-- Browse/Discover Stations -->
-    <string name="tab_browse">Browse</string>
-    <string name="search_radio_browser">Search thousands of stations…</string>
-    <string name="browse_top_voted">Top Voted</string>
-    <string name="browse_popular">Popular</string>
-    <string name="browse_random">Random</string>
-    <string name="browse_history">History</string>
-    <string name="browse_no_results">No Stations Found</string>
-    <string name="browse_no_results_hint">Try a different search or filter</string>
-    <string name="filter_country">Country</string>
-    <string name="filter_genre">Genre</string>
-    <string name="filter_language">Language</string>
-    <string name="filter_all_countries">All Countries</string>
-    <string name="filter_all_genres">All Genres</string>
-    <string name="filter_all_languages">All Languages</string>
-    <string name="select_country">Select Country</string>
-    <string name="select_genre">Select Genre</string>
-    <string name="select_language">Select Language</string>
-    <string name="loading_countries">Loading countries…</string>
-    <string name="loading_genres">Loading genres…</string>
-    <string name="loading_languages">Loading languages…</string>
-    <string name="search_languages">Search languages…</string>
-    <string name="station_saved">%s added to library</string>
-    <string name="station_removed">%s removed from library</string>
-    <string name="station_added_to_favorites">%s added to favorites</string>
-    <string name="station_removed_from_favorites">%s removed from favorites</string>
-    <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
+    <string name="tab_browse">Обзор</string>
+    <string name="search_radio_browser">Поиск среди тысяч станций…</string>
+    <string name="browse_top_voted">Самые популярные</string>
+    <string name="browse_popular">Популярные</string>
+    <string name="browse_random">Случайные</string>
+    <string name="browse_history">История</string>
+    <string name="browse_no_results">Станции не найдены</string>
+    <string name="browse_no_results_hint">Попробуйте другой поиск или фильтр</string>
+    <string name="filter_country">Страна</string>
+    <string name="filter_genre">Жанр</string>
+    <string name="filter_language">Язык</string>
+    <string name="filter_all_countries">Все страны</string>
+    <string name="filter_all_genres">Все жанры</string>
+    <string name="filter_all_languages">Все языки</string>
+    <string name="select_country">Выбрать страну</string>
+    <string name="select_genre">Выбрать жанр</string>
+    <string name="select_language">Выбрать язык</string>
+    <string name="loading_countries">Загрузка стран…</string>
+    <string name="loading_genres">Загрузка жанров…</string>
+    <string name="loading_languages">Загрузка языков…</string>
+    <string name="search_languages">Поиск языков…</string>
+    <string name="station_saved">%s добавлена в библиотеку</string>
+    <string name="station_removed">%s удалена из библиотеки</string>
+    <string name="station_added_to_favorites">%s добавлена в избранное</string>
+    <string name="station_removed_from_favorites">%s удалена из избранного</string>
+    <string name="tor_required_warning">Принудительный Tor включён, но Tor не подключён. Подключитесь к Tor для просмотра станций.</string>
 
     <!-- Notification and Status Messages -->
-    <string name="notification_connecting">Connecting...</string>
-    <string name="notification_paused">Paused</string>
-    <string name="notification_playing">Playing</string>
-    <string name="notification_playing_recording">Playing • Recording</string>
-    <string name="notification_buffering">Buffering...</string>
-    <string name="notification_reconnecting">Reconnecting...</string>
-    <string name="notification_connection_failed">Connection failed</string>
-    <string name="notification_tor_blocked">Tor not connected - stream blocked</string>
-    <string name="notification_audio_focus_denied">Audio focus denied</string>
-    <string name="notification_channel_name">deutsia radio Playback</string>
-    <string name="notification_channel_description">Shows radio playback status</string>
-    <string name="notification_action_pause">Pause</string>
-    <string name="notification_action_stop">Stop</string>
+    <string name="notification_connecting">Подключение...</string>
+    <string name="notification_paused">Приостановлено</string>
+    <string name="notification_playing">Воспроизведение</string>
+    <string name="notification_playing_recording">Воспроизведение • Запись</string>
+    <string name="notification_buffering">Буферизация...</string>
+    <string name="notification_reconnecting">Переподключение...</string>
+    <string name="notification_connection_failed">Ошибка подключения</string>
+    <string name="notification_tor_blocked">Tor не подключён - поток заблокирован</string>
+    <string name="notification_audio_focus_denied">Отказано в аудио фокусе</string>
+    <string name="notification_channel_name">Воспроизведение deutsia radio</string>
+    <string name="notification_channel_description">Показывает статус воспроизведения радио</string>
+    <string name="notification_action_pause">Пауза</string>
+    <string name="notification_action_stop">Стоп</string>
 
     <!-- Recording Messages -->
-    <string name="recording_failed">Recording failed: %s</string>
-    <string name="recording_saved">Recording saved: %s (%dKB)</string>
-    <string name="recording_stopping">Stopping recording...</string>
-    <string name="recording_starting">Starting recording...</string>
-    <string name="recording_no_station">No station playing</string>
-    <string name="recording_directory_updated">Recording directory updated</string>
+    <string name="recording_failed">Ошибка записи: %s</string>
+    <string name="recording_saved">Запись сохранена: %s (%dКБ)</string>
+    <string name="recording_stopping">Остановка записи...</string>
+    <string name="recording_starting">Начало записи...</string>
+    <string name="recording_no_station">Станция не воспроизводится</string>
+    <string name="recording_directory_updated">Каталог записи обновлён</string>
 
     <!-- Dialog Titles and Buttons -->
-    <string name="dialog_add_station">Add Radio Station</string>
-    <string name="dialog_edit_station">Edit Radio Station</string>
-    <string name="dialog_sort_stations">Sort Stations</string>
-    <string name="dialog_delete_stations">Delete stations</string>
-    <string name="button_save">Save</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="button_import">Import</string>
-    <string name="button_export">Export</string>
-    <string name="button_open">Open</string>
-    <string name="button_configure">Configure</string>
-    <string name="button_apply">Apply</string>
-    <string name="button_reset">Reset</string>
-    <string name="button_change">Change</string>
-    <string name="button_start">Start</string>
-    <string name="button_test_connection">Test Connection</string>
-    <string name="hint_test_connection_disclaimer">Note: Testing will connect to httpbin.org via your proxy</string>
-    <string name="button_choose_image">Choose Image</string>
-    <string name="button_clear">Clear</string>
+    <string name="dialog_add_station">Добавить радиостанцию</string>
+    <string name="dialog_edit_station">Редактировать радиостанцию</string>
+    <string name="dialog_sort_stations">Сортировка станций</string>
+    <string name="dialog_delete_stations">Удалить станции</string>
+    <string name="button_save">Сохранить</string>
+    <string name="button_cancel">Отмена</string>
+    <string name="button_import">Импорт</string>
+    <string name="button_export">Экспорт</string>
+    <string name="button_open">Открыть</string>
+    <string name="button_configure">Настроить</string>
+    <string name="button_apply">Применить</string>
+    <string name="button_reset">Сбросить</string>
+    <string name="button_change">Изменить</string>
+    <string name="button_start">Старт</string>
+    <string name="button_test_connection">Проверить соединение</string>
+    <string name="hint_test_connection_disclaimer">Примечание: Тестирование подключится к httpbin.org через ваш прокси</string>
+    <string name="button_choose_image">Выбрать изображение</string>
+    <string name="button_clear">Очистить</string>
 
     <!-- Settings - Appearance -->
-    <string name="settings_appearance">Appearance</string>
-    <string name="settings_theme">Theme</string>
-    <string name="settings_theme_description">Choose light, dark, or system</string>
-    <string name="settings_theme_system_default">System Default</string>
+    <string name="settings_appearance">Внешний вид</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_description">Выберите светлую, тёмную или системную</string>
+    <string name="settings_theme_system_default">Системная</string>
     <string name="settings_material_you">Material You</string>
-    <string name="settings_material_you_description">Use wallpaper-based dynamic colors</string>
-    <string name="settings_color_scheme">Color Scheme</string>
-    <string name="settings_color_scheme_description">Choose your preferred color</string>
-    <string name="settings_color_blue">Blue</string>
+    <string name="settings_material_you_description">Использовать динамические цвета на основе обоев</string>
+    <string name="settings_color_scheme">Цветовая схема</string>
+    <string name="settings_color_scheme_description">Выберите предпочитаемый цвет</string>
+    <string name="settings_color_blue">Синий</string>
 
     <!-- Settings - Tor Network -->
-    <string name="settings_tor_network">Tor Network</string>
-    <string name="settings_enable_tor">Enable Tor (via Orbot)</string>
-    <string name="settings_enable_tor_description">Connect through the Tor network</string>
-    <string name="settings_tor_disconnected">Disconnected</string>
-    <string name="settings_tor_not_running">Tor is not running</string>
-    <string name="settings_force_tor">Force Tor Over Everything</string>
-    <string name="settings_force_tor_description">Route all streams through Tor. Won\'t connect without Tor.</string>
-    <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
-    <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
-    <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_network">Сеть Tor</string>
+    <string name="settings_enable_tor">Включить Tor (через Orbot)</string>
+    <string name="settings_enable_tor_description">Подключаться через сеть Tor</string>
+    <string name="settings_tor_disconnected">Отключено</string>
+    <string name="settings_tor_not_running">Tor не запущен</string>
+    <string name="settings_force_tor">Принудительный Tor для всего</string>
+    <string name="settings_force_tor_description">Маршрутизировать все потоки через Tor. Не подключится без Tor.</string>
+    <string name="settings_force_tor_except_i2p">Принудительный Tor кроме I2P</string>
+    <string name="settings_force_tor_except_i2p_description">Маршрутизировать clearnet через Tor, I2P потоки напрямую к I2P прокси.</string>
+    <string name="settings_tor_info">Требуется Orbot (бесплатно в Play Store или F-Droid). Нажмите на иконку Tor на панели инструментов для быстрого доступа.\n\nРежимы принуждения блокируют соединения, когда Tor недоступен.</string>
 
     <!-- Settings - Custom Proxy -->
-    <string name="settings_custom_proxy">Custom Proxy</string>
-    <string name="settings_enable_custom_proxy">Enable Custom Proxy</string>
-    <string name="settings_enable_custom_proxy_description">Use custom proxy for connections</string>
-    <string name="settings_configure_proxy">Configure Global Proxy</string>
-    <string name="settings_configure_proxy_description">Set up your custom proxy settings</string>
-    <string name="settings_force_custom_proxy">Force Custom Proxy</string>
-    <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
+    <string name="settings_custom_proxy">Пользовательский прокси</string>
+    <string name="settings_enable_custom_proxy">Включить пользовательский прокси</string>
+    <string name="settings_enable_custom_proxy_description">Использовать пользовательский прокси для соединений</string>
+    <string name="settings_configure_proxy">Настроить глобальный прокси</string>
+    <string name="settings_configure_proxy_description">Настройте параметры пользовательского прокси</string>
+    <string name="settings_force_custom_proxy">Принудительный пользовательский прокси</string>
+    <string name="settings_force_custom_proxy_description">Маршрутизировать весь трафик через пользовательский прокси. Не подключится без прокси.</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Принудительный пользовательский прокси кроме Tor/I2P станций</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">Маршрутизировать весь clearnet трафик через пользовательский прокси, но разрешить Tor и I2P станциям использовать их собственные прокси.</string>
 
     <!-- Settings - Bandwidth -->
-    <string name="settings_bandwidth_usage">Bandwidth Usage</string>
-    <string name="settings_total_usage">Total Usage (Lifetime)</string>
-    <string name="settings_session_usage">Session Usage</string>
-    <string name="settings_bandwidth_zero">0 B</string>
+    <string name="settings_bandwidth_usage">Использование трафика</string>
+    <string name="settings_total_usage">Общее использование (за всё время)</string>
+    <string name="settings_session_usage">Использование сеанса</string>
+    <string name="settings_bandwidth_zero">0 Б</string>
 
     <!-- Settings - Playback -->
-    <string name="settings_playback">Playback</string>
-    <string name="settings_sleep_timer">Sleep Timer</string>
-    <string name="settings_sleep_timer_description">Auto-stop playback after set time</string>
-    <string name="settings_sleep_timer_off">Off</string>
-    <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
-    <string name="settings_recording_directory">Recording Directory</string>
-    <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
-    <string name="settings_record_across_stations">Record Across Stations</string>
-    <string name="settings_record_across_stations_description">Keep recording when switching stations</string>
-    <string name="settings_record_all_stations">Record All Stations</string>
-    <string name="settings_record_all_stations_description">Switch to new station\'s stream in same file</string>
+    <string name="settings_playback">Воспроизведение</string>
+    <string name="settings_sleep_timer">Таймер сна</string>
+    <string name="settings_sleep_timer_description">Автоостановка воспроизведения через заданное время</string>
+    <string name="settings_sleep_timer_off">Выключено</string>
+    <string name="settings_equalizer_description">Настройка частотных полос и эффектов</string>
+    <string name="settings_recording_directory">Каталог записей</string>
+    <string name="settings_recording_directory_default">По умолчанию (Music/deutsia_radio)</string>
+    <string name="settings_record_across_stations">Записывать при переключении станций</string>
+    <string name="settings_record_across_stations_description">Продолжать запись при переключении станций</string>
+    <string name="settings_record_all_stations">Записывать все станции</string>
+    <string name="settings_record_all_stations_description">Переключаться на поток новой станции в том же файле</string>
 
     <!-- Settings - Station Management -->
-    <string name="settings_station_management">Station Management</string>
-    <string name="settings_import_from_file">Import from File</string>
-    <string name="settings_import_from_file_description">Import from CSV, JSON, M3U, or PLS</string>
-    <string name="settings_import_i2p_stations">Import I2P Stations</string>
-    <string name="settings_import_i2p_stations_description">14 curated I2P radio stations</string>
-    <string name="settings_import_tor_stations">Import Tor Stations</string>
-    <string name="settings_import_tor_stations_description">3 curated Tor radio stations</string>
-    <string name="settings_export_stations">Export Stations</string>
-    <string name="settings_export_stations_description">Export your stations to a file</string>
+    <string name="settings_station_management">Управление станциями</string>
+    <string name="settings_import_from_file">Импорт из файла</string>
+    <string name="settings_import_from_file_description">Импорт из CSV, JSON, M3U или PLS</string>
+    <string name="settings_import_i2p_stations">Импорт I2P станций</string>
+    <string name="settings_import_i2p_stations_description">14 отобранных I2P радиостанций</string>
+    <string name="settings_import_tor_stations">Импорт Tor станций</string>
+    <string name="settings_import_tor_stations_description">3 отобранные Tor радиостанции</string>
+    <string name="settings_export_stations">Экспорт станций</string>
+    <string name="settings_export_stations_description">Экспортировать ваши станции в файл</string>
 
     <!-- Settings - About -->
-    <string name="settings_about">About</string>
-    <string name="settings_version">Version 1.1</string>
-    <string name="settings_view_github">View on GitHub</string>
-    <string name="settings_donate">Donate</string>
-    <string name="settings_donate_description">If this app helped you out, consider donating</string>
+    <string name="settings_about">О программе</string>
+    <string name="settings_version">Версия 1.1</string>
+    <string name="settings_view_github">Посмотреть на GitHub</string>
+    <string name="settings_donate">Поддержать</string>
+    <string name="settings_donate_description">Если это приложение вам помогло, рассмотрите возможность поддержки</string>
     <string name="settings_monero">Monero (XMR)</string>
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
-    <string name="settings_copy_address">Copy Address</string>
+    <string name="settings_copy_address">Копировать адрес</string>
 
     <!-- Tor Control Bottom Sheet -->
-    <string name="tor_connection_details">Connection Details</string>
-    <string name="tor_proxy_host">Proxy Host</string>
-    <string name="tor_socks_port">SOCKS Port</string>
-    <string name="tor_what_is_orbot">What is Orbot?</string>
-    <string name="tor_orbot_description">Orbot is the official Tor client for Android. It provides secure, encrypted access to the Tor network.</string>
-    <string name="tor_connect">Connect to Tor</string>
-    <string name="tor_open_orbot">Open Orbot</string>
+    <string name="tor_connection_details">Детали соединения</string>
+    <string name="tor_proxy_host">Хост прокси</string>
+    <string name="tor_socks_port">Порт SOCKS</string>
+    <string name="tor_what_is_orbot">Что такое Orbot?</string>
+    <string name="tor_orbot_description">Orbot — это официальный Tor клиент для Android. Он обеспечивает безопасный, зашифрованный доступ к сети Tor.</string>
+    <string name="tor_connect">Подключиться к Tor</string>
+    <string name="tor_open_orbot">Открыть Orbot</string>
 
     <!-- Add/Edit Radio Dialog -->
-    <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
-    <string name="add_edit_authentication_optional">Authentication (Optional)</string>
-    <string name="add_edit_advanced_options">Advanced Options</string>
-    <string name="add_edit_cover_art">Cover Art</string>
-    <string name="add_edit_or_enter_url">Or enter image URL</string>
+    <string name="add_edit_tor_info">Используется встроенный Tor - настройка прокси не требуется</string>
+    <string name="add_edit_authentication_optional">Аутентификация (необязательно)</string>
+    <string name="add_edit_advanced_options">Расширенные параметры</string>
+    <string name="add_edit_cover_art">Обложка</string>
+    <string name="add_edit_or_enter_url">Или введите URL изображения</string>
 
     <!-- Input Hints -->
-    <string name="hint_station_name">Station Name</string>
-    <string name="hint_stream_url">Stream URL</string>
-    <string name="hint_genre">Genre</string>
-    <string name="hint_proxy_type">Proxy Type</string>
-    <string name="hint_proxy_host">Proxy Host</string>
-    <string name="hint_proxy_port">Proxy Port</string>
-    <string name="hint_protocol">Protocol</string>
-    <string name="hint_username_optional">Username (optional)</string>
-    <string name="hint_password_optional">Password (optional)</string>
-    <string name="hint_auth_method">Auth Method</string>
-    <string name="hint_connection_timeout">Connection Timeout (seconds)</string>
-    <string name="hint_cover_art_url">Cover Art URL (optional)</string>
-    <string name="hint_username_optional_caps">Username (Optional)</string>
-    <string name="hint_password_optional_caps">Password (Optional)</string>
-    <string name="hint_auth_type">Authentication Type</string>
+    <string name="hint_station_name">Название станции</string>
+    <string name="hint_stream_url">URL потока</string>
+    <string name="hint_genre">Жанр</string>
+    <string name="hint_proxy_type">Тип прокси</string>
+    <string name="hint_proxy_host">Хост прокси</string>
+    <string name="hint_proxy_port">Порт прокси</string>
+    <string name="hint_protocol">Протокол</string>
+    <string name="hint_username_optional">Имя пользователя (необязательно)</string>
+    <string name="hint_password_optional">Пароль (необязательно)</string>
+    <string name="hint_auth_method">Метод аутентификации</string>
+    <string name="hint_connection_timeout">Тайм-аут соединения (секунды)</string>
+    <string name="hint_cover_art_url">URL обложки (необязательно)</string>
+    <string name="hint_username_optional_caps">Имя пользователя (необязательно)</string>
+    <string name="hint_password_optional_caps">Пароль (необязательно)</string>
+    <string name="hint_auth_type">Тип аутентификации</string>
 
     <!-- Default Values -->
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
-    <string name="default_auth_none">None</string>
+    <string name="default_auth_none">Нет</string>
     <string name="default_timeout">30</string>
-    <string name="default_equalizer_db">0 dB</string>
+    <string name="default_equalizer_db">0 дБ</string>
 
     <!-- Now Playing Fragment -->
     <string name="now_playing_time_placeholder">00:00</string>
-    <string name="now_playing_live">LIVE</string>
-    <string name="now_playing_no_station">No Station Playing</string>
-    <string name="now_playing_no_station_subtitle">Select a station from the list</string>
-    <string name="now_playing_volume_title">Radio Volume</string>
-    <string name="now_playing_volume_description">Adjusts radio stream only</string>
+    <string name="now_playing_live">ПРЯМОЙ ЭФИР</string>
+    <string name="now_playing_no_station">Станция не воспроизводится</string>
+    <string name="now_playing_no_station_subtitle">Выберите станцию из списка</string>
+    <string name="now_playing_volume_title">Громкость радио</string>
+    <string name="now_playing_volume_description">Регулирует только поток радио</string>
 
     <!-- Toast Messages -->
-    <string name="toast_session_bandwidth_reset">Session bandwidth reset</string>
-    <string name="toast_custom_proxy_saved">Custom proxy settings saved</string>
-    <string name="toast_custom_proxy_cleared">Custom proxy settings cleared</string>
-    <string name="toast_address_copied">Address copied to clipboard</string>
-    <string name="toast_using_default_directory">Using default directory</string>
+    <string name="toast_session_bandwidth_reset">Трафик сеанса сброшен</string>
+    <string name="toast_custom_proxy_saved">Настройки пользовательского прокси сохранены</string>
+    <string name="toast_custom_proxy_cleared">Настройки пользовательского прокси очищены</string>
+    <string name="toast_address_copied">Адрес скопирован в буфер обмена</string>
+    <string name="toast_using_default_directory">Используется каталог по умолчанию</string>
 
     <!-- Custom Proxy Status Messages -->
-    <string name="custom_proxy_status_connected">Connected</string>
-    <string name="custom_proxy_status_configured">Proxy configured</string>
-    <string name="custom_proxy_status_not_configured">Not Configured</string>
-    <string name="custom_proxy_status_no_proxy">No proxy set</string>
-    <string name="custom_proxy_status_leak_warning">Leak Warning</string>
-    <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+    <string name="custom_proxy_status_connected">Подключено</string>
+    <string name="custom_proxy_status_configured">Прокси настроен</string>
+    <string name="custom_proxy_status_not_configured">Не настроено</string>
+    <string name="custom_proxy_status_no_proxy">Прокси не установлен</string>
+    <string name="custom_proxy_status_leak_warning">Предупреждение об утечке</string>
+    <string name="custom_proxy_status_leak_detail">Принуждение включено, но не настроено</string>
 
     <!-- Tor Service Notification Messages -->
-    <string name="tor_channel_name">Tor Connection</string>
-    <string name="tor_channel_description">Shows Tor connection status</string>
-    <string name="tor_notification_disconnected">Tor Disconnected</string>
-    <string name="tor_notification_tap_to_open">Tap to open app</string>
-    <string name="tor_notification_connecting">Connecting via Orbot...</string>
-    <string name="tor_notification_please_wait">Please wait</string>
-    <string name="tor_notification_connected">Tor Connected</string>
-    <string name="tor_notification_error">Tor Error</string>
-    <string name="tor_notification_connection_failed">Connection failed</string>
-    <string name="tor_notification_orbot_required">Orbot Required</string>
-    <string name="tor_notification_install_orbot">Please install Orbot for Tor support</string>
-    <string name="tor_notification_action_stop">Stop Tor</string>
+    <string name="tor_channel_name">Соединение Tor</string>
+    <string name="tor_channel_description">Показывает статус соединения Tor</string>
+    <string name="tor_notification_disconnected">Tor отключён</string>
+    <string name="tor_notification_tap_to_open">Нажмите, чтобы открыть приложение</string>
+    <string name="tor_notification_connecting">Подключение через Orbot...</string>
+    <string name="tor_notification_please_wait">Пожалуйста, подождите</string>
+    <string name="tor_notification_connected">Tor подключён</string>
+    <string name="tor_notification_error">Ошибка Tor</string>
+    <string name="tor_notification_connection_failed">Ошибка подключения</string>
+    <string name="tor_notification_orbot_required">Требуется Orbot</string>
+    <string name="tor_notification_install_orbot">Пожалуйста, установите Orbot для поддержки Tor</string>
+    <string name="tor_notification_action_stop">Остановить Tor</string>
 
     <!-- Other Error Messages -->
-    <string name="error_unknown">Unknown error</string>
-    <string name="folder_custom">Custom folder</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="folder_custom">Пользовательская папка</string>
 
     <!-- AddEditRadioDialog Default Values -->
-    <string name="default_genre_other">Other</string>
-    <string name="default_proxy_none">None</string>
+    <string name="default_genre_other">Другое</string>
+    <string name="default_proxy_none">Нет</string>
     <string name="default_proxy_i2p">I2P</string>
     <string name="default_proxy_tor">Tor</string>
-    <string name="default_proxy_custom">Custom</string>
+    <string name="default_proxy_custom">Пользовательский</string>
     <string name="default_protocol_http">HTTP</string>
     <string name="default_protocol_https">HTTPS</string>
     <string name="default_protocol_socks4">SOCKS4</string>
@@ -287,58 +280,58 @@
     <string name="default_timeout_30">30</string>
 
     <!-- Security & Privacy -->
-    <string name="settings_security_privacy">Security &amp; Privacy</string>
-    <string name="settings_app_lock">App Lock</string>
-    <string name="settings_app_lock_description">Require password or biometric to unlock app</string>
-    <string name="settings_biometric_auth">Biometric Authentication</string>
-    <string name="settings_biometric_auth_description">Use fingerprint or face unlock</string>
-    <string name="settings_require_auth_on_launch">Require Auth on Launch</string>
-    <string name="settings_require_auth_on_launch_description">Always require authentication when opening app</string>
-    <string name="settings_set_password">Set Password</string>
-    <string name="settings_change_password">Change Password</string>
-    <string name="settings_database_encryption">Database Encryption</string>
-    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher using your app password (requires restart)</string>
-    <string name="settings_database_encryption_warning">Warning: This is an experimental feature. Make sure you have a backup before enabling!</string>
-    <string name="settings_database_encryption_enable_title">Enable Database Encryption?</string>
-    <string name="settings_database_encryption_enable_message">This will encrypt your entire radio database using your app password. The app will restart to apply changes.\n\nWARNING: This is experimental. Make sure you have a backup!</string>
-    <string name="settings_database_encryption_disable_title">Disable Database Encryption?</string>
-    <string name="settings_database_encryption_disable_message">This will decrypt your database and remove encryption. The app will restart to apply changes.</string>
-    <string name="settings_database_encryption_enabled">Database encryption enabled</string>
-    <string name="settings_database_encryption_disabled">Database encryption disabled</string>
-    <string name="settings_database_encryption_error">Failed to change encryption setting</string>
-    <string name="settings_database_encryption_password_required_title">App Password Required</string>
-    <string name="settings_database_encryption_password_required_message">Database encryption uses your app password to generate the encryption key. Please set an app password first by enabling \"App Lock\" above.\n\nOnce set, you can enable database encryption using the same password - no separate password needed.</string>
+    <string name="settings_security_privacy">Безопасность и конфиденциальность</string>
+    <string name="settings_app_lock">Блокировка приложения</string>
+    <string name="settings_app_lock_description">Требовать пароль или биометрию для разблокировки приложения</string>
+    <string name="settings_biometric_auth">Биометрическая аутентификация</string>
+    <string name="settings_biometric_auth_description">Использовать отпечаток пальца или разблокировку лицом</string>
+    <string name="settings_require_auth_on_launch">Требовать аутентификацию при запуске</string>
+    <string name="settings_require_auth_on_launch_description">Всегда требовать аутентификацию при открытии приложения</string>
+    <string name="settings_set_password">Установить пароль</string>
+    <string name="settings_change_password">Изменить пароль</string>
+    <string name="settings_database_encryption">Шифрование базы данных</string>
+    <string name="settings_database_encryption_description">Зашифровать всю базу данных с помощью SQLCipher, используя ваш пароль приложения (требуется перезапуск)</string>
+    <string name="settings_database_encryption_warning">Предупреждение: Это экспериментальная функция. Убедитесь, что у вас есть резервная копия перед включением!</string>
+    <string name="settings_database_encryption_enable_title">Включить шифрование базы данных?</string>
+    <string name="settings_database_encryption_enable_message">Это зашифрует всю вашу базу данных радио, используя ваш пароль приложения. Приложение перезапустится для применения изменений.\n\nПРЕДУПРЕЖДЕНИЕ: Это экспериментально. Убедитесь, что у вас есть резервная копия!</string>
+    <string name="settings_database_encryption_disable_title">Отключить шифрование базы данных?</string>
+    <string name="settings_database_encryption_disable_message">Это расшифрует вашу базу данных и удалит шифрование. Приложение перезапустится для применения изменений.</string>
+    <string name="settings_database_encryption_enabled">Шифрование базы данных включено</string>
+    <string name="settings_database_encryption_disabled">Шифрование базы данных отключено</string>
+    <string name="settings_database_encryption_error">Не удалось изменить настройки шифрования</string>
+    <string name="settings_database_encryption_password_required_title">Требуется пароль приложения</string>
+    <string name="settings_database_encryption_password_required_message">Шифрование базы данных использует ваш пароль приложения для генерации ключа шифрования. Сначала установите пароль приложения, включив \"Блокировку приложения\" выше.\n\nПосле установки вы сможете включить шифрование базы данных, используя тот же пароль - отдельный пароль не требуется.</string>
 
     <!-- Authentication Dialog -->
-    <string name="auth_dialog_title">Set App Password</string>
-    <string name="auth_dialog_change_title">Change Password</string>
-    <string name="auth_dialog_change_message">Note: If database encryption is enabled, it will be automatically updated to use the new password.</string>
-    <string name="auth_dialog_current_password">Current Password</string>
-    <string name="auth_dialog_new_password">New Password</string>
-    <string name="auth_dialog_confirm_password">Confirm Password</string>
-    <string name="auth_dialog_set">Set Password</string>
-    <string name="auth_dialog_change">Change Password</string>
-    <string name="auth_error_passwords_dont_match">Passwords don\'t match</string>
-    <string name="auth_error_password_too_short">Password must be at least 4 characters</string>
-    <string name="auth_error_current_password_wrong">Current password is incorrect</string>
-    <string name="auth_password_set">Password set successfully</string>
-    <string name="auth_password_changed">Password changed successfully</string>
-    <string name="auth_enter_password_to_encrypt">Verify Your App Password</string>
-    <string name="auth_enter_password_to_decrypt">Verify Your App Password</string>
-    <string name="auth_password_for_encryption">Enter your existing app password to enable database encryption.\n\nYour app password will be used to derive the encryption key. No separate password is needed.</string>
-    <string name="auth_password_for_decryption">Enter your app password to verify and decrypt the database before disabling encryption.</string>
-    <string name="auth_encrypting_database">Encrypting database with your app password…</string>
-    <string name="auth_decrypting_database">Decrypting database…</string>
-    <string name="auth_rekeying_database">Updating database encryption with new password…</string>
+    <string name="auth_dialog_title">Установить пароль приложения</string>
+    <string name="auth_dialog_change_title">Изменить пароль</string>
+    <string name="auth_dialog_change_message">Примечание: Если шифрование базы данных включено, оно будет автоматически обновлено для использования нового пароля.</string>
+    <string name="auth_dialog_current_password">Текущий пароль</string>
+    <string name="auth_dialog_new_password">Новый пароль</string>
+    <string name="auth_dialog_confirm_password">Подтвердить пароль</string>
+    <string name="auth_dialog_set">Установить пароль</string>
+    <string name="auth_dialog_change">Изменить пароль</string>
+    <string name="auth_error_passwords_dont_match">Пароли не совпадают</string>
+    <string name="auth_error_password_too_short">Пароль должен содержать не менее 4 символов</string>
+    <string name="auth_error_current_password_wrong">Текущий пароль неверный</string>
+    <string name="auth_password_set">Пароль успешно установлен</string>
+    <string name="auth_password_changed">Пароль успешно изменён</string>
+    <string name="auth_enter_password_to_encrypt">Подтвердите ваш пароль приложения</string>
+    <string name="auth_enter_password_to_decrypt">Подтвердите ваш пароль приложения</string>
+    <string name="auth_password_for_encryption">Введите ваш существующий пароль приложения для включения шифрования базы данных.\n\nВаш пароль приложения будет использован для получения ключа шифрования. Отдельный пароль не требуется.</string>
+    <string name="auth_password_for_decryption">Введите ваш пароль приложения для подтверждения и расшифровки базы данных перед отключением шифрования.</string>
+    <string name="auth_encrypting_database">Шифрование базы данных вашим паролем приложения…</string>
+    <string name="auth_decrypting_database">Расшифровка базы данных…</string>
+    <string name="auth_rekeying_database">Обновление шифрования базы данных новым паролем…</string>
 
     <!-- Authentication Activity -->
-    <string name="auth_unlock_app">Unlock deutsia radio</string>
-    <string name="auth_enter_password">Enter your password</string>
-    <string name="auth_password_hint">Password</string>
-    <string name="auth_unlock_button">Unlock</string>
-    <string name="auth_use_biometric">Use Biometric</string>
-    <string name="auth_error_wrong_password">Wrong password</string>
-    <string name="auth_biometric_title">Unlock deutsia radio</string>
-    <string name="auth_biometric_subtitle">Authenticate to continue</string>
-    <string name="auth_biometric_negative">Use Password</string>
+    <string name="auth_unlock_app">Разблокировать deutsia radio</string>
+    <string name="auth_enter_password">Введите ваш пароль</string>
+    <string name="auth_password_hint">Пароль</string>
+    <string name="auth_unlock_button">Разблокировать</string>
+    <string name="auth_use_biometric">Использовать биометрию</string>
+    <string name="auth_error_wrong_password">Неверный пароль</string>
+    <string name="auth_biometric_title">Разблокировать deutsia radio</string>
+    <string name="auth_biometric_subtitle">Аутентифицируйтесь для продолжения</string>
+    <string name="auth_biometric_negative">Использовать пароль</string>
 </resources>
