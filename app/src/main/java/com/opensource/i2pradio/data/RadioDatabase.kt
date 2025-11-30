@@ -169,29 +169,34 @@ abstract class RadioDatabase : RoomDatabase() {
         }
 
         fun getDatabase(context: Context): RadioDatabase {
-            return INSTANCE ?: synchronized(this) {
-                // Initialize SQLCipher
-                DatabaseEncryptionManager.initializeSQLCipher(context)
+            // First check without synchronization for performance
+            INSTANCE?.let { return it }
 
-                // Get SupportFactory for encryption (null if encryption disabled)
-                val supportFactory = DatabaseEncryptionManager.getSupportFactory(context)
+            // Double-checked locking pattern to prevent race conditions
+            return synchronized(this) {
+                // Check again inside synchronized block - another thread might have initialized it
+                INSTANCE ?: run {
+                    // Initialize SQLCipher
+                    DatabaseEncryptionManager.initializeSQLCipher(context)
 
-                val builder = Room.databaseBuilder(
-                    context.applicationContext,
-                    RadioDatabase::class.java,
-                    "radio_database"
-                )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
-                    .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
+                    // Get SupportFactory for encryption (null if encryption disabled)
+                    val supportFactory = DatabaseEncryptionManager.getSupportFactory(context)
 
-                // Apply SQLCipher encryption if enabled
-                if (supportFactory != null) {
-                    builder.openHelperFactory(supportFactory)
-                }
+                    val builder = Room.databaseBuilder(
+                        context.applicationContext,
+                        RadioDatabase::class.java,
+                        "radio_database"
+                    )
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                        .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
 
-                val instance = builder.build()
-                INSTANCE = instance
-                instance
+                    // Apply SQLCipher encryption if enabled
+                    if (supportFactory != null) {
+                        builder.openHelperFactory(supportFactory)
+                    }
+
+                    builder.build()
+                }.also { INSTANCE = it }
             }
         }
 
