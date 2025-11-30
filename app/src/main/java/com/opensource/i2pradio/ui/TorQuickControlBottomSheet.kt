@@ -108,18 +108,18 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     private fun showStoppedState() {
         statusIcon.setImageResource(R.drawable.ic_tor_off)
         statusIcon.alpha = 0.6f
-        statusTitle.text = "Tor Disconnected"
-        statusSubtitle.text = "Tap Connect to browse anonymously via Tor"
+        statusTitle.text = getString(R.string.tor_control_title_stopped)
+        statusSubtitle.text = getString(R.string.tor_control_subtitle_stopped)
         connectionProgress.visibility = View.GONE
         connectionDetailsContainer.visibility = View.GONE
         orbotInfoCard.visibility = View.GONE
 
-        primaryActionButton.text = "Connect to Tor"
+        primaryActionButton.text = getString(R.string.tor_connect)
         primaryActionButton.setIconResource(R.drawable.ic_tor_on)
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = "Open Orbot"
+        secondaryActionButton.text = getString(R.string.tor_control_button_open_orbot)
         secondaryActionButton.visibility = View.VISIBLE
         secondaryActionButton.isEnabled = TorManager.isOrbotInstalled(requireContext())
     }
@@ -127,8 +127,8 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     private fun showConnectingState() {
         statusIcon.setImageResource(R.drawable.ic_tor_connecting)
         statusIcon.alpha = 1f
-        statusTitle.text = "Connecting to Tor..."
-        statusSubtitle.text = "Establishing secure connection via Orbot"
+        statusTitle.text = getString(R.string.tor_control_title_connecting)
+        statusSubtitle.text = getString(R.string.tor_control_subtitle_connecting)
         connectionProgress.visibility = View.VISIBLE
         connectionDetailsContainer.visibility = View.GONE
         orbotInfoCard.visibility = View.GONE
@@ -148,12 +148,12 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             }
             .start()
 
-        primaryActionButton.text = "Connecting..."
+        primaryActionButton.text = getString(R.string.tor_control_button_connecting)
         primaryActionButton.icon = null
         primaryActionButton.isEnabled = false
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = "Cancel"
+        secondaryActionButton.text = getString(R.string.tor_control_button_cancel)
         secondaryActionButton.visibility = View.VISIBLE
         secondaryActionButton.isEnabled = true
     }
@@ -167,11 +167,11 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
                                 PreferencesHelper.isForceTorExceptI2P(requireContext())
 
         if (isForceTorEnabled) {
-            statusTitle.text = "Connected to Tor (Force Mode)"
-            statusSubtitle.text = "Disconnect via Orbot or disable Force Tor in settings"
+            statusTitle.text = getString(R.string.tor_control_title_connected_force)
+            statusSubtitle.text = getString(R.string.tor_control_subtitle_connected_force)
         } else {
-            statusTitle.text = "Connected to Tor"
-            statusSubtitle.text = "Your connection is private and anonymous"
+            statusTitle.text = getString(R.string.tor_control_title_connected)
+            statusSubtitle.text = getString(R.string.tor_control_subtitle_connected)
         }
 
         connectionProgress.visibility = View.GONE
@@ -197,14 +197,14 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             }
             .start()
 
-        primaryActionButton.text = "Disconnect"
+        primaryActionButton.text = getString(R.string.tor_control_button_disconnect)
         primaryActionButton.setIconResource(R.drawable.ic_tor_off)
         // Disable disconnect button if force Tor mode is enabled
         primaryActionButton.isEnabled = !isForceTorEnabled
         primaryActionButton.alpha = if (isForceTorEnabled) 0.5f else 1.0f
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = "Open Orbot"
+        secondaryActionButton.text = getString(R.string.tor_control_button_open_orbot)
         secondaryActionButton.visibility = View.VISIBLE
         secondaryActionButton.isEnabled = true
     }
@@ -212,8 +212,8 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     private fun showErrorState() {
         statusIcon.setImageResource(R.drawable.ic_tor_error)
         statusIcon.alpha = 1f
-        statusTitle.text = "Connection Failed"
-        statusSubtitle.text = TorManager.errorMessage ?: "Could not connect to Tor network"
+        statusTitle.text = getString(R.string.tor_control_title_error)
+        statusSubtitle.text = TorManager.errorMessage ?: getString(R.string.tor_control_subtitle_error)
         connectionProgress.visibility = View.GONE
         connectionDetailsContainer.visibility = View.GONE
         orbotInfoCard.visibility = View.GONE
@@ -236,12 +236,12 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             }
             .start()
 
-        primaryActionButton.text = "Retry Connection"
+        primaryActionButton.text = getString(R.string.tor_control_button_retry)
         primaryActionButton.setIconResource(R.drawable.ic_tor_on)
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = "Open Orbot"
+        secondaryActionButton.text = getString(R.string.tor_control_button_open_orbot)
         secondaryActionButton.visibility = View.VISIBLE
         secondaryActionButton.isEnabled = TorManager.isOrbotInstalled(requireContext())
     }
@@ -249,13 +249,13 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     private fun showOrbotNotInstalledState() {
         statusIcon.setImageResource(R.drawable.ic_orbot)
         statusIcon.alpha = 1f
-        statusTitle.text = "Orbot Required"
-        statusSubtitle.text = "Install Orbot to connect to the Tor network"
+        statusTitle.text = getString(R.string.tor_control_title_orbot_required)
+        statusSubtitle.text = getString(R.string.tor_control_subtitle_orbot_required)
         connectionProgress.visibility = View.GONE
         connectionDetailsContainer.visibility = View.GONE
         orbotInfoCard.visibility = View.VISIBLE
 
-        primaryActionButton.text = "Install Orbot"
+        primaryActionButton.text = getString(R.string.tor_control_button_install)
         primaryActionButton.setIconResource(R.drawable.ic_download)
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE

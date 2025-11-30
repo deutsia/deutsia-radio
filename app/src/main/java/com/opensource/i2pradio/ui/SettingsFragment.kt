@@ -522,13 +522,20 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showSleepTimerDialog(button: MaterialButton) {
-        val options = arrayOf("Off", "15 minutes", "30 minutes", "45 minutes", "60 minutes", "90 minutes")
+        val options = arrayOf(
+            getString(R.string.settings_sleep_timer_off),
+            getString(R.string.settings_sleep_timer_15min),
+            getString(R.string.settings_sleep_timer_30min),
+            getString(R.string.settings_sleep_timer_45min),
+            getString(R.string.settings_sleep_timer_60min),
+            getString(R.string.settings_sleep_timer_90min)
+        )
         val values = intArrayOf(0, 15, 30, 45, 60, 90)
         val currentMinutes = PreferencesHelper.getSleepTimerMinutes(requireContext())
         val selectedIndex = values.indexOf(currentMinutes).coerceAtLeast(0)
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Sleep Timer")
+            .setTitle(getString(R.string.settings_sleep_timer))
             .setSingleChoiceItems(options, selectedIndex) { dialog, which ->
                 val minutes = values[which]
                 PreferencesHelper.setSleepTimerMinutes(requireContext(), minutes)
@@ -970,14 +977,17 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showRecordingDirectoryDialog() {
-        val options = mutableListOf("Default (Music/deutsia_radio)", "Choose custom folder...")
+        val options = mutableListOf(
+            getString(R.string.settings_recording_directory_default),
+            getString(R.string.settings_recording_directory_choose)
+        )
         val savedUri = PreferencesHelper.getRecordingDirectoryUri(requireContext())
         if (savedUri != null) {
-            options.add(1, "Clear custom folder")
+            options.add(1, getString(R.string.settings_recording_directory_clear))
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Recording Directory")
+            .setTitle(getString(R.string.settings_recording_directory))
             .setItems(options.toTypedArray()) { dialog, which ->
                 when {
                     which == 0 -> {
@@ -1005,14 +1015,18 @@ class SettingsFragment : Fragment() {
     private fun updateThemeButtonText(button: MaterialButton) {
         val currentMode = AppCompatDelegate.getDefaultNightMode()
         button.text = when (currentMode) {
-            AppCompatDelegate.MODE_NIGHT_NO -> "Light"
-            AppCompatDelegate.MODE_NIGHT_YES -> "Dark"
-            else -> "System Default"
+            AppCompatDelegate.MODE_NIGHT_NO -> getString(R.string.settings_theme_light)
+            AppCompatDelegate.MODE_NIGHT_YES -> getString(R.string.settings_theme_dark)
+            else -> getString(R.string.settings_theme_system_default)
         }
     }
 
     private fun showThemeDialog(themeButton: MaterialButton) {
-        val themes = arrayOf("System Default", "Light", "Dark")
+        val themes = arrayOf(
+            getString(R.string.settings_theme_system_default),
+            getString(R.string.settings_theme_light),
+            getString(R.string.settings_theme_dark)
+        )
         val currentMode = AppCompatDelegate.getDefaultNightMode()
         val selectedIndex = when (currentMode) {
             AppCompatDelegate.MODE_NIGHT_NO -> 1
@@ -1021,7 +1035,7 @@ class SettingsFragment : Fragment() {
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Choose Theme")
+            .setTitle(getString(R.string.settings_theme))
             .setSingleChoiceItems(themes, selectedIndex) { dialog, which ->
                 val newMode = when (which) {
                     0 -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -1040,22 +1054,28 @@ class SettingsFragment : Fragment() {
     private fun updateColorSchemeButtonText(button: MaterialButton) {
         val currentScheme = PreferencesHelper.getColorScheme(requireContext())
         button.text = when (currentScheme) {
-            "peach" -> "Peach"
-            "green" -> "Green"
-            "purple" -> "Purple"
-            "orange" -> "Orange"
-            else -> "Blue"
+            "peach" -> getString(R.string.settings_color_peach)
+            "green" -> getString(R.string.settings_color_green)
+            "purple" -> getString(R.string.settings_color_purple)
+            "orange" -> getString(R.string.settings_color_orange)
+            else -> getString(R.string.settings_color_blue)
         }
     }
 
     private fun showColorSchemeDialog(colorSchemeButton: MaterialButton) {
-        val schemes = arrayOf("Blue (Default)", "Peach", "Green", "Purple", "Orange")
+        val schemes = arrayOf(
+            getString(R.string.settings_color_blue_default),
+            getString(R.string.settings_color_peach),
+            getString(R.string.settings_color_green),
+            getString(R.string.settings_color_purple),
+            getString(R.string.settings_color_orange)
+        )
         val schemeValues = arrayOf("default", "peach", "green", "purple", "orange")
         val currentScheme = PreferencesHelper.getColorScheme(requireContext())
         val selectedIndex = schemeValues.indexOf(currentScheme).coerceAtLeast(0)
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Choose Color Scheme")
+            .setTitle(getString(R.string.settings_color_scheme))
             .setSingleChoiceItems(schemes, selectedIndex) { dialog, which ->
                 val newScheme = schemeValues[which]
                 PreferencesHelper.setColorScheme(requireContext(), newScheme)
