@@ -34,6 +34,40 @@
     <string name="genre_all">Tất cả thể loại</string>
     <string name="filter_by_genre">Lọc theo thể loại</string>
 
+    <!-- Genre Names -->
+    <string name="genre_alternative">Alternative</string>
+    <string name="genre_ambient">Ambient</string>
+    <string name="genre_blues">Blues</string>
+    <string name="genre_christian">Christian</string>
+    <string name="genre_classical">Classical</string>
+    <string name="genre_comedy">Comedy</string>
+    <string name="genre_country">Country</string>
+    <string name="genre_dance">Dance</string>
+    <string name="genre_edm">EDM</string>
+    <string name="genre_electronic">Electronic</string>
+    <string name="genre_folk">Folk</string>
+    <string name="genre_funk">Funk</string>
+    <string name="genre_gospel">Gospel</string>
+    <string name="genre_hip_hop">Hip Hop</string>
+    <string name="genre_indie">Indie</string>
+    <string name="genre_jazz">Jazz</string>
+    <string name="genre_k_pop">K-Pop</string>
+    <string name="genre_latin">Latin</string>
+    <string name="genre_lo_fi">Lo-Fi</string>
+    <string name="genre_metal">Metal</string>
+    <string name="genre_news">News</string>
+    <string name="genre_oldies">Oldies</string>
+    <string name="genre_pop">Pop</string>
+    <string name="genre_punk">Punk</string>
+    <string name="genre_r_and_b">R&amp;B</string>
+    <string name="genre_reggae">Reggae</string>
+    <string name="genre_rock">Rock</string>
+    <string name="genre_soul">Soul</string>
+    <string name="genre_sports">Sports</string>
+    <string name="genre_talk">Talk</string>
+    <string name="genre_world">World</string>
+    <string name="genre_other">Other</string>
+
      <!-- about -->
     <string name="about_description">deutsia radio là trình phát radio đa mạng miễn phí và mã nguồn mở, tập hợp các luồng từ mạng clearnet, Tor (.onion) và I2P. Tận hưởng các trạm yêu thích của bạn trong giao diện Material You với tích hợp Orbot và ngăn chặn rò rỉ có thể cấu hình</string>
 
@@ -118,6 +152,29 @@
     <string name="settings_color_scheme">Bảng màu</string>
     <string name="settings_color_scheme_description">Chọn màu ưa thích của bạn</string>
     <string name="settings_color_blue">Xanh dương</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_description">Choose your preferred language</string>
+
+    <!-- Language Names -->
+    <string name="language_choose">Choose Language</string>
+    <string name="language_system_default">System Default</string>
+    <string name="language_arabic">العربية</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_farsi">فارسی</string>
+    <string name="language_french">Français</string>
+    <string name="language_hindi">हिन्दी</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_burmese">မြန်မာ</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_ukrainian">Українська</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_chinese">中文</string>
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Mạng Tor</string>

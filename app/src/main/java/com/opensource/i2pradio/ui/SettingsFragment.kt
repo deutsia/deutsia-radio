@@ -1120,7 +1120,7 @@ class SettingsFragment : Fragment() {
         val selectedIndex = languageCodes.indexOf(currentLanguage).coerceAtLeast(0)
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Choose Language")
+            .setTitle(getString(R.string.language_choose))
             .setSingleChoiceItems(languages, selectedIndex) { dialog, which ->
                 val newLanguage = languageCodes[which]
                 PreferencesHelper.setAppLanguage(requireContext(), newLanguage)

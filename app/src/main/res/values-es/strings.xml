@@ -34,6 +34,40 @@
     <string name="genre_all">Todos los géneros</string>
     <string name="filter_by_genre">Filtrar por género</string>
 
+    <!-- Genre Names -->
+    <string name="genre_alternative">Alternativa</string>
+    <string name="genre_ambient">Ambiental</string>
+    <string name="genre_blues">Blues</string>
+    <string name="genre_christian">Cristiana</string>
+    <string name="genre_classical">Clásica</string>
+    <string name="genre_comedy">Comedia</string>
+    <string name="genre_country">Country</string>
+    <string name="genre_dance">Dance</string>
+    <string name="genre_edm">EDM</string>
+    <string name="genre_electronic">Electrónica</string>
+    <string name="genre_folk">Folk</string>
+    <string name="genre_funk">Funk</string>
+    <string name="genre_gospel">Gospel</string>
+    <string name="genre_hip_hop">Hip Hop</string>
+    <string name="genre_indie">Indie</string>
+    <string name="genre_jazz">Jazz</string>
+    <string name="genre_k_pop">K-Pop</string>
+    <string name="genre_latin">Latina</string>
+    <string name="genre_lo_fi">Lo-Fi</string>
+    <string name="genre_metal">Metal</string>
+    <string name="genre_news">Noticias</string>
+    <string name="genre_oldies">Clásicos</string>
+    <string name="genre_pop">Pop</string>
+    <string name="genre_punk">Punk</string>
+    <string name="genre_r_and_b">R&amp;B</string>
+    <string name="genre_reggae">Reggae</string>
+    <string name="genre_rock">Rock</string>
+    <string name="genre_soul">Soul</string>
+    <string name="genre_sports">Deportes</string>
+    <string name="genre_talk">Conversación</string>
+    <string name="genre_world">Mundial</string>
+    <string name="genre_other">Otro</string>
+
      <!-- about -->
     <string name="about_description">deutsia radio es un reproductor de radio multired gratuito y de código abierto que reúne transmisiones de clearnet, Tor (.onion) y redes I2P. Disfruta de tus estaciones favoritas en una interfaz Material You con integración Orbot y prevención de fugas configurable</string>
 
@@ -118,6 +152,29 @@
     <string name="settings_color_scheme">Esquema de color</string>
     <string name="settings_color_scheme_description">Elige tu color preferido</string>
     <string name="settings_color_blue">Azul</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_description">Elige tu idioma preferido</string>
+
+    <!-- Language Names -->
+    <string name="language_choose">Elegir idioma</string>
+    <string name="language_system_default">Predeterminado del sistema</string>
+    <string name="language_arabic">العربية</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_farsi">فارسی</string>
+    <string name="language_french">Français</string>
+    <string name="language_hindi">हिन्दी</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_burmese">မြန်မာ</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_ukrainian">Українська</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_chinese">中文</string>
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Red Tor</string>
