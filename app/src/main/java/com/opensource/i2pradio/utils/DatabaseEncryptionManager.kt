@@ -213,8 +213,10 @@ object DatabaseEncryptionManager {
             val passphraseHex = passphrase.toHexString()
 
             // Export to encrypted database using proper SQLCipher syntax
-            // Note: The KEY parameter must use double quotes around x'...'
-            unencryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS encrypted KEY \"x'$passphraseHex'\";")
+            // The x'...' blob literal must NOT be quoted with double quotes
+            // Double quotes denote identifiers in SQL, not literals
+            // The blob literal x'hexstring' should be used directly as the KEY value
+            unencryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS encrypted KEY x'$passphraseHex';")
             unencryptedDb.rawExecSQL("SELECT sqlcipher_export('encrypted');")
             unencryptedDb.rawExecSQL("DETACH DATABASE encrypted;")
             unencryptedDb.close()
