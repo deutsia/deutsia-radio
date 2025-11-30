@@ -37,6 +37,7 @@ import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
 import com.opensource.i2pradio.ui.TorStatusView
 import com.opensource.i2pradio.ui.CustomProxyStatusView
 import com.opensource.i2pradio.ui.browse.BrowseStationsFragment
+import com.opensource.i2pradio.utils.BiometricAuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,6 +59,8 @@ class MainActivity : AppCompatActivity() {
     private var miniPlayerManuallyClosed = false
     private var lastStationId: Long? = null
     private var lastStationUrl: String? = null  // Use URL to detect station changes for unsaved stations
+    private var isAuthenticated = false  // Track authentication state
+    private var isFirstLaunch = true  // Track if this is the first launch
 
     // Tor state listener
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
@@ -504,9 +507,48 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        // Check if authentication is required
+        val isAppLockEnabled = PreferencesHelper.isAppLockEnabled(this)
+        val requireAuthOnLaunch = PreferencesHelper.isRequireAuthOnLaunch(this)
+        val hasPassword = BiometricAuthManager.hasPassword(this)
+
+        // Show authentication if:
+        // 1. App lock is enabled
+        // 2. Password is set
+        // 3. Either this is first launch (and require on launch is enabled) OR app is resuming and not already authenticated
+        val shouldAuthenticate = isAppLockEnabled && hasPassword &&
+            ((isFirstLaunch && requireAuthOnLaunch) || (!isFirstLaunch && !isAuthenticated))
+
+        if (shouldAuthenticate) {
+            // Launch authentication activity
+            val intent = Intent(this, AuthenticationActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE_AUTHENTICATION)
+        } else if (isFirstLaunch) {
+            // Mark as authenticated on first launch if no auth required
+            isAuthenticated = true
+        }
+
+        // Mark first launch as complete
+        isFirstLaunch = false
+
         // Refresh Tor status when app comes to foreground (only if Orbot integration is enabled)
         if (PreferencesHelper.isEmbeddedTorEnabled(this)) {
             TorManager.requestOrbotStatus(this)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Reset authentication state when app goes to background
+        isAuthenticated = false
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_AUTHENTICATION) {
+            // If authentication activity finished, mark as authenticated
+            isAuthenticated = true
         }
     }
 
@@ -525,6 +567,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        // Request code for authentication
+        private const val REQUEST_CODE_AUTHENTICATION = 1001
+
         // Broadcast action for like state changes
         const val BROADCAST_LIKE_STATE_CHANGED = "com.opensource.i2pradio.LIKE_STATE_CHANGED"
         const val EXTRA_STATION_ID = "station_id"

@@ -48,6 +48,11 @@ object PreferencesHelper {
     private const val KEY_BANDWIDTH_USAGE_SESSION = "bandwidth_usage_session"
     private const val KEY_BANDWIDTH_USAGE_LAST_RESET = "bandwidth_usage_last_reset"
 
+    // Authentication settings
+    private const val KEY_APP_LOCK_ENABLED = "app_lock_enabled"
+    private const val KEY_BIOMETRIC_ENABLED = "biometric_enabled"
+    private const val KEY_REQUIRE_AUTH_ON_LAUNCH = "require_auth_on_launch"
+
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
@@ -676,5 +681,61 @@ object PreferencesHelper {
             bytes < 1024 * 1024 * 1024 -> String.format("%.2f MB", bytes / (1024.0 * 1024.0))
             else -> String.format("%.2f GB", bytes / (1024.0 * 1024.0 * 1024.0))
         }
+    }
+
+    // ===== Authentication Preferences =====
+
+    /**
+     * Enable or disable app lock
+     */
+    fun setAppLockEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_APP_LOCK_ENABLED, enabled)
+            .apply()
+    }
+
+    /**
+     * Check if app lock is enabled
+     */
+    fun isAppLockEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_APP_LOCK_ENABLED, false)
+    }
+
+    /**
+     * Enable or disable biometric authentication
+     */
+    fun setBiometricEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_BIOMETRIC_ENABLED, enabled)
+            .apply()
+    }
+
+    /**
+     * Check if biometric authentication is enabled
+     */
+    fun isBiometricEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_BIOMETRIC_ENABLED, false)
+    }
+
+    /**
+     * Set whether to require authentication on app launch
+     */
+    fun setRequireAuthOnLaunch(context: Context, required: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_REQUIRE_AUTH_ON_LAUNCH, required)
+            .apply()
+    }
+
+    /**
+     * Check if authentication is required on app launch
+     */
+    fun isRequireAuthOnLaunch(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_REQUIRE_AUTH_ON_LAUNCH, true)
     }
 }
