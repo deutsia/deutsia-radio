@@ -312,6 +312,10 @@
     <string name="auth_error_current_password_wrong">Current password is incorrect</string>
     <string name="auth_password_set">Password set successfully</string>
     <string name="auth_password_changed">Password changed successfully</string>
+    <string name="auth_enter_password_to_encrypt">Enter Password to Encrypt Database</string>
+    <string name="auth_enter_password_to_decrypt">Enter Password to Decrypt Database</string>
+    <string name="auth_password_for_encryption">Your password will be used to encrypt the database. You\'ll need to enter it each time you open the app.</string>
+    <string name="auth_password_for_decryption">Enter your password to decrypt the database before disabling encryption.</string>
 
     <!-- Authentication Activity -->
     <string name="auth_unlock_app">Unlock deutsia radio</string>
