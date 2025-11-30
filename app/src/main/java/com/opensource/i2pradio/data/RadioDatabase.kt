@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.opensource.i2pradio.utils.DatabaseEncryptionManager
 
 @Database(entities = [RadioStation::class, BrowseHistory::class], version = 8, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
@@ -168,16 +169,37 @@ abstract class RadioDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): RadioDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
+                // Initialize SQLCipher
+                DatabaseEncryptionManager.initializeSQLCipher(context)
+
+                // Get SupportFactory for encryption (null if encryption disabled)
+                val supportFactory = DatabaseEncryptionManager.getSupportFactory(context)
+
+                val builder = Room.databaseBuilder(
                     context.applicationContext,
                     RadioDatabase::class.java,
                     "radio_database"
                 )
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                     .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
-                    .build()
+
+                // Apply SQLCipher encryption if enabled
+                supportFactory?.let { builder.openHelperFactory(it) }
+
+                val instance = builder.build()
                 INSTANCE = instance
                 instance
+            }
+        }
+
+        /**
+         * Close and clear the database instance
+         * Call this before enabling/disabling encryption
+         */
+        fun closeDatabase() {
+            synchronized(this) {
+                INSTANCE?.close()
+                INSTANCE = null
             }
         }
     }

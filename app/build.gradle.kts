@@ -108,6 +108,10 @@ dependencies {
     // Biometric authentication
     implementation("androidx.biometric:biometric:1.1.0")
 
+    // SQLCipher for database encryption
+    implementation("net.zetetic:sqlcipher-android:4.6.0")
+    implementation("androidx.sqlite:sqlite-ktx:2.4.0")
+
     // Test dependencies
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
