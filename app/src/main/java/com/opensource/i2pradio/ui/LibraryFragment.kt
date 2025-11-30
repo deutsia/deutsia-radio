@@ -770,12 +770,12 @@ class RadioStationAdapter(
         fun bind(station: RadioStation) {
             stationName.text = station.name
 
-            // Show proxy type indicator (I2P or Tor)
+            // Show proxy type indicator (I2P or Tor only - Custom proxy is indicated by top-right icon)
             val proxyIndicator = if (station.useProxy) {
                 when (station.getProxyTypeEnum()) {
                     ProxyType.I2P -> " • I2P"
                     ProxyType.TOR -> " • Tor"
-                    ProxyType.CUSTOM -> " • Custom"
+                    ProxyType.CUSTOM -> ""
                     ProxyType.NONE -> ""
                 }
             } else ""

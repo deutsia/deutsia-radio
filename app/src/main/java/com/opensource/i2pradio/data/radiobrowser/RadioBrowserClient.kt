@@ -82,7 +82,7 @@ class RadioBrowserClient(private val context: Context) {
             }
         }
         // Priority 2: Force Custom Proxy for clearnet (RadioBrowser API is clearnet)
-        else if ((forceCustomProxy || (forceCustomProxyExceptTorI2P && customProxyAppliedToClearnet))) {
+        else if (forceCustomProxy || forceCustomProxyExceptTorI2P) {
             val proxyHost = PreferencesHelper.getCustomProxyHost(context)
             val proxyPort = PreferencesHelper.getCustomProxyPort(context)
             val proxyProtocol = PreferencesHelper.getCustomProxyProtocol(context)
