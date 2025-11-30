@@ -1995,6 +1995,7 @@ class SettingsFragment : Fragment() {
                         BiometricAuthManager.setPassword(requireContext(), password)
                         PreferencesHelper.setAppLockEnabled(requireContext(), true)
                         updateAuthenticationUIVisibility()
+                        updateDatabaseEncryptionSwitchState()
                         Toast.makeText(requireContext(), R.string.auth_password_set, Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -2086,11 +2087,34 @@ class SettingsFragment : Fragment() {
         val isEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(requireContext())
         databaseEncryptionSwitch?.isChecked = isEncryptionEnabled
 
+        // Update switch enabled state based on whether password is set
+        updateDatabaseEncryptionSwitchState()
+
         databaseEncryptionSwitch?.setOnCheckedChangeListener { switch, isChecked ->
             // Prevent toggling during processing
             switch.isEnabled = false
 
             if (isChecked) {
+                // Check if app password is set before allowing encryption
+                if (!com.opensource.i2pradio.utils.BiometricAuthManager.hasPassword(requireContext())) {
+                    // Show dialog explaining password requirement
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.settings_database_encryption_password_required_title)
+                        .setMessage(R.string.settings_database_encryption_password_required_message)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            // Reset switch and re-enable
+                            switch.isChecked = false
+                            switch.isEnabled = true
+                        }
+                        .setOnCancelListener {
+                            // Reset switch and re-enable
+                            switch.isChecked = false
+                            switch.isEnabled = true
+                        }
+                        .show()
+                    return@setOnCheckedChangeListener
+                }
+
                 // Show confirmation dialog for enabling encryption
                 AlertDialog.Builder(requireContext())
                     .setTitle(R.string.settings_database_encryption_enable_title)
@@ -2218,6 +2242,18 @@ class SettingsFragment : Fragment() {
                     .show()
             }
         }
+    }
+
+    /**
+     * Update database encryption switch enabled state based on password availability
+     */
+    private fun updateDatabaseEncryptionSwitchState() {
+        val hasPassword = com.opensource.i2pradio.utils.BiometricAuthManager.hasPassword(requireContext())
+        val isEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(requireContext())
+
+        // Enable switch only if password is set OR encryption is already enabled
+        // (allow disabling even if password was removed)
+        databaseEncryptionSwitch?.isEnabled = hasPassword || isEncryptionEnabled
     }
 
     /**
