@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">Ошибка записи: %s</string>
-    <string name="recording_saved">Запись сохранена: %s (%dКБ)</string>
+    <string name="recording_saved">Запись сохранена: %1$s (%2$dКБ)</string>
     <string name="recording_stopping">Остановка записи...</string>
     <string name="recording_starting">Начало записи...</string>
     <string name="recording_no_station">Станция не воспроизводится</string>

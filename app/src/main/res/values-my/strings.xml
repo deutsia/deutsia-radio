@@ -113,7 +113,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">ရိုက်ကူးမှု မအောင်မြင်ပါ: %s</string>
-    <string name="recording_saved">ရိုက်ကူးမှုကို သိမ်းဆည်းပြီးပါပြီ: %s (%dKB)</string>
+    <string name="recording_saved">ရိုက်ကူးမှုကို သိမ်းဆည်းပြီးပါပြီ: %1$s (%2$dKB)</string>
     <string name="recording_stopping">ရိုက်ကူးမှုကို ရပ်နေသည်...</string>
     <string name="recording_starting">ရိုက်ကူးမှုကို စတင်နေသည်...</string>
     <string name="recording_no_station">စတေးရှင်း မဖွင့်ထားပါ</string>

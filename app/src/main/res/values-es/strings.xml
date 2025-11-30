@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">Grabación fallida: %s</string>
-    <string name="recording_saved">Grabación guardada: %s (%dKB)</string>
+    <string name="recording_saved">Grabación guardada: %1$s (%2$dKB)</string>
     <string name="recording_stopping">Deteniendo grabación...</string>
     <string name="recording_starting">Iniciando grabación...</string>
     <string name="recording_no_station">No hay estación reproduciéndose</string>

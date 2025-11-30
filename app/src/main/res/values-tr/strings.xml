@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">Kayıt başarısız: %s</string>
-    <string name="recording_saved">Kayıt kaydedildi: %s (%dKB)</string>
+    <string name="recording_saved">Kayıt kaydedildi: %1$s (%2$dKB)</string>
     <string name="recording_stopping">Kayıt durduruluyor...</string>
     <string name="recording_starting">Kayıt başlatılıyor...</string>
     <string name="recording_no_station">Çalan istasyon yok</string>

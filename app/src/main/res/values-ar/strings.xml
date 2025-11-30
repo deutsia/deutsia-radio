@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">فشل التسجيل: %s</string>
-    <string name="recording_saved">تم حفظ التسجيل: %s (%dKB)</string>
+    <string name="recording_saved">تم حفظ التسجيل: %1$s (%2$dKB)</string>
     <string name="recording_stopping">جارٍ إيقاف التسجيل...</string>
     <string name="recording_starting">جارٍ بدء التسجيل...</string>
     <string name="recording_no_station">لا توجد محطة قيد التشغيل</string>

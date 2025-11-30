@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">ضبط ناموفق بود: %s</string>
-    <string name="recording_saved">ضبط ذخیره شد: %s (%dKB)</string>
+    <string name="recording_saved">ضبط ذخیره شد: %1$s (%2$dKB)</string>
     <string name="recording_stopping">در حال توقف ضبط...</string>
     <string name="recording_starting">در حال شروع ضبط...</string>
     <string name="recording_no_station">ایستگاهی در حال پخش نیست</string>

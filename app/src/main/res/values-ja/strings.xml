@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">録音に失敗しました: %s</string>
-    <string name="recording_saved">録音を保存しました: %s (%dKB)</string>
+    <string name="recording_saved">録音を保存しました: %1$s (%2$dKB)</string>
     <string name="recording_stopping">録音を停止中...</string>
     <string name="recording_starting">録音を開始中...</string>
     <string name="recording_no_station">ステーションが再生されていません</string>

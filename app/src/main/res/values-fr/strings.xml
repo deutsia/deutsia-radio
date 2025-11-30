@@ -123,7 +123,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">Échec de l\'enregistrement : %s</string>
-    <string name="recording_saved">Enregistrement sauvegardé : %s (%dKo)</string>
+    <string name="recording_saved">Enregistrement sauvegardé : %1$s (%2$dKo)</string>
     <string name="recording_stopping">Arrêt de l\'enregistrement...</string>
     <string name="recording_starting">Démarrage de l\'enregistrement...</string>
     <string name="recording_no_station">Aucune station en lecture</string>

@@ -113,7 +113,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">रिकॉर्डिंग विफल: %s</string>
-    <string name="recording_saved">रिकॉर्डिंग सहेजी गई: %s (%dKB)</string>
+    <string name="recording_saved">रिकॉर्डिंग सहेजी गई: %1$s (%2$dKB)</string>
     <string name="recording_stopping">रिकॉर्डिंग बंद हो रही है...</string>
     <string name="recording_starting">रिकॉर्डिंग शुरू हो रही है...</string>
     <string name="recording_no_station">कोई स्टेशन नहीं चल रहा</string>
