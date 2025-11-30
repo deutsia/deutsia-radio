@@ -82,13 +82,43 @@ class LibraryFragment : Fragment() {
     }
 
     // Predefined genres list (sorted alphabetically)
-    private val allGenres = listOf(
-        "All Genres", "Alternative", "Ambient", "Blues", "Christian", "Classical",
-        "Comedy", "Country", "Dance", "EDM", "Electronic", "Folk",
-        "Funk", "Gospel", "Hip Hop", "Indie", "Jazz", "K-Pop",
-        "Latin", "Lo-Fi", "Metal", "News", "Oldies", "Pop", "Punk",
-        "R&B", "Reggae", "Rock", "Soul", "Sports", "Talk", "World", "Other"
-    )
+    private fun getAllGenres(): List<String> {
+        return listOf(
+            getString(R.string.genre_all),
+            getString(R.string.genre_alternative),
+            getString(R.string.genre_ambient),
+            getString(R.string.genre_blues),
+            getString(R.string.genre_christian),
+            getString(R.string.genre_classical),
+            getString(R.string.genre_comedy),
+            getString(R.string.genre_country),
+            getString(R.string.genre_dance),
+            getString(R.string.genre_edm),
+            getString(R.string.genre_electronic),
+            getString(R.string.genre_folk),
+            getString(R.string.genre_funk),
+            getString(R.string.genre_gospel),
+            getString(R.string.genre_hip_hop),
+            getString(R.string.genre_indie),
+            getString(R.string.genre_jazz),
+            getString(R.string.genre_k_pop),
+            getString(R.string.genre_latin),
+            getString(R.string.genre_lo_fi),
+            getString(R.string.genre_metal),
+            getString(R.string.genre_news),
+            getString(R.string.genre_oldies),
+            getString(R.string.genre_pop),
+            getString(R.string.genre_punk),
+            getString(R.string.genre_r_and_b),
+            getString(R.string.genre_reggae),
+            getString(R.string.genre_rock),
+            getString(R.string.genre_soul),
+            getString(R.string.genre_sports),
+            getString(R.string.genre_talk),
+            getString(R.string.genre_world),
+            getString(R.string.genre_other)
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -268,13 +298,15 @@ class LibraryFragment : Fragment() {
             }
 
             // Merge predefined genres with database genres, keeping alphabetical order
-            val combinedGenres = (allGenres + dbGenres)
+            val allGenresText = getString(R.string.genre_all)
+            val otherGenreText = getString(R.string.genre_other)
+            val combinedGenres = (getAllGenres() + dbGenres)
                 .distinct()
                 .sortedWith(compareBy {
                     // "All Genres" first, "Other" last, rest alphabetically
                     when (it) {
-                        "All Genres" -> "0$it"
-                        "Other" -> "ZZZ$it"
+                        allGenresText -> "0$it"
+                        otherGenreText -> "ZZZ$it"
                         else -> "A$it"
                     }
                 })
@@ -302,7 +334,7 @@ class LibraryFragment : Fragment() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     // Apply the selection when OK is clicked
-                    currentGenreFilter = if (tempSelectedGenre == "All Genres") null else tempSelectedGenre
+                    currentGenreFilter = if (tempSelectedGenre == allGenresText) null else tempSelectedGenre
                     PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
                     updateGenreFilterButtonText()
                     // Clear search when changing genre filter
