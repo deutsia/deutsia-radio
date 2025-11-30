@@ -916,7 +916,7 @@ class SettingsFragment : Fragment() {
                 torStatusText?.text = "Connected"
                 torStatusDetail?.text = "SOCKS port: ${TorManager.socksPort}"
                 torActionButton?.text = "Stop"
-                torActionButton?.isEnabled = true
+                // Don't override isEnabled here - it's already set based on force mode at line 887
             }
             TorManager.TorState.ERROR -> {
                 // If force Tor is enabled, show a more severe warning
