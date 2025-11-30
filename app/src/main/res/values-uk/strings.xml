@@ -1,0 +1,337 @@
+<!--
+    Ukrainian (Українська) Translation
+-->
+<resources>
+    <string name="app_name">deutsia radio</string>
+    <string name="tab_radios">Бібліотека</string>
+    <string name="tab_now_playing">Зараз грає</string>
+    <string name="tab_settings">Налаштування</string>
+
+    <!-- Equalizer -->
+    <string name="equalizer">Еквалайзер</string>
+    <string name="equalizer_no_audio">Спочатку запустіть станцію</string>
+    <string name="equalizer_not_found">Додаток еквалайзера не знайдено. Встановіть еквалайзер, наприклад Wavelet.</string>
+    <string name="equalizer_preset">Пресет</string>
+    <string name="equalizer_custom">Власний</string>
+    <string name="equalizer_reset">Скинути на плоске</string>
+    <string name="equalizer_init_failed">Не вдалося ініціалізувати еквалайзер</string>
+    <string name="equalizer_bass_boost">Підсилення басів</string>
+    <string name="equalizer_surround_sound">Об\'ємний звук</string>
+
+    <!-- Sort options -->
+    <string name="sort_default">За замовчуванням</string>
+    <string name="sort_name">За назвою</string>
+    <string name="sort_recent">Нещодавні</string>
+    <string name="sort_liked">Улюблені</string>
+    <string name="sort_genre">За жанром</string>
+
+    <!-- Search -->
+    <string name="search_stations">Пошук у бібліотеці</string>
+    <string name="search_countries">Пошук країн…</string>
+    <string name="search_genres">Пошук жанрів…</string>
+
+    <!-- Genre filter -->
+    <string name="genre_all">Усі жанри</string>
+    <string name="filter_by_genre">Фільтр за жанром</string>
+
+     <!-- about -->
+    <string name="about_description">deutsia radio — це безплатний радіоплеєр з відкритим кодом, який об\'єднує потоки з clearnet, Tor (.onion) та I2P мереж. Насолоджуйтесь улюбленими станціями в Material You інтерфейсі з інтеграцією Orbot та налаштованим запобіганням витоків</string>
+
+    <!-- Browse/Discover Stations -->
+    <string name="tab_browse">Огляд</string>
+    <string name="search_radio_browser">Пошук серед тисяч станцій…</string>
+    <string name="browse_top_voted">Найпопулярніші</string>
+    <string name="browse_popular">Популярні</string>
+    <string name="browse_random">Випадкові</string>
+    <string name="browse_history">Історія</string>
+    <string name="browse_no_results">Станції не знайдено</string>
+    <string name="browse_no_results_hint">Спробуйте інший пошук або фільтр</string>
+    <string name="filter_country">Країна</string>
+    <string name="filter_genre">Жанр</string>
+    <string name="filter_language">Мова</string>
+    <string name="filter_all_countries">Усі країни</string>
+    <string name="filter_all_genres">Усі жанри</string>
+    <string name="filter_all_languages">Усі мови</string>
+    <string name="select_country">Вибрати країну</string>
+    <string name="select_genre">Вибрати жанр</string>
+    <string name="select_language">Вибрати мову</string>
+    <string name="loading_countries">Завантаження країн…</string>
+    <string name="loading_genres">Завантаження жанрів…</string>
+    <string name="loading_languages">Завантаження мов…</string>
+    <string name="search_languages">Пошук мов…</string>
+    <string name="station_saved">%s додано до бібліотеки</string>
+    <string name="station_removed">%s видалено з бібліотеки</string>
+    <string name="station_added_to_favorites">%s додано до улюблених</string>
+    <string name="station_removed_from_favorites">%s видалено з улюблених</string>
+    <string name="tor_required_warning">Примусовий Tor увімкнено, але Tor не підключено. Підключіться до Tor для перегляду станцій.</string>
+
+    <!-- Notification and Status Messages -->
+    <string name="notification_connecting">Підключення...</string>
+    <string name="notification_paused">Призупинено</string>
+    <string name="notification_playing">Відтворення</string>
+    <string name="notification_playing_recording">Відтворення • Запис</string>
+    <string name="notification_buffering">Буферизація...</string>
+    <string name="notification_reconnecting">Перепідключення...</string>
+    <string name="notification_connection_failed">Помилка підключення</string>
+    <string name="notification_tor_blocked">Tor не підключено - потік заблоковано</string>
+    <string name="notification_audio_focus_denied">Відмовлено в аудіо фокусі</string>
+    <string name="notification_channel_name">Відтворення deutsia radio</string>
+    <string name="notification_channel_description">Показує статус відтворення радіо</string>
+    <string name="notification_action_pause">Пауза</string>
+    <string name="notification_action_stop">Стоп</string>
+
+    <!-- Recording Messages -->
+    <string name="recording_failed">Помилка запису: %s</string>
+    <string name="recording_saved">Запис збережено: %s (%dКБ)</string>
+    <string name="recording_stopping">Зупинка запису...</string>
+    <string name="recording_starting">Початок запису...</string>
+    <string name="recording_no_station">Станція не відтворюється</string>
+    <string name="recording_directory_updated">Каталог запису оновлено</string>
+
+    <!-- Dialog Titles and Buttons -->
+    <string name="dialog_add_station">Додати радіостанцію</string>
+    <string name="dialog_edit_station">Редагувати радіостанцію</string>
+    <string name="dialog_sort_stations">Сортування станцій</string>
+    <string name="dialog_delete_stations">Видалити станції</string>
+    <string name="button_save">Зберегти</string>
+    <string name="button_cancel">Скасувати</string>
+    <string name="button_import">Імпорт</string>
+    <string name="button_export">Експорт</string>
+    <string name="button_open">Відкрити</string>
+    <string name="button_configure">Налаштувати</string>
+    <string name="button_apply">Застосувати</string>
+    <string name="button_reset">Скинути</string>
+    <string name="button_change">Змінити</string>
+    <string name="button_start">Старт</string>
+    <string name="button_test_connection">Перевірити з\'єднання</string>
+    <string name="hint_test_connection_disclaimer">Примітка: Тестування підключиться до httpbin.org через ваш проксі</string>
+    <string name="button_choose_image">Вибрати зображення</string>
+    <string name="button_clear">Очистити</string>
+
+    <!-- Settings - Appearance -->
+    <string name="settings_appearance">Зовнішній вигляд</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_description">Виберіть світлу, темну або системну</string>
+    <string name="settings_theme_system_default">Системна</string>
+    <string name="settings_material_you">Material You</string>
+    <string name="settings_material_you_description">Використовувати динамічні кольори на основі шпалер</string>
+    <string name="settings_color_scheme">Колірна схема</string>
+    <string name="settings_color_scheme_description">Виберіть бажаний колір</string>
+    <string name="settings_color_blue">Синій</string>
+
+    <!-- Settings - Tor Network -->
+    <string name="settings_tor_network">Мережа Tor</string>
+    <string name="settings_enable_tor">Увімкнути Tor (через Orbot)</string>
+    <string name="settings_enable_tor_description">Підключатися через мережу Tor</string>
+    <string name="settings_tor_disconnected">Відключено</string>
+    <string name="settings_tor_not_running">Tor не запущено</string>
+    <string name="settings_force_tor">Примусовий Tor для всього</string>
+    <string name="settings_force_tor_description">Маршрутизувати всі потоки через Tor. Не підключатиметься без Tor.</string>
+    <string name="settings_force_tor_except_i2p">Примусовий Tor крім I2P</string>
+    <string name="settings_force_tor_except_i2p_description">Маршрутизувати clearnet через Tor, I2P потоки безпосередньо до I2P проксі.</string>
+    <string name="settings_tor_info">Потрібен Orbot (безплатно з Play Store або F-Droid). Натисніть іконку Tor на панелі інструментів для швидкого доступу.\n\nРежими примусу блокують з\'єднання, коли Tor недоступний.</string>
+
+    <!-- Settings - Custom Proxy -->
+    <string name="settings_custom_proxy">Власний проксі</string>
+    <string name="settings_enable_custom_proxy">Увімкнути власний проксі</string>
+    <string name="settings_enable_custom_proxy_description">Використовувати власний проксі для з\'єднань</string>
+    <string name="settings_configure_proxy">Налаштувати глобальний проксі</string>
+    <string name="settings_configure_proxy_description">Налаштуйте параметри власного проксі</string>
+    <string name="settings_force_custom_proxy">Примусовий власний проксі</string>
+    <string name="settings_force_custom_proxy_description">Маршрутизувати весь трафік через власний проксі. Не підключатиметься без проксі.</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Примусовий власний проксі крім Tor/I2P станцій</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">Маршрутизувати весь clearnet трафік через власний проксі, але дозволяти Tor та I2P станціям використовувати їх власні проксі.</string>
+
+    <!-- Settings - Bandwidth -->
+    <string name="settings_bandwidth_usage">Використання трафіку</string>
+    <string name="settings_total_usage">Загальне використання (за весь час)</string>
+    <string name="settings_session_usage">Використання сесії</string>
+    <string name="settings_bandwidth_zero">0 Б</string>
+
+    <!-- Settings - Playback -->
+    <string name="settings_playback">Відтворення</string>
+    <string name="settings_sleep_timer">Таймер сну</string>
+    <string name="settings_sleep_timer_description">Автозупинка відтворення через встановлений час</string>
+    <string name="settings_sleep_timer_off">Вимкнено</string>
+    <string name="settings_equalizer_description">Налаштування частотних смуг та ефектів</string>
+    <string name="settings_recording_directory">Каталог записів</string>
+    <string name="settings_recording_directory_default">За замовчуванням (Music/deutsia_radio)</string>
+    <string name="settings_record_across_stations">Записувати при переключенні станцій</string>
+    <string name="settings_record_across_stations_description">Продовжувати запис при переключенні станцій</string>
+    <string name="settings_record_all_stations">Записувати всі станції</string>
+    <string name="settings_record_all_stations_description">Переключатися на потік нової станції в тому ж файлі</string>
+
+    <!-- Settings - Station Management -->
+    <string name="settings_station_management">Керування станціями</string>
+    <string name="settings_import_from_file">Імпорт з файлу</string>
+    <string name="settings_import_from_file_description">Імпорт з CSV, JSON, M3U або PLS</string>
+    <string name="settings_import_i2p_stations">Імпорт I2P станцій</string>
+    <string name="settings_import_i2p_stations_description">14 відібраних I2P радіостанцій</string>
+    <string name="settings_import_tor_stations">Імпорт Tor станцій</string>
+    <string name="settings_import_tor_stations_description">3 відібрані Tor радіостанції</string>
+    <string name="settings_export_stations">Експорт станцій</string>
+    <string name="settings_export_stations_description">Експортувати ваші станції у файл</string>
+
+    <!-- Settings - About -->
+    <string name="settings_about">Про програму</string>
+    <string name="settings_version">Версія 1.1</string>
+    <string name="settings_view_github">Переглянути на GitHub</string>
+    <string name="settings_donate">Підтримати</string>
+    <string name="settings_donate_description">Якщо цей додаток вам допоміг, розгляньте можливість підтримки</string>
+    <string name="settings_monero">Monero (XMR)</string>
+    <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
+    <string name="settings_copy_address">Копіювати адресу</string>
+
+    <!-- Tor Control Bottom Sheet -->
+    <string name="tor_connection_details">Деталі з\'єднання</string>
+    <string name="tor_proxy_host">Хост проксі</string>
+    <string name="tor_socks_port">Порт SOCKS</string>
+    <string name="tor_what_is_orbot">Що таке Orbot?</string>
+    <string name="tor_orbot_description">Orbot — це офіційний Tor клієнт для Android. Він забезпечує безпечний, зашифрований доступ до мережі Tor.</string>
+    <string name="tor_connect">Підключитися до Tor</string>
+    <string name="tor_open_orbot">Відкрити Orbot</string>
+
+    <!-- Add/Edit Radio Dialog -->
+    <string name="add_edit_tor_info">Використовується вбудований Tor - налаштування проксі не потрібне</string>
+    <string name="add_edit_authentication_optional">Автентифікація (необов\'язково)</string>
+    <string name="add_edit_advanced_options">Розширені параметри</string>
+    <string name="add_edit_cover_art">Обкладинка</string>
+    <string name="add_edit_or_enter_url">Або введіть URL зображення</string>
+
+    <!-- Input Hints -->
+    <string name="hint_station_name">Назва станції</string>
+    <string name="hint_stream_url">URL потоку</string>
+    <string name="hint_genre">Жанр</string>
+    <string name="hint_proxy_type">Тип проксі</string>
+    <string name="hint_proxy_host">Хост проксі</string>
+    <string name="hint_proxy_port">Порт проксі</string>
+    <string name="hint_protocol">Протокол</string>
+    <string name="hint_username_optional">Ім\'я користувача (необов\'язково)</string>
+    <string name="hint_password_optional">Пароль (необов\'язково)</string>
+    <string name="hint_auth_method">Метод автентифікації</string>
+    <string name="hint_connection_timeout">Тайм-аут з\'єднання (секунди)</string>
+    <string name="hint_cover_art_url">URL обкладинки (необов\'язково)</string>
+    <string name="hint_username_optional_caps">Ім\'я користувача (необов\'язково)</string>
+    <string name="hint_password_optional_caps">Пароль (необов\'язково)</string>
+    <string name="hint_auth_type">Тип автентифікації</string>
+
+    <!-- Default Values -->
+    <string name="default_proxy_host_i2p">127.0.0.1</string>
+    <string name="default_proxy_port_i2p">4444</string>
+    <string name="default_proxy_port_http">8080</string>
+    <string name="default_auth_none">Немає</string>
+    <string name="default_timeout">30</string>
+    <string name="default_equalizer_db">0 дБ</string>
+
+    <!-- Now Playing Fragment -->
+    <string name="now_playing_time_placeholder">00:00</string>
+    <string name="now_playing_live">НАЖИВО</string>
+    <string name="now_playing_no_station">Станція не відтворюється</string>
+    <string name="now_playing_no_station_subtitle">Виберіть станцію зі списку</string>
+    <string name="now_playing_volume_title">Гучність радіо</string>
+    <string name="now_playing_volume_description">Регулює лише потік радіо</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_session_bandwidth_reset">Трафік сесії скинуто</string>
+    <string name="toast_custom_proxy_saved">Налаштування власного проксі збережено</string>
+    <string name="toast_custom_proxy_cleared">Налаштування власного проксі очищено</string>
+    <string name="toast_address_copied">Адресу скопійовано в буфер обміну</string>
+    <string name="toast_using_default_directory">Використовується каталог за замовчуванням</string>
+
+    <!-- Custom Proxy Status Messages -->
+    <string name="custom_proxy_status_connected">Підключено</string>
+    <string name="custom_proxy_status_configured">Проксі налаштовано</string>
+    <string name="custom_proxy_status_not_configured">Не налаштовано</string>
+    <string name="custom_proxy_status_no_proxy">Проксі не встановлено</string>
+    <string name="custom_proxy_status_leak_warning">Попередження про витік</string>
+    <string name="custom_proxy_status_leak_detail">Примус увімкнено, але не налаштовано</string>
+
+    <!-- Tor Service Notification Messages -->
+    <string name="tor_channel_name">З\'єднання Tor</string>
+    <string name="tor_channel_description">Показує статус з\'єднання Tor</string>
+    <string name="tor_notification_disconnected">Tor відключено</string>
+    <string name="tor_notification_tap_to_open">Натисніть, щоб відкрити додаток</string>
+    <string name="tor_notification_connecting">Підключення через Orbot...</string>
+    <string name="tor_notification_please_wait">Будь ласка, зачекайте</string>
+    <string name="tor_notification_connected">Tor підключено</string>
+    <string name="tor_notification_error">Помилка Tor</string>
+    <string name="tor_notification_connection_failed">Помилка підключення</string>
+    <string name="tor_notification_orbot_required">Потрібен Orbot</string>
+    <string name="tor_notification_install_orbot">Будь ласка, встановіть Orbot для підтримки Tor</string>
+    <string name="tor_notification_action_stop">Зупинити Tor</string>
+
+    <!-- Other Error Messages -->
+    <string name="error_unknown">Невідома помилка</string>
+    <string name="folder_custom">Власна папка</string>
+
+    <!-- AddEditRadioDialog Default Values -->
+    <string name="default_genre_other">Інше</string>
+    <string name="default_proxy_none">Немає</string>
+    <string name="default_proxy_i2p">I2P</string>
+    <string name="default_proxy_tor">Tor</string>
+    <string name="default_proxy_custom">Власний</string>
+    <string name="default_protocol_http">HTTP</string>
+    <string name="default_protocol_https">HTTPS</string>
+    <string name="default_protocol_socks4">SOCKS4</string>
+    <string name="default_protocol_socks5">SOCKS5</string>
+    <string name="default_auth_basic">Basic</string>
+    <string name="default_auth_digest">Digest</string>
+    <string name="default_port_8080">8080</string>
+    <string name="default_timeout_30">30</string>
+
+    <!-- Security & Privacy -->
+    <string name="settings_security_privacy">Безпека та приватність</string>
+    <string name="settings_app_lock">Блокування додатка</string>
+    <string name="settings_app_lock_description">Вимагати пароль або біометрію для розблокування додатка</string>
+    <string name="settings_biometric_auth">Біометрична автентифікація</string>
+    <string name="settings_biometric_auth_description">Використовувати відбиток пальця або розблокування обличчям</string>
+    <string name="settings_require_auth_on_launch">Вимагати автентифікацію при запуску</string>
+    <string name="settings_require_auth_on_launch_description">Завжди вимагати автентифікацію при відкритті додатка</string>
+    <string name="settings_set_password">Встановити пароль</string>
+    <string name="settings_change_password">Змінити пароль</string>
+    <string name="settings_database_encryption">Шифрування бази даних</string>
+    <string name="settings_database_encryption_description">Зашифрувати всю базу даних за допомогою SQLCipher, використовуючи ваш пароль додатка (потрібен перезапуск)</string>
+    <string name="settings_database_encryption_warning">Попередження: Це експериментальна функція. Переконайтеся, що у вас є резервна копія перед увімкненням!</string>
+    <string name="settings_database_encryption_enable_title">Увімкнути шифрування бази даних?</string>
+    <string name="settings_database_encryption_enable_message">Це зашифрує всю вашу базу даних радіо, використовуючи ваш пароль додатка. Додаток перезапуститься для застосування змін.\n\nПОПЕРЕДЖЕННЯ: Це експериментально. Переконайтеся, що у вас є резервна копія!</string>
+    <string name="settings_database_encryption_disable_title">Вимкнути шифрування бази даних?</string>
+    <string name="settings_database_encryption_disable_message">Це розшифрує вашу базу даних і видалить шифрування. Додаток перезапуститься для застосування змін.</string>
+    <string name="settings_database_encryption_enabled">Шифрування бази даних увімкнено</string>
+    <string name="settings_database_encryption_disabled">Шифрування бази даних вимкнено</string>
+    <string name="settings_database_encryption_error">Не вдалося змінити налаштування шифрування</string>
+    <string name="settings_database_encryption_password_required_title">Потрібен пароль додатка</string>
+    <string name="settings_database_encryption_password_required_message">Шифрування бази даних використовує ваш пароль додатка для генерації ключа шифрування. Спочатку встановіть пароль додатка, увімкнувши \"Блокування додатка\" вище.\n\nПісля встановлення ви зможете увімкнути шифрування бази даних, використовуючи той самий пароль - окремий пароль не потрібен.</string>
+
+    <!-- Authentication Dialog -->
+    <string name="auth_dialog_title">Встановити пароль додатка</string>
+    <string name="auth_dialog_change_title">Змінити пароль</string>
+    <string name="auth_dialog_change_message">Примітка: Якщо шифрування бази даних увімкнено, воно буде автоматично оновлено для використання нового пароля.</string>
+    <string name="auth_dialog_current_password">Поточний пароль</string>
+    <string name="auth_dialog_new_password">Новий пароль</string>
+    <string name="auth_dialog_confirm_password">Підтвердити пароль</string>
+    <string name="auth_dialog_set">Встановити пароль</string>
+    <string name="auth_dialog_change">Змінити пароль</string>
+    <string name="auth_error_passwords_dont_match">Паролі не збігаються</string>
+    <string name="auth_error_password_too_short">Пароль має містити щонайменше 4 символи</string>
+    <string name="auth_error_current_password_wrong">Поточний пароль неправильний</string>
+    <string name="auth_password_set">Пароль успішно встановлено</string>
+    <string name="auth_password_changed">Пароль успішно змінено</string>
+    <string name="auth_enter_password_to_encrypt">Підтвердьте ваш пароль додатка</string>
+    <string name="auth_enter_password_to_decrypt">Підтвердьте ваш пароль додатка</string>
+    <string name="auth_password_for_encryption">Введіть ваш існуючий пароль додатка для увімкнення шифрування бази даних.\n\nВаш пароль додатка буде використано для отримання ключа шифрування. Окремий пароль не потрібен.</string>
+    <string name="auth_password_for_decryption">Введіть ваш пароль додатка для підтвердження та розшифрування бази даних перед вимкненням шифрування.</string>
+    <string name="auth_encrypting_database">Шифрування бази даних вашим паролем додатка…</string>
+    <string name="auth_decrypting_database">Розшифрування бази даних…</string>
+    <string name="auth_rekeying_database">Оновлення шифрування бази даних новим паролем…</string>
+
+    <!-- Authentication Activity -->
+    <string name="auth_unlock_app">Розблокувати deutsia radio</string>
+    <string name="auth_enter_password">Введіть ваш пароль</string>
+    <string name="auth_password_hint">Пароль</string>
+    <string name="auth_unlock_button">Розблокувати</string>
+    <string name="auth_use_biometric">Використати біометрію</string>
+    <string name="auth_error_wrong_password">Неправильний пароль</string>
+    <string name="auth_biometric_title">Розблокувати deutsia radio</string>
+    <string name="auth_biometric_subtitle">Автентифікуйтеся для продовження</string>
+    <string name="auth_biometric_negative">Використати пароль</string>
+</resources>

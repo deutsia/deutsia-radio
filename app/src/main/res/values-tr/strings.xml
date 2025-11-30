@@ -1,0 +1,337 @@
+<!--
+    Turkish (Türkçe) Translation
+-->
+<resources>
+    <string name="app_name">deutsia radio</string>
+    <string name="tab_radios">Kütüphane</string>
+    <string name="tab_now_playing">Şimdi Çalıyor</string>
+    <string name="tab_settings">Ayarlar</string>
+
+    <!-- Equalizer -->
+    <string name="equalizer">Ekolayzır</string>
+    <string name="equalizer_no_audio">Önce bir istasyon çalmaya başlayın</string>
+    <string name="equalizer_not_found">Ekolayzır uygulaması bulunamadı. Wavelet gibi bir ekolayzır uygulaması yükleyin.</string>
+    <string name="equalizer_preset">Ön Ayar</string>
+    <string name="equalizer_custom">Özel</string>
+    <string name="equalizer_reset">Düze Sıfırla</string>
+    <string name="equalizer_init_failed">Ekolayzır başlatılamadı</string>
+    <string name="equalizer_bass_boost">Bas Güçlendirici</string>
+    <string name="equalizer_surround_sound">Surround Ses</string>
+
+    <!-- Sort options -->
+    <string name="sort_default">Varsayılan</string>
+    <string name="sort_name">İsim</string>
+    <string name="sort_recent">Son</string>
+    <string name="sort_liked">Beğenilen</string>
+    <string name="sort_genre">Tür</string>
+
+    <!-- Search -->
+    <string name="search_stations">Kütüphane ara</string>
+    <string name="search_countries">Ülke ara…</string>
+    <string name="search_genres">Tür ara…</string>
+
+    <!-- Genre filter -->
+    <string name="genre_all">Tüm Türler</string>
+    <string name="filter_by_genre">Türe Göre Filtrele</string>
+
+     <!-- about -->
+    <string name="about_description">deutsia radio, clearnet, Tor (.onion) ve I2P ağlarından yayınları bir araya getiren ücretsiz ve açık kaynaklı bir çoklu ağ radyo oynatıcısıdır. Orbot entegrasyonu ve yapılandırılabilir sızıntı önleme özellikli Material You arayüzünde favori istasyonlarınızın keyfini çıkarın</string>
+
+    <!-- Browse/Discover Stations -->
+    <string name="tab_browse">Göz At</string>
+    <string name="search_radio_browser">Binlerce istasyon ara…</string>
+    <string name="browse_top_voted">En Çok Oylanan</string>
+    <string name="browse_popular">Popüler</string>
+    <string name="browse_random">Rastgele</string>
+    <string name="browse_history">Geçmiş</string>
+    <string name="browse_no_results">İstasyon Bulunamadı</string>
+    <string name="browse_no_results_hint">Farklı bir arama veya filtre deneyin</string>
+    <string name="filter_country">Ülke</string>
+    <string name="filter_genre">Tür</string>
+    <string name="filter_language">Dil</string>
+    <string name="filter_all_countries">Tüm Ülkeler</string>
+    <string name="filter_all_genres">Tüm Türler</string>
+    <string name="filter_all_languages">Tüm Diller</string>
+    <string name="select_country">Ülke Seç</string>
+    <string name="select_genre">Tür Seç</string>
+    <string name="select_language">Dil Seç</string>
+    <string name="loading_countries">Ülkeler yükleniyor…</string>
+    <string name="loading_genres">Türler yükleniyor…</string>
+    <string name="loading_languages">Diller yükleniyor…</string>
+    <string name="search_languages">Dil ara…</string>
+    <string name="station_saved">%s kütüphaneye eklendi</string>
+    <string name="station_removed">%s kütüphaneden kaldırıldı</string>
+    <string name="station_added_to_favorites">%s favorilere eklendi</string>
+    <string name="station_removed_from_favorites">%s favorilerden kaldırıldı</string>
+    <string name="tor_required_warning">Tor Zorla etkin ancak Tor bağlı değil. İstasyonlara göz atmak için Tor\'a bağlanın.</string>
+
+    <!-- Notification and Status Messages -->
+    <string name="notification_connecting">Bağlanıyor...</string>
+    <string name="notification_paused">Duraklatıldı</string>
+    <string name="notification_playing">Çalıyor</string>
+    <string name="notification_playing_recording">Çalıyor • Kaydediliyor</string>
+    <string name="notification_buffering">Arabelleğe alınıyor...</string>
+    <string name="notification_reconnecting">Yeniden bağlanıyor...</string>
+    <string name="notification_connection_failed">Bağlantı başarısız</string>
+    <string name="notification_tor_blocked">Tor bağlı değil - yayın engellendi</string>
+    <string name="notification_audio_focus_denied">Ses odağı reddedildi</string>
+    <string name="notification_channel_name">deutsia radio Oynatma</string>
+    <string name="notification_channel_description">Radyo oynatma durumunu gösterir</string>
+    <string name="notification_action_pause">Duraklat</string>
+    <string name="notification_action_stop">Durdur</string>
+
+    <!-- Recording Messages -->
+    <string name="recording_failed">Kayıt başarısız: %s</string>
+    <string name="recording_saved">Kayıt kaydedildi: %s (%dKB)</string>
+    <string name="recording_stopping">Kayıt durduruluyor...</string>
+    <string name="recording_starting">Kayıt başlatılıyor...</string>
+    <string name="recording_no_station">Çalan istasyon yok</string>
+    <string name="recording_directory_updated">Kayıt dizini güncellendi</string>
+
+    <!-- Dialog Titles and Buttons -->
+    <string name="dialog_add_station">Radyo İstasyonu Ekle</string>
+    <string name="dialog_edit_station">Radyo İstasyonunu Düzenle</string>
+    <string name="dialog_sort_stations">İstasyonları Sırala</string>
+    <string name="dialog_delete_stations">İstasyonları sil</string>
+    <string name="button_save">Kaydet</string>
+    <string name="button_cancel">İptal</string>
+    <string name="button_import">İçe Aktar</string>
+    <string name="button_export">Dışa Aktar</string>
+    <string name="button_open">Aç</string>
+    <string name="button_configure">Yapılandır</string>
+    <string name="button_apply">Uygula</string>
+    <string name="button_reset">Sıfırla</string>
+    <string name="button_change">Değiştir</string>
+    <string name="button_start">Başlat</string>
+    <string name="button_test_connection">Bağlantıyı Test Et</string>
+    <string name="hint_test_connection_disclaimer">Not: Test, vekil sunucunuz üzerinden httpbin.org\'a bağlanacak</string>
+    <string name="button_choose_image">Resim Seç</string>
+    <string name="button_clear">Temizle</string>
+
+    <!-- Settings - Appearance -->
+    <string name="settings_appearance">Görünüm</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_description">Açık, koyu veya sistem seçin</string>
+    <string name="settings_theme_system_default">Sistem Varsayılanı</string>
+    <string name="settings_material_you">Material You</string>
+    <string name="settings_material_you_description">Duvar kağıdı tabanlı dinamik renkler kullan</string>
+    <string name="settings_color_scheme">Renk Şeması</string>
+    <string name="settings_color_scheme_description">Tercih ettiğiniz rengi seçin</string>
+    <string name="settings_color_blue">Mavi</string>
+
+    <!-- Settings - Tor Network -->
+    <string name="settings_tor_network">Tor Ağı</string>
+    <string name="settings_enable_tor">Tor\'u Etkinleştir (Orbot üzerinden)</string>
+    <string name="settings_enable_tor_description">Tor ağı üzerinden bağlan</string>
+    <string name="settings_tor_disconnected">Bağlı Değil</string>
+    <string name="settings_tor_not_running">Tor çalışmıyor</string>
+    <string name="settings_force_tor">Her Şey için Tor Zorla</string>
+    <string name="settings_force_tor_description">Tüm yayınları Tor üzerinden yönlendir. Tor olmadan bağlanmaz.</string>
+    <string name="settings_force_tor_except_i2p">I2P Hariç Tor Zorla</string>
+    <string name="settings_force_tor_except_i2p_description">Clearnet\'i Tor üzerinden yönlendir, I2P yayınlarını doğrudan I2P vekil sunucusuna bağla.</string>
+    <string name="settings_tor_info">Orbot gerektirir (Play Store veya F-Droid\'den ücretsiz). Hızlı erişim için araç çubuğundaki Tor simgesine dokunun.\n\nZorlama modları Tor kullanılamadığında bağlantıları engeller.</string>
+
+    <!-- Settings - Custom Proxy -->
+    <string name="settings_custom_proxy">Özel Vekil Sunucu</string>
+    <string name="settings_enable_custom_proxy">Özel Vekil Sunucuyu Etkinleştir</string>
+    <string name="settings_enable_custom_proxy_description">Bağlantılar için özel vekil sunucu kullan</string>
+    <string name="settings_configure_proxy">Global Vekil Sunucuyu Yapılandır</string>
+    <string name="settings_configure_proxy_description">Özel vekil sunucu ayarlarınızı yapın</string>
+    <string name="settings_force_custom_proxy">Özel Vekil Sunucu Zorla</string>
+    <string name="settings_force_custom_proxy_description">Tüm trafiği özel vekil sunucu üzerinden yönlendir. Vekil sunucu olmadan bağlanmaz.</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2P İstasyonları Hariç Özel Vekil Sunucu Zorla</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">Tüm clearnet trafiğini özel vekil sunucu üzerinden yönlendir, ancak Tor ve I2P istasyonlarının yerel vekil sunucularını kullanmasına izin ver.</string>
+
+    <!-- Settings - Bandwidth -->
+    <string name="settings_bandwidth_usage">Bant Genişliği Kullanımı</string>
+    <string name="settings_total_usage">Toplam Kullanım (Ömür Boyu)</string>
+    <string name="settings_session_usage">Oturum Kullanımı</string>
+    <string name="settings_bandwidth_zero">0 B</string>
+
+    <!-- Settings - Playback -->
+    <string name="settings_playback">Oynatma</string>
+    <string name="settings_sleep_timer">Uyku Zamanlayıcısı</string>
+    <string name="settings_sleep_timer_description">Belirlenen süreden sonra oynatmayı otomatik durdur</string>
+    <string name="settings_sleep_timer_off">Kapalı</string>
+    <string name="settings_equalizer_description">Ses frekans bantlarını ve efektleri ayarla</string>
+    <string name="settings_recording_directory">Kayıt Dizini</string>
+    <string name="settings_recording_directory_default">Varsayılan (Music/deutsia_radio)</string>
+    <string name="settings_record_across_stations">İstasyonlar Arası Kayıt</string>
+    <string name="settings_record_across_stations_description">İstasyon değiştirirken kaydı sürdür</string>
+    <string name="settings_record_all_stations">Tüm İstasyonları Kaydet</string>
+    <string name="settings_record_all_stations_description">Aynı dosyada yeni istasyonun yayınına geç</string>
+
+    <!-- Settings - Station Management -->
+    <string name="settings_station_management">İstasyon Yönetimi</string>
+    <string name="settings_import_from_file">Dosyadan İçe Aktar</string>
+    <string name="settings_import_from_file_description">CSV, JSON, M3U veya PLS\'den içe aktar</string>
+    <string name="settings_import_i2p_stations">I2P İstasyonlarını İçe Aktar</string>
+    <string name="settings_import_i2p_stations_description">14 seçilmiş I2P radyo istasyonu</string>
+    <string name="settings_import_tor_stations">Tor İstasyonlarını İçe Aktar</string>
+    <string name="settings_import_tor_stations_description">3 seçilmiş Tor radyo istasyonu</string>
+    <string name="settings_export_stations">İstasyonları Dışa Aktar</string>
+    <string name="settings_export_stations_description">İstasyonlarınızı bir dosyaya aktar</string>
+
+    <!-- Settings - About -->
+    <string name="settings_about">Hakkında</string>
+    <string name="settings_version">Sürüm 1.1</string>
+    <string name="settings_view_github">GitHub\'da Görüntüle</string>
+    <string name="settings_donate">Bağış Yap</string>
+    <string name="settings_donate_description">Bu uygulama işinize yaradıysa bağış yapmayı düşünün</string>
+    <string name="settings_monero">Monero (XMR)</string>
+    <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
+    <string name="settings_copy_address">Adresi Kopyala</string>
+
+    <!-- Tor Control Bottom Sheet -->
+    <string name="tor_connection_details">Bağlantı Detayları</string>
+    <string name="tor_proxy_host">Vekil Sunucu Hostu</string>
+    <string name="tor_socks_port">SOCKS Portu</string>
+    <string name="tor_what_is_orbot">Orbot nedir?</string>
+    <string name="tor_orbot_description">Orbot, Android için resmi Tor istemcisidir. Tor ağına güvenli, şifreli erişim sağlar.</string>
+    <string name="tor_connect">Tor\'a Bağlan</string>
+    <string name="tor_open_orbot">Orbot\'u Aç</string>
+
+    <!-- Add/Edit Radio Dialog -->
+    <string name="add_edit_tor_info">Gömülü Tor kullanılıyor - vekil sunucu yapılandırması gerekmez</string>
+    <string name="add_edit_authentication_optional">Kimlik Doğrulama (İsteğe Bağlı)</string>
+    <string name="add_edit_advanced_options">Gelişmiş Seçenekler</string>
+    <string name="add_edit_cover_art">Kapak Resmi</string>
+    <string name="add_edit_or_enter_url">Veya resim URL\'si girin</string>
+
+    <!-- Input Hints -->
+    <string name="hint_station_name">İstasyon Adı</string>
+    <string name="hint_stream_url">Yayın URL\'si</string>
+    <string name="hint_genre">Tür</string>
+    <string name="hint_proxy_type">Vekil Sunucu Türü</string>
+    <string name="hint_proxy_host">Vekil Sunucu Hostu</string>
+    <string name="hint_proxy_port">Vekil Sunucu Portu</string>
+    <string name="hint_protocol">Protokol</string>
+    <string name="hint_username_optional">Kullanıcı adı (isteğe bağlı)</string>
+    <string name="hint_password_optional">Şifre (isteğe bağlı)</string>
+    <string name="hint_auth_method">Kimlik Doğrulama Yöntemi</string>
+    <string name="hint_connection_timeout">Bağlantı Zaman Aşımı (saniye)</string>
+    <string name="hint_cover_art_url">Kapak Resmi URL\'si (isteğe bağlı)</string>
+    <string name="hint_username_optional_caps">Kullanıcı Adı (İsteğe Bağlı)</string>
+    <string name="hint_password_optional_caps">Şifre (İsteğe Bağlı)</string>
+    <string name="hint_auth_type">Kimlik Doğrulama Türü</string>
+
+    <!-- Default Values -->
+    <string name="default_proxy_host_i2p">127.0.0.1</string>
+    <string name="default_proxy_port_i2p">4444</string>
+    <string name="default_proxy_port_http">8080</string>
+    <string name="default_auth_none">Yok</string>
+    <string name="default_timeout">30</string>
+    <string name="default_equalizer_db">0 dB</string>
+
+    <!-- Now Playing Fragment -->
+    <string name="now_playing_time_placeholder">00:00</string>
+    <string name="now_playing_live">CANLI</string>
+    <string name="now_playing_no_station">Çalan İstasyon Yok</string>
+    <string name="now_playing_no_station_subtitle">Listeden bir istasyon seçin</string>
+    <string name="now_playing_volume_title">Radyo Ses Seviyesi</string>
+    <string name="now_playing_volume_description">Yalnızca radyo yayınını ayarlar</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_session_bandwidth_reset">Oturum bant genişliği sıfırlandı</string>
+    <string name="toast_custom_proxy_saved">Özel vekil sunucu ayarları kaydedildi</string>
+    <string name="toast_custom_proxy_cleared">Özel vekil sunucu ayarları temizlendi</string>
+    <string name="toast_address_copied">Adres panoya kopyalandı</string>
+    <string name="toast_using_default_directory">Varsayılan dizin kullanılıyor</string>
+
+    <!-- Custom Proxy Status Messages -->
+    <string name="custom_proxy_status_connected">Bağlandı</string>
+    <string name="custom_proxy_status_configured">Vekil sunucu yapılandırıldı</string>
+    <string name="custom_proxy_status_not_configured">Yapılandırılmadı</string>
+    <string name="custom_proxy_status_no_proxy">Vekil sunucu ayarlanmadı</string>
+    <string name="custom_proxy_status_leak_warning">Sızıntı Uyarısı</string>
+    <string name="custom_proxy_status_leak_detail">Zorlama etkin ancak yapılandırılmamış</string>
+
+    <!-- Tor Service Notification Messages -->
+    <string name="tor_channel_name">Tor Bağlantısı</string>
+    <string name="tor_channel_description">Tor bağlantı durumunu gösterir</string>
+    <string name="tor_notification_disconnected">Tor Bağlantısı Kesildi</string>
+    <string name="tor_notification_tap_to_open">Uygulamayı açmak için dokunun</string>
+    <string name="tor_notification_connecting">Orbot üzerinden bağlanıyor...</string>
+    <string name="tor_notification_please_wait">Lütfen bekleyin</string>
+    <string name="tor_notification_connected">Tor Bağlandı</string>
+    <string name="tor_notification_error">Tor Hatası</string>
+    <string name="tor_notification_connection_failed">Bağlantı başarısız</string>
+    <string name="tor_notification_orbot_required">Orbot Gerekli</string>
+    <string name="tor_notification_install_orbot">Tor desteği için lütfen Orbot\'u yükleyin</string>
+    <string name="tor_notification_action_stop">Tor\'u Durdur</string>
+
+    <!-- Other Error Messages -->
+    <string name="error_unknown">Bilinmeyen hata</string>
+    <string name="folder_custom">Özel klasör</string>
+
+    <!-- AddEditRadioDialog Default Values -->
+    <string name="default_genre_other">Diğer</string>
+    <string name="default_proxy_none">Yok</string>
+    <string name="default_proxy_i2p">I2P</string>
+    <string name="default_proxy_tor">Tor</string>
+    <string name="default_proxy_custom">Özel</string>
+    <string name="default_protocol_http">HTTP</string>
+    <string name="default_protocol_https">HTTPS</string>
+    <string name="default_protocol_socks4">SOCKS4</string>
+    <string name="default_protocol_socks5">SOCKS5</string>
+    <string name="default_auth_basic">Temel</string>
+    <string name="default_auth_digest">Özet</string>
+    <string name="default_port_8080">8080</string>
+    <string name="default_timeout_30">30</string>
+
+    <!-- Security & Privacy -->
+    <string name="settings_security_privacy">Güvenlik &amp; Gizlilik</string>
+    <string name="settings_app_lock">Uygulama Kilidi</string>
+    <string name="settings_app_lock_description">Uygulamanın kilidini açmak için şifre veya biyometrik gerekli</string>
+    <string name="settings_biometric_auth">Biyometrik Kimlik Doğrulama</string>
+    <string name="settings_biometric_auth_description">Parmak izi veya yüz kilidi kullan</string>
+    <string name="settings_require_auth_on_launch">Başlatmada Kimlik Doğrulama Gerekli</string>
+    <string name="settings_require_auth_on_launch_description">Uygulamayı açarken her zaman kimlik doğrulama gerekli</string>
+    <string name="settings_set_password">Şifre Ayarla</string>
+    <string name="settings_change_password">Şifre Değiştir</string>
+    <string name="settings_database_encryption">Veritabanı Şifrelemesi</string>
+    <string name="settings_database_encryption_description">Uygulama şifrenizi kullanarak tüm veritabanını SQLCipher ile şifrele (yeniden başlatma gerektirir)</string>
+    <string name="settings_database_encryption_warning">Uyarı: Bu deneysel bir özelliktir. Etkinleştirmeden önce yedeğinizin olduğundan emin olun!</string>
+    <string name="settings_database_encryption_enable_title">Veritabanı Şifrelemesi Etkinleştirilsin mi?</string>
+    <string name="settings_database_encryption_enable_message">Bu, uygulama şifrenizi kullanarak tüm radyo veritabanınızı şifreleyecektir. Değişiklikleri uygulamak için uygulama yeniden başlatılacak.\n\nUYARI: Bu deneyseldir. Yedeğinizin olduğundan emin olun!</string>
+    <string name="settings_database_encryption_disable_title">Veritabanı Şifrelemesi Devre Dışı Bırakılsın mı?</string>
+    <string name="settings_database_encryption_disable_message">Bu, veritabanınızın şifresini çözecek ve şifrelemeyi kaldıracaktır. Değişiklikleri uygulamak için uygulama yeniden başlatılacak.</string>
+    <string name="settings_database_encryption_enabled">Veritabanı şifrelemesi etkinleştirildi</string>
+    <string name="settings_database_encryption_disabled">Veritabanı şifrelemesi devre dışı bırakıldı</string>
+    <string name="settings_database_encryption_error">Şifreleme ayarı değiştirilemedi</string>
+    <string name="settings_database_encryption_password_required_title">Uygulama Şifresi Gerekli</string>
+    <string name="settings_database_encryption_password_required_message">Veritabanı şifrelemesi, şifreleme anahtarını oluşturmak için uygulama şifrenizi kullanır. Lütfen önce yukarıdaki \"Uygulama Kilidi\"ni etkinleştirerek bir uygulama şifresi ayarlayın.\n\nAyarlandıktan sonra, aynı şifreyi kullanarak veritabanı şifrelemesini etkinleştirebilirsiniz - ayrı bir şifre gerekmez.</string>
+
+    <!-- Authentication Dialog -->
+    <string name="auth_dialog_title">Uygulama Şifresi Ayarla</string>
+    <string name="auth_dialog_change_title">Şifre Değiştir</string>
+    <string name="auth_dialog_change_message">Not: Veritabanı şifrelemesi etkinse, yeni şifreyi kullanmak üzere otomatik olarak güncellenecektir.</string>
+    <string name="auth_dialog_current_password">Mevcut Şifre</string>
+    <string name="auth_dialog_new_password">Yeni Şifre</string>
+    <string name="auth_dialog_confirm_password">Şifreyi Onayla</string>
+    <string name="auth_dialog_set">Şifre Ayarla</string>
+    <string name="auth_dialog_change">Şifre Değiştir</string>
+    <string name="auth_error_passwords_dont_match">Şifreler eşleşmiyor</string>
+    <string name="auth_error_password_too_short">Şifre en az 4 karakter olmalıdır</string>
+    <string name="auth_error_current_password_wrong">Mevcut şifre yanlış</string>
+    <string name="auth_password_set">Şifre başarıyla ayarlandı</string>
+    <string name="auth_password_changed">Şifre başarıyla değiştirildi</string>
+    <string name="auth_enter_password_to_encrypt">Uygulama Şifrenizi Doğrulayın</string>
+    <string name="auth_enter_password_to_decrypt">Uygulama Şifrenizi Doğrulayın</string>
+    <string name="auth_password_for_encryption">Veritabanı şifrelemesini etkinleştirmek için mevcut uygulama şifrenizi girin.\n\nUygulama şifreniz şifreleme anahtarını türetmek için kullanılacaktır. Ayrı bir şifre gerekmez.</string>
+    <string name="auth_password_for_decryption">Şifrelemeyi devre dışı bırakmadan önce veritabanını doğrulamak ve şifresini çözmek için uygulama şifrenizi girin.</string>
+    <string name="auth_encrypting_database">Veritabanı uygulama şifrenizle şifreleniyor…</string>
+    <string name="auth_decrypting_database">Veritabanının şifresi çözülüyor…</string>
+    <string name="auth_rekeying_database">Veritabanı şifrelemesi yeni şifreyle güncelleniyor…</string>
+
+    <!-- Authentication Activity -->
+    <string name="auth_unlock_app">deutsia radio\'nun Kilidini Aç</string>
+    <string name="auth_enter_password">Şifrenizi girin</string>
+    <string name="auth_password_hint">Şifre</string>
+    <string name="auth_unlock_button">Kilidi Aç</string>
+    <string name="auth_use_biometric">Biyometrik Kullan</string>
+    <string name="auth_error_wrong_password">Yanlış şifre</string>
+    <string name="auth_biometric_title">deutsia radio\'nun Kilidini Aç</string>
+    <string name="auth_biometric_subtitle">Devam etmek için kimlik doğrulayın</string>
+    <string name="auth_biometric_negative">Şifre Kullan</string>
+</resources>

@@ -1,0 +1,337 @@
+<!--
+    Japanese (日本語) Translation
+-->
+<resources>
+    <string name="app_name">deutsia radio</string>
+    <string name="tab_radios">ライブラリ</string>
+    <string name="tab_now_playing">再生中</string>
+    <string name="tab_settings">設定</string>
+
+    <!-- Equalizer -->
+    <string name="equalizer">イコライザー</string>
+    <string name="equalizer_no_audio">まずステーションを開始してください</string>
+    <string name="equalizer_not_found">イコライザーアプリが見つかりません。Waveletなどのイコライザーアプリをインストールしてください。</string>
+    <string name="equalizer_preset">プリセット</string>
+    <string name="equalizer_custom">カスタム</string>
+    <string name="equalizer_reset">フラットにリセット</string>
+    <string name="equalizer_init_failed">イコライザーの初期化に失敗しました</string>
+    <string name="equalizer_bass_boost">バスブースト</string>
+    <string name="equalizer_surround_sound">サラウンドサウンド</string>
+
+    <!-- Sort options -->
+    <string name="sort_default">デフォルト</string>
+    <string name="sort_name">名前</string>
+    <string name="sort_recent">最近</string>
+    <string name="sort_liked">お気に入り</string>
+    <string name="sort_genre">ジャンル</string>
+
+    <!-- Search -->
+    <string name="search_stations">ライブラリを検索</string>
+    <string name="search_countries">国を検索…</string>
+    <string name="search_genres">ジャンルを検索…</string>
+
+    <!-- Genre filter -->
+    <string name="genre_all">すべてのジャンル</string>
+    <string name="filter_by_genre">ジャンルでフィルター</string>
+
+     <!-- about -->
+    <string name="about_description">deutsia radioは、clearnet、Tor（.onion）、I2Pネットワークからのストリームをまとめた無料のオープンソースマルチネットラジオプレーヤーです。Orbot統合と設定可能なリーク防止機能を備えたMaterial Youインターフェースでお気に入りのステーションをお楽しみください</string>
+
+    <!-- Browse/Discover Stations -->
+    <string name="tab_browse">閲覧</string>
+    <string name="search_radio_browser">数千のステーションを検索…</string>
+    <string name="browse_top_voted">最も投票されたステーション</string>
+    <string name="browse_popular">人気</string>
+    <string name="browse_random">ランダム</string>
+    <string name="browse_history">履歴</string>
+    <string name="browse_no_results">ステーションが見つかりません</string>
+    <string name="browse_no_results_hint">別の検索またはフィルターを試してください</string>
+    <string name="filter_country">国</string>
+    <string name="filter_genre">ジャンル</string>
+    <string name="filter_language">言語</string>
+    <string name="filter_all_countries">すべての国</string>
+    <string name="filter_all_genres">すべてのジャンル</string>
+    <string name="filter_all_languages">すべての言語</string>
+    <string name="select_country">国を選択</string>
+    <string name="select_genre">ジャンルを選択</string>
+    <string name="select_language">言語を選択</string>
+    <string name="loading_countries">国を読み込み中…</string>
+    <string name="loading_genres">ジャンルを読み込み中…</string>
+    <string name="loading_languages">言語を読み込み中…</string>
+    <string name="search_languages">言語を検索…</string>
+    <string name="station_saved">%sをライブラリに追加しました</string>
+    <string name="station_removed">%sをライブラリから削除しました</string>
+    <string name="station_added_to_favorites">%sをお気に入りに追加しました</string>
+    <string name="station_removed_from_favorites">%sをお気に入りから削除しました</string>
+    <string name="tor_required_warning">Tor強制が有効ですが、Torが接続されていません。ステーションを閲覧するにはTorに接続してください。</string>
+
+    <!-- Notification and Status Messages -->
+    <string name="notification_connecting">接続中...</string>
+    <string name="notification_paused">一時停止</string>
+    <string name="notification_playing">再生中</string>
+    <string name="notification_playing_recording">再生中 • 録音中</string>
+    <string name="notification_buffering">バッファリング中...</string>
+    <string name="notification_reconnecting">再接続中...</string>
+    <string name="notification_connection_failed">接続に失敗しました</string>
+    <string name="notification_tor_blocked">Tor未接続 - ストリームがブロックされました</string>
+    <string name="notification_audio_focus_denied">オーディオフォーカスが拒否されました</string>
+    <string name="notification_channel_name">deutsia radio再生</string>
+    <string name="notification_channel_description">ラジオ再生ステータスを表示</string>
+    <string name="notification_action_pause">一時停止</string>
+    <string name="notification_action_stop">停止</string>
+
+    <!-- Recording Messages -->
+    <string name="recording_failed">録音に失敗しました: %s</string>
+    <string name="recording_saved">録音を保存しました: %s (%dKB)</string>
+    <string name="recording_stopping">録音を停止中...</string>
+    <string name="recording_starting">録音を開始中...</string>
+    <string name="recording_no_station">ステーションが再生されていません</string>
+    <string name="recording_directory_updated">録音ディレクトリを更新しました</string>
+
+    <!-- Dialog Titles and Buttons -->
+    <string name="dialog_add_station">ラジオステーションを追加</string>
+    <string name="dialog_edit_station">ラジオステーションを編集</string>
+    <string name="dialog_sort_stations">ステーションを並べ替え</string>
+    <string name="dialog_delete_stations">ステーションを削除</string>
+    <string name="button_save">保存</string>
+    <string name="button_cancel">キャンセル</string>
+    <string name="button_import">インポート</string>
+    <string name="button_export">エクスポート</string>
+    <string name="button_open">開く</string>
+    <string name="button_configure">設定</string>
+    <string name="button_apply">適用</string>
+    <string name="button_reset">リセット</string>
+    <string name="button_change">変更</string>
+    <string name="button_start">開始</string>
+    <string name="button_test_connection">接続をテスト</string>
+    <string name="hint_test_connection_disclaimer">注：テストはプロキシ経由でhttpbin.orgに接続します</string>
+    <string name="button_choose_image">画像を選択</string>
+    <string name="button_clear">クリア</string>
+
+    <!-- Settings - Appearance -->
+    <string name="settings_appearance">外観</string>
+    <string name="settings_theme">テーマ</string>
+    <string name="settings_theme_description">ライト、ダーク、またはシステムを選択</string>
+    <string name="settings_theme_system_default">システムデフォルト</string>
+    <string name="settings_material_you">Material You</string>
+    <string name="settings_material_you_description">壁紙ベースの動的カラーを使用</string>
+    <string name="settings_color_scheme">配色</string>
+    <string name="settings_color_scheme_description">お好みの色を選択</string>
+    <string name="settings_color_blue">青</string>
+
+    <!-- Settings - Tor Network -->
+    <string name="settings_tor_network">Torネットワーク</string>
+    <string name="settings_enable_tor">Torを有効化（Orbot経由）</string>
+    <string name="settings_enable_tor_description">Torネットワーク経由で接続</string>
+    <string name="settings_tor_disconnected">切断</string>
+    <string name="settings_tor_not_running">Torが実行されていません</string>
+    <string name="settings_force_tor">すべてにTorを強制</string>
+    <string name="settings_force_tor_description">すべてのストリームをTor経由でルーティング。Torなしでは接続しません。</string>
+    <string name="settings_force_tor_except_i2p">I2P以外にTorを強制</string>
+    <string name="settings_force_tor_except_i2p_description">clearnetをTor経由でルーティング、I2PストリームはI2Pプロキシに直接接続。</string>
+    <string name="settings_tor_info">Orbotが必要です（Play StoreまたはF-Droidから無料）。ツールバーのTorアイコンをタップして素早くアクセスできます。\n\n強制モードは、Torが利用できない場合に接続をブロックします。</string>
+
+    <!-- Settings - Custom Proxy -->
+    <string name="settings_custom_proxy">カスタムプロキシ</string>
+    <string name="settings_enable_custom_proxy">カスタムプロキシを有効化</string>
+    <string name="settings_enable_custom_proxy_description">接続にカスタムプロキシを使用</string>
+    <string name="settings_configure_proxy">グローバルプロキシを設定</string>
+    <string name="settings_configure_proxy_description">カスタムプロキシ設定をセットアップ</string>
+    <string name="settings_force_custom_proxy">カスタムプロキシを強制</string>
+    <string name="settings_force_custom_proxy_description">すべてのトラフィックをカスタムプロキシ経由でルーティング。プロキシなしでは接続しません。</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2Pステーション以外にカスタムプロキシを強制</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">すべてのclearnetトラフィックをカスタムプロキシ経由でルーティングしますが、TorとI2Pステーションがネイティブプロキシを使用することを許可します。</string>
+
+    <!-- Settings - Bandwidth -->
+    <string name="settings_bandwidth_usage">帯域幅使用量</string>
+    <string name="settings_total_usage">合計使用量（累計）</string>
+    <string name="settings_session_usage">セッション使用量</string>
+    <string name="settings_bandwidth_zero">0 B</string>
+
+    <!-- Settings - Playback -->
+    <string name="settings_playback">再生</string>
+    <string name="settings_sleep_timer">スリープタイマー</string>
+    <string name="settings_sleep_timer_description">設定時間後に再生を自動停止</string>
+    <string name="settings_sleep_timer_off">オフ</string>
+    <string name="settings_equalizer_description">オーディオ周波数帯とエフェクトを調整</string>
+    <string name="settings_recording_directory">録音ディレクトリ</string>
+    <string name="settings_recording_directory_default">デフォルト（Music/deutsia_radio）</string>
+    <string name="settings_record_across_stations">ステーション間で録音</string>
+    <string name="settings_record_across_stations_description">ステーション切り替え時に録音を継続</string>
+    <string name="settings_record_all_stations">すべてのステーションを録音</string>
+    <string name="settings_record_all_stations_description">同じファイルで新しいステーションのストリームに切り替え</string>
+
+    <!-- Settings - Station Management -->
+    <string name="settings_station_management">ステーション管理</string>
+    <string name="settings_import_from_file">ファイルからインポート</string>
+    <string name="settings_import_from_file_description">CSV、JSON、M3U、またはPLSからインポート</string>
+    <string name="settings_import_i2p_stations">I2Pステーションをインポート</string>
+    <string name="settings_import_i2p_stations_description">厳選された14のI2Pラジオステーション</string>
+    <string name="settings_import_tor_stations">Torステーションをインポート</string>
+    <string name="settings_import_tor_stations_description">厳選された3つのTorラジオステーション</string>
+    <string name="settings_export_stations">ステーションをエクスポート</string>
+    <string name="settings_export_stations_description">ステーションをファイルにエクスポート</string>
+
+    <!-- Settings - About -->
+    <string name="settings_about">このアプリについて</string>
+    <string name="settings_version">バージョン 1.1</string>
+    <string name="settings_view_github">GitHubで見る</string>
+    <string name="settings_donate">寄付</string>
+    <string name="settings_donate_description">このアプリが役に立った場合は、寄付をご検討ください</string>
+    <string name="settings_monero">Monero (XMR)</string>
+    <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
+    <string name="settings_copy_address">アドレスをコピー</string>
+
+    <!-- Tor Control Bottom Sheet -->
+    <string name="tor_connection_details">接続の詳細</string>
+    <string name="tor_proxy_host">プロキシホスト</string>
+    <string name="tor_socks_port">SOCKSポート</string>
+    <string name="tor_what_is_orbot">Orbotとは？</string>
+    <string name="tor_orbot_description">OrbotはAndroid用の公式Torクライアントです。Torネットワークへの安全で暗号化されたアクセスを提供します。</string>
+    <string name="tor_connect">Torに接続</string>
+    <string name="tor_open_orbot">Orbotを開く</string>
+
+    <!-- Add/Edit Radio Dialog -->
+    <string name="add_edit_tor_info">埋め込みTorを使用 - プロキシ設定は不要</string>
+    <string name="add_edit_authentication_optional">認証（オプション）</string>
+    <string name="add_edit_advanced_options">詳細オプション</string>
+    <string name="add_edit_cover_art">カバーアート</string>
+    <string name="add_edit_or_enter_url">または画像URLを入力</string>
+
+    <!-- Input Hints -->
+    <string name="hint_station_name">ステーション名</string>
+    <string name="hint_stream_url">ストリームURL</string>
+    <string name="hint_genre">ジャンル</string>
+    <string name="hint_proxy_type">プロキシタイプ</string>
+    <string name="hint_proxy_host">プロキシホスト</string>
+    <string name="hint_proxy_port">プロキシポート</string>
+    <string name="hint_protocol">プロトコル</string>
+    <string name="hint_username_optional">ユーザー名（オプション）</string>
+    <string name="hint_password_optional">パスワード（オプション）</string>
+    <string name="hint_auth_method">認証方法</string>
+    <string name="hint_connection_timeout">接続タイムアウト（秒）</string>
+    <string name="hint_cover_art_url">カバーアートURL（オプション）</string>
+    <string name="hint_username_optional_caps">ユーザー名（オプション）</string>
+    <string name="hint_password_optional_caps">パスワード（オプション）</string>
+    <string name="hint_auth_type">認証タイプ</string>
+
+    <!-- Default Values -->
+    <string name="default_proxy_host_i2p">127.0.0.1</string>
+    <string name="default_proxy_port_i2p">4444</string>
+    <string name="default_proxy_port_http">8080</string>
+    <string name="default_auth_none">なし</string>
+    <string name="default_timeout">30</string>
+    <string name="default_equalizer_db">0 dB</string>
+
+    <!-- Now Playing Fragment -->
+    <string name="now_playing_time_placeholder">00:00</string>
+    <string name="now_playing_live">ライブ</string>
+    <string name="now_playing_no_station">ステーションが再生されていません</string>
+    <string name="now_playing_no_station_subtitle">リストからステーションを選択してください</string>
+    <string name="now_playing_volume_title">ラジオ音量</string>
+    <string name="now_playing_volume_description">ラジオストリームのみを調整</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_session_bandwidth_reset">セッション帯域幅をリセットしました</string>
+    <string name="toast_custom_proxy_saved">カスタムプロキシ設定を保存しました</string>
+    <string name="toast_custom_proxy_cleared">カスタムプロキシ設定をクリアしました</string>
+    <string name="toast_address_copied">アドレスをクリップボードにコピーしました</string>
+    <string name="toast_using_default_directory">デフォルトディレクトリを使用しています</string>
+
+    <!-- Custom Proxy Status Messages -->
+    <string name="custom_proxy_status_connected">接続済み</string>
+    <string name="custom_proxy_status_configured">プロキシ設定済み</string>
+    <string name="custom_proxy_status_not_configured">未設定</string>
+    <string name="custom_proxy_status_no_proxy">プロキシが設定されていません</string>
+    <string name="custom_proxy_status_leak_warning">リーク警告</string>
+    <string name="custom_proxy_status_leak_detail">強制が有効ですが設定されていません</string>
+
+    <!-- Tor Service Notification Messages -->
+    <string name="tor_channel_name">Tor接続</string>
+    <string name="tor_channel_description">Tor接続ステータスを表示</string>
+    <string name="tor_notification_disconnected">Tor切断</string>
+    <string name="tor_notification_tap_to_open">タップしてアプリを開く</string>
+    <string name="tor_notification_connecting">Orbot経由で接続中...</string>
+    <string name="tor_notification_please_wait">お待ちください</string>
+    <string name="tor_notification_connected">Tor接続済み</string>
+    <string name="tor_notification_error">Torエラー</string>
+    <string name="tor_notification_connection_failed">接続に失敗しました</string>
+    <string name="tor_notification_orbot_required">Orbotが必要です</string>
+    <string name="tor_notification_install_orbot">Torサポートのため、Orbotをインストールしてください</string>
+    <string name="tor_notification_action_stop">Torを停止</string>
+
+    <!-- Other Error Messages -->
+    <string name="error_unknown">不明なエラー</string>
+    <string name="folder_custom">カスタムフォルダ</string>
+
+    <!-- AddEditRadioDialog Default Values -->
+    <string name="default_genre_other">その他</string>
+    <string name="default_proxy_none">なし</string>
+    <string name="default_proxy_i2p">I2P</string>
+    <string name="default_proxy_tor">Tor</string>
+    <string name="default_proxy_custom">カスタム</string>
+    <string name="default_protocol_http">HTTP</string>
+    <string name="default_protocol_https">HTTPS</string>
+    <string name="default_protocol_socks4">SOCKS4</string>
+    <string name="default_protocol_socks5">SOCKS5</string>
+    <string name="default_auth_basic">Basic</string>
+    <string name="default_auth_digest">Digest</string>
+    <string name="default_port_8080">8080</string>
+    <string name="default_timeout_30">30</string>
+
+    <!-- Security & Privacy -->
+    <string name="settings_security_privacy">セキュリティとプライバシー</string>
+    <string name="settings_app_lock">アプリロック</string>
+    <string name="settings_app_lock_description">アプリのロック解除にパスワードまたは生体認証を要求</string>
+    <string name="settings_biometric_auth">生体認証</string>
+    <string name="settings_biometric_auth_description">指紋または顔認証を使用</string>
+    <string name="settings_require_auth_on_launch">起動時に認証を要求</string>
+    <string name="settings_require_auth_on_launch_description">アプリを開くときに常に認証を要求</string>
+    <string name="settings_set_password">パスワードを設定</string>
+    <string name="settings_change_password">パスワードを変更</string>
+    <string name="settings_database_encryption">データベース暗号化</string>
+    <string name="settings_database_encryption_description">アプリパスワードを使用してSQLCipherでデータベース全体を暗号化（再起動が必要）</string>
+    <string name="settings_database_encryption_warning">警告：これは実験的な機能です。有効にする前に必ずバックアップを取ってください！</string>
+    <string name="settings_database_encryption_enable_title">データベース暗号化を有効にしますか？</string>
+    <string name="settings_database_encryption_enable_message">これにより、アプリパスワードを使用してラジオデータベース全体が暗号化されます。変更を適用するためにアプリが再起動します。\n\n警告：これは実験的です。必ずバックアップを取ってください！</string>
+    <string name="settings_database_encryption_disable_title">データベース暗号化を無効にしますか？</string>
+    <string name="settings_database_encryption_disable_message">これにより、データベースが復号化され、暗号化が削除されます。変更を適用するためにアプリが再起動します。</string>
+    <string name="settings_database_encryption_enabled">データベース暗号化が有効になりました</string>
+    <string name="settings_database_encryption_disabled">データベース暗号化が無効になりました</string>
+    <string name="settings_database_encryption_error">暗号化設定の変更に失敗しました</string>
+    <string name="settings_database_encryption_password_required_title">アプリパスワードが必要です</string>
+    <string name="settings_database_encryption_password_required_message">データベース暗号化は、アプリパスワードを使用して暗号化キーを生成します。まず、上記の「アプリロック」を有効にしてアプリパスワードを設定してください。\n\n設定後、同じパスワードを使用してデータベース暗号化を有効にできます - 別のパスワードは不要です。</string>
+
+    <!-- Authentication Dialog -->
+    <string name="auth_dialog_title">アプリパスワードを設定</string>
+    <string name="auth_dialog_change_title">パスワードを変更</string>
+    <string name="auth_dialog_change_message">注：データベース暗号化が有効な場合、新しいパスワードを使用するように自動的に更新されます。</string>
+    <string name="auth_dialog_current_password">現在のパスワード</string>
+    <string name="auth_dialog_new_password">新しいパスワード</string>
+    <string name="auth_dialog_confirm_password">パスワードを確認</string>
+    <string name="auth_dialog_set">パスワードを設定</string>
+    <string name="auth_dialog_change">パスワードを変更</string>
+    <string name="auth_error_passwords_dont_match">パスワードが一致しません</string>
+    <string name="auth_error_password_too_short">パスワードは少なくとも4文字である必要があります</string>
+    <string name="auth_error_current_password_wrong">現在のパスワードが正しくありません</string>
+    <string name="auth_password_set">パスワードを設定しました</string>
+    <string name="auth_password_changed">パスワードを変更しました</string>
+    <string name="auth_enter_password_to_encrypt">アプリパスワードを確認してください</string>
+    <string name="auth_enter_password_to_decrypt">アプリパスワードを確認してください</string>
+    <string name="auth_password_for_encryption">データベース暗号化を有効にするには、既存のアプリパスワードを入力してください。\n\nアプリパスワードは暗号化キーの導出に使用されます。別のパスワードは不要です。</string>
+    <string name="auth_password_for_decryption">暗号化を無効にする前に、アプリパスワードを入力して確認し、データベースを復号化してください。</string>
+    <string name="auth_encrypting_database">アプリパスワードでデータベースを暗号化中…</string>
+    <string name="auth_decrypting_database">データベースを復号化中…</string>
+    <string name="auth_rekeying_database">新しいパスワードでデータベース暗号化を更新中…</string>
+
+    <!-- Authentication Activity -->
+    <string name="auth_unlock_app">deutsia radioのロックを解除</string>
+    <string name="auth_enter_password">パスワードを入力してください</string>
+    <string name="auth_password_hint">パスワード</string>
+    <string name="auth_unlock_button">ロック解除</string>
+    <string name="auth_use_biometric">生体認証を使用</string>
+    <string name="auth_error_wrong_password">パスワードが正しくありません</string>
+    <string name="auth_biometric_title">deutsia radioのロックを解除</string>
+    <string name="auth_biometric_subtitle">続行するには認証してください</string>
+    <string name="auth_biometric_negative">パスワードを使用</string>
+</resources>
