@@ -196,14 +196,12 @@ object DatabaseEncryptionManager {
                 dbPath,
                 "",
                 null,
-                SQLiteDatabase.OPEN_READWRITE
+                SQLiteDatabase.OPEN_READWRITE,
+                null
             )
 
             // Export to encrypted database
-            unencryptedDb.rawExecSQL(
-                "ATTACH DATABASE ? AS encrypted KEY ?",
-                arrayOf(tempDbPath, passphrase.toHexString())
-            )
+            unencryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS encrypted KEY '${passphrase.toHexString()}'")
             unencryptedDb.rawExecSQL("SELECT sqlcipher_export('encrypted')")
             unencryptedDb.rawExecSQL("DETACH DATABASE encrypted")
             unencryptedDb.close()
@@ -239,19 +237,18 @@ object DatabaseEncryptionManager {
         val tempDbPath = "$dbPath.decrypted"
 
         try {
-            // Open encrypted database
+            // Open encrypted database using hex string representation
+            val passphraseHex = passphrase.toHexString()
             val encryptedDb = SQLiteDatabase.openDatabase(
                 dbPath,
-                passphrase,
+                passphraseHex,
                 null,
-                SQLiteDatabase.OPEN_READWRITE
+                SQLiteDatabase.OPEN_READWRITE,
+                null
             )
 
             // Export to unencrypted database
-            encryptedDb.rawExecSQL(
-                "ATTACH DATABASE ? AS plaintext KEY ''",
-                arrayOf(tempDbPath)
-            )
+            encryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS plaintext KEY ''")
             encryptedDb.rawExecSQL("SELECT sqlcipher_export('plaintext')")
             encryptedDb.rawExecSQL("DETACH DATABASE plaintext")
             encryptedDb.close()
