@@ -3,8 +3,8 @@ package com.opensource.i2pradio.utils
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SQLiteDatabase
+import net.zetetic.database.sqlcipher.SupportFactory
 import java.security.GeneralSecurityException
 import java.security.SecureRandom
 
