@@ -21,6 +21,7 @@ import com.opensource.i2pradio.data.ProxyProtocol
 import com.opensource.i2pradio.data.ProxyAuthType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.data.RadioStationPasswordHelper
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -226,7 +227,9 @@ class AddEditRadioDialog : DialogFragment() {
                             // Load custom proxy fields
                             customProxyProtocolInput?.setText(it.customProxyProtocol, false)
                             proxyUsernameInput?.setText(it.proxyUsername)
-                            proxyPasswordInput?.setText(it.proxyPassword)
+                            // Decrypt password for display
+                            val decryptedPassword = RadioStationPasswordHelper.getDecryptedPassword(requireContext(), it)
+                            proxyPasswordInput?.setText(decryptedPassword)
                             proxyAuthTypeInput?.setText(it.proxyAuthType, false)
                             proxyConnectionTimeoutInput?.setText(it.proxyConnectionTimeout.toString())
                         } else {
@@ -299,7 +302,8 @@ class AddEditRadioDialog : DialogFragment() {
                     ?: coverArtInput?.text.toString().ifEmpty { null }
 
                 if (name.isNotEmpty() && url.isNotEmpty()) {
-                    val station = RadioStation(
+                    // Create station without password first
+                    var station = RadioStation(
                         id = stationToEdit?.id ?: 0,
                         name = name,
                         streamUrl = url,
@@ -320,13 +324,16 @@ class AddEditRadioDialog : DialogFragment() {
                         country = stationToEdit?.country ?: "",
                         countryCode = stationToEdit?.countryCode ?: "",
                         homepage = stationToEdit?.homepage ?: "",
-                        // Custom proxy fields
+                        // Custom proxy fields (password will be encrypted below)
                         customProxyProtocol = customProxyProtocol,
                         proxyUsername = proxyUsername,
-                        proxyPassword = proxyPassword,
+                        proxyPassword = "",  // Will be set below with encryption
                         proxyAuthType = proxyAuthType,
                         proxyConnectionTimeout = proxyConnectionTimeout
                     )
+
+                    // Encrypt password before storing
+                    station = RadioStationPasswordHelper.withNewPassword(requireContext(), station, proxyPassword)
 
                     lifecycleScope.launch(Dispatchers.IO) {
                         if (stationToEdit == null) {

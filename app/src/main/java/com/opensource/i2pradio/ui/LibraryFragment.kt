@@ -42,6 +42,7 @@ import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.data.RadioStationPasswordHelper
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.SortOrder
 import kotlinx.coroutines.Dispatchers
@@ -477,10 +478,10 @@ class LibraryFragment : Fragment() {
             putExtra("proxy_port", station.proxyPort)
             putExtra("proxy_type", proxyType.name)
             putExtra("cover_art_uri", station.coverArtUri)
-            // Custom proxy fields
+            // Custom proxy fields - decrypt password before passing to service
             putExtra("custom_proxy_protocol", station.customProxyProtocol)
             putExtra("proxy_username", station.proxyUsername)
-            putExtra("proxy_password", station.proxyPassword)
+            putExtra("proxy_password", RadioStationPasswordHelper.getDecryptedPassword(requireContext(), station))
             putExtra("proxy_auth_type", station.proxyAuthType)
             putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
         }

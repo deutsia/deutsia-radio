@@ -2,6 +2,7 @@ package com.opensource.i2pradio.ui
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.opensource.i2pradio.utils.PasswordEncryptionUtil
 
 object PreferencesHelper {
     private const val PREFS_NAME = "DeutsiaRadioPrefs"
@@ -442,17 +443,38 @@ object PreferencesHelper {
 
     /**
      * Set custom proxy password (optional, for authenticated proxies)
+     * Password is stored encrypted using EncryptedSharedPreferences
      */
     fun setCustomProxyPassword(context: Context, password: String) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_CUSTOM_PROXY_PASSWORD, password)
-            .apply()
+        // Migrate old plain-text password if it exists
+        val oldPassword = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CUSTOM_PROXY_PASSWORD, null)
+
+        if (oldPassword != null && oldPassword.isNotEmpty()) {
+            // Remove old plain-text password
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .remove(KEY_CUSTOM_PROXY_PASSWORD)
+                .apply()
+        }
+
+        // Save password encrypted
+        PasswordEncryptionUtil.saveCustomProxyPassword(context, password)
     }
 
     fun getCustomProxyPassword(context: Context): String {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_CUSTOM_PROXY_PASSWORD, "") ?: ""
+        // Check for old plain-text password first
+        val oldPassword = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CUSTOM_PROXY_PASSWORD, null)
+
+        if (oldPassword != null && oldPassword.isNotEmpty()) {
+            // Migrate to encrypted storage
+            setCustomProxyPassword(context, oldPassword)
+            return oldPassword
+        }
+
+        // Return encrypted password
+        return PasswordEncryptionUtil.getCustomProxyPassword(context)
     }
 
     /**
