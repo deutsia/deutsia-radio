@@ -99,6 +99,11 @@ object TorManager {
     private val healthCheckHandler = Handler(Looper.getMainLooper())
     private var healthCheckRunnable: Runnable? = null
 
+    // Thread tracking for proper cleanup to prevent memory leaks
+    @Volatile private var healthCheckThread: Thread? = null
+    @Volatile private var socketCheckThread: Thread? = null
+    @Volatile private var isShuttingDown = false
+
     fun addStateListener(listener: (TorState) -> Unit, notifyImmediately: Boolean = true) {
         stateListeners.add(listener)
         // Immediately notify of current state (unless suppressed during initialization)
@@ -150,10 +155,28 @@ object TorManager {
     private fun stopHealthCheck() {
         healthCheckRunnable?.let { healthCheckHandler.removeCallbacks(it) }
         healthCheckRunnable = null
+
+        // Interrupt any running health check thread to prevent memory leak
+        healthCheckThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+            }
+        }
+        healthCheckThread = null
     }
 
     private fun checkConnectionHealth() {
-        Thread {
+        // Cancel any previous health check thread to prevent accumulation
+        healthCheckThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+            }
+        }
+
+        healthCheckThread = Thread {
+            // Check shutdown flag early to avoid unnecessary work
+            if (isShuttingDown) return@Thread
+
             Log.d(TAG, "===== TOR HEALTH CHECK =====")
             Log.d(TAG, "Checking SOCKS proxy at $_socksHost:$_socksPort")
             try {
@@ -163,18 +186,25 @@ object TorManager {
                 // Connection is healthy, no state change needed
                 Log.d(TAG, "Health check PASSED - Tor SOCKS proxy is responsive")
                 Log.d(TAG, "============================")
+            } catch (e: InterruptedException) {
+                Log.d(TAG, "Health check interrupted (normal during cleanup)")
+                Log.d(TAG, "============================")
             } catch (e: Exception) {
+                // Don't process if we're shutting down
+                if (isShuttingDown) return@Thread
+
                 Log.w(TAG, "Health check FAILED: ${e.message}")
                 Log.d(TAG, "============================")
                 Handler(Looper.getMainLooper()).post {
-                    if (_state == TorState.CONNECTED) {
+                    if (_state == TorState.CONNECTED && !isShuttingDown) {
                         Log.w(TAG, "Connection health check failed: ${e.message}")
                         _errorMessage = "Tor connection lost. Please check Orbot."
                         notifyStateChange(TorState.ERROR)
                     }
                 }
             }
-        }.start()
+        }
+        healthCheckThread?.start()
     }
 
     /**
@@ -222,6 +252,9 @@ object TorManager {
             onComplete?.invoke(_state == TorState.CONNECTED)
             return
         }
+
+        // Reset shutdown flag when starting
+        isShuttingDown = false
 
         // Check if Orbot is installed
         if (!isOrbotInstalled(context)) {
@@ -281,12 +314,28 @@ object TorManager {
      * Check if Orbot's SOCKS proxy is accessible.
      */
     private fun checkOrbotConnection(context: Context, onComplete: ((Boolean) -> Unit)?) {
-        Thread {
+        // Cancel any previous socket check thread to prevent accumulation
+        socketCheckThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+            }
+        }
+
+        socketCheckThread = Thread {
+            // Check shutdown flag early
+            if (isShuttingDown) {
+                onComplete?.invoke(false)
+                return@Thread
+            }
+
             try {
                 // Try to connect to Orbot's SOCKS port
                 val socket = java.net.Socket()
                 socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_ORBOT_SOCKS_PORT), 2000)
                 socket.close()
+
+                // Don't update state if shutting down
+                if (isShuttingDown) return@Thread
 
                 // Connection successful - Orbot is running
                 _socksPort = DEFAULT_ORBOT_SOCKS_PORT
@@ -294,19 +343,29 @@ object TorManager {
                 _socksHost = "127.0.0.1"
 
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
-                    Log.d(TAG, "Orbot is running on SOCKS port $_socksPort")
-                    notifyStateChange(TorState.CONNECTED)
-                    onComplete?.invoke(true)
+                    if (!isShuttingDown) {
+                        Log.d(TAG, "Orbot is running on SOCKS port $_socksPort")
+                        notifyStateChange(TorState.CONNECTED)
+                        onComplete?.invoke(true)
+                    }
                 }
+            } catch (e: InterruptedException) {
+                Log.d(TAG, "Orbot connection check interrupted (normal during cleanup)")
+                onComplete?.invoke(false)
             } catch (e: Exception) {
+                if (isShuttingDown) return@Thread
+
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
-                    Log.w(TAG, "Orbot SOCKS port not accessible: ${e.message}")
-                    _errorMessage = "Please open Orbot and start the Tor service"
-                    notifyStateChange(TorState.ERROR)
-                    onComplete?.invoke(false)
+                    if (!isShuttingDown) {
+                        Log.w(TAG, "Orbot SOCKS port not accessible: ${e.message}")
+                        _errorMessage = "Please open Orbot and start the Tor service"
+                        notifyStateChange(TorState.ERROR)
+                        onComplete?.invoke(false)
+                    }
                 }
             }
-        }.start()
+        }
+        socketCheckThread?.start()
     }
 
     /**
@@ -379,7 +438,19 @@ object TorManager {
      * Call this when the app is being destroyed.
      */
     fun cleanup(context: Context) {
+        // Set shutdown flag to stop all background threads
+        isShuttingDown = true
+
         stopHealthCheck()
+
+        // Interrupt any running socket check thread
+        socketCheckThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+            }
+        }
+        socketCheckThread = null
+
         if (isReceiverRegistered && orbotStatusReceiver != null) {
             try {
                 context.unregisterReceiver(orbotStatusReceiver)
@@ -434,25 +505,43 @@ object TorManager {
         }
 
         // Also check the socket as a fallback - this is the most reliable way to detect Tor status
-        Thread {
+        // Cancel any previous socket check thread to prevent accumulation
+        socketCheckThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+            }
+        }
+
+        socketCheckThread = Thread {
+            // Check shutdown flag early
+            if (isShuttingDown) return@Thread
+
             try {
                 val socket = java.net.Socket()
                 socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_ORBOT_SOCKS_PORT), 1000)
                 socket.close()
 
+                // Don't update state if shutting down
+                if (isShuttingDown) return@Thread
+
                 // Orbot is running
                 Handler(Looper.getMainLooper()).post {
-                    if (_state != TorState.CONNECTED) {
+                    if (_state != TorState.CONNECTED && !isShuttingDown) {
                         _socksPort = DEFAULT_ORBOT_SOCKS_PORT
                         _httpPort = DEFAULT_ORBOT_HTTP_PORT
                         _socksHost = "127.0.0.1"
                         notifyStateChange(TorState.CONNECTED)
                     }
                 }
+            } catch (e: InterruptedException) {
+                Log.d(TAG, "Orbot status check interrupted (normal during cleanup)")
             } catch (e: Exception) {
+                // Don't process if shutting down
+                if (isShuttingDown) return@Thread
+
                 // Orbot not running or not accessible - update state regardless of current state
                 Handler(Looper.getMainLooper()).post {
-                    if (_state == TorState.CONNECTED || _state == TorState.STARTING) {
+                    if ((_state == TorState.CONNECTED || _state == TorState.STARTING) && !isShuttingDown) {
                         _socksPort = -1
                         _httpPort = -1
                         notifyStateChange(TorState.STOPPED)
@@ -460,7 +549,8 @@ object TorManager {
                     }
                 }
             }
-        }.start()
+        }
+        socketCheckThread?.start()
     }
 
     /**

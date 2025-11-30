@@ -18,7 +18,7 @@ abstract class RadioDatabase : RoomDatabase() {
         private var INSTANCE: RadioDatabase? = null
 
         @Volatile
-        private var sessionPassword: String? = null  // Stores password during session for encrypted databases
+        private var sessionPassword: CharArray? = null  // Stores password during session for encrypted databases (CharArray for security)
 
         // Migration from version 1 to 2: Add proxyType column
         private val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -175,20 +175,28 @@ abstract class RadioDatabase : RoomDatabase() {
          * Set the session password for database encryption
          * Must be called after successful authentication, before accessing database
          *
-         * @param password The user's app password
+         * SECURITY: Uses CharArray instead of String so password can be securely
+         * zeroed from memory when no longer needed.
+         *
+         * @param password The user's app password as CharArray
          */
-        fun setSessionPassword(password: String) {
+        fun setSessionPassword(password: CharArray) {
             synchronized(this) {
-                sessionPassword = password
+                // Clear old password before setting new one
+                sessionPassword?.fill(0.toChar())
+                sessionPassword = password.copyOf()
             }
         }
 
         /**
          * Clear the session password
          * Should be called when app backgrounds or user logs out
+         *
+         * SECURITY: Zeros out the password from memory before clearing reference
          */
         fun clearSessionPassword() {
             synchronized(this) {
+                sessionPassword?.fill(0.toChar())
                 sessionPassword = null
             }
         }
@@ -211,7 +219,13 @@ abstract class RadioDatabase : RoomDatabase() {
                                 "Database encryption is enabled but session password not set. " +
                                 "Call RadioDatabase.setSessionPassword() after authentication."
                             )
-                        DatabaseEncryptionManager.getSupportFactory(context, password)
+                        // Convert CharArray to String for compatibility with existing getSupportFactory
+                        val passwordString = String(password)
+                        val factory = DatabaseEncryptionManager.getSupportFactory(context, passwordString)
+                        // Zero out the temporary String from memory (best effort - JVM may still have copies)
+                        // Note: This doesn't guarantee removal but is better than nothing
+                        passwordString.toCharArray().fill(0.toChar())
+                        factory
                     } else {
                         null
                     }

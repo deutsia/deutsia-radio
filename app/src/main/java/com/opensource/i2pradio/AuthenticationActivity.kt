@@ -86,7 +86,11 @@ class AuthenticationActivity : AppCompatActivity() {
 
         if (BiometricAuthManager.verifyPassword(this, password)) {
             // Set session password for database decryption
-            com.opensource.i2pradio.data.RadioDatabase.setSessionPassword(password)
+            // SECURITY: Convert to CharArray for secure memory handling
+            val passwordChars = password.toCharArray()
+            com.opensource.i2pradio.data.RadioDatabase.setSessionPassword(passwordChars)
+            // Zero out local CharArray copy (RadioDatabase made its own copy)
+            passwordChars.fill(0.toChar())
             unlockSuccess()
         } else {
             showError(getString(R.string.auth_error_wrong_password))
