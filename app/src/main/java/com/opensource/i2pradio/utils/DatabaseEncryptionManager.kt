@@ -115,16 +115,16 @@ object DatabaseEncryptionManager {
     fun getSupportFactory(context: Context): SupportFactory? {
         val passphrase = getDatabasePassphrase(context) ?: return null
 
-        return try {
-            // Use clearPassphrase = false to prevent SupportFactory from automatically
-            // clearing the passphrase after first use. This is required for Room which
-            // may close and reopen the database multiple times (e.g., for LiveData queries).
-            // We still clear our local passphrase copy in the finally block.
-            SupportFactory(passphrase, null, false)
-        } finally {
-            // Clear passphrase from memory
-            passphrase.fill(0)
-        }
+        // Use clearPassphrase = false to prevent SupportFactory from automatically
+        // clearing the passphrase after first use. This is required for Room which
+        // may close and reopen the database multiple times (e.g., for LiveData queries).
+        //
+        // IMPORTANT: We do NOT clear the passphrase here because SupportFactory holds
+        // a reference to the ByteArray. Clearing it would zero out the passphrase that
+        // SupportFactory is using, causing "file is not a database" errors when Room
+        // reopens the database. The passphrase will remain in memory as long as the
+        // SupportFactory instance exists, which is necessary for Room's operation.
+        return SupportFactory(passphrase, null, false)
     }
 
     /**
