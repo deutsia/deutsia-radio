@@ -194,7 +194,7 @@ object DatabaseEncryptionManager {
             // Open unencrypted database
             val unencryptedDb = SQLiteDatabase.openDatabase(
                 dbPath,
-                ByteArray(0),
+                "",
                 null,
                 SQLiteDatabase.OPEN_READWRITE,
                 null
@@ -237,10 +237,11 @@ object DatabaseEncryptionManager {
         val tempDbPath = "$dbPath.decrypted"
 
         try {
-            // Open encrypted database
+            // Open encrypted database using hex string representation
+            val passphraseHex = passphrase.toHexString()
             val encryptedDb = SQLiteDatabase.openDatabase(
                 dbPath,
-                passphrase,
+                passphraseHex,
                 null,
                 SQLiteDatabase.OPEN_READWRITE,
                 null
