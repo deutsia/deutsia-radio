@@ -275,4 +275,40 @@
     <string name="default_auth_digest">Digest</string>
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
+
+    <!-- Security & Privacy -->
+    <string name="settings_security_privacy">Security &amp; Privacy</string>
+    <string name="settings_app_lock">App Lock</string>
+    <string name="settings_app_lock_description">Require password or biometric to unlock app</string>
+    <string name="settings_biometric_auth">Biometric Authentication</string>
+    <string name="settings_biometric_auth_description">Use fingerprint or face unlock</string>
+    <string name="settings_require_auth_on_launch">Require Auth on Launch</string>
+    <string name="settings_require_auth_on_launch_description">Always require authentication when opening app</string>
+    <string name="settings_set_password">Set Password</string>
+    <string name="settings_change_password">Change Password</string>
+
+    <!-- Authentication Dialog -->
+    <string name="auth_dialog_title">Set App Password</string>
+    <string name="auth_dialog_change_title">Change Password</string>
+    <string name="auth_dialog_current_password">Current Password</string>
+    <string name="auth_dialog_new_password">New Password</string>
+    <string name="auth_dialog_confirm_password">Confirm Password</string>
+    <string name="auth_dialog_set">Set Password</string>
+    <string name="auth_dialog_change">Change Password</string>
+    <string name="auth_error_passwords_dont_match">Passwords don\'t match</string>
+    <string name="auth_error_password_too_short">Password must be at least 4 characters</string>
+    <string name="auth_error_current_password_wrong">Current password is incorrect</string>
+    <string name="auth_password_set">Password set successfully</string>
+    <string name="auth_password_changed">Password changed successfully</string>
+
+    <!-- Authentication Activity -->
+    <string name="auth_unlock_app">Unlock deutsia radio</string>
+    <string name="auth_enter_password">Enter your password</string>
+    <string name="auth_password_hint">Password</string>
+    <string name="auth_unlock_button">Unlock</string>
+    <string name="auth_use_biometric">Use Biometric</string>
+    <string name="auth_error_wrong_password">Wrong password</string>
+    <string name="auth_biometric_title">Unlock deutsia radio</string>
+    <string name="auth_biometric_subtitle">Authenticate to continue</string>
+    <string name="auth_biometric_negative">Use Password</string>
 </resources>

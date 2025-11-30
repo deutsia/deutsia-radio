@@ -40,6 +40,7 @@ import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 import com.opensource.i2pradio.util.StationImportExport
+import com.opensource.i2pradio.utils.BiometricAuthManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,6 +88,14 @@ class SettingsFragment : Fragment() {
     private var bandwidthTotalText: TextView? = null
     private var bandwidthSessionText: TextView? = null
     private var resetBandwidthButton: MaterialButton? = null
+
+    // Authentication UI elements
+    private var appLockSwitch: MaterialSwitch? = null
+    private var setPasswordButton: MaterialButton? = null
+    private var biometricContainer: View? = null
+    private var biometricSwitch: MaterialSwitch? = null
+    private var requireAuthContainer: View? = null
+    private var requireAuthSwitch: MaterialSwitch? = null
 
     // Bandwidth update broadcast receiver
     private val bandwidthUpdateReceiver = object : BroadcastReceiver() {
@@ -437,6 +446,17 @@ class SettingsFragment : Fragment() {
         bandwidthTotalText = view.findViewById(R.id.bandwidthTotalText)
         bandwidthSessionText = view.findViewById(R.id.bandwidthSessionText)
         resetBandwidthButton = view.findViewById(R.id.resetBandwidthButton)
+
+        // Authentication UI elements
+        appLockSwitch = view.findViewById(R.id.appLockSwitch)
+        setPasswordButton = view.findViewById(R.id.setPasswordButton)
+        biometricContainer = view.findViewById(R.id.biometricContainer)
+        biometricSwitch = view.findViewById(R.id.biometricSwitch)
+        requireAuthContainer = view.findViewById(R.id.requireAuthContainer)
+        requireAuthSwitch = view.findViewById(R.id.requireAuthSwitch)
+
+        // Setup authentication controls
+        setupAuthenticationControls()
 
         // Setup custom proxy controls
         setupCustomProxyControls()
@@ -1793,6 +1813,267 @@ class SettingsFragment : Fragment() {
         }
 
         return true
+    }
+
+    /**
+     * Setup authentication controls (app lock, biometric, password)
+     */
+    private fun setupAuthenticationControls() {
+        // Initialize app lock state
+        val isAppLockEnabled = PreferencesHelper.isAppLockEnabled(requireContext())
+        appLockSwitch?.isChecked = isAppLockEnabled
+        updateAuthenticationUIVisibility()
+
+        // App Lock Switch
+        appLockSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            if (isChecked) {
+                // Enabling app lock - check if password is set
+                if (!BiometricAuthManager.hasPassword(requireContext())) {
+                    // No password set, show password setup dialog
+                    showSetPasswordDialog()
+                } else {
+                    // Password already exists, just enable
+                    PreferencesHelper.setAppLockEnabled(requireContext(), true)
+                    updateAuthenticationUIVisibility()
+                }
+            } else {
+                // Disabling app lock
+                PreferencesHelper.setAppLockEnabled(requireContext(), false)
+                updateAuthenticationUIVisibility()
+            }
+        }
+
+        // Set Password Button
+        setPasswordButton?.setOnClickListener {
+            if (BiometricAuthManager.hasPassword(requireContext())) {
+                showChangePasswordDialog()
+            } else {
+                showSetPasswordDialog()
+            }
+        }
+
+        // Biometric Switch
+        biometricSwitch?.isChecked = PreferencesHelper.isBiometricEnabled(requireContext())
+        biometricSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setBiometricEnabled(requireContext(), isChecked)
+        }
+
+        // Require Auth on Launch Switch
+        requireAuthSwitch?.isChecked = PreferencesHelper.isRequireAuthOnLaunch(requireContext())
+        requireAuthSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setRequireAuthOnLaunch(requireContext(), isChecked)
+        }
+    }
+
+    /**
+     * Update visibility of authentication UI elements based on app lock state
+     */
+    private fun updateAuthenticationUIVisibility() {
+        val isAppLockEnabled = PreferencesHelper.isAppLockEnabled(requireContext())
+        val hasPassword = BiometricAuthManager.hasPassword(requireContext())
+        val isBiometricAvailable = BiometricAuthManager.isBiometricAvailable(requireContext())
+
+        if (isAppLockEnabled && hasPassword) {
+            setPasswordButton?.visibility = View.VISIBLE
+            setPasswordButton?.text = getString(R.string.settings_change_password)
+            requireAuthContainer?.visibility = View.VISIBLE
+
+            // Show biometric option only if hardware is available
+            if (isBiometricAvailable) {
+                biometricContainer?.visibility = View.VISIBLE
+            } else {
+                biometricContainer?.visibility = View.GONE
+            }
+        } else {
+            setPasswordButton?.visibility = View.GONE
+            biometricContainer?.visibility = View.GONE
+            requireAuthContainer?.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Show dialog to set password for the first time
+     */
+    private fun showSetPasswordDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_configure_proxy, null)
+        val container = dialogView.findViewById<View>(R.id.proxyConfigContainer)
+
+        // Create password input fields
+        val passwordLayout = com.google.android.material.textfield.TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.auth_dialog_new_password)
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+        }
+        val passwordInput = TextInputEditText(requireContext()).apply {
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        passwordLayout.addView(passwordInput)
+
+        val confirmLayout = com.google.android.material.textfield.TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.auth_dialog_confirm_password)
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+        }
+        val confirmInput = TextInputEditText(requireContext()).apply {
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        confirmLayout.addView(confirmInput)
+
+        // Add to container
+        (container as? android.view.ViewGroup)?.apply {
+            removeAllViews()
+            addView(passwordLayout)
+            addView(confirmLayout)
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.auth_dialog_title)
+            .setView(dialogView)
+            .setPositiveButton(R.string.auth_dialog_set) { _, _ ->
+                val password = passwordInput.text.toString()
+                val confirm = confirmInput.text.toString()
+
+                when {
+                    password.length < 4 -> {
+                        Toast.makeText(requireContext(), R.string.auth_error_password_too_short, Toast.LENGTH_SHORT).show()
+                        appLockSwitch?.isChecked = false
+                    }
+                    password != confirm -> {
+                        Toast.makeText(requireContext(), R.string.auth_error_passwords_dont_match, Toast.LENGTH_SHORT).show()
+                        appLockSwitch?.isChecked = false
+                    }
+                    else -> {
+                        BiometricAuthManager.setPassword(requireContext(), password)
+                        PreferencesHelper.setAppLockEnabled(requireContext(), true)
+                        updateAuthenticationUIVisibility()
+                        Toast.makeText(requireContext(), R.string.auth_password_set, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                appLockSwitch?.isChecked = false
+            }
+            .create()
+
+        dialog.show()
+    }
+
+    /**
+     * Show dialog to change existing password
+     */
+    private fun showChangePasswordDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_configure_proxy, null)
+        val container = dialogView.findViewById<View>(R.id.proxyConfigContainer)
+
+        // Create password input fields
+        val currentLayout = com.google.android.material.textfield.TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.auth_dialog_current_password)
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+        }
+        val currentInput = TextInputEditText(requireContext()).apply {
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        currentLayout.addView(currentInput)
+
+        val newLayout = com.google.android.material.textfield.TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.auth_dialog_new_password)
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+        }
+        val newInput = TextInputEditText(requireContext()).apply {
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        newLayout.addView(newInput)
+
+        val confirmLayout = com.google.android.material.textfield.TextInputLayout(requireContext()).apply {
+            hint = getString(R.string.auth_dialog_confirm_password)
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
+        }
+        val confirmInput = TextInputEditText(requireContext()).apply {
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        confirmLayout.addView(confirmInput)
+
+        // Add to container
+        (container as? android.view.ViewGroup)?.apply {
+            removeAllViews()
+            addView(currentLayout)
+            addView(newLayout)
+            addView(confirmLayout)
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.auth_dialog_change_title)
+            .setView(dialogView)
+            .setPositiveButton(R.string.auth_dialog_change) { _, _ ->
+                val currentPassword = currentInput.text.toString()
+                val newPassword = newInput.text.toString()
+                val confirm = confirmInput.text.toString()
+
+                when {
+                    newPassword.length < 4 -> {
+                        Toast.makeText(requireContext(), R.string.auth_error_password_too_short, Toast.LENGTH_SHORT).show()
+                    }
+                    newPassword != confirm -> {
+                        Toast.makeText(requireContext(), R.string.auth_error_passwords_dont_match, Toast.LENGTH_SHORT).show()
+                    }
+                    !BiometricAuthManager.changePassword(requireContext(), currentPassword, newPassword) -> {
+                        Toast.makeText(requireContext(), R.string.auth_error_current_password_wrong, Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        Toast.makeText(requireContext(), R.string.auth_password_changed, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+
+        dialog.show()
     }
 
 

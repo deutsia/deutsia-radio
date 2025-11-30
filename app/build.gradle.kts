@@ -105,6 +105,9 @@ dependencies {
     // Security - EncryptedSharedPreferences for secure password storage
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
+    // Biometric authentication
+    implementation("androidx.biometric:biometric:1.1.0")
+
     // Test dependencies
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
