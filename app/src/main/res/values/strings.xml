@@ -287,7 +287,7 @@
     <string name="settings_set_password">Set Password</string>
     <string name="settings_change_password">Change Password</string>
     <string name="settings_database_encryption">Database Encryption</string>
-    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher (requires app restart)</string>
+    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher (requires app password and restart)</string>
     <string name="settings_database_encryption_warning">Warning: This is an experimental feature. Make sure you have a backup before enabling!</string>
     <string name="settings_database_encryption_enable_title">Enable Database Encryption?</string>
     <string name="settings_database_encryption_enable_message">This will encrypt your entire radio database. The app will restart to apply changes.\n\nWARNING: This is experimental. Make sure you have a backup!</string>
@@ -296,6 +296,8 @@
     <string name="settings_database_encryption_enabled">Database encryption enabled</string>
     <string name="settings_database_encryption_disabled">Database encryption disabled</string>
     <string name="settings_database_encryption_error">Failed to change encryption setting</string>
+    <string name="settings_database_encryption_password_required_title">App Password Required</string>
+    <string name="settings_database_encryption_password_required_message">Database encryption requires an app password to be set first. This ensures your encrypted database is protected by authentication.\n\nPlease set an app password in the Security section before enabling database encryption.</string>
 
     <!-- Authentication Dialog -->
     <string name="auth_dialog_title">Set App Password</string>
@@ -310,6 +312,10 @@
     <string name="auth_error_current_password_wrong">Current password is incorrect</string>
     <string name="auth_password_set">Password set successfully</string>
     <string name="auth_password_changed">Password changed successfully</string>
+    <string name="auth_enter_password_to_encrypt">Enter Password to Encrypt Database</string>
+    <string name="auth_enter_password_to_decrypt">Enter Password to Decrypt Database</string>
+    <string name="auth_password_for_encryption">Your password will be used to encrypt the database. You\'ll need to enter it each time you open the app.</string>
+    <string name="auth_password_for_decryption">Enter your password to decrypt the database before disabling encryption.</string>
 
     <!-- Authentication Activity -->
     <string name="auth_unlock_app">Unlock deutsia radio</string>

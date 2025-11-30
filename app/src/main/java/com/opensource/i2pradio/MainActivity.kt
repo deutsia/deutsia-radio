@@ -542,6 +542,14 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         // Reset authentication state when app goes to background
         isAuthenticated = false
+
+        // Clear session password for database encryption
+        com.opensource.i2pradio.data.RadioDatabase.clearSessionPassword()
+
+        // Close database to ensure it's re-opened with fresh authentication next time
+        if (com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)) {
+            com.opensource.i2pradio.data.RadioDatabase.closeDatabase()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
