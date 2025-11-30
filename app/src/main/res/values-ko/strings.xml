@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">녹음 실패: %s</string>
-    <string name="recording_saved">녹음 저장됨: %s (%dKB)</string>
+    <string name="recording_saved">녹음 저장됨: %1$s (%2$dKB)</string>
     <string name="recording_stopping">녹음 중지 중...</string>
     <string name="recording_starting">녹음 시작 중...</string>
     <string name="recording_no_station">재생 중인 방송국 없음</string>

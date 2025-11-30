@@ -113,7 +113,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">Recording failed: %s</string>
-    <string name="recording_saved">Recording saved: %s (%dKB)</string>
+    <string name="recording_saved">Recording saved: %1$s (%2$dKB)</string>
     <string name="recording_stopping">Stopping recording...</string>
     <string name="recording_starting">Starting recording...</string>
     <string name="recording_no_station">No station playing</string>

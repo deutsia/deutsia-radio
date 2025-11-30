@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">Aufnahme fehlgeschlagen: %s</string>
-    <string name="recording_saved">Aufnahme gespeichert: %s (%dKB)</string>
+    <string name="recording_saved">Aufnahme gespeichert: %1$s (%2$dKB)</string>
     <string name="recording_stopping">Aufnahme wird gestoppt...</string>
     <string name="recording_starting">Aufnahme wird gestartet...</string>
     <string name="recording_no_station">Kein Sender wird abgespielt</string>

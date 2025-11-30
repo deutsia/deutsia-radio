@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">Ghi thất bại: %s</string>
-    <string name="recording_saved">Đã lưu bản ghi: %s (%dKB)</string>
+    <string name="recording_saved">Đã lưu bản ghi: %1$s (%2$dKB)</string>
     <string name="recording_stopping">Đang dừng ghi...</string>
     <string name="recording_starting">Đang bắt đầu ghi...</string>
     <string name="recording_no_station">Không có trạm đang phát</string>

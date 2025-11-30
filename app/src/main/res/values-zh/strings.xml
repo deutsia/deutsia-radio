@@ -116,7 +116,7 @@
 
     <!-- Recording Messages -->
     <string name="recording_failed">录制失败：%s</string>
-    <string name="recording_saved">录制已保存：%s (%dKB)</string>
+    <string name="recording_saved">录制已保存：%1$s (%2$dKB)</string>
     <string name="recording_stopping">停止录制中...</string>
     <string name="recording_starting">开始录制中...</string>
     <string name="recording_no_station">无电台播放</string>
