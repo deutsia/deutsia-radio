@@ -116,7 +116,11 @@ object DatabaseEncryptionManager {
         val passphrase = getDatabasePassphrase(context) ?: return null
 
         return try {
-            SupportFactory(passphrase)
+            // Use clearPassphrase = false to prevent SupportFactory from automatically
+            // clearing the passphrase after first use. This is required for Room which
+            // may close and reopen the database multiple times (e.g., for LiveData queries).
+            // We still clear our local passphrase copy in the finally block.
+            SupportFactory(passphrase, false)
         } finally {
             // Clear passphrase from memory
             passphrase.fill(0)
