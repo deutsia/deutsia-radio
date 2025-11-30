@@ -130,6 +130,8 @@
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Custom Proxy</string>
+    <string name="settings_enable_custom_proxy">Enable Custom Proxy</string>
+    <string name="settings_enable_custom_proxy_description">Use custom proxy for connections</string>
     <string name="settings_configure_proxy">Configure Global Proxy</string>
     <string name="settings_configure_proxy_description">Set up your custom proxy settings</string>
     <string name="settings_force_custom_proxy">Force Custom Proxy</string>
