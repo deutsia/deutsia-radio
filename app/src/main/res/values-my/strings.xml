@@ -1,334 +1,334 @@
 <resources>
     <string name="app_name">deutsia radio</string>
-    <string name="tab_radios">Library</string>
-    <string name="tab_now_playing">Now Playing</string>
-    <string name="tab_settings">Settings</string>
+    <string name="tab_radios">စာကြည့်တိုက်</string>
+    <string name="tab_now_playing">ယခုဖွင့်နေသည်</string>
+    <string name="tab_settings">ဆက်တင်များ</string>
 
     <!-- Equalizer -->
-    <string name="equalizer">Equalizer</string>
-    <string name="equalizer_no_audio">Start playing a station first</string>
-    <string name="equalizer_not_found">No equalizer app found. Install an equalizer app like Wavelet.</string>
-    <string name="equalizer_preset">Preset</string>
-    <string name="equalizer_custom">Custom</string>
-    <string name="equalizer_reset">Reset to Flat</string>
-    <string name="equalizer_init_failed">Could not initialize equalizer</string>
-    <string name="equalizer_bass_boost">Bass Booster</string>
-    <string name="equalizer_surround_sound">Surround Sound</string>
+    <string name="equalizer">အသံညှိစက်</string>
+    <string name="equalizer_no_audio">ဦးစွာ စတေးရှင်းတစ်ခုကို ဖွင့်ပါ</string>
+    <string name="equalizer_not_found">အသံညှိစက် အက်ပ်မတွေ့ပါ။ Wavelet ကဲ့သို့ အသံညှိစက်အက်ပ်ကို တပ်ဆင်ပါ။</string>
+    <string name="equalizer_preset">ကြိုတင်သတ်မှတ်ချက်</string>
+    <string name="equalizer_custom">စိတ်ကြိုက်</string>
+    <string name="equalizer_reset">ပုံမှန်သို့ ပြန်သတ်မှတ်ရန်</string>
+    <string name="equalizer_init_failed">အသံညှိစက်ကို စတင်၍မရပါ</string>
+    <string name="equalizer_bass_boost">အသံနိမ့် မြှင့်တင်ရေး</string>
+    <string name="equalizer_surround_sound">ပတ်ဝန်းကျင် အသံ</string>
 
     <!-- Sort options -->
-    <string name="sort_default">Default</string>
-    <string name="sort_name">Name</string>
-    <string name="sort_recent">Recent</string>
-    <string name="sort_liked">Liked</string>
-    <string name="sort_genre">Genre</string>
+    <string name="sort_default">မူလ</string>
+    <string name="sort_name">အမည်</string>
+    <string name="sort_recent">မကြာသေးမီ</string>
+    <string name="sort_liked">နှစ်သက်သော</string>
+    <string name="sort_genre">အမျိုးအစား</string>
 
     <!-- Search -->
-    <string name="search_stations">Search library</string>
-    <string name="search_countries">Search countries…</string>
-    <string name="search_genres">Search genres…</string>
+    <string name="search_stations">စာကြည့်တိုက်တွင် ရှာရန်</string>
+    <string name="search_countries">နိုင်ငံများကို ရှာပါ…</string>
+    <string name="search_genres">အမျိုးအစားများကို ရှာပါ…</string>
 
     <!-- Genre filter -->
-    <string name="genre_all">All Genres</string>
-    <string name="filter_by_genre">Filter by Genre</string>
+    <string name="genre_all">အမျိုးအစားအားလုံး</string>
+    <string name="filter_by_genre">အမျိုးအစားအလိုက် စစ်ထုတ်ရန်</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with Orbot integration and configurable leak prevention</string>
+    <string name="about_description">deutsia radio သည် clearnet၊ Tor (.onion) နှင့် I2P ကွန်ရက်များမှ ထုတ်လွှင့်မှုများကို ပေါင်းစည်းထားသော အခမဲ့ပွင့်လင်းအရင်းအမြစ် မာလ်တီနက် ရေဒီယိုပလေယာဖြစ်သည်။ Orbot ပေါင်းစည်းမှုနှင့် ပြင်ဆင်နိုင်သော leak ကာကွယ်မှုဖြင့် Material You အင်တာဖေ့စ်တွင် သင့်အကြိုက်ဆုံး စတေးရှင်းများကို ခံစားပါ</string>
 
     <!-- Browse/Discover Stations -->
-    <string name="tab_browse">Browse</string>
-    <string name="search_radio_browser">Search thousands of stations…</string>
-    <string name="browse_top_voted">Top Voted</string>
-    <string name="browse_popular">Popular</string>
-    <string name="browse_random">Random</string>
-    <string name="browse_history">History</string>
-    <string name="browse_no_results">No Stations Found</string>
-    <string name="browse_no_results_hint">Try a different search or filter</string>
-    <string name="filter_country">Country</string>
-    <string name="filter_genre">Genre</string>
-    <string name="filter_language">Language</string>
-    <string name="filter_all_countries">All Countries</string>
-    <string name="filter_all_genres">All Genres</string>
-    <string name="filter_all_languages">All Languages</string>
-    <string name="select_country">Select Country</string>
-    <string name="select_genre">Select Genre</string>
-    <string name="select_language">Select Language</string>
-    <string name="loading_countries">Loading countries…</string>
-    <string name="loading_genres">Loading genres…</string>
-    <string name="loading_languages">Loading languages…</string>
-    <string name="search_languages">Search languages…</string>
-    <string name="station_saved">%s added to library</string>
-    <string name="station_removed">%s removed from library</string>
-    <string name="station_added_to_favorites">%s added to favorites</string>
-    <string name="station_removed_from_favorites">%s removed from favorites</string>
-    <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
+    <string name="tab_browse">ရှာဖွေရန်</string>
+    <string name="search_radio_browser">စတေးရှင်းထောင်ပေါင်းများစွာကို ရှာပါ…</string>
+    <string name="browse_top_voted">အများဆုံး မဲရသော</string>
+    <string name="browse_popular">လူကြိုက်များသော</string>
+    <string name="browse_random">ကျပန်း</string>
+    <string name="browse_history">မှတ်တမ်း</string>
+    <string name="browse_no_results">စတေးရှင်းများ မတွေ့ပါ</string>
+    <string name="browse_no_results_hint">အခြား ရှာဖွေမှု သို့မဟုတ် စစ်ထုတ်မှုကို စမ်းကြည့်ပါ</string>
+    <string name="filter_country">နိုင်ငံ</string>
+    <string name="filter_genre">အမျိုးအစား</string>
+    <string name="filter_language">ဘာသာစကား</string>
+    <string name="filter_all_countries">နိုင်ငံအားလုံး</string>
+    <string name="filter_all_genres">အမျိုးအစားအားလုံး</string>
+    <string name="filter_all_languages">ဘာသာစကားအားလုံး</string>
+    <string name="select_country">နိုင်ငံကို ရွေးချယ်ပါ</string>
+    <string name="select_genre">အမျိုးအစားကို ရွေးချယ်ပါ</string>
+    <string name="select_language">ဘာသာစကားကို ရွေးချယ်ပါ</string>
+    <string name="loading_countries">နိုင်ငံများကို ဖွင့်နေသည်…</string>
+    <string name="loading_genres">အမျိုးအစားများကို ဖွင့်နေသည်…</string>
+    <string name="loading_languages">ဘာသာစကားများကို ဖွင့်နေသည်…</string>
+    <string name="search_languages">ဘာသာစကားများကို ရှာပါ…</string>
+    <string name="station_saved">%s ကို စာကြည့်တိုက်သို့ ထည့်ပြီးပါပြီ</string>
+    <string name="station_removed">%s ကို စာကြည့်တိုက်မှ ဖယ်ရှားပြီးပါပြီ</string>
+    <string name="station_added_to_favorites">%s ကို အကြိုက်ဆုံးများသို့ ထည့်ပြီးပါပြီ</string>
+    <string name="station_removed_from_favorites">%s ကို အကြိုက်ဆုံးများမှ ဖယ်ရှားပြီးပါပြီ</string>
+    <string name="tor_required_warning">Tor ကို အတင်းအဓမ္မ သုံးရန် ဖွင့်ထားသော်လည်း Tor မချိတ်ဆက်ထားပါ။ စတေးရှင်းများကို ရှာကြည့်ရန် Tor သို့ ချိတ်ဆက်ပါ။</string>
 
     <!-- Notification and Status Messages -->
-    <string name="notification_connecting">Connecting...</string>
-    <string name="notification_paused">Paused</string>
-    <string name="notification_playing">Playing</string>
-    <string name="notification_playing_recording">Playing • Recording</string>
-    <string name="notification_buffering">Buffering...</string>
-    <string name="notification_reconnecting">Reconnecting...</string>
-    <string name="notification_connection_failed">Connection failed</string>
-    <string name="notification_tor_blocked">Tor not connected - stream blocked</string>
-    <string name="notification_audio_focus_denied">Audio focus denied</string>
-    <string name="notification_channel_name">deutsia radio Playback</string>
-    <string name="notification_channel_description">Shows radio playback status</string>
-    <string name="notification_action_pause">Pause</string>
-    <string name="notification_action_stop">Stop</string>
+    <string name="notification_connecting">ချိတ်ဆက်နေသည်...</string>
+    <string name="notification_paused">ခေတ္တရပ်ထားသည်</string>
+    <string name="notification_playing">ဖွင့်နေသည်</string>
+    <string name="notification_playing_recording">ဖွင့်နေသည် • ရိုက်ကူးနေသည်</string>
+    <string name="notification_buffering">ဖွင့်ရန် ပြင်ဆင်နေသည်...</string>
+    <string name="notification_reconnecting">ပြန်လည်ချိတ်ဆက်နေသည်...</string>
+    <string name="notification_connection_failed">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
+    <string name="notification_tor_blocked">Tor မချိတ်ဆက်ထားပါ - ထုတ်လွှင့်မှုကို ပိတ်ဆို့ထားသည်</string>
+    <string name="notification_audio_focus_denied">အသံ အာရုံစိုက်မှု ငြင်းပယ်ခံရသည်</string>
+    <string name="notification_channel_name">deutsia radio ဖွင့်ခြင်း</string>
+    <string name="notification_channel_description">ရေဒီယို ဖွင့်ခြင်း အခြေအနေကို ပြသည်</string>
+    <string name="notification_action_pause">ခေတ္တရပ်ရန်</string>
+    <string name="notification_action_stop">ရပ်ရန်</string>
 
     <!-- Recording Messages -->
-    <string name="recording_failed">Recording failed: %s</string>
-    <string name="recording_saved">Recording saved: %s (%dKB)</string>
-    <string name="recording_stopping">Stopping recording...</string>
-    <string name="recording_starting">Starting recording...</string>
-    <string name="recording_no_station">No station playing</string>
-    <string name="recording_directory_updated">Recording directory updated</string>
+    <string name="recording_failed">ရိုက်ကူးမှု မအောင်မြင်ပါ: %s</string>
+    <string name="recording_saved">ရိုက်ကူးမှုကို သိမ်းဆည်းပြီးပါပြီ: %s (%dKB)</string>
+    <string name="recording_stopping">ရိုက်ကူးမှုကို ရပ်နေသည်...</string>
+    <string name="recording_starting">ရိုက်ကူးမှုကို စတင်နေသည်...</string>
+    <string name="recording_no_station">စတေးရှင်း မဖွင့်ထားပါ</string>
+    <string name="recording_directory_updated">ရိုက်ကူးမှု ဖိုင်တွဲကို အပ်ဒိတ်လုပ်ပြီးပါပြီ</string>
 
     <!-- Dialog Titles and Buttons -->
-    <string name="dialog_add_station">Add Radio Station</string>
-    <string name="dialog_edit_station">Edit Radio Station</string>
-    <string name="dialog_sort_stations">Sort Stations</string>
-    <string name="dialog_delete_stations">Delete stations</string>
-    <string name="button_save">Save</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="button_import">Import</string>
-    <string name="button_export">Export</string>
-    <string name="button_open">Open</string>
-    <string name="button_configure">Configure</string>
-    <string name="button_apply">Apply</string>
-    <string name="button_reset">Reset</string>
-    <string name="button_change">Change</string>
-    <string name="button_start">Start</string>
-    <string name="button_test_connection">Test Connection</string>
-    <string name="hint_test_connection_disclaimer">Note: Testing will connect to httpbin.org via your proxy</string>
-    <string name="button_choose_image">Choose Image</string>
-    <string name="button_clear">Clear</string>
+    <string name="dialog_add_station">ရေဒီယိုစတေးရှင်း ထည့်ရန်</string>
+    <string name="dialog_edit_station">ရေဒီယိုစတေးရှင်း တည်းဖြတ်ရန်</string>
+    <string name="dialog_sort_stations">စတေးရှင်းများကို စီရန်</string>
+    <string name="dialog_delete_stations">စတေးရှင်းများကို ဖျက်ရန်</string>
+    <string name="button_save">သိမ်းဆည်းရန်</string>
+    <string name="button_cancel">ပယ်ဖျက်ရန်</string>
+    <string name="button_import">တင်သွင်းရန်</string>
+    <string name="button_export">ထုတ်ယူရန်</string>
+    <string name="button_open">ဖွင့်ရန်</string>
+    <string name="button_configure">ပြင်ဆင်သတ်မှတ်ရန်</string>
+    <string name="button_apply">အသုံးချရန်</string>
+    <string name="button_reset">ပြန်လည်သတ်မှတ်ရန်</string>
+    <string name="button_change">ပြောင်းလဲရန်</string>
+    <string name="button_start">စတင်ရန်</string>
+    <string name="button_test_connection">ချိတ်ဆက်မှုကို စမ်းသပ်ရန်</string>
+    <string name="hint_test_connection_disclaimer">မှတ်ချက်: စမ်းသပ်မှုသည် သင့် proxy မှတစ်ဆင့် httpbin.org သို့ ချိတ်ဆက်မည်</string>
+    <string name="button_choose_image">ပုံကို ရွေးချယ်ရန်</string>
+    <string name="button_clear">ရှင်းလင်းရန်</string>
 
     <!-- Settings - Appearance -->
-    <string name="settings_appearance">Appearance</string>
-    <string name="settings_theme">Theme</string>
-    <string name="settings_theme_description">Choose light, dark, or system</string>
-    <string name="settings_theme_system_default">System Default</string>
+    <string name="settings_appearance">အသွင်အပြင်</string>
+    <string name="settings_theme">အပြင်အဆင်</string>
+    <string name="settings_theme_description">အလင်း၊ အမှောင် သို့မဟုတ် စနစ် ရွေးချယ်ပါ</string>
+    <string name="settings_theme_system_default">စနစ် မူလအတိုင်း</string>
     <string name="settings_material_you">Material You</string>
-    <string name="settings_material_you_description">Use wallpaper-based dynamic colors</string>
-    <string name="settings_color_scheme">Color Scheme</string>
-    <string name="settings_color_scheme_description">Choose your preferred color</string>
-    <string name="settings_color_blue">Blue</string>
+    <string name="settings_material_you_description">နောက်ခံပုံအခြေခံ ဒိုင်းနမစ်အရောင်များကို သုံးပါ</string>
+    <string name="settings_color_scheme">အရောင်အစီအစဉ်</string>
+    <string name="settings_color_scheme_description">သင့်အကြိုက် အရောင်ကို ရွေးချယ်ပါ</string>
+    <string name="settings_color_blue">အပြာ</string>
 
     <!-- Settings - Tor Network -->
-    <string name="settings_tor_network">Tor Network</string>
-    <string name="settings_enable_tor">Enable Tor (via Orbot)</string>
-    <string name="settings_enable_tor_description">Connect through the Tor network</string>
-    <string name="settings_tor_disconnected">Disconnected</string>
-    <string name="settings_tor_not_running">Tor is not running</string>
-    <string name="settings_force_tor">Force Tor Over Everything</string>
-    <string name="settings_force_tor_description">Route all streams through Tor. Won\'t connect without Tor.</string>
-    <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
-    <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
-    <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_network">Tor ကွန်ရက်</string>
+    <string name="settings_enable_tor">Tor ကို ဖွင့်ရန် (Orbot မှတစ်ဆင့်)</string>
+    <string name="settings_enable_tor_description">Tor ကွန်ရက်မှတစ်ဆင့် ချိတ်ဆက်ပါ</string>
+    <string name="settings_tor_disconnected">ချိတ်ဆက်မထားပါ</string>
+    <string name="settings_tor_not_running">Tor မလုပ်ဆောင်နေပါ</string>
+    <string name="settings_force_tor">Tor ကို အားလုံးအတွက် အတင်းအဓမ္မသုံးရန်</string>
+    <string name="settings_force_tor_description">ထုတ်လွှင့်မှုအားလုံးကို Tor မှတစ်ဆင့် ပို့ပါ။ Tor မရှိဘဲ ချိတ်ဆက်မည်မဟုတ်ပါ။</string>
+    <string name="settings_force_tor_except_i2p">I2P မှလွဲ၍ Tor ကို အတင်းအဓမ္မသုံးရန်</string>
+    <string name="settings_force_tor_except_i2p_description">clearnet ကို Tor မှတစ်ဆင့်၊ I2P ထုတ်လွှင့်မှုများကို I2P proxy သို့ တိုက်ရိုက် ပို့ပါ။</string>
+    <string name="settings_tor_info">Orbot လိုအပ်သည် (Play Store သို့မဟုတ် F-Droid မှ အခမဲ့)။ အမြန်ဝင်ရောက်ရန် toolbar ရှိ Tor အိုင်ကွန်ကို တို့ပါ။\n\nအတင်းအဓမ္မ မုဒ်များသည် Tor မရနိုင်သောအခါ ချိတ်ဆက်မှုများကို ပိတ်ဆို့သည်။</string>
 
     <!-- Settings - Custom Proxy -->
-    <string name="settings_custom_proxy">Custom Proxy</string>
-    <string name="settings_enable_custom_proxy">Enable Custom Proxy</string>
-    <string name="settings_enable_custom_proxy_description">Use custom proxy for connections</string>
-    <string name="settings_configure_proxy">Configure Global Proxy</string>
-    <string name="settings_configure_proxy_description">Set up your custom proxy settings</string>
-    <string name="settings_force_custom_proxy">Force Custom Proxy</string>
-    <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
-    <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
+    <string name="settings_custom_proxy">စိတ်ကြိုက် Proxy</string>
+    <string name="settings_enable_custom_proxy">စိတ်ကြိုက် Proxy ကို ဖွင့်ရန်</string>
+    <string name="settings_enable_custom_proxy_description">ချိတ်ဆက်မှုများအတွက် စိတ်ကြိုက် proxy ကို သုံးပါ</string>
+    <string name="settings_configure_proxy">Global Proxy ကို ပြင်ဆင်သတ်မှတ်ရန်</string>
+    <string name="settings_configure_proxy_description">သင့် စိတ်ကြိုက် proxy ဆက်တင်များကို သတ်မှတ်ပါ</string>
+    <string name="settings_force_custom_proxy">စိတ်ကြိုက် Proxy ကို အတင်းအဓမ္မသုံးရန်</string>
+    <string name="settings_force_custom_proxy_description">အသွားအလာအားလုံးကို စိတ်ကြိုက် proxy မှတစ်ဆင့် ပို့ပါ။ proxy မရှိဘဲ ချိတ်ဆက်မည်မဟုတ်ပါ။</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2P စတေးရှင်းများမှလွဲ၍ စိတ်ကြိုက် Proxy ကို အတင်းအဓမ္မသုံးရန်</string>
+    <string name="settings_force_custom_proxy_except_tor_i2p_description">clearnet အသွားအလာအားလုံးကို စိတ်ကြိုက် proxy မှတစ်ဆင့် ပို့ပါ၊ သို့သော် Tor နှင့် I2P စတေးရှင်းများကို ၎င်းတို့၏ မူရင်း proxies များကို သုံးခွင့်ပြုပါ။</string>
 
     <!-- Settings - Bandwidth -->
-    <string name="settings_bandwidth_usage">Bandwidth Usage</string>
-    <string name="settings_total_usage">Total Usage (Lifetime)</string>
-    <string name="settings_session_usage">Session Usage</string>
+    <string name="settings_bandwidth_usage">အင်တာနက် အသုံးပြုမှု</string>
+    <string name="settings_total_usage">စုစုပေါင်း အသုံးပြုမှု (တစ်သက်လုံး)</string>
+    <string name="settings_session_usage">Session အသုံးပြုမှု</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
     <!-- Settings - Playback -->
-    <string name="settings_playback">Playback</string>
-    <string name="settings_sleep_timer">Sleep Timer</string>
-    <string name="settings_sleep_timer_description">Auto-stop playback after set time</string>
-    <string name="settings_sleep_timer_off">Off</string>
-    <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
-    <string name="settings_recording_directory">Recording Directory</string>
-    <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
-    <string name="settings_record_across_stations">Record Across Stations</string>
-    <string name="settings_record_across_stations_description">Keep recording when switching stations</string>
-    <string name="settings_record_all_stations">Record All Stations</string>
-    <string name="settings_record_all_stations_description">Switch to new station\'s stream in same file</string>
+    <string name="settings_playback">ဖွင့်ခြင်း</string>
+    <string name="settings_sleep_timer">အိပ်စက် အချိန်တိုင်း</string>
+    <string name="settings_sleep_timer_description">သတ်မှတ်ချိန်ကျပြီး နောက် အလိုအလျောက် ရပ်ရန်</string>
+    <string name="settings_sleep_timer_off">ပိတ်ထားသည်</string>
+    <string name="settings_equalizer_description">အသံ ကြိမ်နှုန်း ဘန်းများနှင့် အကျိုးသက်ရောက်မှုများကို ညှိပါ</string>
+    <string name="settings_recording_directory">ရိုက်ကူးမှု ဖိုင်တွဲ</string>
+    <string name="settings_recording_directory_default">မူလ (Music/deutsia_radio)</string>
+    <string name="settings_record_across_stations">စတေးရှင်းများကို ဖြတ်၍ ရိုက်ကူးရန်</string>
+    <string name="settings_record_across_stations_description">စတေးရှင်းပြောင်းသောအခါ ရိုက်ကူးမှုကို ဆက်လုပ်ပါ</string>
+    <string name="settings_record_all_stations">စတေးရှင်းအားလုံးကို ရိုက်ကူးရန်</string>
+    <string name="settings_record_all_stations_description">ဖိုင်တူတွင် စတေးရှင်းအသစ်၏ ထုတ်လွှင့်မှုသို့ ပြောင်းပါ</string>
 
     <!-- Settings - Station Management -->
-    <string name="settings_station_management">Station Management</string>
-    <string name="settings_import_from_file">Import from File</string>
-    <string name="settings_import_from_file_description">Import from CSV, JSON, M3U, or PLS</string>
-    <string name="settings_import_i2p_stations">Import I2P Stations</string>
-    <string name="settings_import_i2p_stations_description">14 curated I2P radio stations</string>
-    <string name="settings_import_tor_stations">Import Tor Stations</string>
-    <string name="settings_import_tor_stations_description">3 curated Tor radio stations</string>
-    <string name="settings_export_stations">Export Stations</string>
-    <string name="settings_export_stations_description">Export your stations to a file</string>
+    <string name="settings_station_management">စတေးရှင်း စီမံခန့်ခွဲမှု</string>
+    <string name="settings_import_from_file">ဖိုင်မှ တင်သွင်းရန်</string>
+    <string name="settings_import_from_file_description">CSV၊ JSON၊ M3U သို့မဟုတ် PLS မှ တင်သွင်းပါ</string>
+    <string name="settings_import_i2p_stations">I2P စတေးရှင်းများကို တင်သွင်းရန်</string>
+    <string name="settings_import_i2p_stations_description">ရွေးချယ်ထားသော I2P ရေဒီယိုစတေးရှင်း ၁၄ ခု</string>
+    <string name="settings_import_tor_stations">Tor စတေးရှင်းများကို တင်သွင်းရန်</string>
+    <string name="settings_import_tor_stations_description">ရွေးချယ်ထားသော Tor ရေဒီယိုစတေးရှင်း ၃ ခု</string>
+    <string name="settings_export_stations">စတေးရှင်းများကို ထုတ်ယူရန်</string>
+    <string name="settings_export_stations_description">သင့်စတေးရှင်းများကို ဖိုင်သို့ ထုတ်ယူပါ</string>
 
     <!-- Settings - About -->
-    <string name="settings_about">About</string>
-    <string name="settings_version">Version 1.1</string>
-    <string name="settings_view_github">View on GitHub</string>
-    <string name="settings_donate">Donate</string>
-    <string name="settings_donate_description">If this app helped you out, consider donating</string>
+    <string name="settings_about">အကြောင်း</string>
+    <string name="settings_version">ဗားရှင်း 1.1</string>
+    <string name="settings_view_github">GitHub တွင် ကြည့်ရန်</string>
+    <string name="settings_donate">လှူဒါန်းရန်</string>
+    <string name="settings_donate_description">ဒီအက်ပ်က သင့်ကို ကူညီခဲ့ရင် လှူဒါန်းရန် စဉ်းစားပါ</string>
     <string name="settings_monero">Monero (XMR)</string>
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
-    <string name="settings_copy_address">Copy Address</string>
+    <string name="settings_copy_address">လိပ်စာကို ကူးယူရန်</string>
 
     <!-- Tor Control Bottom Sheet -->
-    <string name="tor_connection_details">Connection Details</string>
-    <string name="tor_proxy_host">Proxy Host</string>
+    <string name="tor_connection_details">ချိတ်ဆက်မှု အသေးစိတ်</string>
+    <string name="tor_proxy_host">Proxy လက်ခံဌာန</string>
     <string name="tor_socks_port">SOCKS Port</string>
-    <string name="tor_what_is_orbot">What is Orbot?</string>
-    <string name="tor_orbot_description">Orbot is the official Tor client for Android. It provides secure, encrypted access to the Tor network.</string>
-    <string name="tor_connect">Connect to Tor</string>
-    <string name="tor_open_orbot">Open Orbot</string>
+    <string name="tor_what_is_orbot">Orbot ဆိုတာ ဘာလဲ?</string>
+    <string name="tor_orbot_description">Orbot သည် Android အတွက် တရားဝင် Tor ကလိုင်းယင့်ဖြစ်သည်။ ၎င်းသည် Tor ကွန်ရက်သို့ လုံခြုံသော၊ ကုဒ်ဝှက်ထားသော ဝင်ရောက်မှုကို ပေးသည်။</string>
+    <string name="tor_connect">Tor သို့ ချိတ်ဆက်ရန်</string>
+    <string name="tor_open_orbot">Orbot ကို ဖွင့်ရန်</string>
 
     <!-- Add/Edit Radio Dialog -->
-    <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
-    <string name="add_edit_authentication_optional">Authentication (Optional)</string>
-    <string name="add_edit_advanced_options">Advanced Options</string>
-    <string name="add_edit_cover_art">Cover Art</string>
-    <string name="add_edit_or_enter_url">Or enter image URL</string>
+    <string name="add_edit_tor_info">ထည့်သွင်းထားသော Tor ကို သုံးနေသည် - proxy config မလိုပါ</string>
+    <string name="add_edit_authentication_optional">အထောက်အထား (ရွေးချယ်နိုင်သော)</string>
+    <string name="add_edit_advanced_options">အဆင့်မြင့် ရွေးချယ်စရာများ</string>
+    <string name="add_edit_cover_art">အဖုံးပုံ</string>
+    <string name="add_edit_or_enter_url">သို့မဟုတ် ပုံ URL ကို ထည့်ပါ</string>
 
     <!-- Input Hints -->
-    <string name="hint_station_name">Station Name</string>
+    <string name="hint_station_name">စတေးရှင်း အမည်</string>
     <string name="hint_stream_url">Stream URL</string>
-    <string name="hint_genre">Genre</string>
-    <string name="hint_proxy_type">Proxy Type</string>
-    <string name="hint_proxy_host">Proxy Host</string>
+    <string name="hint_genre">အမျိုးအစား</string>
+    <string name="hint_proxy_type">Proxy အမျိုးအစား</string>
+    <string name="hint_proxy_host">Proxy လက်ခံဌာန</string>
     <string name="hint_proxy_port">Proxy Port</string>
-    <string name="hint_protocol">Protocol</string>
-    <string name="hint_username_optional">Username (optional)</string>
-    <string name="hint_password_optional">Password (optional)</string>
-    <string name="hint_auth_method">Auth Method</string>
-    <string name="hint_connection_timeout">Connection Timeout (seconds)</string>
-    <string name="hint_cover_art_url">Cover Art URL (optional)</string>
-    <string name="hint_username_optional_caps">Username (Optional)</string>
-    <string name="hint_password_optional_caps">Password (Optional)</string>
-    <string name="hint_auth_type">Authentication Type</string>
+    <string name="hint_protocol">ပရိုတိုကော</string>
+    <string name="hint_username_optional">အသုံးပြုသူအမည် (ရွေးချယ်နိုင်သော)</string>
+    <string name="hint_password_optional">စကားဝှက် (ရွေးချယ်နိုင်သော)</string>
+    <string name="hint_auth_method">အထောက်အထား နည်းလမ်း</string>
+    <string name="hint_connection_timeout">ချိတ်ဆက်မှု အချိန်ကုန် (စက္ကန့်)</string>
+    <string name="hint_cover_art_url">အဖုံးပုံ URL (ရွေးချယ်နိုင်သော)</string>
+    <string name="hint_username_optional_caps">အသုံးပြုသူအမည် (ရွေးချယ်နိုင်သော)</string>
+    <string name="hint_password_optional_caps">စကားဝှက် (ရွေးချယ်နိုင်သော)</string>
+    <string name="hint_auth_type">အထောက်အထား အမျိုးအစား</string>
 
     <!-- Default Values -->
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
-    <string name="default_auth_none">None</string>
+    <string name="default_auth_none">မရှိပါ</string>
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
     <!-- Now Playing Fragment -->
     <string name="now_playing_time_placeholder">00:00</string>
-    <string name="now_playing_live">LIVE</string>
-    <string name="now_playing_no_station">No Station Playing</string>
-    <string name="now_playing_no_station_subtitle">Select a station from the list</string>
-    <string name="now_playing_volume_title">Radio Volume</string>
-    <string name="now_playing_volume_description">Adjusts radio stream only</string>
+    <string name="now_playing_live">တိုက်ရိုက်</string>
+    <string name="now_playing_no_station">စတေးရှင်း မဖွင့်ထားပါ</string>
+    <string name="now_playing_no_station_subtitle">စာရင်းမှ စတေးရှင်းတစ်ခုကို ရွေးချယ်ပါ</string>
+    <string name="now_playing_volume_title">ရေဒီယို အသံအတိုး</string>
+    <string name="now_playing_volume_description">ရေဒီယို ထုတ်လွှင့်မှုကိုသာ ညှိပါ</string>
 
     <!-- Toast Messages -->
-    <string name="toast_session_bandwidth_reset">Session bandwidth reset</string>
-    <string name="toast_custom_proxy_saved">Custom proxy settings saved</string>
-    <string name="toast_custom_proxy_cleared">Custom proxy settings cleared</string>
-    <string name="toast_address_copied">Address copied to clipboard</string>
-    <string name="toast_using_default_directory">Using default directory</string>
+    <string name="toast_session_bandwidth_reset">Session bandwidth ကို ပြန်လည်သတ်မှတ်ပြီးပါပြီ</string>
+    <string name="toast_custom_proxy_saved">စိတ်ကြိုက် proxy ဆက်တင်များကို သိမ်းဆည်းပြီးပါပြီ</string>
+    <string name="toast_custom_proxy_cleared">စိတ်ကြိုက် proxy ဆက်တင်များကို ရှင်းလင်းပြီးပါပြီ</string>
+    <string name="toast_address_copied">လိပ်စာကို clipboard သို့ ကူးယူပြီးပါပြီ</string>
+    <string name="toast_using_default_directory">မူလ ဖိုင်တွဲကို သုံးနေသည်</string>
 
     <!-- Custom Proxy Status Messages -->
-    <string name="custom_proxy_status_connected">Connected</string>
-    <string name="custom_proxy_status_configured">Proxy configured</string>
-    <string name="custom_proxy_status_not_configured">Not Configured</string>
-    <string name="custom_proxy_status_no_proxy">No proxy set</string>
-    <string name="custom_proxy_status_leak_warning">Leak Warning</string>
-    <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+    <string name="custom_proxy_status_connected">ချိတ်ဆက်ပြီးပါပြီ</string>
+    <string name="custom_proxy_status_configured">Proxy ကို ပြင်ဆင်သတ်မှတ်ပြီးပါပြီ</string>
+    <string name="custom_proxy_status_not_configured">ပြင်ဆင်သတ်မှတ်မထားပါ</string>
+    <string name="custom_proxy_status_no_proxy">Proxy မသတ်မှတ်ထားပါ</string>
+    <string name="custom_proxy_status_leak_warning">Leak သတိပေးချက်</string>
+    <string name="custom_proxy_status_leak_detail">အတင်းအဓမ္မ ဖွင့်ထားသော်လည်း ပြင်ဆင်သတ်မှတ်မထားပါ</string>
 
     <!-- Tor Service Notification Messages -->
-    <string name="tor_channel_name">Tor Connection</string>
-    <string name="tor_channel_description">Shows Tor connection status</string>
-    <string name="tor_notification_disconnected">Tor Disconnected</string>
-    <string name="tor_notification_tap_to_open">Tap to open app</string>
-    <string name="tor_notification_connecting">Connecting via Orbot...</string>
-    <string name="tor_notification_please_wait">Please wait</string>
-    <string name="tor_notification_connected">Tor Connected</string>
-    <string name="tor_notification_error">Tor Error</string>
-    <string name="tor_notification_connection_failed">Connection failed</string>
-    <string name="tor_notification_orbot_required">Orbot Required</string>
-    <string name="tor_notification_install_orbot">Please install Orbot for Tor support</string>
-    <string name="tor_notification_action_stop">Stop Tor</string>
+    <string name="tor_channel_name">Tor ချိတ်ဆက်မှု</string>
+    <string name="tor_channel_description">Tor ချိတ်ဆက်မှု အခြေအနေကို ပြသည်</string>
+    <string name="tor_notification_disconnected">Tor ချိတ်ဆက်မထားပါ</string>
+    <string name="tor_notification_tap_to_open">အက်ပ်ကို ဖွင့်ရန် တို့ပါ</string>
+    <string name="tor_notification_connecting">Orbot မှတစ်ဆင့် ချိတ်ဆက်နေသည်...</string>
+    <string name="tor_notification_please_wait">ခဏစောင့်ပါ</string>
+    <string name="tor_notification_connected">Tor ချိတ်ဆက်ပြီးပါပြီ</string>
+    <string name="tor_notification_error">Tor အမှား</string>
+    <string name="tor_notification_connection_failed">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
+    <string name="tor_notification_orbot_required">Orbot လိုအပ်သည်</string>
+    <string name="tor_notification_install_orbot">Tor ပံ့ပိုးမှုအတွက် Orbot ကို တပ်ဆင်ပါ</string>
+    <string name="tor_notification_action_stop">Tor ကို ရပ်ရန်</string>
 
     <!-- Other Error Messages -->
-    <string name="error_unknown">Unknown error</string>
-    <string name="folder_custom">Custom folder</string>
+    <string name="error_unknown">မသိသော အမှား</string>
+    <string name="folder_custom">စိတ်ကြိုက် ဖိုင်တွဲ</string>
 
     <!-- AddEditRadioDialog Default Values -->
-    <string name="default_genre_other">Other</string>
-    <string name="default_proxy_none">None</string>
+    <string name="default_genre_other">အခြား</string>
+    <string name="default_proxy_none">မရှိပါ</string>
     <string name="default_proxy_i2p">I2P</string>
     <string name="default_proxy_tor">Tor</string>
-    <string name="default_proxy_custom">Custom</string>
+    <string name="default_proxy_custom">စိတ်ကြိုက်</string>
     <string name="default_protocol_http">HTTP</string>
     <string name="default_protocol_https">HTTPS</string>
     <string name="default_protocol_socks4">SOCKS4</string>
     <string name="default_protocol_socks5">SOCKS5</string>
-    <string name="default_auth_basic">Basic</string>
+    <string name="default_auth_basic">အခြေခံ</string>
     <string name="default_auth_digest">Digest</string>
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
     <!-- Security & Privacy -->
-    <string name="settings_security_privacy">Security &amp; Privacy</string>
-    <string name="settings_app_lock">App Lock</string>
-    <string name="settings_app_lock_description">Require password or biometric to unlock app</string>
-    <string name="settings_biometric_auth">Biometric Authentication</string>
-    <string name="settings_biometric_auth_description">Use fingerprint or face unlock</string>
-    <string name="settings_require_auth_on_launch">Require Auth on Launch</string>
-    <string name="settings_require_auth_on_launch_description">Always require authentication when opening app</string>
-    <string name="settings_set_password">Set Password</string>
-    <string name="settings_change_password">Change Password</string>
-    <string name="settings_database_encryption">Database Encryption</string>
-    <string name="settings_database_encryption_description">Encrypt entire database with SQLCipher using your app password (requires restart)</string>
-    <string name="settings_database_encryption_warning">Warning: This is an experimental feature. Make sure you have a backup before enabling!</string>
-    <string name="settings_database_encryption_enable_title">Enable Database Encryption?</string>
-    <string name="settings_database_encryption_enable_message">This will encrypt your entire radio database using your app password. The app will restart to apply changes.\n\nWARNING: This is experimental. Make sure you have a backup!</string>
-    <string name="settings_database_encryption_disable_title">Disable Database Encryption?</string>
-    <string name="settings_database_encryption_disable_message">This will decrypt your database and remove encryption. The app will restart to apply changes.</string>
-    <string name="settings_database_encryption_enabled">Database encryption enabled</string>
-    <string name="settings_database_encryption_disabled">Database encryption disabled</string>
-    <string name="settings_database_encryption_error">Failed to change encryption setting</string>
-    <string name="settings_database_encryption_password_required_title">App Password Required</string>
-    <string name="settings_database_encryption_password_required_message">Database encryption uses your app password to generate the encryption key. Please set an app password first by enabling \"App Lock\" above.\n\nOnce set, you can enable database encryption using the same password - no separate password needed.</string>
+    <string name="settings_security_privacy">လုံခြုံရေးနှင့် ကိုယ်ရေးကိုယ်တာ</string>
+    <string name="settings_app_lock">အက်ပ် သော့ခတ်မှု</string>
+    <string name="settings_app_lock_description">အက်ပ်ကို ဖွင့်ရန် စကားဝှက် သို့မဟုတ် ဇီဝအထောက်အထား လိုအပ်ရန်</string>
+    <string name="settings_biometric_auth">ဇီဝအထောက်အထား အတည်ပြုမှု</string>
+    <string name="settings_biometric_auth_description">လက်ဗွေ သို့မဟုတ် မျက်နှာ သော့ဖွင့်မှုကို သုံးပါ</string>
+    <string name="settings_require_auth_on_launch">ဖွင့်သည့်အခါတွင် အထောက်အထား လိုအပ်ရန်</string>
+    <string name="settings_require_auth_on_launch_description">အက်ပ်ကို ဖွင့်သောအခါ အမြဲတမ်း အထောက်အထား လိုအပ်ရန်</string>
+    <string name="settings_set_password">စကားဝှက် သတ်မှတ်ရန်</string>
+    <string name="settings_change_password">စကားဝှက် ပြောင်းလဲရန်</string>
+    <string name="settings_database_encryption">ဒေတာဘေ့စ် ကုဒ်ဝှက်မှု</string>
+    <string name="settings_database_encryption_description">သင့် အက်ပ် စကားဝှက်ကို သုံး၍ SQLCipher ဖြင့် ဒေတာဘေ့စ်တစ်ခုလုံးကို ကုဒ်ဝှက်ပါ (ပြန်လည်စတင်ရန် လိုအပ်သည်)</string>
+    <string name="settings_database_encryption_warning">သတိပေးချက်: ဒါဟာ စမ်းသပ်မှု လုပ်ဆောင်ချက်တစ်ခုပါ။ ဖွင့်မီ အရန်သိမ်းထားပါ!</string>
+    <string name="settings_database_encryption_enable_title">ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို ဖွင့်မလား?</string>
+    <string name="settings_database_encryption_enable_message">ဤသည်က သင့် အက်ပ် စကားဝှက်ကို သုံး၍ သင့် ရေဒီယို ဒေတာဘေ့စ်တစ်ခုလုံးကို ကုဒ်ဝှက်မည်။ အပြောင်းအလဲများ အသုံးချရန် အက်ပ်ကို ပြန်လည်စတင်မည်။\n\nသတိပေးချက်: ဒါဟာ စမ်းသပ်မှုပါ။ အရန်သိမ်းထားပါ!</string>
+    <string name="settings_database_encryption_disable_title">ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို ပိတ်မလား?</string>
+    <string name="settings_database_encryption_disable_message">ဤသည်က သင့် ဒေတာဘေ့စ်ကို ကုဒ်ဖြည်ပြီး ကုဒ်ဝှက်မှုကို ဖယ်ရှားမည်။ အပြောင်းအလဲများ အသုံးချရန် အက်ပ်ကို ပြန်လည်စတင်မည်။</string>
+    <string name="settings_database_encryption_enabled">ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို ဖွင့်ပြီးပါပြီ</string>
+    <string name="settings_database_encryption_disabled">ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို ပိတ်ပြီးပါပြီ</string>
+    <string name="settings_database_encryption_error">ကုဒ်ဝှက်မှု ဆက်တင်ကို ပြောင်းလဲ၍ မရပါ</string>
+    <string name="settings_database_encryption_password_required_title">အက်ပ် စကားဝှက် လိုအပ်သည်</string>
+    <string name="settings_database_encryption_password_required_message">ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုသည် ကုဒ်ဝှက်မှု သော့ကို ဖန်တီးရန် သင့် အက်ပ် စကားဝှက်ကို သုံးသည်။ ဦးစွာ အပေါ်က \"အက်ပ် သော့ခတ်မှု\" ကို ဖွင့်ပြီး အက်ပ် စကားဝှက်ကို သတ်မှတ်ပါ။\n\nသတ်မှတ်ပြီးရင် တူညီသော စကားဝှက်ကို သုံး၍ ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို ဖွင့်နိုင်ပါသည် - သီးခြား စကားဝှက် မလိုပါ။</string>
 
     <!-- Authentication Dialog -->
-    <string name="auth_dialog_title">Set App Password</string>
-    <string name="auth_dialog_change_title">Change Password</string>
-    <string name="auth_dialog_change_message">Note: If database encryption is enabled, it will be automatically updated to use the new password.</string>
-    <string name="auth_dialog_current_password">Current Password</string>
-    <string name="auth_dialog_new_password">New Password</string>
-    <string name="auth_dialog_confirm_password">Confirm Password</string>
-    <string name="auth_dialog_set">Set Password</string>
-    <string name="auth_dialog_change">Change Password</string>
-    <string name="auth_error_passwords_dont_match">Passwords don\'t match</string>
-    <string name="auth_error_password_too_short">Password must be at least 4 characters</string>
-    <string name="auth_error_current_password_wrong">Current password is incorrect</string>
-    <string name="auth_password_set">Password set successfully</string>
-    <string name="auth_password_changed">Password changed successfully</string>
-    <string name="auth_enter_password_to_encrypt">Verify Your App Password</string>
-    <string name="auth_enter_password_to_decrypt">Verify Your App Password</string>
-    <string name="auth_password_for_encryption">Enter your existing app password to enable database encryption.\n\nYour app password will be used to derive the encryption key. No separate password is needed.</string>
-    <string name="auth_password_for_decryption">Enter your app password to verify and decrypt the database before disabling encryption.</string>
-    <string name="auth_encrypting_database">Encrypting database with your app password…</string>
-    <string name="auth_decrypting_database">Decrypting database…</string>
-    <string name="auth_rekeying_database">Updating database encryption with new password…</string>
+    <string name="auth_dialog_title">အက်ပ် စကားဝှက် သတ်မှတ်ရန်</string>
+    <string name="auth_dialog_change_title">စကားဝှက် ပြောင်းလဲရန်</string>
+    <string name="auth_dialog_change_message">မှတ်ချက်: ဒေတာဘေ့စ် ကုဒ်ဝှက်မှု ဖွင့်ထားရင် စကားဝှက်အသစ်ကို သုံးရန် အလိုအလျောက် အပ်ဒိတ်လုပ်မည်။</string>
+    <string name="auth_dialog_current_password">လက်ရှိ စကားဝှက်</string>
+    <string name="auth_dialog_new_password">စကားဝှက်အသစ်</string>
+    <string name="auth_dialog_confirm_password">စကားဝှက်ကို အတည်ပြုပါ</string>
+    <string name="auth_dialog_set">စကားဝှက် သတ်မှတ်ရန်</string>
+    <string name="auth_dialog_change">စကားဝှက် ပြောင်းလဲရန်</string>
+    <string name="auth_error_passwords_dont_match">စကားဝှက်များ မတူပါ</string>
+    <string name="auth_error_password_too_short">စကားဝှက်သည် အနည်းဆုံး ၄ လုံး ရှိရမည်</string>
+    <string name="auth_error_current_password_wrong">လက်ရှိ စကားဝှက် မမှန်ပါ</string>
+    <string name="auth_password_set">စကားဝှက်ကို သတ်မှတ်ပြီးပါပြီ</string>
+    <string name="auth_password_changed">စကားဝှက်ကို ပြောင်းလဲပြီးပါပြီ</string>
+    <string name="auth_enter_password_to_encrypt">သင့် အက်ပ် စကားဝှက်ကို အတည်ပြုပါ</string>
+    <string name="auth_enter_password_to_decrypt">သင့် အက်ပ် စကားဝှက်ကို အတည်ပြုပါ</string>
+    <string name="auth_password_for_encryption">ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို ဖွင့်ရန် သင့် လက်ရှိ အက်ပ် စကားဝှက်ကို ထည့်ပါ။\n\nကုဒ်ဝှက်မှု သော့ကို ဖန်တီးရန် သင့် အက်ပ် စကားဝှက်ကို သုံးမည်။ သီးခြား စကားဝှက် မလိုပါ။</string>
+    <string name="auth_password_for_decryption">ကုဒ်ဝှက်မှုကို ပိတ်မီ ဒေတာဘေ့စ်ကို အတည်ပြုပြီး ကုဒ်ဖြည်ရန် သင့် အက်ပ် စကားဝှက်ကို ထည့်ပါ။</string>
+    <string name="auth_encrypting_database">သင့် အက်ပ် စကားဝှက်ဖြင့် ဒေတာဘေ့စ်ကို ကုဒ်ဝှက်နေသည်…</string>
+    <string name="auth_decrypting_database">ဒေတာဘေ့စ်ကို ကုဒ်ဖြည်နေသည်…</string>
+    <string name="auth_rekeying_database">စကားဝှက်အသစ်ဖြင့် ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို အပ်ဒိတ်လုပ်နေသည်…</string>
 
     <!-- Authentication Activity -->
-    <string name="auth_unlock_app">Unlock deutsia radio</string>
-    <string name="auth_enter_password">Enter your password</string>
-    <string name="auth_password_hint">Password</string>
-    <string name="auth_unlock_button">Unlock</string>
-    <string name="auth_use_biometric">Use Biometric</string>
-    <string name="auth_error_wrong_password">Wrong password</string>
-    <string name="auth_biometric_title">Unlock deutsia radio</string>
-    <string name="auth_biometric_subtitle">Authenticate to continue</string>
-    <string name="auth_biometric_negative">Use Password</string>
+    <string name="auth_unlock_app">deutsia radio ကို သော့ဖွင့်ပါ</string>
+    <string name="auth_enter_password">သင့်စကားဝှက်ကို ထည့်ပါ</string>
+    <string name="auth_password_hint">စကားဝှက်</string>
+    <string name="auth_unlock_button">သော့ဖွင့်ရန်</string>
+    <string name="auth_use_biometric">ဇီဝအထောက်အထား သုံးပါ</string>
+    <string name="auth_error_wrong_password">စကားဝှက် မမှန်ပါ</string>
+    <string name="auth_biometric_title">deutsia radio ကို သော့ဖွင့်ပါ</string>
+    <string name="auth_biometric_subtitle">ဆက်လက်လုပ်ဆောင်ရန် အထောက်အထား အတည်ပြုပါ</string>
+    <string name="auth_biometric_negative">စကားဝှက် သုံးပါ</string>
 </resources>
