@@ -47,6 +47,12 @@ object PreferencesHelper {
     private const val KEY_BANDWIDTH_USAGE_SESSION = "bandwidth_usage_session"
     private const val KEY_BANDWIDTH_USAGE_LAST_RESET = "bandwidth_usage_last_reset"
 
+    // Authentication settings
+    private const val KEY_BIOMETRIC_AUTH_ENABLED = "biometric_auth_enabled"
+    private const val KEY_PASSWORD_AUTH_ENABLED = "password_auth_enabled"
+    private const val KEY_PASSWORD_HASH = "password_hash"
+    private const val KEY_LAST_AUTH_TIMESTAMP = "last_auth_timestamp"
+
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
@@ -654,5 +660,77 @@ object PreferencesHelper {
             bytes < 1024 * 1024 * 1024 -> String.format("%.2f MB", bytes / (1024.0 * 1024.0))
             else -> String.format("%.2f GB", bytes / (1024.0 * 1024.0 * 1024.0))
         }
+    }
+
+    // Authentication settings
+    /**
+     * Enable/disable biometric authentication.
+     * When enabled, the app will require biometric authentication (fingerprint/face) on startup.
+     */
+    fun setBiometricAuthEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_BIOMETRIC_AUTH_ENABLED, enabled)
+            .apply()
+    }
+
+    fun isBiometricAuthEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_BIOMETRIC_AUTH_ENABLED, false)
+    }
+
+    /**
+     * Enable/disable password authentication.
+     * When enabled, the app will require password authentication on startup.
+     */
+    fun setPasswordAuthEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_PASSWORD_AUTH_ENABLED, enabled)
+            .apply()
+    }
+
+    fun isPasswordAuthEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_PASSWORD_AUTH_ENABLED, false)
+    }
+
+    /**
+     * Set password hash for authentication.
+     * The password is hashed using SHA-256 before storage.
+     */
+    fun setPasswordHash(context: Context, hash: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_PASSWORD_HASH, hash)
+            .apply()
+    }
+
+    fun getPasswordHash(context: Context): String? {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_PASSWORD_HASH, null)
+    }
+
+    /**
+     * Check if any authentication method is enabled.
+     */
+    fun isAuthenticationEnabled(context: Context): Boolean {
+        return isBiometricAuthEnabled(context) || isPasswordAuthEnabled(context)
+    }
+
+    /**
+     * Set the last authentication timestamp.
+     * Used to determine if re-authentication is needed.
+     */
+    fun setLastAuthTimestamp(context: Context, timestamp: Long) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putLong(KEY_LAST_AUTH_TIMESTAMP, timestamp)
+            .apply()
+    }
+
+    fun getLastAuthTimestamp(context: Context): Long {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(KEY_LAST_AUTH_TIMESTAMP, 0L)
     }
 }

@@ -21,6 +21,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.textfield.TextInputEditText
+import com.opensource.i2pradio.auth.AuthenticationManager
 import com.opensource.i2pradio.ui.SettingsFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
@@ -58,6 +60,8 @@ class MainActivity : AppCompatActivity() {
     private var miniPlayerManuallyClosed = false
     private var lastStationId: Long? = null
     private var lastStationUrl: String? = null  // Use URL to detect station changes for unsaved stations
+    private var isAuthenticated = false
+    private var authenticationAttempts = 0
 
     // Tor state listener
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
@@ -161,6 +165,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Check if authentication is required
+        if (PreferencesHelper.isAuthenticationEnabled(this)) {
+            showAuthenticationDialog()
+            return // Don't initialize the rest of the app until authenticated
+        } else {
+            isAuthenticated = true
+        }
+
+        initializeApp()
+    }
+
+    /**
+     * Initialize the app after authentication (or if authentication is not required)
+     */
+    private fun initializeApp() {
         repository = RadioRepository(this)
         radioBrowserRepository = RadioBrowserRepository(this)
 
@@ -533,6 +552,105 @@ class MainActivity : AppCompatActivity() {
 
         // Broadcast action for proxy mode changes
         const val BROADCAST_PROXY_MODE_CHANGED = "com.opensource.i2pradio.PROXY_MODE_CHANGED"
+    }
+
+    /**
+     * Show authentication dialog (biometric or password)
+     */
+    private fun showAuthenticationDialog() {
+        val biometricEnabled = PreferencesHelper.isBiometricAuthEnabled(this)
+        val passwordEnabled = PreferencesHelper.isPasswordAuthEnabled(this)
+
+        // Try biometric first if available and enabled
+        if (biometricEnabled && AuthenticationManager.isBiometricAvailable(this)) {
+            AuthenticationManager.showBiometricPrompt(
+                this,
+                getString(R.string.biometric_auth_title),
+                getString(R.string.biometric_auth_subtitle),
+                onSuccess = {
+                    onAuthenticationSuccess()
+                },
+                onError = { error ->
+                    if (error == "FALLBACK_TO_PASSWORD" && passwordEnabled) {
+                        // User clicked "Use Password" button
+                        showPasswordAuthenticationDialog()
+                    } else if (error == "Authentication cancelled") {
+                        // User cancelled - close the app
+                        finish()
+                    } else {
+                        // Other error - show password dialog if available, otherwise close app
+                        if (passwordEnabled) {
+                            showPasswordAuthenticationDialog()
+                        } else {
+                            Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                            finish()
+                        }
+                    }
+                },
+                allowPasswordFallback = passwordEnabled
+            )
+        } else if (passwordEnabled) {
+            // Show password dialog
+            showPasswordAuthenticationDialog()
+        } else {
+            // No authentication method configured (shouldn't happen)
+            isAuthenticated = true
+            initializeApp()
+        }
+    }
+
+    /**
+     * Show password authentication dialog
+     */
+    private fun showPasswordAuthenticationDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_password_auth, null)
+        val passwordInput = dialogView.findViewById<TextInputEditText>(R.id.passwordInput)
+        val passwordInputLayout = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.passwordInputLayout)
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.cancelButton).setOnClickListener {
+            dialog.dismiss()
+            finish() // Close app if user cancels authentication
+        }
+
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.confirmButton).setOnClickListener {
+            val password = passwordInput.text.toString()
+
+            if (AuthenticationManager.verifyPassword(password, this)) {
+                passwordInputLayout.error = null
+                dialog.dismiss()
+                onAuthenticationSuccess()
+            } else {
+                authenticationAttempts++
+                passwordInputLayout.error = getString(R.string.incorrect_password)
+
+                // Lock out after too many attempts
+                if (authenticationAttempts >= 5) {
+                    Toast.makeText(this, "Too many failed attempts", Toast.LENGTH_LONG).show()
+                    dialog.dismiss()
+                    finish()
+                }
+            }
+        }
+
+        // Set focus on password input and show keyboard
+        passwordInput.requestFocus()
+
+        dialog.show()
+    }
+
+    /**
+     * Called when authentication succeeds
+     */
+    private fun onAuthenticationSuccess() {
+        isAuthenticated = true
+        authenticationAttempts = 0
+        PreferencesHelper.setLastAuthTimestamp(this, System.currentTimeMillis())
+        initializeApp()
     }
 
     private inner class ViewPagerAdapter(activity: AppCompatActivity) :

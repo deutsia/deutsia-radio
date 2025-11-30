@@ -275,4 +275,38 @@
     <string name="default_auth_digest">Digest</string>
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
+
+    <!-- Authentication Settings -->
+    <string name="settings_authentication">Authentication</string>
+    <string name="settings_biometric_auth">Biometric Authentication</string>
+    <string name="settings_biometric_auth_description">Require fingerprint or face unlock when opening the app</string>
+    <string name="settings_password_auth">Password Authentication</string>
+    <string name="settings_password_auth_description">Require password when opening the app</string>
+    <string name="settings_change_password">Change Password</string>
+
+    <!-- Password Setup Dialog -->
+    <string name="set_password">Set Password</string>
+    <string name="password_setup_message">Create a password to protect your app. Minimum 4 characters.</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="passwords_dont_match">Passwords don\'t match</string>
+    <string name="password_too_short">Password must be at least 4 characters</string>
+    <string name="password_set_successfully">Password set successfully</string>
+    <string name="password_changed_successfully">Password changed successfully</string>
+
+    <!-- Password Authentication Dialog -->
+    <string name="enter_password">Enter Password</string>
+    <string name="password_auth_message">Enter your password to unlock the app</string>
+    <string name="unlock">Unlock</string>
+    <string name="incorrect_password">Incorrect password</string>
+    <string name="authentication_required">Authentication Required</string>
+
+    <!-- Biometric Authentication -->
+    <string name="biometric_auth_title">Unlock App</string>
+    <string name="biometric_auth_subtitle">Use biometric authentication to unlock</string>
+    <string name="biometric_not_available">Biometric authentication not available</string>
+    <string name="biometric_not_enrolled">No biometric credentials enrolled. Please set up fingerprint or face unlock in your device settings.</string>
+    <string name="authentication_failed">Authentication failed</string>
+    <string name="authentication_cancelled">Authentication cancelled</string>
+    <string name="authentication_success">Authentication successful</string>
 </resources>

@@ -34,6 +34,7 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.auth.AuthenticationManager
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
@@ -87,6 +88,12 @@ class SettingsFragment : Fragment() {
     private var bandwidthTotalText: TextView? = null
     private var bandwidthSessionText: TextView? = null
     private var resetBandwidthButton: MaterialButton? = null
+
+    // Authentication UI elements
+    private var biometricAuthSwitch: MaterialSwitch? = null
+    private var biometricAuthDescription: TextView? = null
+    private var passwordAuthSwitch: MaterialSwitch? = null
+    private var changePasswordButton: MaterialButton? = null
 
     // Bandwidth update broadcast receiver
     private val bandwidthUpdateReceiver = object : BroadcastReceiver() {
@@ -438,6 +445,12 @@ class SettingsFragment : Fragment() {
         bandwidthSessionText = view.findViewById(R.id.bandwidthSessionText)
         resetBandwidthButton = view.findViewById(R.id.resetBandwidthButton)
 
+        // Authentication UI elements
+        biometricAuthSwitch = view.findViewById(R.id.biometricAuthSwitch)
+        biometricAuthDescription = view.findViewById(R.id.biometricAuthDescription)
+        passwordAuthSwitch = view.findViewById(R.id.passwordAuthSwitch)
+        changePasswordButton = view.findViewById(R.id.changePasswordButton)
+
         // Setup custom proxy controls
         setupCustomProxyControls()
 
@@ -446,6 +459,9 @@ class SettingsFragment : Fragment() {
 
         // Setup Tor controls
         setupTorControls()
+
+        // Setup authentication controls
+        setupAuthenticationControls()
 
         // Bind to RadioService to get audio session ID
         val serviceIntent = Intent(requireContext(), RadioService::class.java)
@@ -1793,6 +1809,184 @@ class SettingsFragment : Fragment() {
         }
 
         return true
+    }
+
+    /**
+     * Setup authentication controls (biometric and password)
+     */
+    private fun setupAuthenticationControls() {
+        // Check biometric availability and update description
+        val biometricAvailable = AuthenticationManager.isBiometricAvailable(requireContext())
+        val biometricStatusMessage = AuthenticationManager.getBiometricStatusMessage(requireContext())
+
+        biometricAuthDescription?.text = if (biometricAvailable) {
+            getString(R.string.settings_biometric_auth_description)
+        } else {
+            biometricStatusMessage
+        }
+
+        // Initialize switches
+        biometricAuthSwitch?.isChecked = PreferencesHelper.isBiometricAuthEnabled(requireContext())
+        passwordAuthSwitch?.isChecked = PreferencesHelper.isPasswordAuthEnabled(requireContext())
+
+        // Enable/disable biometric switch based on availability
+        biometricAuthSwitch?.isEnabled = biometricAvailable
+
+        // Show/hide change password button
+        updateChangePasswordButtonVisibility()
+
+        // Biometric auth switch listener
+        biometricAuthSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            if (!biometricAvailable && isChecked) {
+                Toast.makeText(requireContext(), biometricStatusMessage, Toast.LENGTH_LONG).show()
+                switch.isChecked = false
+                return@setOnCheckedChangeListener
+            }
+
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            if (isChecked) {
+                // Test biometric before enabling
+                AuthenticationManager.showBiometricPrompt(
+                    requireActivity(),
+                    getString(R.string.settings_biometric_auth),
+                    getString(R.string.settings_biometric_auth_description),
+                    onSuccess = {
+                        PreferencesHelper.setBiometricAuthEnabled(requireContext(), true)
+                        Toast.makeText(requireContext(), getString(R.string.authentication_success), Toast.LENGTH_SHORT).show()
+                    },
+                    onError = { error ->
+                        switch.isChecked = false
+                        if (error != "FALLBACK_TO_PASSWORD" && error != "Authentication cancelled") {
+                            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+            } else {
+                PreferencesHelper.setBiometricAuthEnabled(requireContext(), false)
+            }
+        }
+
+        // Password auth switch listener
+        passwordAuthSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            if (isChecked) {
+                if (!AuthenticationManager.isPasswordConfigured(requireContext())) {
+                    // Show password setup dialog
+                    showPasswordSetupDialog { success ->
+                        if (success) {
+                            PreferencesHelper.setPasswordAuthEnabled(requireContext(), true)
+                            updateChangePasswordButtonVisibility()
+                            Toast.makeText(requireContext(), getString(R.string.password_set_successfully), Toast.LENGTH_SHORT).show()
+                        } else {
+                            switch.isChecked = false
+                        }
+                    }
+                } else {
+                    PreferencesHelper.setPasswordAuthEnabled(requireContext(), true)
+                    updateChangePasswordButtonVisibility()
+                }
+            } else {
+                PreferencesHelper.setPasswordAuthEnabled(requireContext(), false)
+                updateChangePasswordButtonVisibility()
+            }
+        }
+
+        // Change password button listener
+        changePasswordButton?.setOnClickListener {
+            showPasswordSetupDialog { success ->
+                if (success) {
+                    Toast.makeText(requireContext(), getString(R.string.password_changed_successfully), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    /**
+     * Update visibility of change password button
+     */
+    private fun updateChangePasswordButtonVisibility() {
+        val passwordConfigured = AuthenticationManager.isPasswordConfigured(requireContext())
+        val passwordEnabled = PreferencesHelper.isPasswordAuthEnabled(requireContext())
+        changePasswordButton?.visibility = if (passwordConfigured && passwordEnabled) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Show password setup/change dialog
+     */
+    private fun showPasswordSetupDialog(callback: (Boolean) -> Unit) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_password_setup, null)
+        val passwordInput = dialogView.findViewById<TextInputEditText>(R.id.passwordInput)
+        val confirmPasswordInput = dialogView.findViewById<TextInputEditText>(R.id.confirmPasswordInput)
+        val passwordInputLayout = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.passwordInputLayout)
+        val confirmPasswordInputLayout = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.confirmPasswordInputLayout)
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        dialogView.findViewById<MaterialButton>(R.id.cancelButton).setOnClickListener {
+            dialog.dismiss()
+            callback(false)
+        }
+
+        dialogView.findViewById<MaterialButton>(R.id.confirmButton).setOnClickListener {
+            val password = passwordInput.text.toString()
+            val confirmPassword = confirmPasswordInput.text.toString()
+
+            // Clear previous errors
+            passwordInputLayout.error = null
+            confirmPasswordInputLayout.error = null
+
+            // Validate password
+            val validationError = AuthenticationManager.validatePasswordStrength(password)
+            if (validationError != null) {
+                passwordInputLayout.error = validationError
+                return@setOnClickListener
+            }
+
+            // Check if passwords match
+            if (password != confirmPassword) {
+                confirmPasswordInputLayout.error = getString(R.string.passwords_dont_match)
+                return@setOnClickListener
+            }
+
+            // Set password
+            AuthenticationManager.setPassword(password, requireContext())
+            dialog.dismiss()
+            callback(true)
+        }
+
+        dialog.show()
     }
 
 
