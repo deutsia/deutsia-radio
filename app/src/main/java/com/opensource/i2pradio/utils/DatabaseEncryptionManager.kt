@@ -190,36 +190,58 @@ object DatabaseEncryptionManager {
         val dbPath = context.getDatabasePath(dbName).absolutePath
         val tempDbPath = "$dbPath.encrypted"
 
+        var unencryptedDb: SQLiteDatabase? = null
         try {
-            // Open unencrypted database
-            val unencryptedDb = SQLiteDatabase.openDatabase(
-                dbPath,
-                "",
-                null,
-                SQLiteDatabase.OPEN_READWRITE,
-                null
-            )
+            // Clean up WAL and SHM files from Room's WAL mode
+            deleteWalFiles(dbPath)
 
-            // Export to encrypted database
-            unencryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS encrypted KEY x'${passphrase.toHexString()}'")
-            unencryptedDb.rawExecSQL("SELECT sqlcipher_export('encrypted')")
-            unencryptedDb.rawExecSQL("DETACH DATABASE encrypted")
+            // Open unencrypted database with empty key
+            // For plaintext databases, SQLCipher needs to be told explicitly
+            unencryptedDb = SQLiteDatabase.openOrCreateDatabase(dbPath, "", null, null)
+
+            // Set empty key for plaintext database
+            unencryptedDb.rawExecSQL("PRAGMA key = '';")
+
+            // Verify we can read the database
+            unencryptedDb.rawExecSQL("SELECT count(*) FROM sqlite_master;")
+
+            // Create hex string for the passphrase
+            val passphraseHex = passphrase.toHexString()
+
+            // Export to encrypted database using proper SQLCipher syntax
+            // Note: The KEY parameter must use double quotes around x'...'
+            unencryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS encrypted KEY \"x'$passphraseHex'\";")
+            unencryptedDb.rawExecSQL("SELECT sqlcipher_export('encrypted');")
+            unencryptedDb.rawExecSQL("DETACH DATABASE encrypted;")
             unencryptedDb.close()
+            unencryptedDb = null
 
             // Replace original with encrypted version
             val originalFile = java.io.File(dbPath)
             val encryptedFile = java.io.File(tempDbPath)
 
+            if (!encryptedFile.exists()) {
+                throw IllegalStateException("Encrypted database file was not created")
+            }
+
             originalFile.delete()
-            encryptedFile.renameTo(originalFile)
+            if (!encryptedFile.renameTo(originalFile)) {
+                throw IllegalStateException("Failed to rename encrypted database")
+            }
+
+            // Clean up any remaining WAL files
+            deleteWalFiles(dbPath)
 
             android.util.Log.i("DatabaseEncryption", "Database encrypted successfully")
         } catch (e: Exception) {
             android.util.Log.e("DatabaseEncryption", "Failed to encrypt database", e)
-            // Clean up temporary file
+            // Clean up temporary files
             java.io.File(tempDbPath).delete()
+            java.io.File("$tempDbPath-wal").delete()
+            java.io.File("$tempDbPath-shm").delete()
             throw e
         } finally {
+            unencryptedDb?.close()
             passphrase.fill(0)
         }
     }
@@ -236,38 +258,66 @@ object DatabaseEncryptionManager {
         val dbPath = context.getDatabasePath(dbName).absolutePath
         val tempDbPath = "$dbPath.decrypted"
 
+        var encryptedDb: SQLiteDatabase? = null
         try {
-            // Open encrypted database using hex string representation
+            // Clean up WAL and SHM files from Room's WAL mode
+            deleteWalFiles(dbPath)
+
+            // Open encrypted database using passphrase
             val passphraseHex = passphrase.toHexString()
-            val encryptedDb = SQLiteDatabase.openDatabase(
-                dbPath,
-                passphraseHex,
-                null,
-                SQLiteDatabase.OPEN_READWRITE,
-                null
-            )
+            encryptedDb = SQLiteDatabase.openOrCreateDatabase(dbPath, passphraseHex, null, null)
+
+            // Verify we can read the encrypted database
+            encryptedDb.rawExecSQL("SELECT count(*) FROM sqlite_master;")
 
             // Export to unencrypted database
-            encryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS plaintext KEY ''")
-            encryptedDb.rawExecSQL("SELECT sqlcipher_export('plaintext')")
-            encryptedDb.rawExecSQL("DETACH DATABASE plaintext")
+            encryptedDb.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS plaintext KEY '';")
+            encryptedDb.rawExecSQL("SELECT sqlcipher_export('plaintext');")
+            encryptedDb.rawExecSQL("DETACH DATABASE plaintext;")
             encryptedDb.close()
+            encryptedDb = null
 
             // Replace original with unencrypted version
             val originalFile = java.io.File(dbPath)
             val decryptedFile = java.io.File(tempDbPath)
 
+            if (!decryptedFile.exists()) {
+                throw IllegalStateException("Decrypted database file was not created")
+            }
+
             originalFile.delete()
-            decryptedFile.renameTo(originalFile)
+            if (!decryptedFile.renameTo(originalFile)) {
+                throw IllegalStateException("Failed to rename decrypted database")
+            }
+
+            // Clean up any remaining WAL files
+            deleteWalFiles(dbPath)
 
             android.util.Log.i("DatabaseEncryption", "Database decrypted successfully")
         } catch (e: Exception) {
             android.util.Log.e("DatabaseEncryption", "Failed to decrypt database", e)
-            // Clean up temporary file
+            // Clean up temporary files
             java.io.File(tempDbPath).delete()
+            java.io.File("$tempDbPath-wal").delete()
+            java.io.File("$tempDbPath-shm").delete()
             throw e
         } finally {
+            encryptedDb?.close()
             passphrase.fill(0)
+        }
+    }
+
+    /**
+     * Delete WAL and SHM files associated with a database
+     * Room uses WAL mode by default, which creates these files
+     */
+    private fun deleteWalFiles(dbPath: String) {
+        try {
+            java.io.File("$dbPath-wal").delete()
+            java.io.File("$dbPath-shm").delete()
+            java.io.File("$dbPath-journal").delete()
+        } catch (e: Exception) {
+            android.util.Log.w("DatabaseEncryption", "Failed to delete WAL files", e)
         }
     }
 }

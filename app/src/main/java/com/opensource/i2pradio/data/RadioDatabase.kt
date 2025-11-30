@@ -201,6 +201,15 @@ abstract class RadioDatabase : RoomDatabase() {
          */
         fun closeDatabase() {
             synchronized(this) {
+                try {
+                    // Checkpoint WAL to ensure all data is written to main database file
+                    INSTANCE?.openHelper?.writableDatabase?.let { db ->
+                        db.query("PRAGMA wal_checkpoint(FULL)", null)
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.w("RadioDatabase", "Failed to checkpoint WAL", e)
+                }
+
                 INSTANCE?.close()
                 INSTANCE = null
             }
