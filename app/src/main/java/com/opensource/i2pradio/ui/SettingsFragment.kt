@@ -2053,6 +2053,7 @@ class SettingsFragment : Fragment() {
 
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.auth_dialog_change_title)
+            .setMessage(R.string.auth_dialog_change_message)
             .setView(dialogView)
             .setPositiveButton(R.string.auth_dialog_change) { _, _ ->
                 val currentPassword = currentInput.text.toString()
@@ -2075,7 +2076,7 @@ class SettingsFragment : Fragment() {
                         if (com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(requireContext())) {
                             // Show progress dialog for re-keying
                             val progressDialog = AlertDialog.Builder(requireContext())
-                                .setMessage("Re-keying database with new password...")
+                                .setMessage(R.string.auth_rekeying_database)
                                 .setCancelable(false)
                                 .create()
                             progressDialog.show()
@@ -2235,7 +2236,7 @@ class SettingsFragment : Fragment() {
 
                 // Show progress dialog
                 val progressDialog = AlertDialog.Builder(requireContext())
-                    .setMessage("Encrypting database...")
+                    .setMessage(R.string.auth_encrypting_database)
                     .setCancelable(false)
                     .create()
                 progressDialog.show()
@@ -2332,7 +2333,7 @@ class SettingsFragment : Fragment() {
 
                 // Show progress dialog
                 val progressDialog = AlertDialog.Builder(requireContext())
-                    .setMessage("Decrypting database...")
+                    .setMessage(R.string.auth_decrypting_database)
                     .setCancelable(false)
                     .create()
                 progressDialog.show()
