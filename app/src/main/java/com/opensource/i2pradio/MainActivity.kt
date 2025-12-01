@@ -188,11 +188,13 @@ class MainActivity : AppCompatActivity() {
             // Apply custom color scheme based on user preference
             val colorScheme = PreferencesHelper.getColorScheme(this)
             val themeResId = when (colorScheme) {
+                "classic" -> R.style.Theme_I2PRadio // Classic theme (default)
+                "blue" -> R.style.Theme_I2PRadio_Blue
                 "peach" -> R.style.Theme_I2PRadio_Peach
                 "green" -> R.style.Theme_I2PRadio_Green
                 "purple" -> R.style.Theme_I2PRadio_Purple
                 "orange" -> R.style.Theme_I2PRadio_Orange
-                else -> R.style.Theme_I2PRadio // default blue
+                else -> R.style.Theme_I2PRadio // default to Classic for backward compatibility
             }
             setTheme(themeResId)
         } else {

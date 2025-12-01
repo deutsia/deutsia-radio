@@ -1070,24 +1070,31 @@ class SettingsFragment : Fragment() {
     private fun updateColorSchemeButtonText(button: MaterialButton) {
         val currentScheme = PreferencesHelper.getColorScheme(requireContext())
         button.text = when (currentScheme) {
+            "classic" -> getString(R.string.settings_color_classic)
+            "blue" -> getString(R.string.settings_color_blue)
             "peach" -> getString(R.string.settings_color_peach)
             "green" -> getString(R.string.settings_color_green)
             "purple" -> getString(R.string.settings_color_purple)
             "orange" -> getString(R.string.settings_color_orange)
-            else -> getString(R.string.settings_color_blue)
+            else -> getString(R.string.settings_color_classic) // default to Classic for backward compatibility
         }
     }
 
     private fun showColorSchemeDialog(colorSchemeButton: MaterialButton) {
         val schemes = arrayOf(
-            getString(R.string.settings_color_blue_default),
+            getString(R.string.settings_color_classic_default),
+            getString(R.string.settings_color_blue),
             getString(R.string.settings_color_peach),
             getString(R.string.settings_color_green),
             getString(R.string.settings_color_purple),
             getString(R.string.settings_color_orange)
         )
-        val schemeValues = arrayOf("default", "peach", "green", "purple", "orange")
-        val currentScheme = PreferencesHelper.getColorScheme(requireContext())
+        val schemeValues = arrayOf("classic", "blue", "peach", "green", "purple", "orange")
+        var currentScheme = PreferencesHelper.getColorScheme(requireContext())
+        // Migrate "default" to "classic" for backward compatibility
+        if (currentScheme == "default") {
+            currentScheme = "classic"
+        }
         val selectedIndex = schemeValues.indexOf(currentScheme).coerceAtLeast(0)
 
         AlertDialog.Builder(requireContext())
