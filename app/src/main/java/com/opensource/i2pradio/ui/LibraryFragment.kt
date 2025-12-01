@@ -435,7 +435,7 @@ class LibraryFragment : Fragment() {
                     currentGenreFilter = if (tempSelectedGenre == allGenresText || tempSelectedGenre == null) {
                         null
                     } else {
-                        getEnglishGenreName( tempSelectedGenre)
+                        getEnglishGenreName(tempSelectedGenre)
                     }
                     PreferencesHelper.setGenreFilter(requireContext(), currentGenreFilter)
                     updateGenreFilterButtonText()
