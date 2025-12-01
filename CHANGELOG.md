@@ -11,4 +11,4 @@
 - Multi-word search optimization in browse tab
 
 ### Fixed
-- Bug fixes
+- Numerous minor bug fixes
