@@ -209,11 +209,11 @@ abstract class RadioDatabase : RoomDatabase() {
             return synchronized(this) {
                 // Check again inside synchronized block - another thread might have initialized it
                 INSTANCE ?: run {
-                    // Initialize SQLCipher
-                    DatabaseEncryptionManager.initializeSQLCipher(context)
-
                     // Get SupportFactory for encryption (null if encryption disabled or no password set)
                     val supportFactory = if (DatabaseEncryptionManager.isDatabaseEncryptionEnabled(context)) {
+                        // Initialize SQLCipher only when encryption is enabled
+                        DatabaseEncryptionManager.initializeSQLCipher(context)
+
                         val password = sessionPassword
                             ?: throw IllegalStateException(
                                 "Database encryption is enabled but session password not set. " +
