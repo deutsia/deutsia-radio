@@ -2,7 +2,9 @@ package com.opensource.i2pradio.ui
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.utils.PasswordEncryptionUtil
+import org.json.JSONObject
 
 object PreferencesHelper {
     private const val PREFS_NAME = "DeutsiaRadioPrefs"
@@ -53,6 +55,9 @@ object PreferencesHelper {
     private const val KEY_APP_LOCK_ENABLED = "app_lock_enabled"
     private const val KEY_BIOMETRIC_ENABLED = "biometric_enabled"
     private const val KEY_REQUIRE_AUTH_ON_LAUNCH = "require_auth_on_launch"
+
+    // Currently playing station persistence
+    private const val KEY_CURRENT_STATION_JSON = "current_station_json"
 
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -763,5 +768,118 @@ object PreferencesHelper {
     fun isRequireAuthOnLaunch(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_REQUIRE_AUTH_ON_LAUNCH, true)
+    }
+
+    // ===== Currently Playing Station Persistence =====
+
+    /**
+     * Save the currently playing station to persistent storage.
+     * This ensures the UI can restore the station info when MainActivity is recreated.
+     */
+    fun saveCurrentStation(context: Context, station: RadioStation?) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+        if (station == null) {
+            // Clear the saved station
+            prefs.edit()
+                .remove(KEY_CURRENT_STATION_JSON)
+                .apply()
+            return
+        }
+
+        try {
+            // Serialize RadioStation to JSON
+            val json = JSONObject().apply {
+                put("id", station.id)
+                put("name", station.name)
+                put("streamUrl", station.streamUrl)
+                put("proxyHost", station.proxyHost)
+                put("proxyPort", station.proxyPort)
+                put("useProxy", station.useProxy)
+                put("proxyType", station.proxyType)
+                put("genre", station.genre)
+                put("coverArtUri", station.coverArtUri ?: "")
+                put("isPreset", station.isPreset)
+                put("addedTimestamp", station.addedTimestamp)
+                put("isLiked", station.isLiked)
+                put("lastPlayedAt", station.lastPlayedAt)
+                put("source", station.source)
+                put("radioBrowserUuid", station.radioBrowserUuid ?: "")
+                put("lastVerified", station.lastVerified)
+                put("cachedAt", station.cachedAt)
+                put("bitrate", station.bitrate)
+                put("codec", station.codec)
+                put("country", station.country)
+                put("countryCode", station.countryCode)
+                put("homepage", station.homepage)
+                put("customProxyProtocol", station.customProxyProtocol)
+                put("proxyUsername", station.proxyUsername)
+                put("proxyPassword", station.proxyPassword)
+                put("proxyAuthType", station.proxyAuthType)
+                put("proxyDnsResolution", station.proxyDnsResolution)
+                put("proxyConnectionTimeout", station.proxyConnectionTimeout)
+                put("proxyBypassLocalAddresses", station.proxyBypassLocalAddresses)
+            }
+
+            prefs.edit()
+                .putString(KEY_CURRENT_STATION_JSON, json.toString())
+                .apply()
+        } catch (e: Exception) {
+            android.util.Log.e("PreferencesHelper", "Error saving current station", e)
+        }
+    }
+
+    /**
+     * Restore the currently playing station from persistent storage.
+     * Returns null if no station was saved or if deserialization fails.
+     */
+    fun getCurrentStation(context: Context): RadioStation? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val jsonString = prefs.getString(KEY_CURRENT_STATION_JSON, null) ?: return null
+
+        return try {
+            val json = JSONObject(jsonString)
+            RadioStation(
+                id = json.getLong("id"),
+                name = json.getString("name"),
+                streamUrl = json.getString("streamUrl"),
+                proxyHost = json.getString("proxyHost"),
+                proxyPort = json.getInt("proxyPort"),
+                useProxy = json.getBoolean("useProxy"),
+                proxyType = json.getString("proxyType"),
+                genre = json.getString("genre"),
+                coverArtUri = json.getString("coverArtUri").let { if (it.isEmpty()) null else it },
+                isPreset = json.getBoolean("isPreset"),
+                addedTimestamp = json.getLong("addedTimestamp"),
+                isLiked = json.getBoolean("isLiked"),
+                lastPlayedAt = json.getLong("lastPlayedAt"),
+                source = json.getString("source"),
+                radioBrowserUuid = json.getString("radioBrowserUuid").let { if (it.isEmpty()) null else it },
+                lastVerified = json.getLong("lastVerified"),
+                cachedAt = json.getLong("cachedAt"),
+                bitrate = json.getInt("bitrate"),
+                codec = json.getString("codec"),
+                country = json.getString("country"),
+                countryCode = json.getString("countryCode"),
+                homepage = json.getString("homepage"),
+                customProxyProtocol = json.getString("customProxyProtocol"),
+                proxyUsername = json.getString("proxyUsername"),
+                proxyPassword = json.getString("proxyPassword"),
+                proxyAuthType = json.getString("proxyAuthType"),
+                proxyDnsResolution = json.getBoolean("proxyDnsResolution"),
+                proxyConnectionTimeout = json.getInt("proxyConnectionTimeout"),
+                proxyBypassLocalAddresses = json.getBoolean("proxyBypassLocalAddresses")
+            )
+        } catch (e: Exception) {
+            android.util.Log.e("PreferencesHelper", "Error restoring current station", e)
+            null
+        }
+    }
+
+    /**
+     * Clear the currently playing station from persistent storage.
+     */
+    fun clearCurrentStation(context: Context) {
+        saveCurrentStation(context, null)
     }
 }

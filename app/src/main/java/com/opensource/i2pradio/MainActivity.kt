@@ -125,6 +125,19 @@ class MainActivity : AppCompatActivity() {
             radioService?.let { service ->
                 viewModel.setPlaying(service.isPlaying())
                 viewModel.setBuffering(service.isBuffering())
+
+                // Restore currently playing station from persistent storage if ViewModel has no station
+                // This handles the case where MainActivity was destroyed while audio was playing in background
+                if (viewModel.getCurrentStation() == null) {
+                    val savedStation = PreferencesHelper.getCurrentStation(this@MainActivity)
+                    if (savedStation != null) {
+                        // Only restore if service is actually playing or buffering
+                        // This prevents showing stale station info when nothing is playing
+                        if (service.isPlaying() || service.isBuffering()) {
+                            viewModel.setCurrentStation(savedStation)
+                        }
+                    }
+                }
             }
         }
 
