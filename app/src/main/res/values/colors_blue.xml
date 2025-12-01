@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Blue Theme - Original Default Colors -->
+
+    <!-- Light Theme Colors -->
+    <color name="md_theme_blue_light_primary">#0061A4</color>
+    <color name="md_theme_blue_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_blue_light_primaryContainer">#D1E4FF</color>
+    <color name="md_theme_blue_light_onPrimaryContainer">#001D36</color>
+    <color name="md_theme_blue_light_secondary">#535F70</color>
+    <color name="md_theme_blue_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_blue_light_secondaryContainer">#D7E3F7</color>
+    <color name="md_theme_blue_light_onSecondaryContainer">#101C2B</color>
+
+    <!-- Dark Theme Colors -->
+    <color name="md_theme_blue_dark_primary">#9ECAFF</color>
+    <color name="md_theme_blue_dark_onPrimary">#003258</color>
+    <color name="md_theme_blue_dark_primaryContainer">#00497D</color>
+    <color name="md_theme_blue_dark_onPrimaryContainer">#D1E4FF</color>
+    <color name="md_theme_blue_dark_secondary">#BBC7DB</color>
+    <color name="md_theme_blue_dark_onSecondary">#253140</color>
+    <color name="md_theme_blue_dark_secondaryContainer">#3B4858</color>
+    <color name="md_theme_blue_dark_onSecondaryContainer">#D7E3F7</color>
+</resources>
