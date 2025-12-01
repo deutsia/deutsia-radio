@@ -153,6 +153,7 @@
     <string name="settings_color_classic">Classic</string>
     <string name="settings_color_classic_default">Classic (Default)</string>
     <string name="settings_color_blue">Blue</string>
+    <string name="settings_color_blue_default">Blue (Default)</string>
     <string name="settings_color_peach">Peach</string>
     <string name="settings_color_green">Green</string>
     <string name="settings_color_purple">Purple</string>
