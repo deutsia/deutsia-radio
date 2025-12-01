@@ -52,6 +52,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         val previousStation = _currentStation.value
         _currentStation.value = station
 
+        // Persist the current station to SharedPreferences
+        // This ensures the UI can restore the station when MainActivity is recreated
+        PreferencesHelper.saveCurrentStation(getApplication(), station)
+
         // Stop recording if station is cleared
         if (station == null && _recordingState.value?.isRecording == true) {
             stopRecording()
@@ -122,7 +126,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     fun updateCurrentStationLikeState(isLiked: Boolean) {
         _currentStation.value?.let { station ->
             // Create a copy with updated like state
-            _currentStation.value = station.copy(isLiked = isLiked)
+            val updatedStation = station.copy(isLiked = isLiked)
+            _currentStation.value = updatedStation
+            // Persist the updated station
+            PreferencesHelper.saveCurrentStation(getApplication(), updatedStation)
         }
     }
 
@@ -134,7 +141,10 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         // Update the current station's cover art if it matches
         _currentStation.value?.let { station ->
             if (stationId == -1L || station.id == stationId) {
-                _currentStation.value = station.copy(coverArtUri = coverArtUri)
+                val updatedStation = station.copy(coverArtUri = coverArtUri)
+                _currentStation.value = updatedStation
+                // Persist the updated station
+                PreferencesHelper.saveCurrentStation(getApplication(), updatedStation)
             }
         }
         // Trigger cover art update event for all observers
