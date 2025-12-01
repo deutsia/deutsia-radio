@@ -29,7 +29,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 - 🌐 **Multinet Support** - Clearnet, I2P (.i2p), and Tor (.onion)
 - 🔒 **Force Tor Modes** - Proxy-or-fail enforcement with instant leak prevention
 - 📡 **50,000+ Stations** - Access RadioBrowser API or add custom streams
-- 🎨 **Material You** - Dynamic theming along with 5 color schemes
+- 🎨 **Material You** - Dynamic theming along with 6 color schemes
 - 📝 **Stream Recording** - Record across multiple stations
 - 🔐 **App Lock** - Secure your listening with biometric/PIN protection and optional database encrpytion 
 - 🌍 **14 Languages** - Multilingual interface support
