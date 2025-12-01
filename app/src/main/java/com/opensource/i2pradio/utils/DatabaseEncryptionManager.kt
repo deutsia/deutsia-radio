@@ -30,6 +30,9 @@ object DatabaseEncryptionManager {
     private const val KEY_DB_SALT = "db_salt"  // Changed from KEY_DB_PASSPHRASE
     private const val PASSPHRASE_LENGTH = 32 // 256 bits
 
+    @Volatile
+    private var sqlCipherInitialized = false
+
     /**
      * Get or create the master key for encryption
      */
@@ -144,10 +147,17 @@ object DatabaseEncryptionManager {
 
     /**
      * Initialize SQLCipher library
-     * Should be called once on app startup
+     * This is idempotent - safe to call multiple times, but only loads once
      */
     fun initializeSQLCipher(context: Context) {
-        SQLiteDatabase.loadLibs(context)
+        if (!sqlCipherInitialized) {
+            synchronized(this) {
+                if (!sqlCipherInitialized) {
+                    SQLiteDatabase.loadLibs(context)
+                    sqlCipherInitialized = true
+                }
+            }
+        }
     }
 
     /**
