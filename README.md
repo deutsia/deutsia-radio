@@ -21,7 +21,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 ---
 
 ## 📢 Updates
-- **New Release:** Default theme, 14 language translations, app lock, global proxy support, bandwidth UI, and multi-word search
+- **New Release: v1.1** Default theme, 14 language translations, app lock, global proxy support, bandwidth UI, and multi-word search
 
 ---
 
