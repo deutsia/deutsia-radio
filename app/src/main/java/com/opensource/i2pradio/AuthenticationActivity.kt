@@ -3,15 +3,20 @@ package com.opensource.i2pradio
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.opensource.i2pradio.ui.PreferencesHelper
 import com.opensource.i2pradio.utils.BiometricAuthManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Activity that displays the authentication screen to unlock the app.
@@ -24,6 +29,8 @@ class AuthenticationActivity : AppCompatActivity() {
     private lateinit var errorText: TextView
     private lateinit var unlockButton: MaterialButton
     private lateinit var biometricButton: MaterialButton
+    private var progressBar: ProgressBar? = null
+    private var isVerifying = false  // Prevent multiple verification attempts
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +58,9 @@ class AuthenticationActivity : AppCompatActivity() {
             }
         }
 
+        // Initialize progress bar (optional - may not be in all layouts)
+        progressBar = findViewById(R.id.progressBar)
+
         // Setup biometric button
         val isBiometricEnabled = PreferencesHelper.isBiometricEnabled(this)
         val isBiometricAvailable = BiometricAuthManager.isBiometricAvailable(this)
@@ -75,8 +85,13 @@ class AuthenticationActivity : AppCompatActivity() {
 
     /**
      * Attempt to unlock with password
+     * Runs password verification on background thread to avoid UI blocking
+     * (PBKDF2 with 600k iterations is CPU-intensive)
      */
     private fun attemptPasswordUnlock() {
+        // Prevent multiple simultaneous verification attempts
+        if (isVerifying) return
+
         val password = passwordInput.text.toString()
 
         if (password.isEmpty()) {
@@ -84,19 +99,40 @@ class AuthenticationActivity : AppCompatActivity() {
             return
         }
 
-        if (BiometricAuthManager.verifyPassword(this, password)) {
-            // Set session password for database decryption (only if encryption is enabled)
-            if (com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)) {
-                // SECURITY: Convert to CharArray for secure memory handling
-                val passwordChars = password.toCharArray()
-                com.opensource.i2pradio.data.RadioDatabase.setSessionPassword(passwordChars)
-                // Zero out local CharArray copy (RadioDatabase made its own copy)
-                passwordChars.fill(0.toChar())
+        // Show loading state
+        isVerifying = true
+        unlockButton.isEnabled = false
+        biometricButton.isEnabled = false
+        progressBar?.visibility = View.VISIBLE
+        errorText.visibility = View.GONE
+
+        // Run password verification on background thread
+        // PBKDF2 with 600k iterations is CPU-intensive and would block UI
+        lifecycleScope.launch {
+            val isValid = withContext(Dispatchers.Default) {
+                BiometricAuthManager.verifyPassword(this@AuthenticationActivity, password)
             }
-            unlockSuccess()
-        } else {
-            showError(getString(R.string.auth_error_wrong_password))
-            passwordInput.text?.clear()
+
+            // Back on main thread
+            isVerifying = false
+            unlockButton.isEnabled = true
+            biometricButton.isEnabled = true
+            progressBar?.visibility = View.GONE
+
+            if (isValid) {
+                // Set session password for database decryption (only if encryption is enabled)
+                if (com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this@AuthenticationActivity)) {
+                    // SECURITY: Convert to CharArray for secure memory handling
+                    val passwordChars = password.toCharArray()
+                    com.opensource.i2pradio.data.RadioDatabase.setSessionPassword(passwordChars)
+                    // Zero out local CharArray copy (RadioDatabase made its own copy)
+                    passwordChars.fill(0.toChar())
+                }
+                unlockSuccess()
+            } else {
+                showError(getString(R.string.auth_error_wrong_password))
+                passwordInput.text?.clear()
+            }
         }
     }
 

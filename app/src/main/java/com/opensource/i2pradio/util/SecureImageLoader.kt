@@ -116,6 +116,16 @@ object SecureImageLoader {
             android.util.Log.d("SecureImageLoader",
                 "Created image loader with Tor proxy: ${config.host}:${config.port}")
         } else {
+            // Even without Tor, provide a custom OkHttpClient that explicitly allows
+            // HTTP (cleartext) connections. Coil's default loader may block HTTP requests
+            // on Android 9+ due to network security configuration defaults.
+            // The manifest has usesCleartextTraffic="true" but Coil needs a configured client.
+            val okHttpClient = OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
+                .build()
+
+            builder.okHttpClient(okHttpClient)
+
             android.util.Log.d("SecureImageLoader",
                 "Created image loader without proxy (Tor not active or not required)")
         }

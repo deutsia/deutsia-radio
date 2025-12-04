@@ -80,6 +80,16 @@
                 android:textColor="?attr/colorError"
                 android:visibility="gone" />
 
+            <!-- Progress Bar (shown during password verification) -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
             <!-- Unlock Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/unlockButton"
