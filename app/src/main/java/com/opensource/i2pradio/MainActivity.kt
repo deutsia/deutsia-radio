@@ -224,6 +224,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Preserve authentication state if we're recreating for UI changes (theme/color/language)
+        // This prevents requiring re-authentication when the user changes visual settings
+        if (savedInstanceState != null && preserveAuthOnRecreate) {
+            isAuthenticated = true
+            isFirstLaunch = false  // Not a true first launch, just a UI recreation
+            preserveAuthOnRecreate = false
+        }
+
         // Check if database encryption is enabled
         val isDbEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)
 
@@ -662,6 +670,19 @@ class MainActivity : AppCompatActivity() {
 
         // Broadcast action for proxy mode changes
         const val BROADCAST_PROXY_MODE_CHANGED = "com.opensource.i2pradio.PROXY_MODE_CHANGED"
+
+        // Flag to preserve authentication state across activity recreation (for UI changes like themes)
+        @Volatile
+        private var preserveAuthOnRecreate = false
+
+        /**
+         * Call this before activity.recreate() to preserve authentication state.
+         * This prevents requiring re-authentication when changing themes, colors, or languages.
+         */
+        @JvmStatic
+        fun prepareForUiRecreate() {
+            preserveAuthOnRecreate = true
+        }
     }
 
     private inner class ViewPagerAdapter(activity: AppCompatActivity) :
