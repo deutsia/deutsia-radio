@@ -21,8 +21,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 ---
 
 ## 📢 Updates
-- **New Release: v1.1** Default theme, 14 language translations, app lock, global proxy support, bandwidth UI, and multi-word search
-
+- **New Release: v1.2** Fixed App crash, improved search functionality, fixed recording bug
 ---
 
 ## 🎉 Features
@@ -30,7 +29,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 - 🔒 **Force Tor Modes** - Proxy-or-fail enforcement with instant leak prevention
 - 📡 **50,000+ Stations** - Access RadioBrowser API or add custom streams
 - 🎨 **Material You** - Dynamic theming along with 6 color schemes
-- 📝 **Stream Recording** - Record across multiple stations
+- 🔴 **Stream Recording** - Record across multiple stations
 - 🔐 **App Lock** - Secure your listening with biometric/PIN protection and optional database encrpytion 
 - 🌍 **14 Languages** - Multilingual interface support
 - 🌓 **Light/Dark/System** - Adaptive theme modes
@@ -104,7 +103,7 @@ APK output: `app/build/outputs/apk/debug/`
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 - [RadioBrowser](https://www.radio-browser.info/) - Station database
 - [Orbot](https://guardianproject.info/apps/org.torproject.android/) - Tor integration
 - [I2P Project](https://geti2p.net/) - Anonymous networking on Android

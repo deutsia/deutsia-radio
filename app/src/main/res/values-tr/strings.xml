@@ -245,7 +245,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">Hakkında</string>
-    <string name="settings_version">Sürüm 1.1</string>
+    <string name="settings_version">Sürüm 1.2</string>
     <string name="settings_view_github">GitHub\'da Görüntüle</string>
     <string name="settings_donate">Bağış Yap</string>
     <string name="settings_donate_description">Bu uygulama işinize yaradıysa bağış yapmayı düşünün</string>

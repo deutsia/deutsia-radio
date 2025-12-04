@@ -245,7 +245,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">关于</string>
-    <string name="settings_version">版本 1.1</string>
+    <string name="settings_version">版本 1.2</string>
     <string name="settings_view_github">在 GitHub 上查看</string>
     <string name="settings_donate">捐赠</string>
     <string name="settings_donate_description">如果此应用对您有帮助，请考虑捐赠</string>
