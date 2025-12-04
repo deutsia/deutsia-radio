@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
+import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.ProxyType
@@ -296,6 +297,7 @@ class SettingsFragment : Fragment() {
                 PreferencesHelper.setMaterialYouEnabled(requireContext(), isChecked)
                 // Delay recreate to allow the animation to complete
                 uiHandler.postDelayed({
+                    MainActivity.prepareForUiRecreate()
                     activity?.recreate()
                 }, 300)
             }
@@ -1105,6 +1107,7 @@ class SettingsFragment : Fragment() {
                 updateColorSchemeButtonText(colorSchemeButton)
                 // Recreate activity to apply new color scheme
                 uiHandler.postDelayed({
+                    MainActivity.prepareForUiRecreate()
                     activity?.recreate()
                 }, 300)
                 dialog.dismiss()
@@ -1174,6 +1177,7 @@ class SettingsFragment : Fragment() {
 
                 // Recreate activity to apply new language
                 uiHandler.postDelayed({
+                    MainActivity.prepareForUiRecreate()
                     activity?.recreate()
                 }, 300)
                 dialog.dismiss()
