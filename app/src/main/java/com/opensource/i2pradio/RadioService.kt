@@ -1677,12 +1677,14 @@ class RadioService : Service() {
                     builder
                         .connectTimeout(timeout, TimeUnit.SECONDS)
                         .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming - data arrives sporadically
+                        .retryOnConnectionFailure(true) // Retry on connection drops for better reliability
                         .build()
                 } else {
                     OkHttpClient.Builder()
                         .addInterceptor(BandwidthTrackingInterceptor(this))
                         .connectTimeout(30, TimeUnit.SECONDS)
                         .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming - data arrives sporadically
+                        .retryOnConnectionFailure(true) // Retry on connection drops for better reliability
                         .build()
                 }
                 currentOkHttpClient!!

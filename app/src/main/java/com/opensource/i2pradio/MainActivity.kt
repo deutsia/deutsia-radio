@@ -154,18 +154,37 @@ class MainActivity : AppCompatActivity() {
      * Initialize repositories and load preset stations
      * This is called either immediately in onCreate() if no encryption,
      * or after authentication in onResume() if database encryption is enabled
+     *
+     * When database encryption is enabled, repository initialization involves:
+     * - SQLCipher native library loading
+     * - Encrypted database opening with key derivation
+     * These operations are CPU-intensive and must run off the main thread to avoid ANR.
      */
     private fun initializeRepositories() {
         if (repositoriesInitialized) {
             return  // Already initialized
         }
 
-        repository = RadioRepository(this)
-        radioBrowserRepository = RadioBrowserRepository(this)
-        repositoriesInitialized = true
+        val isDbEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            repository.initializePresetStations(this@MainActivity)
+        if (isDbEncryptionEnabled) {
+            // With database encryption, initialization is slow (SQLCipher + key derivation)
+            // Run on IO thread to avoid ANR
+            lifecycleScope.launch(Dispatchers.IO) {
+                repository = RadioRepository(this@MainActivity)
+                radioBrowserRepository = RadioBrowserRepository(this@MainActivity)
+                repositoriesInitialized = true
+                repository.initializePresetStations(this@MainActivity)
+            }
+        } else {
+            // Without encryption, initialization is fast enough for main thread
+            repository = RadioRepository(this)
+            radioBrowserRepository = RadioBrowserRepository(this)
+            repositoriesInitialized = true
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                repository.initializePresetStations(this@MainActivity)
+            }
         }
     }
 

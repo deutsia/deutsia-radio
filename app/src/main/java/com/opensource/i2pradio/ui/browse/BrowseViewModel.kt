@@ -144,6 +144,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
     /**
      * Search stations by name
+     * This now preserves active filters (tag, country, language) and combines them with search
      */
     fun search(query: String) {
         _searchQuery.value = query
@@ -152,6 +153,38 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _stations.value = emptyList()
         if (query.isNotBlank()) {
             fetchStations()
+        } else if (hasActiveFilters()) {
+            // If search is cleared but filters are active, show filtered results
+            restoreFilteredView()
+        }
+    }
+
+    /**
+     * Check if any filters (tag, country, or language) are currently active
+     */
+    private fun hasActiveFilters(): Boolean {
+        return _selectedTag.value != null ||
+               _selectedCountry.value != null ||
+               _selectedLanguage.value != null
+    }
+
+    /**
+     * Restore the filtered view when search is cleared but filters remain active
+     */
+    private fun restoreFilteredView() {
+        when {
+            _selectedTag.value != null -> {
+                _currentCategory.value = BrowseCategory.BY_TAG
+                fetchStations()
+            }
+            _selectedCountry.value != null -> {
+                _currentCategory.value = BrowseCategory.BY_COUNTRY
+                fetchStations()
+            }
+            _selectedLanguage.value != null -> {
+                _currentCategory.value = BrowseCategory.BY_LANGUAGE
+                fetchStations()
+            }
         }
     }
 
@@ -539,6 +572,9 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      * - Searching by genre/tag (e.g., "Jazz", "Classical")
      * - Searching by country (e.g., "Germany", "USA")
      * - Combined searches (e.g., "Rock Germany" finds rock stations from Germany)
+     * - COMBINED WITH ACTIVE FILTERS: If a tag/country/language filter is active,
+     *   search results are filtered to only include stations matching both the search
+     *   query AND the active filter criteria
      *
      * PERFORMANCE: Reduced from 9+ API calls to just 2-3 calls per search (78-89% reduction!)
      */
@@ -549,13 +585,30 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     ): RadioBrowserResult<List<RadioBrowserStation>> {
         val trimmedQuery = query.trim()
 
+        // Get active filters to combine with search
+        val activeTag = _selectedTag.value
+        val activeCountry = _selectedCountry.value
+        val activeLanguage = _selectedLanguage.value
+
         // For pagination (offset > 0), search by name only for consistency
+        // but still apply active filters
         if (offset > 0) {
-            return repository.searchStations(
+            val result = repository.searchStations(
                 name = trimmedQuery,
+                tag = activeTag?.name,  // Include tag filter if active
+                countrycode = activeCountry?.iso3166_1,  // Include country filter if active
                 limit = limit,
                 offset = offset
             )
+            // Apply language filter client-side if active (API doesn't support combined language filter)
+            return if (activeLanguage != null && result is RadioBrowserResult.Success) {
+                val filtered = result.data.filter { station ->
+                    station.language.contains(activeLanguage.name, ignoreCase = true)
+                }
+                RadioBrowserResult.Success(filtered)
+            } else {
+                result
+            }
         }
 
         // Split query into words for intelligent multi-field search
@@ -567,9 +620,11 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         val allResults = mutableListOf<RadioBrowserStation>()
 
         // Primary search: Search by name (most comprehensive - covers station names)
-        // RadioBrowser searches for the query as a substring in station names
+        // Include active tag filter in API call when available
         val nameResult = repository.searchStations(
             name = trimmedQuery,
+            tag = activeTag?.name,  // Combine with active tag filter
+            countrycode = activeCountry?.iso3166_1,  // Combine with active country filter
             limit = limit,
             offset = 0
         )
@@ -578,21 +633,25 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         // Secondary search: Search by tag/genre (for genre-based queries like "Rock" or "Jazz")
-        // RadioBrowser searches for the query as a substring in tags/genres
-        val tagResult = repository.searchStations(
-            tag = trimmedQuery,
-            limit = limit,
-            offset = 0
-        )
-        if (tagResult is RadioBrowserResult.Success) {
-            allResults.addAll(tagResult.data)
+        // Only do this if no tag filter is already active (otherwise redundant)
+        if (activeTag == null) {
+            val tagResult = repository.searchStations(
+                tag = trimmedQuery,
+                countrycode = activeCountry?.iso3166_1,  // Still apply country filter
+                limit = limit,
+                offset = 0
+            )
+            if (tagResult is RadioBrowserResult.Success) {
+                allResults.addAll(tagResult.data)
+            }
         }
 
         // Tertiary search: Search by country for single-word queries only
-        // Skip for multi-word to reduce API calls - client-side filtering handles cross-field matches
-        if (words.size == 1) {
+        // Skip if country filter is already active (would be redundant)
+        if (words.size == 1 && activeCountry == null) {
             val countryResult = repository.searchStations(
                 country = trimmedQuery,
+                tag = activeTag?.name,  // Still apply tag filter
                 limit = limit,
                 offset = 0
             )
@@ -603,7 +662,13 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
         // If no results from any search, return error
         if (allResults.isEmpty()) {
-            return RadioBrowserResult.Error("No stations found for: $trimmedQuery")
+            val filterInfo = buildString {
+                append(trimmedQuery)
+                activeTag?.let { append(" in genre '${it.name}'") }
+                activeCountry?.let { append(" in country '${it.name}'") }
+                activeLanguage?.let { append(" in language '${it.name}'") }
+            }
+            return RadioBrowserResult.Error("No stations found for: $filterInfo")
         }
 
         // OPTIMIZATION: Pre-normalize search terms once (not in the filter loop)
@@ -611,7 +676,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
         // For multi-word queries, filter results client-side to keep only stations
         // that match ALL words somewhere in their searchable fields (name, tags, country)
-        val filteredResults = if (searchTerms.size > 1) {
+        var filteredResults = if (searchTerms.size > 1) {
             // Multi-word query: filter to stations that match all words somewhere
             allResults.filter { station ->
                 // OPTIMIZATION: Build normalized searchable text once per station
@@ -628,6 +693,15 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             }
         } else {
             allResults
+        }
+
+        // Apply language filter client-side if active
+        // (RadioBrowser API doesn't support combining language with other filters well)
+        if (activeLanguage != null) {
+            val langName = activeLanguage.name.lowercase()
+            filteredResults = filteredResults.filter { station ->
+                station.language.lowercase().contains(langName)
+            }
         }
 
         // Deduplicate and limit results

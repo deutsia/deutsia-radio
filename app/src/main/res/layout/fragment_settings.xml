@@ -867,9 +867,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="?attr/colorPrimary"
-            android:layout_marginBottom="16dp"
-            android:drawableStart="@drawable/ic_bandwidth"
-            android:drawablePadding="8dp" />
+            android:layout_marginBottom="16dp" />
                 <!-- Total Usage -->
                 <LinearLayout
                     android:layout_width="match_parent"
