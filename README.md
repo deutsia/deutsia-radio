@@ -69,7 +69,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 
 ## 📦 Requirements
 - Android 7.0 (API 24) or higher
-- **For Tor:** [Orbot](https://guardianproject.info/apps/org.torproject.android/)
+- **For Tor:** [Orbot](https://guardianproject.info/apps/org.torproject.android/) Note: You can also use Invizible Pro or other Android apps that allow Tor proxy (non-vpn) implementation. Using Tor as a full device VPN will make I2P streaming almost impossible due to its latency. Using Tor a proxy integrates with the app better and allows for a seperate full device VPN to run in the background if desired.
 - **For I2P:** [I2P Android](https://geti2p.net/en/download)
 
 ---
@@ -103,7 +103,7 @@ APK output: `app/build/outputs/apk/debug/`
 
 ---
 
-## Acknowledgments
+##  Acknowledgments
 - [RadioBrowser](https://www.radio-browser.info/) - Station database
 - [Orbot](https://guardianproject.info/apps/org.torproject.android/) - Tor integration
 - [I2P Project](https://geti2p.net/) - Anonymous networking on Android
