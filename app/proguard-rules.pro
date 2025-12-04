@@ -53,3 +53,8 @@
 # Keep Coil image loader
 -keep class coil.** { *; }
 -dontwarn coil.**
+
+# Keep SQLCipher classes - required for JNI native library access
+# The native libsqlcipher.so accesses fields like mNativeHandle via JNI
+-keep class net.sqlcipher.** { *; }
+-keep class net.sqlcipher.database.** { *; }
