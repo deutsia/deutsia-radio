@@ -335,17 +335,66 @@ object StationImportExport {
                 JSONArray(content)
             } else {
                 val rootObj = JSONObject(content)
-                rootObj.optJSONArray("stations") ?: JSONArray()
+                // Support multiple common array key names
+                val arrayKeys = listOf("stations", "playlist", "items", "streams", "radios", "channels")
+                var foundArray: JSONArray? = null
+                for (key in arrayKeys) {
+                    foundArray = rootObj.optJSONArray(key)
+                    if (foundArray != null && foundArray.length() > 0) break
+                }
+                foundArray ?: JSONArray()
             }
 
             for (i in 0 until json.length()) {
                 try {
+                    // Handle both object entries and plain string URLs
+                    val element = json.get(i)
+
+                    if (element is String) {
+                        // Plain URL string - create station from URL
+                        val url = element.trim()
+                        if (url.isEmpty() || (!url.startsWith("http://") && !url.startsWith("https://"))) {
+                            errors.add("Entry $i: Invalid URL")
+                            continue
+                        }
+
+                        // Generate name from URL
+                        val name = url.substringAfter("//")
+                            .substringBefore("/")
+                            .replace(Regex("""^www\."""), "")
+                            .split(".").firstOrNull()
+                            ?.replaceFirstChar { it.uppercase() }
+                            ?: "Radio Station $i"
+
+                        // Auto-detect proxy type from URL
+                        val proxyType = detectProxyTypeFromUrl(url)
+                        val useProxy = proxyType != ProxyType.NONE
+
+                        val station = RadioStation(
+                            name = name,
+                            streamUrl = url,
+                            proxyType = proxyType.name,
+                            proxyHost = if (useProxy) proxyType.getDefaultHost() else "",
+                            proxyPort = if (useProxy) proxyType.getDefaultPort() else 0,
+                            useProxy = useProxy,
+                            genre = "Other",
+                            coverArtUri = null,
+                            isLiked = false
+                        )
+                        stations.add(station)
+                        continue
+                    }
+
+                    // Handle object entries
                     val obj = json.getJSONObject(i)
                     val name = obj.optString("name", "").takeIf { it.isNotEmpty() }
-                        ?: obj.optString("title", "")
+                        ?: obj.optString("title", "").takeIf { it.isNotEmpty() }
+                        ?: obj.optString("station", "")
                     val url = obj.optString("streamUrl", "").takeIf { it.isNotEmpty() }
                         ?: obj.optString("url", "").takeIf { it.isNotEmpty() }
-                        ?: obj.optString("stream", "")
+                        ?: obj.optString("stream", "").takeIf { it.isNotEmpty() }
+                        ?: obj.optString("src", "").takeIf { it.isNotEmpty() }
+                        ?: obj.optString("source", "")
 
                     if (name.isEmpty() || url.isEmpty()) {
                         errors.add("Entry $i: Missing name or URL")
