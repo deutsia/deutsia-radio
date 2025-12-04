@@ -23,6 +23,12 @@ object BiometricAuthManager {
     private const val ENCRYPTED_PREFS_NAME = "encrypted_auth"
     private const val KEY_PASSWORD_HASH = "password_hash"
 
+    // Cache EncryptedSharedPreferences to avoid repeated slow initialization
+    // MasterKey creation and EncryptedSharedPreferences.create() are expensive operations
+    @Volatile
+    private var cachedPrefs: android.content.SharedPreferences? = null
+    private val prefsLock = Any()
+
     /**
      * Get or create the master key for encryption
      */
@@ -34,18 +40,28 @@ object BiometricAuthManager {
 
     /**
      * Get EncryptedSharedPreferences instance for storing auth data
+     * Cached to avoid repeated slow initialization (MasterKey + crypto setup)
      */
     private fun getEncryptedPreferences(context: Context): android.content.SharedPreferences {
-        return try {
-            EncryptedSharedPreferences.create(
-                context,
-                ENCRYPTED_PREFS_NAME,
-                getMasterKey(context),
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        } catch (e: GeneralSecurityException) {
-            throw RuntimeException("Failed to create EncryptedSharedPreferences", e)
+        // Fast path - return cached instance
+        cachedPrefs?.let { return it }
+
+        // Slow path - create and cache
+        synchronized(prefsLock) {
+            // Double-check after acquiring lock
+            cachedPrefs?.let { return it }
+
+            return try {
+                EncryptedSharedPreferences.create(
+                    context.applicationContext,  // Use app context to avoid leaks
+                    ENCRYPTED_PREFS_NAME,
+                    getMasterKey(context.applicationContext),
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                ).also { cachedPrefs = it }
+            } catch (e: GeneralSecurityException) {
+                throw RuntimeException("Failed to create EncryptedSharedPreferences", e)
+            }
         }
     }
 
