@@ -542,9 +542,12 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun toggleLike(station: RadioBrowserStation) {
         val uuid = station.stationuuid
-        val isCurrentlyLiked = _likedStationUuids.value.orEmpty().contains(uuid)
 
         viewModelScope.launch {
+            // Check current state from database to avoid race conditions
+            val existingStation = repository.getStationInfoByUuid(uuid)
+            val isCurrentlyLiked = existingStation?.isLiked == true
+
             if (isCurrentlyLiked) {
                 // Unlike: remove the station from library entirely
                 val deleted = repository.deleteStationByUuid(uuid)
