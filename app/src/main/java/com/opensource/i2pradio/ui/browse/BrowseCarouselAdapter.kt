@@ -1,0 +1,100 @@
+package com.opensource.i2pradio.ui.browse
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.opensource.i2pradio.R
+import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
+
+/**
+ * Adapter for horizontal carousel of stations (Trending, Popular sections).
+ */
+class BrowseCarouselAdapter(
+    private val onStationClick: (RadioBrowserStation) -> Unit,
+    private val onLikeClick: (RadioBrowserStation) -> Unit,
+    private val showRankBadge: Boolean = false
+) : ListAdapter<RadioBrowserStation, BrowseCarouselAdapter.ViewHolder>(DiffCallback()) {
+
+    private var likedUuids: Set<String> = emptySet()
+
+    fun updateLikedUuids(uuids: Set<String>) {
+        likedUuids = uuids
+        notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_browse_station_card, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(getItem(position), position + 1)
+    }
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val stationImage: ImageView = itemView.findViewById(R.id.stationImage)
+        private val stationName: TextView = itemView.findViewById(R.id.stationName)
+        private val stationInfo: TextView = itemView.findViewById(R.id.stationInfo)
+        private val rankBadge: TextView = itemView.findViewById(R.id.rankBadge)
+        private val btnLike: ImageButton = itemView.findViewById(R.id.btnLike)
+
+        fun bind(station: RadioBrowserStation, rank: Int) {
+            stationName.text = station.name
+            stationInfo.text = buildString {
+                station.getPrimaryGenre()?.let { append(it) }
+                if (station.country.isNotBlank()) {
+                    if (isNotEmpty()) append(" • ")
+                    append(station.country)
+                }
+            }.ifEmpty { station.country.ifEmpty { "Radio" } }
+
+            // Load station image
+            if (!station.favicon.isNullOrBlank()) {
+                Glide.with(itemView.context)
+                    .load(station.favicon)
+                    .placeholder(R.drawable.ic_radio)
+                    .error(R.drawable.ic_radio)
+                    .centerCrop()
+                    .into(stationImage)
+            } else {
+                stationImage.setImageResource(R.drawable.ic_radio)
+            }
+
+            // Rank badge
+            if (showRankBadge) {
+                rankBadge.visibility = View.VISIBLE
+                rankBadge.text = rank.toString()
+            } else {
+                rankBadge.visibility = View.GONE
+            }
+
+            // Like state
+            val isLiked = likedUuids.contains(station.stationuuid)
+            btnLike.setImageResource(
+                if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+            )
+
+            // Click listeners
+            itemView.setOnClickListener { onStationClick(station) }
+            btnLike.setOnClickListener { onLikeClick(station) }
+        }
+    }
+
+    private class DiffCallback : DiffUtil.ItemCallback<RadioBrowserStation>() {
+        override fun areItemsTheSame(oldItem: RadioBrowserStation, newItem: RadioBrowserStation): Boolean {
+            return oldItem.stationuuid == newItem.stationuuid
+        }
+
+        override fun areContentsTheSame(oldItem: RadioBrowserStation, newItem: RadioBrowserStation): Boolean {
+            return oldItem == newItem
+        }
+    }
+}

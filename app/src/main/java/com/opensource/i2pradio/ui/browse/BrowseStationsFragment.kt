@@ -12,11 +12,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -25,37 +28,63 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
+import com.opensource.i2pradio.data.radiobrowser.RadioBrowserResult
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
 import com.opensource.i2pradio.ui.RadioViewModel
 import kotlinx.coroutines.launch
 
 /**
  * Fragment for browsing and searching RadioBrowser stations.
+ * Features a two-mode UI:
+ * - Discovery mode: Visual browsing with genre chips and carousels
+ * - Results mode: Search and filtered list view
  */
 class BrowseStationsFragment : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
+    // Discovery mode views
+    private lateinit var discoveryContainer: NestedScrollView
+    private lateinit var discoverySearchBar: MaterialCardView
+    private lateinit var genreChipsRow1: LinearLayout
+    private lateinit var genreChipsRow2: LinearLayout
+    private lateinit var trendingRecyclerView: RecyclerView
+    private lateinit var trendingSeeAll: TextView
+    private lateinit var topVotedPreviewRecyclerView: RecyclerView
+    private lateinit var topVotedSeeAll: TextView
+    private lateinit var popularRecyclerView: RecyclerView
+    private lateinit var popularSeeAll: TextView
+
+    // Results mode views
+    private lateinit var resultsContainer: LinearLayout
+    private lateinit var btnBackToDiscovery: ImageButton
+    private lateinit var resultsSearchInputLayout: TextInputLayout
+    private lateinit var resultsSearchInput: TextInputEditText
+    private lateinit var categoryFilterChip: Chip
+    private lateinit var countryFilterChip: Chip
+    private lateinit var genreFilterChip: Chip
+    private lateinit var languageFilterChip: Chip
+    private lateinit var addFilterChip: Chip
+    private lateinit var resultsCount: TextView
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var stationsRecyclerView: RecyclerView
+
+    // Shared views
     private lateinit var loadingContainer: FrameLayout
     private lateinit var emptyStateContainer: LinearLayout
     private lateinit var torWarningBanner: MaterialCardView
-    private lateinit var searchInput: TextInputEditText
-    private lateinit var chipTopVoted: Chip
-    private lateinit var chipPopular: Chip
-    private lateinit var chipRandom: Chip
-    private lateinit var chipHistory: Chip
-    private lateinit var countryFilterButton: MaterialButton
-    private lateinit var genreFilterButton: MaterialButton
-    private lateinit var languageFilterButton: MaterialButton
-    private lateinit var adapter: BrowseStationsAdapter
+
+    // Adapters
+    private lateinit var stationsAdapter: BrowseStationsAdapter
+    private lateinit var trendingAdapter: BrowseCarouselAdapter
+    private lateinit var topVotedPreviewAdapter: BrowseCarouselAdapter
+    private lateinit var popularAdapter: BrowseCarouselAdapter
 
     private val viewModel: BrowseViewModel by viewModels()
     private val radioViewModel: RadioViewModel by activityViewModels()
@@ -64,13 +93,37 @@ class BrowseStationsFragment : Fragment() {
     private var searchDebounceRunnable: Runnable? = null
     private val searchDebounceDelay = 500L
     private var isManualSearchClear = false
+    private var isInResultsMode = false
+
+    // Current results mode category (for display)
+    private var currentResultsTitle = ""
+
+    // Genre chips data
+    private data class GenreChipData(val tag: String, val displayName: Int)
+    private val genreChipsRow1Data = listOf(
+        GenreChipData("pop", R.string.genre_pop),
+        GenreChipData("rock", R.string.genre_rock),
+        GenreChipData("jazz", R.string.genre_jazz),
+        GenreChipData("classical", R.string.genre_classical),
+        GenreChipData("hip hop", R.string.genre_hip_hop),
+        GenreChipData("electronic", R.string.genre_electronic)
+    )
+    private val genreChipsRow2Data = listOf(
+        GenreChipData("country", R.string.genre_country),
+        GenreChipData("latin", R.string.genre_latin),
+        GenreChipData("r&b", R.string.genre_r_and_b),
+        GenreChipData("news", R.string.genre_news),
+        GenreChipData("talk", R.string.genre_talk),
+        GenreChipData("sports", R.string.genre_sports)
+    )
 
     // Broadcast receiver for like state changes from other views
     private val likeStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == MainActivity.BROADCAST_LIKE_STATE_CHANGED) {
-                // Refresh the liked UUIDs to update the UI
                 viewModel.refreshLikedAndSavedUuids()
+                // Also refresh carousel adapters
+                refreshCarouselLikeStates()
             }
         }
     }
@@ -84,43 +137,187 @@ class BrowseStationsFragment : Fragment() {
 
         repository = RadioBrowserRepository(requireContext())
 
-        // Find views
-        recyclerView = view.findViewById(R.id.stationsRecyclerView)
-        swipeRefresh = view.findViewById(R.id.swipeRefresh)
-        loadingContainer = view.findViewById(R.id.loadingContainer)
-        emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
-        torWarningBanner = view.findViewById(R.id.torWarningBanner)
-        searchInput = view.findViewById(R.id.searchInput)
-        chipTopVoted = view.findViewById(R.id.chipTopVoted)
-        chipPopular = view.findViewById(R.id.chipPopular)
-        chipRandom = view.findViewById(R.id.chipRandom)
-        chipHistory = view.findViewById(R.id.chipHistory)
-        countryFilterButton = view.findViewById(R.id.countryFilterButton)
-        genreFilterButton = view.findViewById(R.id.genreFilterButton)
-        languageFilterButton = view.findViewById(R.id.languageFilterButton)
-
-        setupRecyclerView()
-        setupSearch()
-        setupChips()
-        setupFilters()
-        setupSwipeRefresh()
+        findViews(view)
+        setupDiscoveryMode()
+        setupResultsMode()
+        setupSharedViews()
         observeViewModel()
+        loadDiscoveryData()
 
         return view
     }
 
-    private fun setupRecyclerView() {
-        adapter = BrowseStationsAdapter(
+    private fun findViews(view: View) {
+        // Discovery mode views
+        discoveryContainer = view.findViewById(R.id.discoveryContainer)
+        discoverySearchBar = view.findViewById(R.id.discoverySearchBar)
+        genreChipsRow1 = view.findViewById(R.id.genreChipsRow1)
+        genreChipsRow2 = view.findViewById(R.id.genreChipsRow2)
+        trendingRecyclerView = view.findViewById(R.id.trendingRecyclerView)
+        trendingSeeAll = view.findViewById(R.id.trendingSeeAll)
+        topVotedPreviewRecyclerView = view.findViewById(R.id.topVotedPreviewRecyclerView)
+        topVotedSeeAll = view.findViewById(R.id.topVotedSeeAll)
+        popularRecyclerView = view.findViewById(R.id.popularRecyclerView)
+        popularSeeAll = view.findViewById(R.id.popularSeeAll)
+
+        // Results mode views
+        resultsContainer = view.findViewById(R.id.resultsContainer)
+        btnBackToDiscovery = view.findViewById(R.id.btnBackToDiscovery)
+        resultsSearchInputLayout = view.findViewById(R.id.resultsSearchInputLayout)
+        resultsSearchInput = view.findViewById(R.id.resultsSearchInput)
+        categoryFilterChip = view.findViewById(R.id.categoryFilterChip)
+        countryFilterChip = view.findViewById(R.id.countryFilterChip)
+        genreFilterChip = view.findViewById(R.id.genreFilterChip)
+        languageFilterChip = view.findViewById(R.id.languageFilterChip)
+        addFilterChip = view.findViewById(R.id.addFilterChip)
+        resultsCount = view.findViewById(R.id.resultsCount)
+        swipeRefresh = view.findViewById(R.id.swipeRefresh)
+        stationsRecyclerView = view.findViewById(R.id.stationsRecyclerView)
+
+        // Shared views
+        loadingContainer = view.findViewById(R.id.loadingContainer)
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
+        torWarningBanner = view.findViewById(R.id.torWarningBanner)
+    }
+
+    private fun setupDiscoveryMode() {
+        // Search bar tap -> switch to results mode with search focus
+        discoverySearchBar.setOnClickListener {
+            switchToResultsMode(focusSearch = true)
+        }
+
+        // Set up genre chips
+        setupGenreChips()
+
+        // Set up carousels
+        setupCarousels()
+
+        // See All buttons
+        trendingSeeAll.setOnClickListener {
+            currentResultsTitle = getString(R.string.browse_trending)
+            switchToResultsMode()
+            viewModel.loadRandom() // Uses recently changed as "trending"
+        }
+
+        topVotedSeeAll.setOnClickListener {
+            currentResultsTitle = getString(R.string.browse_top_voted)
+            switchToResultsMode()
+            viewModel.loadTopVoted()
+        }
+
+        popularSeeAll.setOnClickListener {
+            currentResultsTitle = getString(R.string.browse_popular)
+            switchToResultsMode()
+            viewModel.loadTopClicked()
+        }
+    }
+
+    private fun setupGenreChips() {
+        // Row 1
+        genreChipsRow1Data.forEach { genreData ->
+            val chip = createGenreChip(genreData)
+            genreChipsRow1.addView(chip)
+        }
+
+        // Row 2
+        genreChipsRow2Data.forEach { genreData ->
+            val chip = createGenreChip(genreData)
+            genreChipsRow2.addView(chip)
+        }
+    }
+
+    private fun createGenreChip(genreData: GenreChipData): Chip {
+        val chip = Chip(requireContext()).apply {
+            text = getString(genreData.displayName)
+            isCheckable = false
+            isClickable = true
+            setChipBackgroundColorResource(R.color.chip_background_selector)
+            setTextColor(ContextCompat.getColorStateList(context, R.color.chip_text_selector))
+            chipStrokeWidth = 0f
+
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.marginEnd = resources.getDimensionPixelSize(R.dimen.chip_margin)
+            layoutParams = params
+        }
+
+        chip.setOnClickListener {
+            // Find the tag in loaded tags or create a temporary one
+            val tags = viewModel.tags.value
+            val tagInfo = tags?.find { it.name.equals(genreData.tag, ignoreCase = true) }
+
+            currentResultsTitle = getString(genreData.displayName)
+            switchToResultsMode()
+
+            if (tagInfo != null) {
+                viewModel.filterByTag(tagInfo)
+            } else {
+                // Search by tag name directly if TagInfo not available
+                viewModel.search(genreData.tag)
+            }
+        }
+
+        return chip
+    }
+
+    private fun setupCarousels() {
+        // Trending carousel
+        trendingAdapter = BrowseCarouselAdapter(
+            onStationClick = { station -> playStation(station) },
+            onLikeClick = { station -> likeStation(station) },
+            showRankBadge = true
+        )
+        trendingRecyclerView.adapter = trendingAdapter
+        trendingRecyclerView.layoutManager = LinearLayoutManager(
+            requireContext(), LinearLayoutManager.HORIZONTAL, false
+        )
+
+        // Top Voted preview (vertical, limited items)
+        topVotedPreviewAdapter = BrowseCarouselAdapter(
+            onStationClick = { station -> playStation(station) },
+            onLikeClick = { station -> likeStation(station) },
+            showRankBadge = true
+        )
+        topVotedPreviewRecyclerView.adapter = topVotedPreviewAdapter
+        topVotedPreviewRecyclerView.layoutManager = LinearLayoutManager(
+            requireContext(), LinearLayoutManager.HORIZONTAL, false
+        )
+
+        // Popular carousel
+        popularAdapter = BrowseCarouselAdapter(
+            onStationClick = { station -> playStation(station) },
+            onLikeClick = { station -> likeStation(station) },
+            showRankBadge = false
+        )
+        popularRecyclerView.adapter = popularAdapter
+        popularRecyclerView.layoutManager = LinearLayoutManager(
+            requireContext(), LinearLayoutManager.HORIZONTAL, false
+        )
+    }
+
+    private fun setupResultsMode() {
+        // Back button
+        btnBackToDiscovery.setOnClickListener {
+            switchToDiscoveryMode()
+        }
+
+        // Search input
+        setupResultsSearch()
+
+        // Main stations list
+        stationsAdapter = BrowseStationsAdapter(
             onStationClick = { station -> playStation(station) },
             onAddClick = { station -> saveStation(station) },
             onRemoveClick = { station -> removeStation(station) },
             onLikeClick = { station -> likeStation(station) }
         )
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        stationsRecyclerView.adapter = stationsAdapter
+        stationsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Pagination - load more when scrolling near bottom
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        // Pagination
+        stationsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
@@ -132,40 +329,49 @@ class BrowseStationsFragment : Fragment() {
                 }
             }
         })
+
+        // Swipe refresh
+        swipeRefresh.setOnRefreshListener {
+            viewModel.refresh()
+        }
+
+        // Filter chips
+        setupFilterChips()
     }
 
-    private fun setupSearch() {
-        searchInput.addTextChangedListener(object : TextWatcher {
+    private fun setupResultsSearch() {
+        resultsSearchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                // Debounce search
-                searchDebounceRunnable?.let { searchInput.removeCallbacks(it) }
+                searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
                 searchDebounceRunnable = Runnable {
                     val query = s?.toString()?.trim() ?: ""
                     if (query.length >= 2) {
+                        currentResultsTitle = "\"$query\""
                         viewModel.search(query)
-                        clearChipSelection()
+                        updateCategoryChip()
                     } else if (query.isEmpty() && !isManualSearchClear) {
-                        // Reset to top voted when search is cleared (but not when manually cleared by chip clicks)
-                        chipTopVoted.isChecked = true
-                        clearOtherChips(chipTopVoted)
+                        // Reset to top voted when search is cleared
+                        currentResultsTitle = getString(R.string.browse_top_voted)
                         viewModel.loadTopVoted()
+                        updateCategoryChip()
                     }
                     isManualSearchClear = false
                 }
-                searchInput.postDelayed(searchDebounceRunnable!!, searchDebounceDelay)
+                resultsSearchInput.postDelayed(searchDebounceRunnable!!, searchDebounceDelay)
             }
         })
 
-        searchInput.setOnEditorActionListener { _, actionId, _ ->
+        resultsSearchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = searchInput.text?.toString()?.trim() ?: ""
+                val query = resultsSearchInput.text?.toString()?.trim() ?: ""
                 if (query.isNotEmpty()) {
+                    currentResultsTitle = "\"$query\""
                     viewModel.search(query)
-                    clearChipSelection()
+                    updateCategoryChip()
                 }
-                searchInput.clearFocus()
+                hideKeyboard()
                 true
             } else {
                 false
@@ -173,93 +379,63 @@ class BrowseStationsFragment : Fragment() {
         }
     }
 
-    private fun setupChips() {
-        // Use click listeners instead of checked change listeners
-        // This is more reliable with ChipGroup single selection
-        chipTopVoted.setOnClickListener {
-            if (!chipTopVoted.isChecked) {
-                chipTopVoted.isChecked = true
-            }
-            clearOtherChips(chipTopVoted)
-            clearSearch()
-            viewModel.loadTopVoted()
+    private fun setupFilterChips() {
+        // Category chip shows current browse mode
+        categoryFilterChip.setOnClickListener {
+            showCategoryMenu()
         }
 
-        chipPopular.setOnClickListener {
-            if (!chipPopular.isChecked) {
-                chipPopular.isChecked = true
-            }
-            clearOtherChips(chipPopular)
-            clearSearch()
-            viewModel.loadTopClicked()
-        }
-
-        chipRandom.setOnClickListener {
-            if (!chipRandom.isChecked) {
-                chipRandom.isChecked = true
-            }
-            clearOtherChips(chipRandom)
-            clearSearch()
-            viewModel.loadRandom()
-        }
-
-        chipHistory.setOnClickListener {
-            if (!chipHistory.isChecked) {
-                chipHistory.isChecked = true
-            }
-            clearOtherChips(chipHistory)
-            clearSearch()
-            viewModel.loadHistory()
-        }
-    }
-
-    private fun clearOtherChips(except: Chip) {
-        if (except != chipTopVoted) chipTopVoted.isChecked = false
-        if (except != chipPopular) chipPopular.isChecked = false
-        if (except != chipRandom) chipRandom.isChecked = false
-        if (except != chipHistory) chipHistory.isChecked = false
-    }
-
-    private fun selectTopVotedChip() {
-        chipTopVoted.isChecked = true
-        clearOtherChips(chipTopVoted)
-        clearSearch()
-        viewModel.loadTopVoted()
-    }
-
-    private fun setupFilters() {
-        countryFilterButton.setOnClickListener {
+        // Country filter
+        countryFilterChip.setOnClickListener {
             showCountryFilterDialog()
         }
-
-        genreFilterButton.setOnClickListener {
-            showGenreFilterDialog()
+        countryFilterChip.setOnCloseIconClickListener {
+            viewModel.filterByCountry(null)
+            countryFilterChip.visibility = View.GONE
         }
 
-        languageFilterButton.setOnClickListener {
+        // Genre filter
+        genreFilterChip.setOnClickListener {
+            showGenreFilterDialog()
+        }
+        genreFilterChip.setOnCloseIconClickListener {
+            viewModel.filterByTag(null)
+            genreFilterChip.visibility = View.GONE
+        }
+
+        // Language filter
+        languageFilterChip.setOnClickListener {
             showLanguageFilterDialog()
+        }
+        languageFilterChip.setOnCloseIconClickListener {
+            viewModel.filterByLanguage(null)
+            languageFilterChip.visibility = View.GONE
+        }
+
+        // Add filter button
+        addFilterChip.setOnClickListener {
+            showAddFilterMenu()
         }
     }
 
-    private fun setupSwipeRefresh() {
-        swipeRefresh.setOnRefreshListener {
-            viewModel.refresh()
-        }
+    private fun setupSharedViews() {
+        // Any shared view setup if needed
     }
 
     private fun observeViewModel() {
         viewModel.stations.observe(viewLifecycleOwner) { stations ->
-            adapter.submitList(stations)
+            stationsAdapter.submitList(stations)
             updateEmptyState(stations.isEmpty())
+            updateResultsCount(stations.size)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading && adapter.itemCount == 0) {
+            if (isLoading && stationsAdapter.itemCount == 0 && isInResultsMode) {
                 loadingContainer.visibility = View.VISIBLE
             } else {
                 loadingContainer.visibility = View.GONE
             }
-            swipeRefresh.isRefreshing = isLoading && adapter.itemCount > 0
+            swipeRefresh.isRefreshing = isLoading && stationsAdapter.itemCount > 0
         }
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
@@ -274,60 +450,217 @@ class BrowseStationsFragment : Fragment() {
         }
 
         viewModel.savedStationUuids.observe(viewLifecycleOwner) { uuids ->
-            adapter.updateSavedUuids(uuids)
+            stationsAdapter.updateSavedUuids(uuids)
         }
 
         viewModel.likedStationUuids.observe(viewLifecycleOwner) { uuids ->
-            adapter.updateLikedUuids(uuids)
+            stationsAdapter.updateLikedUuids(uuids)
+            // Update carousel adapters too
+            trendingAdapter.updateLikedUuids(uuids)
+            topVotedPreviewAdapter.updateLikedUuids(uuids)
+            popularAdapter.updateLikedUuids(uuids)
         }
 
         viewModel.selectedCountry.observe(viewLifecycleOwner) { country ->
-            countryFilterButton.text = country?.name ?: getString(R.string.filter_country)
+            if (country != null) {
+                countryFilterChip.text = country.name
+                countryFilterChip.visibility = View.VISIBLE
+            } else {
+                countryFilterChip.visibility = View.GONE
+            }
         }
 
         viewModel.selectedTag.observe(viewLifecycleOwner) { tag ->
-            // Display translated genre name on the filter button
-            genreFilterButton.text = if (tag != null) {
-                translateGenreName(tag.name)
+            if (tag != null) {
+                genreFilterChip.text = translateGenreName(tag.name)
+                genreFilterChip.visibility = View.VISIBLE
             } else {
-                getString(R.string.filter_genre)
+                genreFilterChip.visibility = View.GONE
             }
         }
 
         viewModel.selectedLanguage.observe(viewLifecycleOwner) { language ->
-            languageFilterButton.text = language?.name ?: getString(R.string.filter_language)
+            if (language != null) {
+                languageFilterChip.text = language.name
+                languageFilterChip.visibility = View.VISIBLE
+            } else {
+                languageFilterChip.visibility = View.GONE
+            }
         }
+    }
+
+    private fun loadDiscoveryData() {
+        lifecycleScope.launch {
+            // Load trending (recently changed)
+            when (val result = repository.getRecentlyChanged(10, 0)) {
+                is RadioBrowserResult.Success -> {
+                    trendingAdapter.submitList(result.data)
+                }
+                else -> {}
+            }
+
+            // Load top voted preview
+            when (val result = repository.getTopVoted(10, 0)) {
+                is RadioBrowserResult.Success -> {
+                    topVotedPreviewAdapter.submitList(result.data)
+                }
+                else -> {}
+            }
+
+            // Load popular
+            when (val result = repository.getTopClicked(10, 0)) {
+                is RadioBrowserResult.Success -> {
+                    popularAdapter.submitList(result.data)
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun refreshCarouselLikeStates() {
+        val likedUuids = viewModel.likedStationUuids.value ?: emptySet()
+        trendingAdapter.updateLikedUuids(likedUuids)
+        topVotedPreviewAdapter.updateLikedUuids(likedUuids)
+        popularAdapter.updateLikedUuids(likedUuids)
+    }
+
+    private fun switchToResultsMode(focusSearch: Boolean = false) {
+        isInResultsMode = true
+        discoveryContainer.visibility = View.GONE
+        resultsContainer.visibility = View.VISIBLE
+
+        if (focusSearch) {
+            resultsSearchInput.requestFocus()
+            showKeyboard()
+        }
+
+        // If no category set, default to Top Voted
+        if (currentResultsTitle.isEmpty()) {
+            currentResultsTitle = getString(R.string.browse_top_voted)
+            viewModel.loadTopVoted()
+        }
+        updateCategoryChip()
+    }
+
+    private fun switchToDiscoveryMode() {
+        isInResultsMode = false
+        resultsContainer.visibility = View.GONE
+        discoveryContainer.visibility = View.VISIBLE
+
+        // Clear search and filters
+        clearSearch()
+        viewModel.filterByCountry(null)
+        viewModel.filterByTag(null)
+        viewModel.filterByLanguage(null)
+        currentResultsTitle = ""
+
+        // Refresh discovery data
+        loadDiscoveryData()
+    }
+
+    private fun updateCategoryChip() {
+        categoryFilterChip.text = currentResultsTitle.ifEmpty { getString(R.string.browse_top_voted) }
+    }
+
+    private fun updateResultsCount(count: Int) {
+        resultsCount.text = getString(R.string.browse_results_format, count)
     }
 
     private fun updateEmptyState(isEmpty: Boolean) {
-        if (isEmpty && viewModel.isLoading.value != true) {
+        if (isEmpty && viewModel.isLoading.value != true && isInResultsMode) {
             emptyStateContainer.visibility = View.VISIBLE
-            recyclerView.visibility = View.GONE
+            stationsRecyclerView.visibility = View.GONE
         } else {
             emptyStateContainer.visibility = View.GONE
-            recyclerView.visibility = View.VISIBLE
+            stationsRecyclerView.visibility = View.VISIBLE
         }
     }
 
-    private fun clearChipSelection() {
-        chipTopVoted.isChecked = false
-        chipPopular.isChecked = false
-        chipRandom.isChecked = false
-        chipHistory.isChecked = false
+    private fun clearSearch() {
+        searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+        isManualSearchClear = true
+        resultsSearchInput.setText("")
     }
 
-    private fun clearSearch() {
-        searchDebounceRunnable?.let { searchInput.removeCallbacks(it) }
-        isManualSearchClear = true
-        searchInput.setText("")
+    private fun showKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(resultsSearchInput, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(resultsSearchInput.windowToken, 0)
+    }
+
+    private fun showCategoryMenu() {
+        val categories = arrayOf(
+            getString(R.string.browse_top_voted),
+            getString(R.string.browse_popular),
+            getString(R.string.browse_trending),
+            getString(R.string.browse_history)
+        )
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.browse_top_voted)
+            .setItems(categories) { _, which ->
+                clearSearch()
+                when (which) {
+                    0 -> {
+                        currentResultsTitle = getString(R.string.browse_top_voted)
+                        viewModel.loadTopVoted()
+                    }
+                    1 -> {
+                        currentResultsTitle = getString(R.string.browse_popular)
+                        viewModel.loadTopClicked()
+                    }
+                    2 -> {
+                        currentResultsTitle = getString(R.string.browse_trending)
+                        viewModel.loadRandom()
+                    }
+                    3 -> {
+                        currentResultsTitle = getString(R.string.browse_history)
+                        viewModel.loadHistory()
+                    }
+                }
+                updateCategoryChip()
+            }
+            .show()
+    }
+
+    private fun showAddFilterMenu() {
+        val filters = mutableListOf<String>()
+        val actions = mutableListOf<() -> Unit>()
+
+        if (viewModel.selectedCountry.value == null) {
+            filters.add(getString(R.string.filter_country))
+            actions.add { showCountryFilterDialog() }
+        }
+        if (viewModel.selectedTag.value == null) {
+            filters.add(getString(R.string.filter_genre))
+            actions.add { showGenreFilterDialog() }
+        }
+        if (viewModel.selectedLanguage.value == null) {
+            filters.add(getString(R.string.filter_language))
+            actions.add { showLanguageFilterDialog() }
+        }
+
+        if (filters.isEmpty()) {
+            Toast.makeText(requireContext(), "All filters are already applied", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.add_filter)
+            .setItems(filters.toTypedArray()) { _, which ->
+                actions[which]()
+            }
+            .show()
     }
 
     /**
      * Translate common genre names from English (RadioBrowser API) to localized strings.
-     * Returns the translated name if available, otherwise returns the original name.
      */
     private fun translateGenreName(englishName: String): String {
-        // Normalize the genre name for matching (lowercase, trim)
         val normalized = englishName.trim().lowercase()
 
         return when (normalized) {
@@ -363,17 +696,15 @@ class BrowseStationsFragment : Fragment() {
             "talk" -> getString(R.string.genre_talk)
             "world" -> getString(R.string.genre_world)
             "other" -> getString(R.string.genre_other)
-            else -> englishName // Return original if no translation available
+            else -> englishName
         }
     }
 
     private fun playStation(station: RadioBrowserStation) {
-        // Add to browse history
         lifecycleScope.launch {
             repository.addToBrowseHistory(station)
         }
 
-        // Convert to RadioStation and play
         val radioStation = repository.convertToRadioStation(station)
         radioViewModel.setCurrentStation(radioStation)
         radioViewModel.setBuffering(true)
@@ -386,7 +717,6 @@ class BrowseStationsFragment : Fragment() {
             putExtra("proxy_port", 0)
             putExtra("proxy_type", "NONE")
             putExtra("cover_art_uri", radioStation.coverArtUri)
-            // Custom proxy fields (default values for new RadioBrowser stations)
             putExtra("custom_proxy_protocol", "HTTP")
             putExtra("proxy_username", "")
             putExtra("proxy_password", "")
@@ -415,27 +745,22 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun likeStation(station: RadioBrowserStation) {
-        // Check current like and saved state before toggling
         val wasLiked = viewModel.likedStationUuids.value?.contains(station.stationuuid) ?: false
         val wasSaved = viewModel.savedStationUuids.value?.contains(station.stationuuid) ?: false
 
         viewModel.toggleLike(station)
 
-        // Show appropriate toast based on the action performed
         lifecycleScope.launch {
             val updatedStation = repository.getStationInfoByUuid(station.stationuuid)
 
             if (!wasLiked) {
-                // Station was just liked/hearted
                 if (!wasSaved) {
-                    // Station wasn't in library before - now added
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.station_saved, station.name),
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    // Station was already in library, just marked as favorite
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.station_added_to_favorites, station.name),
@@ -443,8 +768,6 @@ class BrowseStationsFragment : Fragment() {
                     ).show()
                 }
             } else {
-                // Station was just unliked/unhearted
-                // Check if it was a quick toggle or a long-time favorite
                 val stationAge = if (updatedStation != null) {
                     System.currentTimeMillis() - updatedStation.addedTimestamp
                 } else {
@@ -453,14 +776,12 @@ class BrowseStationsFragment : Fragment() {
 
                 val fiveMinutesInMillis = 5 * 60 * 1000
                 if (stationAge > fiveMinutesInMillis) {
-                    // Was a favorite for more than 5 minutes
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.station_removed_from_favorites, station.name),
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    // Quick toggle or recently added
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.station_removed, station.name),
@@ -469,14 +790,12 @@ class BrowseStationsFragment : Fragment() {
                 }
             }
 
-            // If this station is currently playing, update RadioViewModel to sync miniplayer/Now Playing
             radioViewModel.getCurrentStation()?.let { currentStation ->
                 if (currentStation.radioBrowserUuid == station.stationuuid) {
                     radioViewModel.updateCurrentStationLikeState(updatedStation?.isLiked ?: false)
                 }
             }
 
-            // Broadcast like state change to all views
             val broadcastIntent = Intent(MainActivity.BROADCAST_LIKE_STATE_CHANGED).apply {
                 putExtra(MainActivity.EXTRA_IS_LIKED, updatedStation?.isLiked ?: false)
                 putExtra(MainActivity.EXTRA_STATION_ID, updatedStation?.id ?: -1L)
@@ -493,10 +812,9 @@ class BrowseStationsFragment : Fragment() {
             return
         }
 
-        // Variable to hold the temporary selection
         val currentCountry = viewModel.selectedCountry.value
         var tempSelectedCountryIndex: Int? = if (currentCountry == null) {
-            null // "All Countries"
+            null
         } else {
             countries.indexOf(currentCountry).takeIf { it >= 0 }
         }
@@ -504,19 +822,14 @@ class BrowseStationsFragment : Fragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.select_country)
             .setView(createCountrySearchView(countries, tempSelectedCountryIndex) { selectedIndex ->
-                // Store the temporary selection but don't apply yet
                 tempSelectedCountryIndex = selectedIndex
             })
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                // Apply the selection when OK is clicked
                 if (tempSelectedCountryIndex == null) {
                     viewModel.filterByCountry(null)
-                    selectTopVotedChip()
                 } else {
                     viewModel.filterByCountry(countries[tempSelectedCountryIndex!!])
-                    clearChipSelection()
-                    clearSearch()
                 }
             }
             .create()
@@ -531,10 +844,9 @@ class BrowseStationsFragment : Fragment() {
             return
         }
 
-        // Variable to hold the temporary selection
         val currentTag = viewModel.selectedTag.value
         var tempSelectedTagIndex: Int? = if (currentTag == null) {
-            null // "All Genres"
+            null
         } else {
             tags.indexOf(currentTag).takeIf { it >= 0 }
         }
@@ -542,19 +854,14 @@ class BrowseStationsFragment : Fragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.select_genre)
             .setView(createTagSearchView(tags, tempSelectedTagIndex) { selectedIndex ->
-                // Store the temporary selection but don't apply yet
                 tempSelectedTagIndex = selectedIndex
             })
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                // Apply the selection when OK is clicked
                 if (tempSelectedTagIndex == null) {
                     viewModel.filterByTag(null)
-                    selectTopVotedChip()
                 } else {
                     viewModel.filterByTag(tags[tempSelectedTagIndex!!])
-                    clearChipSelection()
-                    clearSearch()
                 }
             }
             .create()
@@ -569,10 +876,9 @@ class BrowseStationsFragment : Fragment() {
             return
         }
 
-        // Variable to hold the temporary selection
         val currentLanguage = viewModel.selectedLanguage.value
         var tempSelectedLanguageIndex: Int? = if (currentLanguage == null) {
-            null // "All Languages"
+            null
         } else {
             languages.indexOf(currentLanguage).takeIf { it >= 0 }
         }
@@ -580,19 +886,14 @@ class BrowseStationsFragment : Fragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.select_language)
             .setView(createLanguageSearchView(languages, tempSelectedLanguageIndex) { selectedIndex ->
-                // Store the temporary selection but don't apply yet
                 tempSelectedLanguageIndex = selectedIndex
             })
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                // Apply the selection when OK is clicked
                 if (tempSelectedLanguageIndex == null) {
                     viewModel.filterByLanguage(null)
-                    selectTopVotedChip()
                 } else {
                     viewModel.filterByLanguage(languages[tempSelectedLanguageIndex!!])
-                    clearChipSelection()
-                    clearSearch()
                 }
             }
             .create()
@@ -611,7 +912,6 @@ class BrowseStationsFragment : Fragment() {
             setPadding(0, 8, 0, 0)
         }
 
-        // Search input with improved styling
         val searchInput = TextInputEditText(context).apply {
             hint = getString(R.string.search_countries)
             inputType = android.text.InputType.TYPE_CLASS_TEXT
@@ -632,7 +932,6 @@ class BrowseStationsFragment : Fragment() {
             setMargins(24, 0, 24, 8)
         })
 
-        // Divider
         val divider = View(context).apply {
             val dividerColor = com.google.android.material.color.MaterialColors.getColor(
                 this,
@@ -645,10 +944,8 @@ class BrowseStationsFragment : Fragment() {
             1
         ))
 
-        // RecyclerView for country list
         val recyclerView = RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context)
-            // Set a max height for the dialog (approx 400dp)
             val maxHeight = (400 * resources.displayMetrics.density).toInt()
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -662,7 +959,6 @@ class BrowseStationsFragment : Fragment() {
         val adapter = CountryAdapter(filteredCountries, selectedIndex, onCountrySelected)
         recyclerView.adapter = adapter
 
-        // Search functionality
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -692,7 +988,6 @@ class BrowseStationsFragment : Fragment() {
             setPadding(0, 8, 0, 0)
         }
 
-        // Search input with improved styling
         val searchInput = TextInputEditText(context).apply {
             hint = getString(R.string.search_genres)
             inputType = android.text.InputType.TYPE_CLASS_TEXT
@@ -713,7 +1008,6 @@ class BrowseStationsFragment : Fragment() {
             setMargins(24, 0, 24, 8)
         })
 
-        // Divider
         val divider = View(context).apply {
             val dividerColor = com.google.android.material.color.MaterialColors.getColor(
                 this,
@@ -726,10 +1020,8 @@ class BrowseStationsFragment : Fragment() {
             1
         ))
 
-        // RecyclerView for tag list
         val recyclerView = RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context)
-            // Set a max height for the dialog (approx 400dp)
             val maxHeight = (400 * resources.displayMetrics.density).toInt()
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -743,7 +1035,6 @@ class BrowseStationsFragment : Fragment() {
         val adapter = TagAdapter(filteredTags, selectedIndex, onTagSelected)
         recyclerView.adapter = adapter
 
-        // Search functionality - searches both English and translated genre names
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -753,7 +1044,6 @@ class BrowseStationsFragment : Fragment() {
                     tags
                 } else {
                     tags.filter { tag ->
-                        // Search against both English name and translated name
                         val englishName = tag.name
                         val translatedName = translateGenreName(tag.name)
                         englishName.contains(query, ignoreCase = true) ||
@@ -779,7 +1069,6 @@ class BrowseStationsFragment : Fragment() {
             setPadding(0, 8, 0, 0)
         }
 
-        // Search input with improved styling
         val searchInput = TextInputEditText(context).apply {
             hint = getString(R.string.search_languages)
             inputType = android.text.InputType.TYPE_CLASS_TEXT
@@ -800,7 +1089,6 @@ class BrowseStationsFragment : Fragment() {
             setMargins(24, 0, 24, 8)
         })
 
-        // Divider
         val divider = View(context).apply {
             val dividerColor = com.google.android.material.color.MaterialColors.getColor(
                 this,
@@ -813,10 +1101,8 @@ class BrowseStationsFragment : Fragment() {
             1
         ))
 
-        // RecyclerView for language list
         val recyclerView = RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context)
-            // Set a max height for the dialog (approx 400dp)
             val maxHeight = (400 * resources.displayMetrics.density).toInt()
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -830,7 +1116,6 @@ class BrowseStationsFragment : Fragment() {
         val adapter = LanguageAdapter(filteredLanguages, selectedIndex, onLanguageSelected)
         recyclerView.adapter = adapter
 
-        // Search functionality
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -849,14 +1134,15 @@ class BrowseStationsFragment : Fragment() {
         return container
     }
 
-    // Adapter for Country list with search
+    // Inner adapter classes for filter dialogs
+
     private inner class CountryAdapter(
         private var countries: List<com.opensource.i2pradio.data.radiobrowser.CountryInfo>,
         private val initialSelectedIndex: Int?,
         private val onCountrySelected: (Int?) -> Unit
     ) : RecyclerView.Adapter<CountryAdapter.ViewHolder>() {
 
-        private var selectedPosition: Int = -1 // -1 means "All Countries"
+        private var selectedPosition: Int = -1
         private val originalCountries = countries
 
         init {
@@ -884,7 +1170,6 @@ class BrowseStationsFragment : Fragment() {
             if (position >= itemCount) return
 
             if (position == 0) {
-                // "All Countries" option
                 holder.textView?.text = getString(R.string.filter_all_countries)
                 holder.radioButton?.isChecked = selectedPosition == -1
 
@@ -897,7 +1182,6 @@ class BrowseStationsFragment : Fragment() {
                 val country = countries[position - 1]
                 holder.textView?.text = "${country.name} (${country.stationCount})"
 
-                // Find the index in the original list
                 val originalIndex = originalCountries.indexOf(country)
                 holder.radioButton?.isChecked = selectedPosition == originalIndex
 
@@ -909,17 +1193,16 @@ class BrowseStationsFragment : Fragment() {
             }
         }
 
-        override fun getItemCount() = countries.size + 1 // +1 for "All Countries"
+        override fun getItemCount() = countries.size + 1
     }
 
-    // Adapter for Tag list with search
     private inner class TagAdapter(
         private var tags: List<com.opensource.i2pradio.data.radiobrowser.TagInfo>,
         private val initialSelectedIndex: Int?,
         private val onTagSelected: (Int?) -> Unit
     ) : RecyclerView.Adapter<TagAdapter.ViewHolder>() {
 
-        private var selectedPosition: Int = -1 // -1 means "All Genres"
+        private var selectedPosition: Int = -1
         private val originalTags = tags
 
         init {
@@ -947,7 +1230,6 @@ class BrowseStationsFragment : Fragment() {
             if (position >= itemCount) return
 
             if (position == 0) {
-                // "All Genres" option
                 holder.textView?.text = getString(R.string.filter_all_genres)
                 holder.radioButton?.isChecked = selectedPosition == -1
 
@@ -958,11 +1240,9 @@ class BrowseStationsFragment : Fragment() {
                 }
             } else {
                 val tag = tags[position - 1]
-                // Display translated genre name if available
                 val displayName = translateGenreName(tag.name)
                 holder.textView?.text = "$displayName (${tag.stationCount})"
 
-                // Find the index in the original list
                 val originalIndex = originalTags.indexOf(tag)
                 holder.radioButton?.isChecked = selectedPosition == originalIndex
 
@@ -974,17 +1254,16 @@ class BrowseStationsFragment : Fragment() {
             }
         }
 
-        override fun getItemCount() = tags.size + 1 // +1 for "All Genres"
+        override fun getItemCount() = tags.size + 1
     }
 
-    // Adapter for Language list with search
     private inner class LanguageAdapter(
         private var languages: List<com.opensource.i2pradio.data.radiobrowser.LanguageInfo>,
         private val initialSelectedIndex: Int?,
         private val onLanguageSelected: (Int?) -> Unit
     ) : RecyclerView.Adapter<LanguageAdapter.ViewHolder>() {
 
-        private var selectedPosition: Int = -1 // -1 means "All Languages"
+        private var selectedPosition: Int = -1
         private val originalLanguages = languages
 
         init {
@@ -1012,7 +1291,6 @@ class BrowseStationsFragment : Fragment() {
             if (position >= itemCount) return
 
             if (position == 0) {
-                // "All Languages" option
                 holder.textView?.text = getString(R.string.filter_all_languages)
                 holder.radioButton?.isChecked = selectedPosition == -1
 
@@ -1025,7 +1303,6 @@ class BrowseStationsFragment : Fragment() {
                 val language = languages[position - 1]
                 holder.textView?.text = "${language.name} (${language.stationCount})"
 
-                // Find the index in the original list
                 val originalIndex = originalLanguages.indexOf(language)
                 holder.radioButton?.isChecked = selectedPosition == originalIndex
 
@@ -1037,24 +1314,22 @@ class BrowseStationsFragment : Fragment() {
             }
         }
 
-        override fun getItemCount() = languages.size + 1 // +1 for "All Languages"
+        override fun getItemCount() = languages.size + 1
     }
 
     override fun onResume() {
         super.onResume()
-        // Register broadcast receiver for like state changes
         val filter = IntentFilter(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(likeStateReceiver, filter)
     }
 
     override fun onPause() {
         super.onPause()
-        // Unregister broadcast receiver
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(likeStateReceiver)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        searchDebounceRunnable?.let { searchInput.removeCallbacks(it) }
+        searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
     }
 }
