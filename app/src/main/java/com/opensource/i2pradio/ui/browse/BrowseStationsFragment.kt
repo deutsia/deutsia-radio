@@ -341,13 +341,28 @@ class BrowseStationsFragment : Fragment() {
 
     /**
      * Set up touch handling for HorizontalScrollViews (genre chips) to work with ViewPager2.
+     * Claim gesture immediately, only release if swipe is clearly vertical.
      */
     private fun setupHorizontalScrollTouchHandling(scrollView: android.widget.HorizontalScrollView) {
+        var startX = 0f
+        var startY = 0f
+        val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
+
         scrollView.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    // When touch starts, request parent not to intercept
+                    startX = event.x
+                    startY = event.y
+                    // Immediately claim gesture - chips get priority
                     v.parent?.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = kotlin.math.abs(event.x - startX)
+                    val dy = kotlin.math.abs(event.y - startY)
+                    // Only release to ViewPager2 if swipe is clearly vertical
+                    if (dy > touchSlop && dy > dx * 2) {
+                        v.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     v.parent?.requestDisallowInterceptTouchEvent(false)
