@@ -534,6 +534,11 @@ class MainActivity : AppCompatActivity() {
         val adapter = ViewPagerAdapter(this)
         viewPager.adapter = adapter
 
+        // Disable horizontal swipe navigation to prevent conflicts with horizontal
+        // scrolling elements (carousels, chips) in the browse tab. Users can still
+        // switch tabs by tapping on the tab bar.
+        viewPager.isUserInputEnabled = false
+
         // Add smooth page transformation with fade and slight scale
         viewPager.setPageTransformer { page, position ->
             val absPosition = kotlin.math.abs(position)

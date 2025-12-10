@@ -54,12 +54,16 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var discoverySearchBar: MaterialCardView
     private lateinit var genreChipsRow1: LinearLayout
     private lateinit var genreChipsRow2: LinearLayout
+    private lateinit var countryChipsRow: LinearLayout
+    private lateinit var languageChipsRow: LinearLayout
     private lateinit var trendingRecyclerView: RecyclerView
     private lateinit var trendingSeeAll: TextView
     private lateinit var topVotedPreviewRecyclerView: RecyclerView
     private lateinit var topVotedSeeAll: TextView
     private lateinit var popularRecyclerView: RecyclerView
     private lateinit var popularSeeAll: TextView
+    private lateinit var newStationsRecyclerView: RecyclerView
+    private lateinit var newStationsSeeAll: TextView
 
     // Results mode views
     private lateinit var resultsContainer: LinearLayout
@@ -85,6 +89,7 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var trendingAdapter: BrowseCarouselAdapter
     private lateinit var topVotedPreviewAdapter: BrowseCarouselAdapter
     private lateinit var popularAdapter: BrowseCarouselAdapter
+    private lateinit var newStationsAdapter: BrowseCarouselAdapter
 
     private val viewModel: BrowseViewModel by viewModels()
     private val radioViewModel: RadioViewModel by activityViewModels()
@@ -115,6 +120,40 @@ class BrowseStationsFragment : Fragment() {
         GenreChipData("news", R.string.genre_news),
         GenreChipData("talk", R.string.genre_talk),
         GenreChipData("sports", R.string.genre_sports)
+    )
+
+    // Country chips data - popular countries by station count
+    private data class CountryChipData(val countryCode: String, val displayName: String, val flag: String)
+    private val countryChipsData = listOf(
+        CountryChipData("US", "USA", "\uD83C\uDDFA\uD83C\uDDF8"),
+        CountryChipData("DE", "Germany", "\uD83C\uDDE9\uD83C\uDDEA"),
+        CountryChipData("GB", "UK", "\uD83C\uDDEC\uD83C\uDDE7"),
+        CountryChipData("FR", "France", "\uD83C\uDDEB\uD83C\uDDF7"),
+        CountryChipData("ES", "Spain", "\uD83C\uDDEA\uD83C\uDDF8"),
+        CountryChipData("BR", "Brazil", "\uD83C\uDDE7\uD83C\uDDF7"),
+        CountryChipData("IT", "Italy", "\uD83C\uDDEE\uD83C\uDDF9"),
+        CountryChipData("MX", "Mexico", "\uD83C\uDDF2\uD83C\uDDFD"),
+        CountryChipData("CA", "Canada", "\uD83C\uDDE8\uD83C\uDDE6"),
+        CountryChipData("AU", "Australia", "\uD83C\uDDE6\uD83C\uDDFA"),
+        CountryChipData("JP", "Japan", "\uD83C\uDDEF\uD83C\uDDF5"),
+        CountryChipData("RU", "Russia", "\uD83C\uDDF7\uD83C\uDDFA")
+    )
+
+    // Language chips data - popular languages
+    private data class LanguageChipData(val language: String, val displayName: String)
+    private val languageChipsData = listOf(
+        LanguageChipData("english", "English"),
+        LanguageChipData("spanish", "Spanish"),
+        LanguageChipData("german", "German"),
+        LanguageChipData("french", "French"),
+        LanguageChipData("portuguese", "Portuguese"),
+        LanguageChipData("italian", "Italian"),
+        LanguageChipData("russian", "Russian"),
+        LanguageChipData("chinese", "Chinese"),
+        LanguageChipData("japanese", "Japanese"),
+        LanguageChipData("arabic", "Arabic"),
+        LanguageChipData("hindi", "Hindi"),
+        LanguageChipData("korean", "Korean")
     )
 
     // Broadcast receiver for like state changes from other views
@@ -153,12 +192,16 @@ class BrowseStationsFragment : Fragment() {
         discoverySearchBar = view.findViewById(R.id.discoverySearchBar)
         genreChipsRow1 = view.findViewById(R.id.genreChipsRow1)
         genreChipsRow2 = view.findViewById(R.id.genreChipsRow2)
+        countryChipsRow = view.findViewById(R.id.countryChipsRow)
+        languageChipsRow = view.findViewById(R.id.languageChipsRow)
         trendingRecyclerView = view.findViewById(R.id.trendingRecyclerView)
         trendingSeeAll = view.findViewById(R.id.trendingSeeAll)
         topVotedPreviewRecyclerView = view.findViewById(R.id.topVotedPreviewRecyclerView)
         topVotedSeeAll = view.findViewById(R.id.topVotedSeeAll)
         popularRecyclerView = view.findViewById(R.id.popularRecyclerView)
         popularSeeAll = view.findViewById(R.id.popularSeeAll)
+        newStationsRecyclerView = view.findViewById(R.id.newStationsRecyclerView)
+        newStationsSeeAll = view.findViewById(R.id.newStationsSeeAll)
 
         // Results mode views
         resultsContainer = view.findViewById(R.id.resultsContainer)
@@ -186,8 +229,10 @@ class BrowseStationsFragment : Fragment() {
             switchToResultsMode(focusSearch = true)
         }
 
-        // Set up genre chips
+        // Set up chips
         setupGenreChips()
+        setupCountryChips()
+        setupLanguageChips()
 
         // Set up carousels
         setupCarousels()
@@ -209,6 +254,12 @@ class BrowseStationsFragment : Fragment() {
             currentResultsTitle = getString(R.string.browse_popular)
             switchToResultsMode()
             viewModel.loadTopClicked()
+        }
+
+        newStationsSeeAll.setOnClickListener {
+            currentResultsTitle = getString(R.string.browse_new_stations)
+            switchToResultsMode()
+            viewModel.loadRandom() // Recently changed stations
         }
     }
 
@@ -262,6 +313,72 @@ class BrowseStationsFragment : Fragment() {
         return chip
     }
 
+    private fun setupCountryChips() {
+        countryChipsData.forEach { countryData ->
+            val chip = createCountryChip(countryData)
+            countryChipsRow.addView(chip)
+        }
+    }
+
+    private fun createCountryChip(countryData: CountryChipData): Chip {
+        val chip = Chip(requireContext()).apply {
+            text = "${countryData.flag} ${countryData.displayName}"
+            isCheckable = false
+            isClickable = true
+            setChipBackgroundColorResource(R.color.chip_background_selector)
+            setTextColor(ContextCompat.getColorStateList(context, R.color.chip_text_selector))
+            chipStrokeWidth = 0f
+
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.marginEnd = resources.getDimensionPixelSize(R.dimen.chip_margin)
+            layoutParams = params
+        }
+
+        chip.setOnClickListener {
+            currentResultsTitle = countryData.displayName
+            switchToResultsMode()
+            viewModel.loadByCountryCode(countryData.countryCode)
+        }
+
+        return chip
+    }
+
+    private fun setupLanguageChips() {
+        languageChipsData.forEach { languageData ->
+            val chip = createLanguageChip(languageData)
+            languageChipsRow.addView(chip)
+        }
+    }
+
+    private fun createLanguageChip(languageData: LanguageChipData): Chip {
+        val chip = Chip(requireContext()).apply {
+            text = languageData.displayName
+            isCheckable = false
+            isClickable = true
+            setChipBackgroundColorResource(R.color.chip_background_selector)
+            setTextColor(ContextCompat.getColorStateList(context, R.color.chip_text_selector))
+            chipStrokeWidth = 0f
+
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.marginEnd = resources.getDimensionPixelSize(R.dimen.chip_margin)
+            layoutParams = params
+        }
+
+        chip.setOnClickListener {
+            currentResultsTitle = languageData.displayName
+            switchToResultsMode()
+            viewModel.loadByLanguage(languageData.language)
+        }
+
+        return chip
+    }
+
     private fun setupCarousels() {
         // Trending carousel
         trendingAdapter = BrowseCarouselAdapter(
@@ -293,6 +410,17 @@ class BrowseStationsFragment : Fragment() {
         )
         popularRecyclerView.adapter = popularAdapter
         popularRecyclerView.layoutManager = LinearLayoutManager(
+            requireContext(), LinearLayoutManager.HORIZONTAL, false
+        )
+
+        // New Stations carousel
+        newStationsAdapter = BrowseCarouselAdapter(
+            onStationClick = { station -> playStation(station) },
+            onLikeClick = { station -> likeStation(station) },
+            showRankBadge = false
+        )
+        newStationsRecyclerView.adapter = newStationsAdapter
+        newStationsRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
     }
@@ -459,6 +587,7 @@ class BrowseStationsFragment : Fragment() {
             trendingAdapter.updateLikedUuids(uuids)
             topVotedPreviewAdapter.updateLikedUuids(uuids)
             popularAdapter.updateLikedUuids(uuids)
+            newStationsAdapter.updateLikedUuids(uuids)
         }
 
         viewModel.selectedCountry.observe(viewLifecycleOwner) { country ->
@@ -514,6 +643,14 @@ class BrowseStationsFragment : Fragment() {
                 }
                 else -> {}
             }
+
+            // Load new stations (recently changed, different offset to get different results than trending)
+            when (val result = repository.getRecentlyChanged(10, 10)) {
+                is RadioBrowserResult.Success -> {
+                    newStationsAdapter.submitList(result.data)
+                }
+                else -> {}
+            }
         }
     }
 
@@ -522,6 +659,7 @@ class BrowseStationsFragment : Fragment() {
         trendingAdapter.updateLikedUuids(likedUuids)
         topVotedPreviewAdapter.updateLikedUuids(likedUuids)
         popularAdapter.updateLikedUuids(likedUuids)
+        newStationsAdapter.updateLikedUuids(likedUuids)
     }
 
     private fun switchToResultsMode(focusSearch: Boolean = false) {
