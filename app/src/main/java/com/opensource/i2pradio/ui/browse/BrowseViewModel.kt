@@ -579,16 +579,36 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Normalize genre name for deduplication purposes.
+     * Maps known variants (e.g., "hip hop", "hip-hop", "hiphop") to a canonical form.
+     */
+    private fun normalizeGenreName(name: String): String {
+        val lower = name.lowercase().trim()
+        return when {
+            lower in listOf("hip hop", "hip-hop", "hiphop") -> "hiphop"
+            lower in listOf("k-pop", "kpop") -> "kpop"
+            lower in listOf("lo-fi", "lofi") -> "lofi"
+            lower in listOf("r&b", "r and b", "rnb") -> "rnb"
+            else -> lower
+        }
+    }
+
+    /**
      * Load tags list
      */
     private fun loadTags() {
         viewModelScope.launch {
             when (val result = repository.getTags(200)) {
                 is RadioBrowserResult.Success -> {
-                    // Filter to tags with at least 10 stations, deduplicate by name (case-insensitive), and sort alphabetically
+                    // Filter to tags with at least 10 stations, consolidate variants, and sort alphabetically
+                    // Group by normalized name and keep the variant with the highest station count
                     _tags.value = result.data
                         .filter { it.stationCount >= 10 }
-                        .distinctBy { it.name.lowercase() }
+                        .groupBy { normalizeGenreName(it.name) }
+                        .map { (_, variants) ->
+                            // Keep the variant with the highest station count (most reliable for API)
+                            variants.maxByOrNull { it.stationCount }!!
+                        }
                         .sortedBy { it.name.lowercase() }
                 }
                 is RadioBrowserResult.Error -> {
