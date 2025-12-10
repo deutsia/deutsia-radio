@@ -96,10 +96,12 @@
     <string name="station_removed_from_favorites">%s removed from favorites</string>
     <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
     <string name="browse_by_genre">Browse by Genre</string>
-    <string name="browse_by_country">Browse by Country</string>
-    <string name="browse_by_language">Browse by Language</string>
     <string name="browse_trending">Trending Now</string>
     <string name="browse_new_stations">New Stations</string>
+    <string name="browse_popular_usa">Popular in USA</string>
+    <string name="browse_popular_germany">Popular in Germany</string>
+    <string name="browse_spanish_radio">Spanish Radio</string>
+    <string name="browse_french_radio">French Radio</string>
     <string name="see_all">See All</string>
     <string name="add_filter">+ Filter</string>
     <string name="browse_results_count">Loading…</string>
