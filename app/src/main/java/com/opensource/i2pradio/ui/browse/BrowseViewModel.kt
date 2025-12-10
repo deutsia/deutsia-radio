@@ -75,6 +75,34 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     // Temporary memory of stations shown in Top Voted (to hide in Popular)
     private val topVotedStationUuids = mutableSetOf<String>()
 
+    // Discovery mode carousel data (cached to survive configuration changes)
+    private val _usaStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
+    val usaStations: LiveData<List<RadioBrowserStation>> = _usaStations
+
+    private val _germanyStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
+    val germanyStations: LiveData<List<RadioBrowserStation>> = _germanyStations
+
+    private val _spanishStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
+    val spanishStations: LiveData<List<RadioBrowserStation>> = _spanishStations
+
+    private val _frenchStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
+    val frenchStations: LiveData<List<RadioBrowserStation>> = _frenchStations
+
+    private val _trendingStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
+    val trendingStations: LiveData<List<RadioBrowserStation>> = _trendingStations
+
+    private val _topVotedPreviewStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
+    val topVotedPreviewStations: LiveData<List<RadioBrowserStation>> = _topVotedPreviewStations
+
+    private val _popularStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
+    val popularStations: LiveData<List<RadioBrowserStation>> = _popularStations
+
+    private val _newStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
+    val newStations: LiveData<List<RadioBrowserStation>> = _newStations
+
+    // Track if discovery data has been loaded
+    private var discoveryDataLoaded = false
+
     // Pagination
     private var currentOffset = 0
     private val pageSize = 50
@@ -98,6 +126,66 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         loadCountries()
         loadTags()
         loadLanguages()
+        loadDiscoveryData()
+    }
+
+    /**
+     * Load all discovery mode carousel data.
+     * This is cached in the ViewModel to survive configuration changes.
+     */
+    fun loadDiscoveryData(forceRefresh: Boolean = false) {
+        if (discoveryDataLoaded && !forceRefresh) return
+        discoveryDataLoaded = true
+
+        viewModelScope.launch {
+            // Load USA stations
+            when (val result = repository.getByCountryCode("US", 10, 0)) {
+                is RadioBrowserResult.Success -> _usaStations.value = result.data
+                else -> {}
+            }
+
+            // Load Germany stations
+            when (val result = repository.getByCountryCode("DE", 10, 0)) {
+                is RadioBrowserResult.Success -> _germanyStations.value = result.data
+                else -> {}
+            }
+
+            // Load Spanish stations
+            when (val result = repository.getByLanguage("spanish", 10, 0)) {
+                is RadioBrowserResult.Success -> _spanishStations.value = result.data
+                else -> {}
+            }
+
+            // Load French stations
+            when (val result = repository.getByLanguage("french", 10, 0)) {
+                is RadioBrowserResult.Success -> _frenchStations.value = result.data
+                else -> {}
+            }
+
+            // Load trending (recently changed)
+            when (val result = repository.getRecentlyChanged(10, 0)) {
+                is RadioBrowserResult.Success -> _trendingStations.value = result.data
+                else -> {}
+            }
+
+            // Load top voted preview
+            when (val result = repository.getTopVoted(10, 0)) {
+                is RadioBrowserResult.Success -> _topVotedPreviewStations.value = result.data
+                else -> {}
+            }
+
+            // Load popular
+            when (val result = repository.getTopClicked(10, 0)) {
+                is RadioBrowserResult.Success -> _popularStations.value = result.data
+                else -> {}
+            }
+
+            // Load new stations (recently changed, different offset to get different results than trending)
+            when (val result = repository.getRecentlyChanged(10, 10)) {
+                is RadioBrowserResult.Success -> _newStations.value = result.data
+                else -> {}
+            }
+        }
     }
 
     /**

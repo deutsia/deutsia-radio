@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="100dp">
+            android:paddingBottom="80dp">
 
             <!-- Search Bar (tapping switches to results mode) -->
             <com.google.android.material.card.MaterialCardView
@@ -34,7 +34,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:gravity="center_vertical"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:paddingHorizontal="20dp">
 
@@ -46,10 +46,9 @@
                         app:tint="?attr/colorOnSurface" />
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="14dp"
+                        android:layout_marginStart="10dp"
                         android:text="@string/search_radio_browser"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="16sp" />
@@ -58,25 +57,45 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Genre Section Header -->
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
                 android:layout_marginTop="24dp"
-                android:text="@string/browse_by_genre"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.05" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/browse_by_genre"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05" />
+
+                <TextView
+                    android:id="@+id/genreSeeAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/see_all"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:paddingVertical="4dp" />
+
+            </LinearLayout>
 
             <!-- Genre Chips Row 1 -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:scrollbars="none"
                 android:clipToPadding="false"
-                android:paddingHorizontal="16dp">
+                android:paddingHorizontal="16dp"
+                android:overScrollMode="never">
 
                 <LinearLayout
                     android:id="@+id/genreChipsRow1"
@@ -90,10 +109,11 @@
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:scrollbars="none"
                 android:clipToPadding="false"
-                android:paddingHorizontal="16dp">
+                android:paddingHorizontal="16dp"
+                android:overScrollMode="never">
 
                 <LinearLayout
                     android:id="@+id/genreChipsRow2"
@@ -480,8 +500,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="12dp"
-            android:paddingBottom="8dp"
-            android:scrollbars="none">
+            android:paddingBottom="6dp"
+            android:scrollbars="none"
+            android:overScrollMode="never">
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/activeFiltersChipGroup"
@@ -575,7 +596,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="100dp"
+                android:paddingBottom="80dp"
                 android:scrollbars="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
