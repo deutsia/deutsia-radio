@@ -125,7 +125,8 @@ class BrowseStationsFragment : Fragment() {
         GenreChipData("jazz", R.string.genre_jazz),
         GenreChipData("classical", R.string.genre_classical),
         GenreChipData("hip hop", R.string.genre_hip_hop),
-        GenreChipData("electronic", R.string.genre_electronic)
+        GenreChipData("electronic", R.string.genre_electronic),
+        GenreChipData("edm", R.string.genre_edm)
     )
     private val genreChipsRow2Data = listOf(
         GenreChipData("country", R.string.genre_country),
