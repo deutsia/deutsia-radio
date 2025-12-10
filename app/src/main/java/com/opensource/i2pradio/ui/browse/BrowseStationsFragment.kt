@@ -340,21 +340,37 @@ class BrowseStationsFragment : Fragment() {
     }
 
     /**
-     * Simple touch handling for genre chip HorizontalScrollViews.
-     * Just prevents ViewPager2 from intercepting horizontal scrolls.
+     * Set up touch handling for genre chip HorizontalScrollViews to work with ViewPager2.
+     * When touching the scroll view, immediately claim the gesture for horizontal scrolling.
+     * Only release to ViewPager2 if the swipe turns out to be clearly vertical.
+     * This matches the approach used for carousels.
      */
     private fun setupGenreScrollTouchHandling(scrollView: android.widget.HorizontalScrollView) {
+        var startX = 0f
+        var startY = 0f
+        val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
+
         scrollView.setOnTouchListener { v, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                    // Tell ViewPager2 not to intercept
+                MotionEvent.ACTION_DOWN -> {
+                    startX = event.x
+                    startY = event.y
+                    // Immediately claim gesture - genre chips get priority
                     v.parent?.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = kotlin.math.abs(event.x - startX)
+                    val dy = kotlin.math.abs(event.y - startY)
+                    // Only release to ViewPager2 if swipe is clearly vertical
+                    if (dy > touchSlop && dy > dx * 2) {
+                        v.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     v.parent?.requestDisallowInterceptTouchEvent(false)
                 }
             }
-            false
+            false // Don't consume the event, let HorizontalScrollView handle it
         }
     }
 
