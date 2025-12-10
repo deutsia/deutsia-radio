@@ -293,9 +293,13 @@ class BrowseStationsFragment : Fragment() {
             genreChipsRow2.addView(chip)
         }
 
-        // Set up touch handling on the LinearLayouts to intercept touches early
-        setupGenreChipsTouchHandling(genreChipsRow1)
-        setupGenreChipsTouchHandling(genreChipsRow2)
+        // Set up touch handling for the HorizontalScrollViews
+        (genreChipsRow1.parent as? android.widget.HorizontalScrollView)?.let {
+            setupGenreScrollTouchHandling(it)
+        }
+        (genreChipsRow2.parent as? android.widget.HorizontalScrollView)?.let {
+            setupGenreScrollTouchHandling(it)
+        }
     }
 
     private fun createGenreChip(genreData: GenreChipData): Chip {
@@ -314,9 +318,6 @@ class BrowseStationsFragment : Fragment() {
             params.marginEnd = resources.getDimensionPixelSize(R.dimen.chip_margin)
             layoutParams = params
         }
-
-        // Set up touch handling to claim horizontal gestures for scrolling
-        setupChipTouchHandling(chip)
 
         chip.setOnClickListener {
             // Find the tag in loaded tags or create a temporary one
@@ -339,113 +340,21 @@ class BrowseStationsFragment : Fragment() {
     }
 
     /**
-     * Set up touch handling on individual chips to claim horizontal gestures.
-     * Only blocks parents ABOVE the HorizontalScrollView so it can still scroll.
+     * Simple touch handling for genre chip HorizontalScrollViews.
+     * Just prevents ViewPager2 from intercepting horizontal scrolls.
      */
-    private fun setupChipTouchHandling(chip: Chip) {
-        var startX = 0f
-        var startY = 0f
-        var claimed = false
-        val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
-
-        // Find the HorizontalScrollView ancestor and get its parent
-        // We only want to block interception above the HorizontalScrollView
-        fun getScrollViewParent(view: android.view.View): android.view.ViewParent? {
-            var parent = view.parent
-            while (parent != null) {
-                if (parent is android.widget.HorizontalScrollView) {
-                    return parent.parent
-                }
-                parent = parent.parent
-            }
-            return null
-        }
-
-        fun disallowAboveScrollView(view: android.view.View, disallow: Boolean) {
-            var parent = getScrollViewParent(view)
-            while (parent != null) {
-                parent.requestDisallowInterceptTouchEvent(disallow)
-                parent = parent.parent
-            }
-        }
-
-        chip.setOnTouchListener { v, event ->
+    private fun setupGenreScrollTouchHandling(scrollView: android.widget.HorizontalScrollView) {
+        scrollView.setOnTouchListener { v, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    startX = event.x
-                    startY = event.y
-                    claimed = true
-                    // Block parents above HorizontalScrollView (NestedScrollView, ViewPager2)
-                    disallowAboveScrollView(v, true)
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val dx = kotlin.math.abs(event.x - startX)
-                    val dy = kotlin.math.abs(event.y - startY)
-                    // Only release if swipe is clearly vertical
-                    if (claimed && dy > touchSlop && dy > dx * 2) {
-                        claimed = false
-                        disallowAboveScrollView(v, false)
-                    }
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    // Tell ViewPager2 not to intercept
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    claimed = false
-                    disallowAboveScrollView(v, false)
+                    v.parent?.requestDisallowInterceptTouchEvent(false)
                 }
             }
-            false // Don't consume - let click listener work
-        }
-    }
-
-    /**
-     * Set up touch handling for genre chip rows to work with ViewPager2.
-     * Claim gesture immediately, only release if swipe is clearly vertical.
-     * Only blocks parents ABOVE the HorizontalScrollView so it can still scroll.
-     */
-    private fun setupGenreChipsTouchHandling(layout: LinearLayout) {
-        var startX = 0f
-        var startY = 0f
-        var claimed = false
-        val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
-
-        // Only block parents above the HorizontalScrollView
-        fun disallowAboveScrollView(view: android.view.View, disallow: Boolean) {
-            var parent = view.parent
-            while (parent != null) {
-                if (parent is android.widget.HorizontalScrollView) {
-                    parent = parent.parent
-                    break
-                }
-                parent = parent.parent
-            }
-            while (parent != null) {
-                parent.requestDisallowInterceptTouchEvent(disallow)
-                parent = parent.parent
-            }
-        }
-
-        layout.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    startX = event.x
-                    startY = event.y
-                    claimed = true
-                    disallowAboveScrollView(v, true)
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    val dx = kotlin.math.abs(event.x - startX)
-                    val dy = kotlin.math.abs(event.y - startY)
-                    // Only release if swipe is clearly vertical
-                    if (claimed && dy > touchSlop && dy > dx * 2) {
-                        claimed = false
-                        disallowAboveScrollView(v, false)
-                    }
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    claimed = false
-                    disallowAboveScrollView(v, false)
-                }
-            }
-            false // Don't consume, let parent HorizontalScrollView handle scrolling
+            false
         }
     }
 
