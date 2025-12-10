@@ -489,7 +489,9 @@
                     android:hint="@string/search_radio_browser"
                     android:inputType="text"
                     android:imeOptions="actionSearch"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="48dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
