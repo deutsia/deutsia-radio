@@ -503,9 +503,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             when (val result = repository.getTags(200)) {
                 is RadioBrowserResult.Success -> {
-                    // Filter to tags with at least 10 stations and sort alphabetically
+                    // Filter to tags with at least 10 stations, deduplicate by name (case-insensitive), and sort alphabetically
                     _tags.value = result.data
                         .filter { it.stationCount >= 10 }
+                        .distinctBy { it.name.lowercase() }
                         .sortedBy { it.name.lowercase() }
                 }
                 is RadioBrowserResult.Error -> {
