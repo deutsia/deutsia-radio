@@ -5,8 +5,8 @@ import androidx.room.*
 
 @Dao
 interface RadioDao {
-    // Default sorting: liked first, then presets, then by added time
-    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, isPreset DESC, addedTimestamp DESC")
+    // Default sorting: liked first, then presets, then by added time (oldest first)
+    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, isPreset DESC, addedTimestamp ASC")
     fun getAllStations(): LiveData<List<RadioStation>>
 
     // Sort by name alphabetically
@@ -29,7 +29,7 @@ interface RadioDao {
     fun getStationsByGenre(genre: String): LiveData<List<RadioStation>>
 
     // Get stations by genre with different sort orders
-    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, isPreset DESC, addedTimestamp DESC")
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, isPreset DESC, addedTimestamp ASC")
     fun getStationsByGenreDefault(genre: String): LiveData<List<RadioStation>>
 
     @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, name ASC")
@@ -50,7 +50,7 @@ interface RadioDao {
     suspend fun getAllGenresSync(): List<String>
 
     // Get all stations synchronously for search filtering
-    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, isPreset DESC, addedTimestamp DESC")
+    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, isPreset DESC, addedTimestamp ASC")
     suspend fun getAllStationsSync(): List<RadioStation>
 
     @Query("SELECT * FROM radio_stations WHERE id = :id")
