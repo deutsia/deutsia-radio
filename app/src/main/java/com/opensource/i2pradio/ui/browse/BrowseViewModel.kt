@@ -25,7 +25,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     private val repository = RadioBrowserRepository(application)
 
     // Current browse category
-    private val _currentCategory = MutableLiveData(BrowseCategory.TOP_VOTED)
+    private val _currentCategory = MutableLiveData(BrowseCategory.ALL_STATIONS)
     val currentCategory: LiveData<BrowseCategory> = _currentCategory
 
     // Station list
@@ -122,7 +122,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
     init {
         // Load initial data
-        loadTopVoted()
+        loadAllStations()
         loadCountries()
         loadTags()
         loadLanguages()

@@ -324,11 +324,12 @@ class BrowseStationsFragment : Fragment() {
             val tags = viewModel.tags.value
             val tagInfo = tags?.find { it.name.equals(genreData.tag, ignoreCase = true) }
 
-            currentResultsTitle = getString(R.string.browse_top_voted)
+            currentResultsTitle = getString(R.string.browse_all_stations)
             switchToResultsMode()
 
             if (tagInfo != null) {
-                viewModel.filterByTag(tagInfo)
+                viewModel.addTagFilter(tagInfo)
+                viewModel.loadAllStations()
             } else {
                 // Search by tag name directly if TagInfo not available
                 viewModel.search(genreData.tag)
@@ -551,9 +552,9 @@ class BrowseStationsFragment : Fragment() {
                         viewModel.search(query)
                         updateCategoryChip()
                     } else if (query.isEmpty() && !isManualSearchClear) {
-                        // Reset to top voted when search is cleared
-                        currentResultsTitle = getString(R.string.browse_top_voted)
-                        viewModel.loadTopVoted()
+                        // Reset to all stations when search is cleared
+                        currentResultsTitle = getString(R.string.browse_all_stations)
+                        viewModel.loadAllStations()
                         updateCategoryChip()
                     }
                     isManualSearchClear = false
@@ -755,10 +756,10 @@ class BrowseStationsFragment : Fragment() {
             showKeyboard()
         }
 
-        // If no category set, default to Top Voted
+        // If no category set, default to All Stations
         if (currentResultsTitle.isEmpty()) {
-            currentResultsTitle = getString(R.string.browse_top_voted)
-            viewModel.loadTopVoted()
+            currentResultsTitle = getString(R.string.browse_all_stations)
+            viewModel.loadAllStations()
         }
         updateCategoryChip()
     }
@@ -780,7 +781,7 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun updateCategoryChip() {
-        categoryFilterChip.text = currentResultsTitle.ifEmpty { getString(R.string.browse_top_voted) }
+        categoryFilterChip.text = currentResultsTitle.ifEmpty { getString(R.string.browse_all_stations) }
     }
 
     private fun updateResultsCount(count: Int) {
@@ -951,9 +952,10 @@ class BrowseStationsFragment : Fragment() {
                 holder.itemView.setOnClickListener {
                     dialog.dismiss()
                     // Navigate to results with this genre
-                    currentResultsTitle = getString(R.string.browse_top_voted)
+                    currentResultsTitle = getString(R.string.browse_all_stations)
                     switchToResultsMode()
-                    viewModel.filterByTag(tag)
+                    viewModel.addTagFilter(tag)
+                    viewModel.loadAllStations()
                 }
             }
 
