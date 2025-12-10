@@ -9,9 +9,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import coil.request.Disposable
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
+import com.opensource.i2pradio.util.loadSecure
 
 /**
  * Adapter for horizontal carousel of stations (Trending, Popular sections).
@@ -45,6 +46,7 @@ class BrowseCarouselAdapter(
         private val stationInfo: TextView = itemView.findViewById(R.id.stationInfo)
         private val rankBadge: TextView = itemView.findViewById(R.id.rankBadge)
         private val btnLike: ImageButton = itemView.findViewById(R.id.btnLike)
+        private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioBrowserStation, rank: Int) {
             stationName.text = station.name
@@ -56,16 +58,15 @@ class BrowseCarouselAdapter(
                 }
             }.ifEmpty { station.country.ifEmpty { "Radio" } }
 
-            // Load station image
-            if (!station.favicon.isNullOrBlank()) {
-                Glide.with(itemView.context)
-                    .load(station.favicon)
-                    .placeholder(R.drawable.ic_radio)
-                    .error(R.drawable.ic_radio)
-                    .centerCrop()
-                    .into(stationImage)
-            } else {
-                stationImage.setImageResource(R.drawable.ic_radio)
+            // Load station image using secure loader (respects Tor settings)
+            imageLoadDisposable?.dispose()
+            stationImage.setImageResource(R.drawable.ic_radio)
+            if (station.favicon.isNotEmpty()) {
+                imageLoadDisposable = stationImage.loadSecure(station.favicon) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_radio)
+                    error(R.drawable.ic_radio)
+                }
             }
 
             // Rank badge
