@@ -13,6 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.view.MotionEvent
+import android.view.GestureDetector
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -54,6 +56,7 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var discoverySearchBar: MaterialCardView
     private lateinit var genreChipsRow1: LinearLayout
     private lateinit var genreChipsRow2: LinearLayout
+    private lateinit var genreSeeAll: TextView
     private lateinit var usaRecyclerView: RecyclerView
     private lateinit var usaSeeAll: TextView
     private lateinit var germanyRecyclerView: RecyclerView
@@ -158,7 +161,7 @@ class BrowseStationsFragment : Fragment() {
         setupResultsMode()
         setupSharedViews()
         observeViewModel()
-        loadDiscoveryData()
+        observeDiscoveryData()
 
         return view
     }
@@ -169,6 +172,7 @@ class BrowseStationsFragment : Fragment() {
         discoverySearchBar = view.findViewById(R.id.discoverySearchBar)
         genreChipsRow1 = view.findViewById(R.id.genreChipsRow1)
         genreChipsRow2 = view.findViewById(R.id.genreChipsRow2)
+        genreSeeAll = view.findViewById(R.id.genreSeeAll)
         usaRecyclerView = view.findViewById(R.id.usaRecyclerView)
         usaSeeAll = view.findViewById(R.id.usaSeeAll)
         germanyRecyclerView = view.findViewById(R.id.germanyRecyclerView)
@@ -210,6 +214,11 @@ class BrowseStationsFragment : Fragment() {
         // Search bar tap -> switch to results mode with search focus
         discoverySearchBar.setOnClickListener {
             switchToResultsMode(focusSearch = true)
+        }
+
+        // Genre See All -> show full genre selection dialog
+        genreSeeAll.setOnClickListener {
+            showFullGenreDialog()
         }
 
         // Set up genre chips
@@ -281,6 +290,14 @@ class BrowseStationsFragment : Fragment() {
             val chip = createGenreChip(genreData)
             genreChipsRow2.addView(chip)
         }
+
+        // Set up touch handling for the parent HorizontalScrollViews
+        (genreChipsRow1.parent as? android.widget.HorizontalScrollView)?.let {
+            setupHorizontalScrollTouchHandling(it)
+        }
+        (genreChipsRow2.parent as? android.widget.HorizontalScrollView)?.let {
+            setupHorizontalScrollTouchHandling(it)
+        }
     }
 
     private fun createGenreChip(genreData: GenreChipData): Chip {
@@ -319,6 +336,63 @@ class BrowseStationsFragment : Fragment() {
         return chip
     }
 
+    /**
+     * Set up touch handling for HorizontalScrollViews (genre chips) to work with ViewPager2.
+     */
+    private fun setupHorizontalScrollTouchHandling(scrollView: android.widget.HorizontalScrollView) {
+        scrollView.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // When touch starts, request parent not to intercept
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    v.parent?.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false // Don't consume, let HorizontalScrollView handle normally
+        }
+    }
+
+    /**
+     * Set up touch handling for horizontal RecyclerViews to work with ViewPager2.
+     * When user starts scrolling horizontally in a carousel, prevent ViewPager2 from
+     * intercepting the touch so the carousel scrolls instead of switching tabs.
+     */
+    private fun setupCarouselTouchHandling(recyclerView: RecyclerView) {
+        recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            private var startX = 0f
+            private var startY = 0f
+            private val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
+
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                when (e.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        startX = e.x
+                        startY = e.y
+                        // Allow parent to intercept initially
+                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        val dx = kotlin.math.abs(e.x - startX)
+                        val dy = kotlin.math.abs(e.y - startY)
+                        // If horizontal movement is dominant and significant, prevent parent from intercepting
+                        if (dx > touchSlop && dx > dy) {
+                            rv.parent?.requestDisallowInterceptTouchEvent(true)
+                        }
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                }
+                return false // Don't consume the event
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+        })
+    }
+
     private fun setupCarousels() {
         // USA carousel
         usaAdapter = BrowseCarouselAdapter(
@@ -330,6 +404,7 @@ class BrowseStationsFragment : Fragment() {
         usaRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(usaRecyclerView)
 
         // Germany carousel
         germanyAdapter = BrowseCarouselAdapter(
@@ -341,6 +416,7 @@ class BrowseStationsFragment : Fragment() {
         germanyRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(germanyRecyclerView)
 
         // Spanish carousel
         spanishAdapter = BrowseCarouselAdapter(
@@ -352,6 +428,7 @@ class BrowseStationsFragment : Fragment() {
         spanishRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(spanishRecyclerView)
 
         // French carousel
         frenchAdapter = BrowseCarouselAdapter(
@@ -363,6 +440,7 @@ class BrowseStationsFragment : Fragment() {
         frenchRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(frenchRecyclerView)
 
         // Trending carousel
         trendingAdapter = BrowseCarouselAdapter(
@@ -374,8 +452,9 @@ class BrowseStationsFragment : Fragment() {
         trendingRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(trendingRecyclerView)
 
-        // Top Voted preview (vertical, limited items)
+        // Top Voted preview (horizontal carousel)
         topVotedPreviewAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
@@ -385,6 +464,7 @@ class BrowseStationsFragment : Fragment() {
         topVotedPreviewRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(topVotedPreviewRecyclerView)
 
         // Popular carousel
         popularAdapter = BrowseCarouselAdapter(
@@ -396,6 +476,7 @@ class BrowseStationsFragment : Fragment() {
         popularRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(popularRecyclerView)
 
         // New Stations carousel
         newStationsAdapter = BrowseCarouselAdapter(
@@ -407,6 +488,7 @@ class BrowseStationsFragment : Fragment() {
         newStationsRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(newStationsRecyclerView)
     }
 
     private fun setupResultsMode() {
@@ -606,71 +688,37 @@ class BrowseStationsFragment : Fragment() {
         }
     }
 
-    private fun loadDiscoveryData() {
-        lifecycleScope.launch {
-            // Load USA stations
-            when (val result = repository.getByCountryCode("US", 10, 0)) {
-                is RadioBrowserResult.Success -> {
-                    usaAdapter.submitList(result.data)
-                }
-                else -> {}
-            }
+    private fun observeDiscoveryData() {
+        viewModel.usaStations.observe(viewLifecycleOwner) { stations ->
+            usaAdapter.submitList(stations)
+        }
 
-            // Load Germany stations
-            when (val result = repository.getByCountryCode("DE", 10, 0)) {
-                is RadioBrowserResult.Success -> {
-                    germanyAdapter.submitList(result.data)
-                }
-                else -> {}
-            }
+        viewModel.germanyStations.observe(viewLifecycleOwner) { stations ->
+            germanyAdapter.submitList(stations)
+        }
 
-            // Load Spanish stations
-            when (val result = repository.getByLanguage("spanish", 10, 0)) {
-                is RadioBrowserResult.Success -> {
-                    spanishAdapter.submitList(result.data)
-                }
-                else -> {}
-            }
+        viewModel.spanishStations.observe(viewLifecycleOwner) { stations ->
+            spanishAdapter.submitList(stations)
+        }
 
-            // Load French stations
-            when (val result = repository.getByLanguage("french", 10, 0)) {
-                is RadioBrowserResult.Success -> {
-                    frenchAdapter.submitList(result.data)
-                }
-                else -> {}
-            }
+        viewModel.frenchStations.observe(viewLifecycleOwner) { stations ->
+            frenchAdapter.submitList(stations)
+        }
 
-            // Load trending (recently changed)
-            when (val result = repository.getRecentlyChanged(10, 0)) {
-                is RadioBrowserResult.Success -> {
-                    trendingAdapter.submitList(result.data)
-                }
-                else -> {}
-            }
+        viewModel.trendingStations.observe(viewLifecycleOwner) { stations ->
+            trendingAdapter.submitList(stations)
+        }
 
-            // Load top voted preview
-            when (val result = repository.getTopVoted(10, 0)) {
-                is RadioBrowserResult.Success -> {
-                    topVotedPreviewAdapter.submitList(result.data)
-                }
-                else -> {}
-            }
+        viewModel.topVotedPreviewStations.observe(viewLifecycleOwner) { stations ->
+            topVotedPreviewAdapter.submitList(stations)
+        }
 
-            // Load popular
-            when (val result = repository.getTopClicked(10, 0)) {
-                is RadioBrowserResult.Success -> {
-                    popularAdapter.submitList(result.data)
-                }
-                else -> {}
-            }
+        viewModel.popularStations.observe(viewLifecycleOwner) { stations ->
+            popularAdapter.submitList(stations)
+        }
 
-            // Load new stations (recently changed, different offset to get different results than trending)
-            when (val result = repository.getRecentlyChanged(10, 10)) {
-                is RadioBrowserResult.Success -> {
-                    newStationsAdapter.submitList(result.data)
-                }
-                else -> {}
-            }
+        viewModel.newStations.observe(viewLifecycleOwner) { stations ->
+            newStationsAdapter.submitList(stations)
         }
     }
 
@@ -716,8 +764,8 @@ class BrowseStationsFragment : Fragment() {
         viewModel.filterByLanguage(null)
         currentResultsTitle = ""
 
-        // Refresh discovery data
-        loadDiscoveryData()
+        // Refresh discovery data (force refresh to get fresh content)
+        viewModel.loadDiscoveryData(forceRefresh = true)
     }
 
     private fun updateCategoryChip() {
@@ -787,6 +835,137 @@ class BrowseStationsFragment : Fragment() {
                 updateCategoryChip()
             }
             .show()
+    }
+
+    /**
+     * Show a full-screen genre dialog for discovery mode browsing.
+     * Selecting a genre immediately switches to results mode filtered by that genre.
+     */
+    private fun showFullGenreDialog() {
+        val tags = viewModel.tags.value ?: return
+        if (tags.isEmpty()) {
+            Toast.makeText(requireContext(), R.string.loading_genres, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val context = requireContext()
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 8, 0, 0)
+        }
+
+        val searchInput = TextInputEditText(context).apply {
+            hint = getString(R.string.search_genres)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+
+        val searchLayout = com.google.android.material.textfield.TextInputLayout(context).apply {
+            boxBackgroundMode = com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILLED
+            isHintEnabled = true
+            endIconMode = com.google.android.material.textfield.TextInputLayout.END_ICON_CLEAR_TEXT
+            setStartIconDrawable(R.drawable.ic_search)
+            addView(searchInput)
+        }
+
+        container.addView(searchLayout, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            setMargins(24, 0, 24, 8)
+        })
+
+        val divider = View(context).apply {
+            val dividerColor = com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOutlineVariant
+            )
+            setBackgroundColor(dividerColor)
+        }
+        container.addView(divider, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            1
+        ))
+
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+            val maxHeight = (450 * resources.displayMetrics.density).toInt()
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                maxHeight
+            )
+            clipToPadding = false
+            setPadding(0, 8, 0, 8)
+        }
+
+        var filteredTags = tags.toList()
+
+        // Create the dialog first so we can dismiss it in the adapter
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.browse_by_genre)
+            .setView(container)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+
+        // Adapter that dismisses dialog and navigates to genre on click
+        val adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+            private var items = filteredTags
+
+            fun updateItems(newItems: List<com.opensource.i2pradio.data.radiobrowser.TagInfo>) {
+                items = newItems
+                notifyDataSetChanged()
+            }
+
+            inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+                val textView: TextView? = view.findViewById(android.R.id.text1)
+            }
+
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+                val view = LayoutInflater.from(parent.context).inflate(
+                    android.R.layout.simple_list_item_1, parent, false
+                )
+                return ViewHolder(view)
+            }
+
+            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+                val tag = items[position]
+                val displayName = translateGenreName(tag.name)
+                (holder as ViewHolder).textView?.text = "$displayName (${tag.stationCount})"
+
+                holder.itemView.setOnClickListener {
+                    dialog.dismiss()
+                    // Navigate to results with this genre
+                    currentResultsTitle = displayName
+                    switchToResultsMode()
+                    viewModel.filterByTag(tag)
+                }
+            }
+
+            override fun getItemCount() = items.size
+        }
+
+        recyclerView.adapter = adapter
+
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString() ?: ""
+                filteredTags = if (query.isEmpty()) {
+                    tags
+                } else {
+                    tags.filter { tag ->
+                        val englishName = tag.name
+                        val translatedName = translateGenreName(tag.name)
+                        englishName.contains(query, ignoreCase = true) ||
+                        translatedName.contains(query, ignoreCase = true)
+                    }
+                }
+                adapter.updateItems(filteredTags)
+            }
+        })
+
+        container.addView(recyclerView)
+        dialog.show()
     }
 
     private fun showAddFilterMenu() {

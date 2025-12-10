@@ -103,7 +103,7 @@
     <string name="browse_spanish_radio">Spanish Radio</string>
     <string name="browse_french_radio">French Radio</string>
     <string name="see_all">See All</string>
-    <string name="add_filter">+ Filter</string>
+    <string name="add_filter">Filter</string>
     <string name="browse_results_count">Loading…</string>
     <string name="browse_results_format">%d stations</string>
     <string name="back">Back</string>
