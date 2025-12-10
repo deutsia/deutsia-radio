@@ -143,6 +143,36 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Load stations by country code (e.g., "US", "DE", "GB")
+     */
+    fun loadByCountryCode(countryCode: String) {
+        // Find or create a CountryInfo for this country code
+        val existingCountry = _countries.value?.find { it.iso3166_1 == countryCode }
+        if (existingCountry != null) {
+            filterByCountry(existingCountry)
+        } else {
+            // Create a temporary CountryInfo if not found in list
+            val tempCountry = CountryInfo(name = countryCode, iso3166_1 = countryCode, stationCount = 0)
+            filterByCountry(tempCountry)
+        }
+    }
+
+    /**
+     * Load stations by language (e.g., "english", "spanish")
+     */
+    fun loadByLanguage(language: String) {
+        // Find or create a LanguageInfo for this language
+        val existingLanguage = _languages.value?.find { it.name.equals(language, ignoreCase = true) }
+        if (existingLanguage != null) {
+            filterByLanguage(existingLanguage)
+        } else {
+            // Create a temporary LanguageInfo if not found in list
+            val tempLanguage = LanguageInfo(name = language, stationCount = 0)
+            filterByLanguage(tempLanguage)
+        }
+    }
+
+    /**
      * Search stations by name
      * This now preserves active filters (tag, country, language) and combines them with search
      */
