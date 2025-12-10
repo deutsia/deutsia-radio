@@ -359,32 +359,48 @@ class BrowseStationsFragment : Fragment() {
 
     /**
      * Set up touch handling for horizontal RecyclerViews to work with ViewPager2.
-     * When user starts scrolling horizontally in a carousel, prevent ViewPager2 from
-     * intercepting the touch so the carousel scrolls instead of switching tabs.
+     * Only claim horizontal gestures for carousel scrolling if the swipe is fast enough.
+     * Slower horizontal swipes fall through to ViewPager2 for screen navigation.
      */
     private fun setupCarouselTouchHandling(recyclerView: RecyclerView) {
         recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
             private var startX = 0f
             private var startY = 0f
+            private var velocityTracker: android.view.VelocityTracker? = null
             private val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
+            // Minimum velocity (pixels/second) required to claim gesture for carousel
+            // Higher value = need faster swipes for carousel, slower swipes go to ViewPager2
+            private val minVelocityForCarousel = 800f
 
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
                 when (e.action) {
                     MotionEvent.ACTION_DOWN -> {
                         startX = e.x
                         startY = e.y
+                        velocityTracker?.recycle()
+                        velocityTracker = android.view.VelocityTracker.obtain()
+                        velocityTracker?.addMovement(e)
                         // Allow parent to intercept initially
                         rv.parent?.requestDisallowInterceptTouchEvent(false)
                     }
                     MotionEvent.ACTION_MOVE -> {
+                        velocityTracker?.addMovement(e)
+                        velocityTracker?.computeCurrentVelocity(1000) // pixels per second
+
                         val dx = kotlin.math.abs(e.x - startX)
                         val dy = kotlin.math.abs(e.y - startY)
-                        // If horizontal movement is dominant and significant, prevent parent from intercepting
-                        if (dx > touchSlop && dx > dy) {
+                        val velocityX = kotlin.math.abs(velocityTracker?.xVelocity ?: 0f)
+
+                        // Only claim for carousel if:
+                        // 1. Horizontal movement is dominant and significant
+                        // 2. Velocity is fast enough (deliberate carousel scroll)
+                        if (dx > touchSlop && dx > dy && velocityX > minVelocityForCarousel) {
                             rv.parent?.requestDisallowInterceptTouchEvent(true)
                         }
                     }
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        velocityTracker?.recycle()
+                        velocityTracker = null
                         rv.parent?.requestDisallowInterceptTouchEvent(false)
                     }
                 }
