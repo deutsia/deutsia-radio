@@ -13,6 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.view.MotionEvent
+import android.view.GestureDetector
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -288,6 +290,14 @@ class BrowseStationsFragment : Fragment() {
             val chip = createGenreChip(genreData)
             genreChipsRow2.addView(chip)
         }
+
+        // Set up touch handling for the parent HorizontalScrollViews
+        (genreChipsRow1.parent as? android.widget.HorizontalScrollView)?.let {
+            setupHorizontalScrollTouchHandling(it)
+        }
+        (genreChipsRow2.parent as? android.widget.HorizontalScrollView)?.let {
+            setupHorizontalScrollTouchHandling(it)
+        }
     }
 
     private fun createGenreChip(genreData: GenreChipData): Chip {
@@ -326,6 +336,63 @@ class BrowseStationsFragment : Fragment() {
         return chip
     }
 
+    /**
+     * Set up touch handling for HorizontalScrollViews (genre chips) to work with ViewPager2.
+     */
+    private fun setupHorizontalScrollTouchHandling(scrollView: android.widget.HorizontalScrollView) {
+        scrollView.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // When touch starts, request parent not to intercept
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    v.parent?.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false // Don't consume, let HorizontalScrollView handle normally
+        }
+    }
+
+    /**
+     * Set up touch handling for horizontal RecyclerViews to work with ViewPager2.
+     * When user starts scrolling horizontally in a carousel, prevent ViewPager2 from
+     * intercepting the touch so the carousel scrolls instead of switching tabs.
+     */
+    private fun setupCarouselTouchHandling(recyclerView: RecyclerView) {
+        recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            private var startX = 0f
+            private var startY = 0f
+            private val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
+
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                when (e.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        startX = e.x
+                        startY = e.y
+                        // Allow parent to intercept initially
+                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        val dx = kotlin.math.abs(e.x - startX)
+                        val dy = kotlin.math.abs(e.y - startY)
+                        // If horizontal movement is dominant and significant, prevent parent from intercepting
+                        if (dx > touchSlop && dx > dy) {
+                            rv.parent?.requestDisallowInterceptTouchEvent(true)
+                        }
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                }
+                return false // Don't consume the event
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+        })
+    }
+
     private fun setupCarousels() {
         // USA carousel
         usaAdapter = BrowseCarouselAdapter(
@@ -337,6 +404,7 @@ class BrowseStationsFragment : Fragment() {
         usaRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(usaRecyclerView)
 
         // Germany carousel
         germanyAdapter = BrowseCarouselAdapter(
@@ -348,6 +416,7 @@ class BrowseStationsFragment : Fragment() {
         germanyRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(germanyRecyclerView)
 
         // Spanish carousel
         spanishAdapter = BrowseCarouselAdapter(
@@ -359,6 +428,7 @@ class BrowseStationsFragment : Fragment() {
         spanishRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(spanishRecyclerView)
 
         // French carousel
         frenchAdapter = BrowseCarouselAdapter(
@@ -370,6 +440,7 @@ class BrowseStationsFragment : Fragment() {
         frenchRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(frenchRecyclerView)
 
         // Trending carousel
         trendingAdapter = BrowseCarouselAdapter(
@@ -381,8 +452,9 @@ class BrowseStationsFragment : Fragment() {
         trendingRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(trendingRecyclerView)
 
-        // Top Voted preview (vertical, limited items)
+        // Top Voted preview (horizontal carousel)
         topVotedPreviewAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
@@ -392,6 +464,7 @@ class BrowseStationsFragment : Fragment() {
         topVotedPreviewRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(topVotedPreviewRecyclerView)
 
         // Popular carousel
         popularAdapter = BrowseCarouselAdapter(
@@ -403,6 +476,7 @@ class BrowseStationsFragment : Fragment() {
         popularRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(popularRecyclerView)
 
         // New Stations carousel
         newStationsAdapter = BrowseCarouselAdapter(
@@ -414,6 +488,7 @@ class BrowseStationsFragment : Fragment() {
         newStationsRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(newStationsRecyclerView)
     }
 
     private fun setupResultsMode() {
