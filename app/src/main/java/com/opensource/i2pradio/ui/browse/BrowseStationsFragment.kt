@@ -315,6 +315,9 @@ class BrowseStationsFragment : Fragment() {
             layoutParams = params
         }
 
+        // Set up touch handling to claim horizontal gestures for scrolling
+        setupChipTouchHandling(chip)
+
         chip.setOnClickListener {
             // Find the tag in loaded tags or create a temporary one
             val tags = viewModel.tags.value
@@ -333,6 +336,54 @@ class BrowseStationsFragment : Fragment() {
         }
 
         return chip
+    }
+
+    /**
+     * Set up touch handling on individual chips to claim horizontal gestures.
+     */
+    private fun setupChipTouchHandling(chip: Chip) {
+        var startX = 0f
+        var startY = 0f
+        var claimed = false
+        val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
+
+        chip.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    startX = event.x
+                    startY = event.y
+                    claimed = true
+                    // Immediately claim gesture through entire view hierarchy
+                    var parent = v.parent
+                    while (parent != null) {
+                        parent.requestDisallowInterceptTouchEvent(true)
+                        parent = parent.parent
+                    }
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = kotlin.math.abs(event.x - startX)
+                    val dy = kotlin.math.abs(event.y - startY)
+                    // Only release if swipe is clearly vertical
+                    if (claimed && dy > touchSlop && dy > dx * 2) {
+                        claimed = false
+                        var parent = v.parent
+                        while (parent != null) {
+                            parent.requestDisallowInterceptTouchEvent(false)
+                            parent = parent.parent
+                        }
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    claimed = false
+                    var parent = v.parent
+                    while (parent != null) {
+                        parent.requestDisallowInterceptTouchEvent(false)
+                        parent = parent.parent
+                    }
+                }
+            }
+            false // Don't consume - let click listener work
+        }
     }
 
     /**
