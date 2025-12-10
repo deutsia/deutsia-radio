@@ -301,6 +301,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 val i2pStations = com.opensource.i2pradio.data.DefaultStations.getI2pStations(getApplication())
                 val browserStations = i2pStations.map { RadioBrowserStation.fromRadioStation(it) }
                 _stations.postValue(browserStations)
+                _hasMoreResults.postValue(false) // Disable pagination for curated list
                 _isLoading.postValue(false)
             } catch (e: Exception) {
                 _errorMessage.postValue("Failed to load I2P stations: ${e.message}")
@@ -321,6 +322,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 val torStations = com.opensource.i2pradio.data.DefaultStations.getTorStations(getApplication())
                 val browserStations = torStations.map { RadioBrowserStation.fromRadioStation(it) }
                 _stations.postValue(browserStations)
+                _hasMoreResults.postValue(false) // Disable pagination for curated list
                 _isLoading.postValue(false)
             } catch (e: Exception) {
                 _errorMessage.postValue("Failed to load Tor stations: ${e.message}")
