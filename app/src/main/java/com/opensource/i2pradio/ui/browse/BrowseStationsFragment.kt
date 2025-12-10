@@ -595,7 +595,7 @@ class BrowseStationsFragment : Fragment() {
             showCountryFilterDialog()
         }
         countryFilterChip.setOnCloseIconClickListener {
-            viewModel.filterByCountry(null)
+            viewModel.clearCountryFilter()
             countryFilterChip.visibility = View.GONE
         }
 
@@ -604,7 +604,7 @@ class BrowseStationsFragment : Fragment() {
             showGenreFilterDialog()
         }
         genreFilterChip.setOnCloseIconClickListener {
-            viewModel.filterByTag(null)
+            viewModel.clearTagFilter()
             genreFilterChip.visibility = View.GONE
         }
 
@@ -613,7 +613,7 @@ class BrowseStationsFragment : Fragment() {
             showLanguageFilterDialog()
         }
         languageFilterChip.setOnCloseIconClickListener {
-            viewModel.filterByLanguage(null)
+            viewModel.clearLanguageFilter()
             languageFilterChip.visibility = View.GONE
         }
 
@@ -1180,9 +1180,10 @@ class BrowseStationsFragment : Fragment() {
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 if (tempSelectedCountryIndex == null) {
-                    viewModel.filterByCountry(null)
+                    viewModel.clearCountryFilter()
                 } else {
-                    viewModel.filterByCountry(countries[tempSelectedCountryIndex!!])
+                    // Use addCountryFilter to keep current category (intelligent filtering)
+                    viewModel.addCountryFilter(countries[tempSelectedCountryIndex!!])
                 }
             }
             .create()
@@ -1212,9 +1213,10 @@ class BrowseStationsFragment : Fragment() {
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 if (tempSelectedTagIndex == null) {
-                    viewModel.filterByTag(null)
+                    viewModel.clearTagFilter()
                 } else {
-                    viewModel.filterByTag(tags[tempSelectedTagIndex!!])
+                    // Use addTagFilter to keep current category (intelligent filtering)
+                    viewModel.addTagFilter(tags[tempSelectedTagIndex!!])
                 }
             }
             .create()
@@ -1244,9 +1246,10 @@ class BrowseStationsFragment : Fragment() {
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 if (tempSelectedLanguageIndex == null) {
-                    viewModel.filterByLanguage(null)
+                    viewModel.clearLanguageFilter()
                 } else {
-                    viewModel.filterByLanguage(languages[tempSelectedLanguageIndex!!])
+                    // Use addLanguageFilter to keep current category (intelligent filtering)
+                    viewModel.addLanguageFilter(languages[tempSelectedLanguageIndex!!])
                 }
             }
             .create()

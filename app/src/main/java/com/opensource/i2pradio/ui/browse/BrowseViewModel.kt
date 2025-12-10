@@ -307,11 +307,13 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Filter by country
+     * Filter by country (sets country as the primary category)
      */
     fun filterByCountry(country: CountryInfo?) {
         _selectedCountry.value = country
-        _currentCategory.value = BrowseCategory.BY_COUNTRY
+        if (country != null) {
+            _currentCategory.value = BrowseCategory.BY_COUNTRY
+        }
         currentOffset = 0
         _stations.value = emptyList()
         if (country != null) {
@@ -320,11 +322,13 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Filter by tag/genre
+     * Filter by tag/genre (sets tag as the primary category)
      */
     fun filterByTag(tag: TagInfo?) {
         _selectedTag.value = tag
-        _currentCategory.value = BrowseCategory.BY_TAG
+        if (tag != null) {
+            _currentCategory.value = BrowseCategory.BY_TAG
+        }
         currentOffset = 0
         _stations.value = emptyList()
         if (tag != null) {
@@ -333,16 +337,82 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Filter by language
+     * Filter by language (sets language as the primary category)
      */
     fun filterByLanguage(language: LanguageInfo?) {
         _selectedLanguage.value = language
-        _currentCategory.value = BrowseCategory.BY_LANGUAGE
+        if (language != null) {
+            _currentCategory.value = BrowseCategory.BY_LANGUAGE
+        }
         currentOffset = 0
         _stations.value = emptyList()
         if (language != null) {
             fetchStations()
         }
+    }
+
+    /**
+     * Add a country filter without changing the current category.
+     * Used for intelligent filtering where filters stack on top of the current view.
+     */
+    fun addCountryFilter(country: CountryInfo?) {
+        _selectedCountry.value = country
+        currentOffset = 0
+        _stations.value = emptyList()
+        fetchStations()
+    }
+
+    /**
+     * Add a tag/genre filter without changing the current category.
+     * Used for intelligent filtering where filters stack on top of the current view.
+     */
+    fun addTagFilter(tag: TagInfo?) {
+        _selectedTag.value = tag
+        currentOffset = 0
+        _stations.value = emptyList()
+        fetchStations()
+    }
+
+    /**
+     * Add a language filter without changing the current category.
+     * Used for intelligent filtering where filters stack on top of the current view.
+     */
+    fun addLanguageFilter(language: LanguageInfo?) {
+        _selectedLanguage.value = language
+        currentOffset = 0
+        _stations.value = emptyList()
+        fetchStations()
+    }
+
+    /**
+     * Clear a specific filter and re-fetch results.
+     * Used when removing a filter chip - keeps current category but removes the filter.
+     */
+    fun clearCountryFilter() {
+        _selectedCountry.value = null
+        currentOffset = 0
+        _stations.value = emptyList()
+        fetchStations()
+    }
+
+    /**
+     * Clear tag filter and re-fetch results.
+     */
+    fun clearTagFilter() {
+        _selectedTag.value = null
+        currentOffset = 0
+        _stations.value = emptyList()
+        fetchStations()
+    }
+
+    /**
+     * Clear language filter and re-fetch results.
+     */
+    fun clearLanguageFilter() {
+        _selectedLanguage.value = null
+        currentOffset = 0
+        _stations.value = emptyList()
+        fetchStations()
     }
 
     /**
@@ -619,6 +689,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                         newStations = newStations.filter { it.stationuuid !in topVotedStationUuids }
                     }
 
+                    // INTELLIGENT FILTERING: Apply active filters to results from ANY category
+                    // This ensures filters like "rock" work with "History", "Top Voted", etc.
+                    newStations = applyActiveFilters(newStations)
+
                     if (append) {
                         val current = _stations.value.orEmpty()
                         _stations.value = current + newStations
@@ -683,6 +757,52 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 checkSavedStatus(currentStations)
             }
         }
+    }
+
+    /**
+     * Apply active filters (tag, country, language) to a list of stations.
+     * This enables intelligent filtering where filters work across ALL categories:
+     * - "Rock" filter + "History" = only history stations with rock tag
+     * - "Germany" filter + "Top Voted" = only top voted stations from Germany
+     * - Multiple filters stack: "Rock" + "Germany" = rock stations from Germany
+     *
+     * Filters are skipped when the current category is the same as the filter type
+     * to avoid redundant filtering (e.g., don't re-filter by tag when in BY_TAG mode).
+     */
+    private fun applyActiveFilters(stations: List<RadioBrowserStation>): List<RadioBrowserStation> {
+        var filtered = stations
+        val currentCat = _currentCategory.value
+
+        // Apply tag filter (unless we're already in BY_TAG mode)
+        val activeTag = _selectedTag.value
+        if (activeTag != null && currentCat != BrowseCategory.BY_TAG) {
+            val tagName = activeTag.name.lowercase()
+            filtered = filtered.filter { station ->
+                station.tags.lowercase().contains(tagName)
+            }
+        }
+
+        // Apply country filter (unless we're already in BY_COUNTRY mode)
+        val activeCountry = _selectedCountry.value
+        if (activeCountry != null && currentCat != BrowseCategory.BY_COUNTRY) {
+            val countryCode = activeCountry.iso3166_1.lowercase()
+            val countryName = activeCountry.name.lowercase()
+            filtered = filtered.filter { station ->
+                station.countrycode.lowercase() == countryCode ||
+                station.country.lowercase().contains(countryName)
+            }
+        }
+
+        // Apply language filter (unless we're already in BY_LANGUAGE mode)
+        val activeLanguage = _selectedLanguage.value
+        if (activeLanguage != null && currentCat != BrowseCategory.BY_LANGUAGE) {
+            val langName = activeLanguage.name.lowercase()
+            filtered = filtered.filter { station ->
+                station.language.lowercase().contains(langName)
+            }
+        }
+
+        return filtered
     }
 
     /**
