@@ -69,6 +69,13 @@ data class RadioBrowserStation(
          * Convert a RadioStation (from curated lists) to RadioBrowserStation
          */
         fun fromRadioStation(station: RadioStation): RadioBrowserStation {
+            // Add I2P or Tor tag if the station uses these proxy types
+            val tags = when (station.proxyType.uppercase()) {
+                "I2P" -> "I2P,${station.genre}"
+                "TOR" -> "Tor,${station.genre}"
+                else -> station.genre
+            }
+
             return RadioBrowserStation(
                 stationuuid = UUID.randomUUID().toString(),
                 name = station.name,
@@ -76,7 +83,7 @@ data class RadioBrowserStation(
                 urlResolved = station.streamUrl,
                 homepage = "",
                 favicon = station.coverArtUri ?: "",
-                tags = station.genre,
+                tags = tags,
                 country = station.country,
                 countrycode = station.countryCode,
                 state = "",
