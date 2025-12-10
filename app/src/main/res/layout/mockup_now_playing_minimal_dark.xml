@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    MOCKUP: Minimal Dark Design
+    ===========================
+    Features:
+    - Pure dark background with AMOLED black option
+    - Floating album art with dramatic shadow
+    - Clean typography hierarchy
+    - Subtle neon accent colors
+    - Minimal chrome, focus on content
+    - Waveform visualization area
+    - Elegant micro-interactions
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0A0F"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- Ambient Glow Behind Album Art (driven by dominant color) -->
+    <View
+        android:id="@+id/ambientGlow"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="@drawable/mockup_ambient_glow"
+        android:alpha="0.3"
+        app:layout_constraintTop_toTopOf="@id/nowPlayingCoverCard"
+        app:layout_constraintBottom_toBottomOf="@id/nowPlayingCoverCard"
+        app:layout_constraintStart_toStartOf="@id/nowPlayingCoverCard"
+        app:layout_constraintEnd_toEndOf="@id/nowPlayingCoverCard" />
+
+    <!-- Minimal Top Bar -->
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="44dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_arrow_back"
+        android:contentDescription="Back"
+        android:padding="12dp"
+        app:tint="#808090"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/likeButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="44dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_favorite_border"
+        android:contentDescription="Favorite"
+        android:padding="12dp"
+        app:tint="#FF5C8A"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/equalizerButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_equalizer"
+        android:contentDescription="Equalizer"
+        android:padding="12dp"
+        app:tint="#808090"
+        app:layout_constraintEnd_toStartOf="@id/likeButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Album Art - Floating with Shadow -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/nowPlayingCoverCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        app:cardBackgroundColor="#1A1A24"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="24dp"
+        app:strokeWidth="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backButton"
+        app:layout_constraintWidth_max="320dp"
+        app:layout_constraintWidth_percent="0.75">
+
+        <ImageView
+            android:id="@+id/nowPlayingCoverArt"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="Album art"
+            tools:src="@drawable/ic_radio" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Waveform Visualization Placeholder -->
+    <View
+        android:id="@+id/waveformView"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="32dp"
+        android:background="@drawable/mockup_waveform_placeholder"
+        android:alpha="0.6"
+        app:layout_constraintTop_toBottomOf="@id/nowPlayingCoverCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Station Info - Clean Typography -->
+    <LinearLayout
+        android:id="@+id/nowPlayingInfoContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="24dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/waveformView">
+
+        <!-- Live Badge -->
+        <TextView
+            android:id="@+id/liveIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:background="@drawable/mockup_pill_badge"
+            android:text="LIVE"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textColor="#00FFA3"
+            android:letterSpacing="0.15"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/nowPlayingStationName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:textSize="26sp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="sans-serif-light"
+            android:letterSpacing="0.02"
+            android:maxLines="2"
+            android:ellipsize="end"
+            tools:text="Synthwave FM" />
+
+        <TextView
+            android:id="@+id/nowPlayingGenre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="#606070"
+            android:letterSpacing="0.05"
+            tools:text="Electronic · Retro · 80s" />
+
+        <!-- Now Playing Metadata (scrolling) -->
+        <TextView
+            android:id="@+id/nowPlayingMetadata"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="#00FFA3"
+            android:fontFamily="sans-serif-medium"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:visibility="gone"
+            tools:text="The Midnight - Days of Thunder"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/nowPlayingStreamInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="#404050"
+            android:fontFamily="monospace"
+            android:visibility="gone"
+            tools:text="320 kbps · FLAC"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <!-- Playback Controls - Minimalist -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/nowPlayingControlsContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="24dp"
+        app:layout_constraintBottom_toTopOf="@id/progressSection"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nowPlayingInfoContainer">
+
+        <!-- Record Button - Minimal Circle -->
+        <ImageButton
+            android:id="@+id/recordButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/mockup_circle_button_dark"
+            android:src="@drawable/ic_fiber_manual_record"
+            android:contentDescription="Record"
+            android:padding="16dp"
+            app:tint="#FF5C5C"
+            app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
+            app:layout_constraintEnd_toStartOf="@id/playPauseButton"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/playPauseButton" />
+
+        <!-- Main Play/Pause - Accent Ring -->
+        <FrameLayout
+            android:id="@+id/playPauseButton"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:background="@drawable/mockup_play_button_ring"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/volumeButton"
+            app:layout_constraintStart_toEndOf="@id/recordButton"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_pause"
+                android:contentDescription="Play/Pause"
+                android:padding="28dp"
+                app:tint="#FFFFFF" />
+
+        </FrameLayout>
+
+        <!-- Volume Button - Minimal Circle -->
+        <ImageButton
+            android:id="@+id/volumeButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/mockup_circle_button_dark"
+            android:src="@drawable/ic_volume"
+            android:contentDescription="Volume"
+            android:padding="16dp"
+            app:tint="#808090"
+            app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/playPauseButton"
+            app:layout_constraintTop_toTopOf="@id/playPauseButton" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Progress Section - Thin Line -->
+    <LinearLayout
+        android:id="@+id/progressSection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginBottom="32dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- Thin Progress Line -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#1A1A24" />
+
+            <View
+                android:id="@+id/bufferProgressBar"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="#00FFA3" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/playbackElapsedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:textColor="#404050" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="∞"
+                android:textSize="11sp"
+                android:textColor="#404050" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Recording Indicator - Floating Pill -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/recordingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:cardBackgroundColor="#331A0A0A"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#FF5C5C"
+        app:layout_constraintTop_toTopOf="@id/backButton"
+        app:layout_constraintBottom_toBottomOf="@id/backButton"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintEnd_toStartOf="@id/equalizerButton">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp">
+
+            <View
+                android:id="@+id/recordingDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/ic_record" />
+
+            <TextView
+                android:id="@+id/recordingTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="00:00"
+                android:textSize="13sp"
+                android:fontFamily="monospace"
+                android:textColor="#FF5C5C" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Empty State -->
+    <LinearLayout
+        android:id="@+id/emptyPlayingState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_radio"
+            android:alpha="0.2"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="No Station Playing"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="sans-serif-light"
+            android:letterSpacing="0.05" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Select a station to begin"
+            android:textSize="13sp"
+            android:textColor="#404050" />
+
+    </LinearLayout>
+
+    <!-- Buffering Indicator -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/bufferingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorSize="48dp"
+        app:indicatorColor="#00FFA3"
+        app:trackColor="#1A1A24"
+        app:trackThickness="3dp"
+        app:layout_constraintBottom_toBottomOf="@id/nowPlayingCoverCard"
+        app:layout_constraintEnd_toEndOf="@id/nowPlayingCoverCard"
+        app:layout_constraintStart_toStartOf="@id/nowPlayingCoverCard"
+        app:layout_constraintTop_toTopOf="@id/nowPlayingCoverCard" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
