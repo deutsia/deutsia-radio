@@ -324,7 +324,7 @@ class BrowseStationsFragment : Fragment() {
             val tags = viewModel.tags.value
             val tagInfo = tags?.find { it.name.equals(genreData.tag, ignoreCase = true) }
 
-            currentResultsTitle = getString(genreData.displayName)
+            currentResultsTitle = getString(R.string.browse_top_voted)
             switchToResultsMode()
 
             if (tagInfo != null) {
@@ -946,7 +946,7 @@ class BrowseStationsFragment : Fragment() {
                 holder.itemView.setOnClickListener {
                     dialog.dismiss()
                     // Navigate to results with this genre
-                    currentResultsTitle = displayName
+                    currentResultsTitle = getString(R.string.browse_top_voted)
                     switchToResultsMode()
                     viewModel.filterByTag(tag)
                 }
