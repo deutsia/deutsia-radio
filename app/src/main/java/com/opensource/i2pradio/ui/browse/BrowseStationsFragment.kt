@@ -134,7 +134,9 @@ class BrowseStationsFragment : Fragment() {
         GenreChipData("r&b", R.string.genre_r_and_b),
         GenreChipData("news", R.string.genre_news),
         GenreChipData("talk", R.string.genre_talk),
-        GenreChipData("sports", R.string.genre_sports)
+        GenreChipData("sports", R.string.genre_sports),
+        GenreChipData("i2p", R.string.genre_i2p),
+        GenreChipData("tor", R.string.genre_tor)
     )
 
     /**
@@ -336,21 +338,33 @@ class BrowseStationsFragment : Fragment() {
         }
 
         chip.setOnClickListener {
-            // Find the tag in loaded tags using normalized comparison
-            // This handles variants like "hip hop", "hip-hop", "hiphop" all matching the same tag
-            val tags = viewModel.tags.value
-            val normalizedChipTag = normalizeGenreName(genreData.tag)
-            val tagInfo = tags?.find { normalizeGenreName(it.name) == normalizedChipTag }
-
             currentResultsTitle = getString(R.string.browse_all_stations)
             switchToResultsMode()
 
-            if (tagInfo != null) {
-                viewModel.addTagFilter(tagInfo)
-                viewModel.loadAllStations()
-            } else {
-                // Search by tag name directly if TagInfo not available
-                viewModel.search(genreData.tag)
+            // Special handling for I2P and Tor chips - load curated lists
+            when (genreData.tag.lowercase()) {
+                "i2p" -> {
+                    viewModel.loadCuratedI2pStations()
+                }
+                "tor" -> {
+                    viewModel.loadCuratedTorStations()
+                }
+                else -> {
+                    // Normal genre chip handling
+                    // Find the tag in loaded tags using normalized comparison
+                    // This handles variants like "hip hop", "hip-hop", "hiphop" all matching the same tag
+                    val tags = viewModel.tags.value
+                    val normalizedChipTag = normalizeGenreName(genreData.tag)
+                    val tagInfo = tags?.find { normalizeGenreName(it.name) == normalizedChipTag }
+
+                    if (tagInfo != null) {
+                        viewModel.addTagFilter(tagInfo)
+                        viewModel.loadAllStations()
+                    } else {
+                        // Search by tag name directly if TagInfo not available
+                        viewModel.search(genreData.tag)
+                    }
+                }
             }
         }
 

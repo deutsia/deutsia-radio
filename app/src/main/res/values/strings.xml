@@ -42,6 +42,8 @@
     <string name="genre_dance">Dance</string>
     <string name="genre_edm">EDM</string>
     <string name="genre_electronic">Electronic</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
     <string name="genre_folk">Folk</string>
     <string name="genre_funk">Funk</string>
     <string name="genre_gospel">Gospel</string>

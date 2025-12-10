@@ -1,6 +1,8 @@
 package com.opensource.i2pradio.data.radiobrowser
 
+import com.opensource.i2pradio.data.RadioStation
 import org.json.JSONObject
+import java.util.UUID
 
 /**
  * Data class representing a radio station from the RadioBrowser API.
@@ -60,6 +62,37 @@ data class RadioBrowserStation(
                 sslError = json.optInt("ssl_error", 0) == 1,
                 geoLat = json.optDouble("geo_lat").takeIf { !it.isNaN() },
                 geoLong = json.optDouble("geo_long").takeIf { !it.isNaN() }
+            )
+        }
+
+        /**
+         * Convert a RadioStation (from curated lists) to RadioBrowserStation
+         */
+        fun fromRadioStation(station: RadioStation): RadioBrowserStation {
+            return RadioBrowserStation(
+                stationuuid = UUID.randomUUID().toString(),
+                name = station.name,
+                url = station.streamUrl,
+                urlResolved = station.streamUrl,
+                homepage = "",
+                favicon = station.coverArtUri ?: "",
+                tags = station.genre,
+                country = station.country,
+                countrycode = station.countryCode,
+                state = "",
+                language = "",
+                languagecodes = "",
+                votes = 0,
+                lastchangetime = "",
+                codec = station.codec,
+                bitrate = station.bitrate,
+                hls = false,
+                lastcheckok = true,
+                clickcount = 0,
+                clicktrend = 0,
+                sslError = false,
+                geoLat = null,
+                geoLong = null
             )
         }
     }
