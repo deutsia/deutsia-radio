@@ -77,8 +77,9 @@ class BrowseStationsFragment : Fragment() {
     // Results mode views
     private lateinit var resultsContainer: LinearLayout
     private lateinit var btnBackToDiscovery: ImageButton
-    private lateinit var resultsSearchInputLayout: TextInputLayout
-    private lateinit var resultsSearchInput: TextInputEditText
+    private lateinit var resultsSearchInputLayout: MaterialCardView
+    private lateinit var resultsSearchInput: android.widget.EditText
+    private lateinit var btnClearSearch: ImageButton
     private lateinit var categoryFilterChip: Chip
     private lateinit var countryFilterChip: Chip
     private lateinit var genreFilterChip: Chip
@@ -195,6 +196,7 @@ class BrowseStationsFragment : Fragment() {
         btnBackToDiscovery = view.findViewById(R.id.btnBackToDiscovery)
         resultsSearchInputLayout = view.findViewById(R.id.resultsSearchInputLayout)
         resultsSearchInput = view.findViewById(R.id.resultsSearchInput)
+        btnClearSearch = view.findViewById(R.id.btnClearSearch)
         categoryFilterChip = view.findViewById(R.id.categoryFilterChip)
         countryFilterChip = view.findViewById(R.id.countryFilterChip)
         genreFilterChip = view.findViewById(R.id.genreFilterChip)
@@ -538,6 +540,9 @@ class BrowseStationsFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
+                // Show/hide clear button based on text content
+                btnClearSearch.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+
                 searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
                 searchDebounceRunnable = Runnable {
                     val query = s?.toString()?.trim() ?: ""
@@ -570,6 +575,12 @@ class BrowseStationsFragment : Fragment() {
             } else {
                 false
             }
+        }
+
+        // Clear button click handler
+        btnClearSearch.setOnClickListener {
+            clearSearch()
+            resultsSearchInput.requestFocus()
         }
     }
 
@@ -790,6 +801,7 @@ class BrowseStationsFragment : Fragment() {
         searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
         isManualSearchClear = true
         resultsSearchInput.setText("")
+        btnClearSearch.visibility = View.GONE
     }
 
     private fun showKeyboard() {

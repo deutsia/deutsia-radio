@@ -466,34 +466,55 @@
                 app:tint="?attr/colorOnSurface" />
 
             <!-- Active search field -->
-            <com.google.android.material.textfield.TextInputLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/resultsSearchInputLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="8dp"
-                app:boxCornerRadiusBottomEnd="24dp"
-                app:boxCornerRadiusBottomStart="24dp"
-                app:boxCornerRadiusTopEnd="24dp"
-                app:boxCornerRadiusTopStart="24dp"
-                app:hintEnabled="false"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHigh"
-                app:endIconMode="clear_text"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/resultsSearchInput"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:hint="@string/search_radio_browser"
-                    android:inputType="text"
-                    android:imeOptions="actionSearch"
-                    android:maxLines="1"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:paddingStart="20dp"
-                    android:paddingEnd="48dp" />
+                    android:paddingEnd="12dp">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <EditText
+                        android:id="@+id/resultsSearchInput"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="@string/search_radio_browser"
+                        android:textColorHint="?attr/colorOnSurfaceVariant"
+                        android:textColor="?attr/colorOnSurface"
+                        android:inputType="text"
+                        android:imeOptions="actionSearch"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnClearSearch"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/button_clear"
+                        android:src="@drawable/ic_close"
+                        android:visibility="gone"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
