@@ -29,7 +29,7 @@
                 android:layout_height="match_parent"
                 android:background="?attr/colorSurfaceContainerHighest"
                 android:scaleType="centerCrop"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Top.Medium" />
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
 
             <!-- Like Button Overlay -->
             <com.google.android.material.card.MaterialCardView
