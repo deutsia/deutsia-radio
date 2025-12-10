@@ -136,6 +136,21 @@ class BrowseStationsFragment : Fragment() {
         GenreChipData("sports", R.string.genre_sports)
     )
 
+    /**
+     * Normalize genre name for matching purposes.
+     * Maps known variants (e.g., "hip hop", "hip-hop", "hiphop") to a canonical form.
+     * This must match the normalization in BrowseViewModel.normalizeGenreName().
+     */
+    private fun normalizeGenreName(name: String): String {
+        val lower = name.lowercase().trim()
+        return when {
+            lower in listOf("hip hop", "hip-hop", "hiphop") -> "hiphop"
+            lower in listOf("k-pop", "kpop") -> "kpop"
+            lower in listOf("lo-fi", "lofi") -> "lofi"
+            lower in listOf("r&b", "r and b", "rnb") -> "rnb"
+            else -> lower
+        }
+    }
 
     // Broadcast receiver for like state changes from other views
     private val likeStateReceiver = object : BroadcastReceiver() {
@@ -320,9 +335,11 @@ class BrowseStationsFragment : Fragment() {
         }
 
         chip.setOnClickListener {
-            // Find the tag in loaded tags or create a temporary one
+            // Find the tag in loaded tags using normalized comparison
+            // This handles variants like "hip hop", "hip-hop", "hiphop" all matching the same tag
             val tags = viewModel.tags.value
-            val tagInfo = tags?.find { it.name.equals(genreData.tag, ignoreCase = true) }
+            val normalizedChipTag = normalizeGenreName(genreData.tag)
+            val tagInfo = tags?.find { normalizeGenreName(it.name) == normalizedChipTag }
 
             currentResultsTitle = getString(R.string.browse_all_stations)
             switchToResultsMode()
