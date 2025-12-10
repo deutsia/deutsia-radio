@@ -346,6 +346,12 @@ class SettingsFragment : Fragment() {
             Toast.makeText(requireContext(), getString(R.string.toast_address_copied), Toast.LENGTH_SHORT).show()
         }
 
+        // Mockup viewer button (temporary - remove before production)
+        view.findViewById<MaterialButton?>(R.id.mockupViewerButton)?.setOnClickListener {
+            val intent = Intent(requireContext(), MockupViewerActivity::class.java)
+            startActivity(intent)
+        }
+
         // Sleep timer button
         val sleepTimerButton = view.findViewById<MaterialButton>(R.id.sleepTimerButton)
         updateSleepTimerButtonText(sleepTimerButton)

@@ -40,6 +40,12 @@
             android:screenOrientation="portrait"
             android:launchMode="singleTop" />
 
+        <!-- Temporary mockup viewer - remove before production -->
+        <activity
+            android:name=".ui.MockupViewerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.I2PRadio" />
+
         <service
             android:name=".RadioService"
             android:enabled="true"
