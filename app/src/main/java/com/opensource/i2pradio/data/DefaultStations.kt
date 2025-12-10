@@ -13,6 +13,8 @@ import org.json.JSONObject
 object DefaultStations {
     private const val TAG = "DefaultStations"
     private const val BUNDLED_STATIONS_FILE = "bundled_stations.json"
+    private const val I2P_STATIONS_FILE = "i2p_stations.json"
+    private const val TOR_STATIONS_FILE = "tor_stations.json"
 
     /**
      * Get preset stations from bundled JSON asset.
@@ -20,7 +22,7 @@ object DefaultStations {
      */
     fun getPresetStations(context: Context): List<RadioStation> {
         return try {
-            loadBundledStations(context)
+            loadStationsFromFile(context, BUNDLED_STATIONS_FILE)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load bundled stations, using fallback", e)
             getFallbackStations()
@@ -28,11 +30,35 @@ object DefaultStations {
     }
 
     /**
-     * Load stations from the bundled JSON asset file.
+     * Get I2P curated stations from JSON asset.
      */
-    private fun loadBundledStations(context: Context): List<RadioStation> {
+    fun getI2pStations(context: Context): List<RadioStation> {
+        return try {
+            loadStationsFromFile(context, I2P_STATIONS_FILE)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load I2P stations", e)
+            emptyList()
+        }
+    }
+
+    /**
+     * Get Tor curated stations from JSON asset.
+     */
+    fun getTorStations(context: Context): List<RadioStation> {
+        return try {
+            loadStationsFromFile(context, TOR_STATIONS_FILE)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load Tor stations", e)
+            emptyList()
+        }
+    }
+
+    /**
+     * Load stations from a JSON asset file.
+     */
+    private fun loadStationsFromFile(context: Context, fileName: String): List<RadioStation> {
         val stations = mutableListOf<RadioStation>()
-        val jsonString = context.assets.open(BUNDLED_STATIONS_FILE).bufferedReader().use { it.readText() }
+        val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
         val json = JSONObject(jsonString)
         val stationsArray = json.getJSONArray("stations")
 

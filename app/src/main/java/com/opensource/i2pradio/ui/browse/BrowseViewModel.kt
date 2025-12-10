@@ -290,6 +290,46 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Load curated I2P stations from bundled JSON
+     */
+    fun loadCuratedI2pStations() {
+        _currentCategory.value = BrowseCategory.ALL_STATIONS
+        currentOffset = 0
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val i2pStations = com.opensource.i2pradio.data.DefaultStations.getI2pStations(getApplication())
+                val browserStations = i2pStations.map { RadioBrowserStation.fromRadioStation(it) }
+                _stations.postValue(browserStations)
+                _isLoading.postValue(false)
+            } catch (e: Exception) {
+                _errorMessage.postValue("Failed to load I2P stations: ${e.message}")
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    /**
+     * Load curated Tor stations from bundled JSON
+     */
+    fun loadCuratedTorStations() {
+        _currentCategory.value = BrowseCategory.ALL_STATIONS
+        currentOffset = 0
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val torStations = com.opensource.i2pradio.data.DefaultStations.getTorStations(getApplication())
+                val browserStations = torStations.map { RadioBrowserStation.fromRadioStation(it) }
+                _stations.postValue(browserStations)
+                _isLoading.postValue(false)
+            } catch (e: Exception) {
+                _errorMessage.postValue("Failed to load Tor stations: ${e.message}")
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    /**
      * Check if any filters (tag, country, or language) are currently active
      */
     private fun hasActiveFilters(): Boolean {
