@@ -153,7 +153,8 @@ enum class BrowseCategory {
     BY_COUNTRY,
     BY_TAG,
     BY_LANGUAGE,
-    SEARCH
+    SEARCH,
+    ALL_STATIONS  // Show all stations based on current filter (no ranking applied)
 }
 
 /**
