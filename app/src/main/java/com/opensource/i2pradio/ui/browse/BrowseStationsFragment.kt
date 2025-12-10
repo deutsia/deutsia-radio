@@ -293,13 +293,9 @@ class BrowseStationsFragment : Fragment() {
             genreChipsRow2.addView(chip)
         }
 
-        // Set up touch handling for the parent HorizontalScrollViews
-        (genreChipsRow1.parent as? android.widget.HorizontalScrollView)?.let {
-            setupHorizontalScrollTouchHandling(it)
-        }
-        (genreChipsRow2.parent as? android.widget.HorizontalScrollView)?.let {
-            setupHorizontalScrollTouchHandling(it)
-        }
+        // Set up touch handling on the LinearLayouts to intercept touches early
+        setupGenreChipsTouchHandling(genreChipsRow1)
+        setupGenreChipsTouchHandling(genreChipsRow2)
     }
 
     private fun createGenreChip(genreData: GenreChipData): Chip {
@@ -340,35 +336,48 @@ class BrowseStationsFragment : Fragment() {
     }
 
     /**
-     * Set up touch handling for HorizontalScrollViews (genre chips) to work with ViewPager2.
+     * Set up touch handling for genre chip rows to work with ViewPager2.
      * Claim gesture immediately, only release if swipe is clearly vertical.
      */
-    private fun setupHorizontalScrollTouchHandling(scrollView: android.widget.HorizontalScrollView) {
+    private fun setupGenreChipsTouchHandling(layout: LinearLayout) {
         var startX = 0f
         var startY = 0f
+        var claimed = false
         val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
 
-        scrollView.setOnTouchListener { v, event ->
+        // Helper to propagate disallow intercept to all ancestors
+        fun disallowParentIntercept(view: android.view.View, disallow: Boolean) {
+            var parent = view.parent
+            while (parent != null) {
+                parent.requestDisallowInterceptTouchEvent(disallow)
+                parent = parent.parent
+            }
+        }
+
+        layout.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     startX = event.x
                     startY = event.y
-                    // Immediately claim gesture - chips get priority
-                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                    claimed = true
+                    // Immediately claim gesture through entire view hierarchy
+                    disallowParentIntercept(v, true)
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val dx = kotlin.math.abs(event.x - startX)
                     val dy = kotlin.math.abs(event.y - startY)
-                    // Only release to ViewPager2 if swipe is clearly vertical
-                    if (dy > touchSlop && dy > dx * 2) {
-                        v.parent?.requestDisallowInterceptTouchEvent(false)
+                    // Only release if swipe is clearly vertical
+                    if (claimed && dy > touchSlop && dy > dx * 2) {
+                        claimed = false
+                        disallowParentIntercept(v, false)
                     }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    v.parent?.requestDisallowInterceptTouchEvent(false)
+                    claimed = false
+                    disallowParentIntercept(v, false)
                 }
             }
-            false // Don't consume, let HorizontalScrollView handle normally
+            false // Don't consume, let parent HorizontalScrollView handle scrolling
         }
     }
 
