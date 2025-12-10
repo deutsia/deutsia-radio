@@ -816,6 +816,7 @@ class BrowseStationsFragment : Fragment() {
 
     private fun showCategoryMenu() {
         val categories = arrayOf(
+            getString(R.string.browse_all_stations),
             getString(R.string.browse_top_voted),
             getString(R.string.browse_popular),
             getString(R.string.browse_trending),
@@ -828,18 +829,22 @@ class BrowseStationsFragment : Fragment() {
                 clearSearch()
                 when (which) {
                     0 -> {
+                        currentResultsTitle = getString(R.string.browse_all_stations)
+                        viewModel.loadAllStations()
+                    }
+                    1 -> {
                         currentResultsTitle = getString(R.string.browse_top_voted)
                         viewModel.loadTopVoted()
                     }
-                    1 -> {
+                    2 -> {
                         currentResultsTitle = getString(R.string.browse_popular)
                         viewModel.loadTopClicked()
                     }
-                    2 -> {
+                    3 -> {
                         currentResultsTitle = getString(R.string.browse_trending)
                         viewModel.loadRandom()
                     }
-                    3 -> {
+                    4 -> {
                         currentResultsTitle = getString(R.string.browse_history)
                         viewModel.loadHistory()
                     }

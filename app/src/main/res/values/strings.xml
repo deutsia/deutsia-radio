@@ -75,6 +75,7 @@
     <string name="browse_popular">Popular</string>
     <string name="browse_random">Random</string>
     <string name="browse_history">History</string>
+    <string name="browse_all_stations">All Stations</string>
     <string name="browse_no_results">No Stations Found</string>
     <string name="browse_no_results_hint">Try a different search or filter</string>
     <string name="filter_country">Country</string>

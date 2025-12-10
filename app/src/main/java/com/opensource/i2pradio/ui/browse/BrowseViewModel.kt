@@ -231,6 +231,18 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Load all stations based on current filter (no ranking applied).
+     * This is useful when filters like "Jazz" return few results with ranked categories
+     * because it fetches ALL stations matching the filter directly from the API.
+     */
+    fun loadAllStations() {
+        _currentCategory.value = BrowseCategory.ALL_STATIONS
+        currentOffset = 0
+        _stations.value = emptyList()
+        fetchStations()
+    }
+
+    /**
      * Load stations by country code (e.g., "US", "DE", "GB")
      */
     fun loadByCountryCode(countryCode: String) {
@@ -670,6 +682,28 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                         performIntelligentSearch(query, pageSize, currentOffset)
                     } else {
                         RadioBrowserResult.Error("Empty search query")
+                    }
+                }
+                BrowseCategory.ALL_STATIONS -> {
+                    // Fetch all stations based on active filters without any ranking
+                    // Priority: tag > country > language > fallback to all stations
+                    val tag = _selectedTag.value
+                    val country = _selectedCountry.value
+                    val language = _selectedLanguage.value
+                    when {
+                        tag != null -> repository.getByTag(tag.name, pageSize, currentOffset)
+                        country != null -> repository.getByCountryCode(country.iso3166_1, pageSize, currentOffset)
+                        language != null -> repository.getByLanguage(language.name, pageSize, currentOffset)
+                        else -> {
+                            // No filter active, use advanced search to get any stations
+                            repository.searchStations(
+                                name = null,
+                                tag = null,
+                                country = null,
+                                limit = pageSize,
+                                offset = currentOffset
+                            )
+                        }
                     }
                 }
                 null -> RadioBrowserResult.Error("No category selected")
