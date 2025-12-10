@@ -293,12 +293,12 @@ class BrowseStationsFragment : Fragment() {
             genreChipsRow2.addView(chip)
         }
 
-        // Set up touch handling for the parent HorizontalScrollViews
+        // Set up touch handling for the HorizontalScrollViews
         (genreChipsRow1.parent as? android.widget.HorizontalScrollView)?.let {
-            setupHorizontalScrollTouchHandling(it)
+            setupGenreScrollTouchHandling(it)
         }
         (genreChipsRow2.parent as? android.widget.HorizontalScrollView)?.let {
-            setupHorizontalScrollTouchHandling(it)
+            setupGenreScrollTouchHandling(it)
         }
     }
 
@@ -340,27 +340,28 @@ class BrowseStationsFragment : Fragment() {
     }
 
     /**
-     * Set up touch handling for HorizontalScrollViews (genre chips) to work with ViewPager2.
+     * Simple touch handling for genre chip HorizontalScrollViews.
+     * Just prevents ViewPager2 from intercepting horizontal scrolls.
      */
-    private fun setupHorizontalScrollTouchHandling(scrollView: android.widget.HorizontalScrollView) {
+    private fun setupGenreScrollTouchHandling(scrollView: android.widget.HorizontalScrollView) {
         scrollView.setOnTouchListener { v, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    // When touch starts, request parent not to intercept
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    // Tell ViewPager2 not to intercept
                     v.parent?.requestDisallowInterceptTouchEvent(true)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     v.parent?.requestDisallowInterceptTouchEvent(false)
                 }
             }
-            false // Don't consume, let HorizontalScrollView handle normally
+            false
         }
     }
 
     /**
      * Set up touch handling for horizontal RecyclerViews to work with ViewPager2.
-     * When user starts scrolling horizontally in a carousel, prevent ViewPager2 from
-     * intercepting the touch so the carousel scrolls instead of switching tabs.
+     * When touching a carousel, immediately claim the gesture for carousel scrolling.
+     * Only release to ViewPager2 if the swipe turns out to be clearly vertical.
      */
     private fun setupCarouselTouchHandling(recyclerView: RecyclerView) {
         recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
@@ -373,15 +374,15 @@ class BrowseStationsFragment : Fragment() {
                     MotionEvent.ACTION_DOWN -> {
                         startX = e.x
                         startY = e.y
-                        // Allow parent to intercept initially
-                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                        // Immediately claim gesture - carousel gets priority
+                        rv.parent?.requestDisallowInterceptTouchEvent(true)
                     }
                     MotionEvent.ACTION_MOVE -> {
                         val dx = kotlin.math.abs(e.x - startX)
                         val dy = kotlin.math.abs(e.y - startY)
-                        // If horizontal movement is dominant and significant, prevent parent from intercepting
-                        if (dx > touchSlop && dx > dy) {
-                            rv.parent?.requestDisallowInterceptTouchEvent(true)
+                        // Only release to ViewPager2 if swipe is clearly vertical
+                        if (dy > touchSlop && dy > dx * 2) {
+                            rv.parent?.requestDisallowInterceptTouchEvent(false)
                         }
                     }
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
