@@ -555,6 +555,8 @@ object TorManager {
 
     /**
      * Get a user-friendly status message for the current state.
+     * NOTE: This returns raw English strings for logging/debugging.
+     * For UI display, use the localized string resources in TorStatusView.
      */
     fun getStatusMessage(): String {
         return when (_state) {
@@ -568,6 +570,8 @@ object TorManager {
 
     /**
      * Get a detailed status string including connection info.
+     * NOTE: This returns raw English strings for logging/debugging.
+     * For UI display, use the localized string resources in TorStatusView.
      */
     fun getDetailedStatus(): String {
         return when (_state) {

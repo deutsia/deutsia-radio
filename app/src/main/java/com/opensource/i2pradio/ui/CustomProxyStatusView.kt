@@ -103,7 +103,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
                 context.theme.resolveAttribute(colorOnSurfaceVariant, typedValue, true)
                 statusDetail.setTextColor(typedValue.data)
 
-                contentDescription = "Custom proxy is configured. Tap to view details."
+                contentDescription = context.getString(R.string.custom_proxy_configured_description)
                 showConnectedAnimation()
             }
             ProxyState.NOT_CONFIGURED -> {
@@ -113,7 +113,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
                 statusText.setTextColor(context.getColor(R.color.tor_disconnected))
                 statusDetail.text = context.getString(R.string.custom_proxy_status_no_proxy)
                 statusDetail.setTextColor(context.getColor(R.color.tor_disconnected))
-                contentDescription = "Custom proxy is not configured. Tap to configure."
+                contentDescription = context.getString(R.string.custom_proxy_not_configured_description)
             }
             ProxyState.LEAK_WARNING -> {
                 statusIcon.setImageResource(R.drawable.ic_proxy_custom_error)
@@ -122,7 +122,7 @@ class CustomProxyStatusView @JvmOverloads constructor(
                 statusText.setTextColor(context.getColor(R.color.tor_error))
                 statusDetail.text = context.getString(R.string.custom_proxy_status_leak_detail)
                 statusDetail.setTextColor(context.getColor(R.color.tor_error))
-                contentDescription = "Force custom proxy enabled but not configured. Privacy may be compromised."
+                contentDescription = context.getString(R.string.custom_proxy_privacy_warning_description)
                 showLeakWarningAnimation()
             }
         }

@@ -99,15 +99,42 @@ class AddEditRadioDialog : DialogFragment() {
 
         // Setup genre dropdown - expanded list sorted alphabetically
         val genres = arrayOf(
-            "Alternative", "Ambient", "Blues", "Christian", "Classical",
-            "Comedy", "Country", "Dance", "EDM", "Electronic", "Folk",
-            "Funk", "Gospel", "Hip Hop", "Indie", "Jazz", "K-Pop",
-            "Latin", "Lo-Fi", "Metal", "News", "Oldies", "Pop", "Punk",
-            "R&B", "Reggae", "Rock", "Soul", "Sports", "Talk", "World", getString(R.string.default_genre_other)
+            getString(R.string.genre_alternative),
+            getString(R.string.genre_ambient),
+            getString(R.string.genre_blues),
+            getString(R.string.genre_christian),
+            getString(R.string.genre_classical),
+            getString(R.string.genre_comedy),
+            getString(R.string.genre_country),
+            getString(R.string.genre_dance),
+            getString(R.string.genre_edm),
+            getString(R.string.genre_electronic),
+            getString(R.string.genre_folk),
+            getString(R.string.genre_funk),
+            getString(R.string.genre_gospel),
+            getString(R.string.genre_hip_hop),
+            getString(R.string.genre_indie),
+            getString(R.string.genre_jazz),
+            getString(R.string.genre_k_pop),
+            getString(R.string.genre_latin),
+            getString(R.string.genre_lo_fi),
+            getString(R.string.genre_metal),
+            getString(R.string.genre_news),
+            getString(R.string.genre_oldies),
+            getString(R.string.genre_pop),
+            getString(R.string.genre_punk),
+            getString(R.string.genre_r_and_b),
+            getString(R.string.genre_reggae),
+            getString(R.string.genre_rock),
+            getString(R.string.genre_soul),
+            getString(R.string.genre_sports),
+            getString(R.string.genre_talk),
+            getString(R.string.genre_world),
+            getString(R.string.genre_other)
         )
         val genreAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, genres)
         genreInput.setAdapter(genreAdapter)
-        genreInput.setText(getString(R.string.default_genre_other), false)
+        genreInput.setText(getString(R.string.genre_other), false)
 
         // Setup proxy type dropdown
         val proxyTypes = arrayOf(getString(R.string.default_proxy_none), getString(R.string.default_proxy_i2p), getString(R.string.default_proxy_tor), getString(R.string.default_proxy_custom))
@@ -125,13 +152,22 @@ class AddEditRadioDialog : DialogFragment() {
         proxyConnectionTimeoutInput = view.findViewById(R.id.proxyConnectionTimeoutInput)
 
         // Setup custom proxy protocol dropdown
-        val protocols = arrayOf(getString(R.string.default_protocol_http), getString(R.string.default_protocol_https), getString(R.string.default_protocol_socks4), getString(R.string.default_protocol_socks5))
+        val protocols = arrayOf(
+            getString(R.string.default_protocol_http),
+            getString(R.string.default_protocol_https),
+            getString(R.string.default_protocol_socks4),
+            getString(R.string.default_protocol_socks5)
+        )
         val protocolAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, protocols)
         customProxyProtocolInput?.setAdapter(protocolAdapter)
         customProxyProtocolInput?.setText(getString(R.string.default_protocol_http), false)
 
         // Setup auth type dropdown
-        val authTypes = arrayOf(getString(R.string.default_proxy_none), getString(R.string.default_auth_basic), getString(R.string.default_auth_digest))
+        val authTypes = arrayOf(
+            getString(R.string.default_proxy_none),
+            getString(R.string.default_auth_basic),
+            getString(R.string.default_auth_digest)
+        )
         val authTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, authTypes)
         proxyAuthTypeInput?.setAdapter(authTypeAdapter)
         proxyAuthTypeInput?.setText(getString(R.string.default_proxy_none), false)
@@ -202,10 +238,10 @@ class AddEditRadioDialog : DialogFragment() {
                     // Set proxy type dropdown
                     val proxyType = it.getProxyTypeEnum()
                     val proxyTypeDisplay = when (proxyType) {
-                        ProxyType.I2P -> "I2P"
-                        ProxyType.TOR -> "Tor"
-                        ProxyType.CUSTOM -> "Custom"
-                        ProxyType.NONE -> "None"
+                        ProxyType.I2P -> getString(R.string.default_proxy_i2p)
+                        ProxyType.TOR -> getString(R.string.default_proxy_tor)
+                        ProxyType.CUSTOM -> getString(R.string.default_proxy_custom)
+                        ProxyType.NONE -> getString(R.string.default_proxy_none)
                     }
                     proxyTypeInput.setText(proxyTypeDisplay, false)
 
@@ -261,9 +297,9 @@ class AddEditRadioDialog : DialogFragment() {
                 // Get proxy type from dropdown
                 val proxyTypeText = proxyTypeInput.text.toString()
                 val proxyType = when (proxyTypeText) {
-                    "I2P" -> ProxyType.I2P
-                    "Tor" -> ProxyType.TOR
-                    "Custom" -> ProxyType.CUSTOM
+                    getString(R.string.default_proxy_i2p) -> ProxyType.I2P
+                    getString(R.string.default_proxy_tor) -> ProxyType.TOR
+                    getString(R.string.default_proxy_custom) -> ProxyType.CUSTOM
                     else -> ProxyType.NONE
                 }
                 val useProxy = proxyType != ProxyType.NONE

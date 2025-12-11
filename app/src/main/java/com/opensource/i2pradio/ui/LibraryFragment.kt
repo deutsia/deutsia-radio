@@ -784,11 +784,11 @@ class LibraryFragment : Fragment() {
 
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.dialog_delete_stations))
-            .setMessage("Are you sure you want to delete $selectedCount station${if (selectedCount > 1) "s" else ""}?")
-            .setPositiveButton("Delete") { _, _ ->
+            .setMessage(getString(if (selectedCount > 1) R.string.delete_stations_message_plural else R.string.delete_stations_message_single, selectedCount))
+            .setPositiveButton(getString(R.string.button_delete)) { _, _ ->
                 deleteSelectedStations()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .show()
     }
 
@@ -802,7 +802,7 @@ class LibraryFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 Toast.makeText(
                     requireContext(),
-                    "Deleted ${selectedIds.size} station${if (selectedIds.size > 1) "s" else ""}",
+                    getString(if (selectedIds.size > 1) R.string.deleted_stations_message_plural else R.string.deleted_stations_message_single, selectedIds.size),
                     Toast.LENGTH_SHORT
                 ).show()
                 actionMode?.finish()
@@ -912,8 +912,8 @@ class RadioStationAdapter(
             // Show proxy type indicator (I2P or Tor only - Custom proxy is indicated by top-right icon)
             val proxyIndicator = if (station.useProxy) {
                 when (station.getProxyTypeEnum()) {
-                    ProxyType.I2P -> " • I2P"
-                    ProxyType.TOR -> " • Tor"
+                    ProxyType.I2P -> getString(R.string.proxy_label_i2p)
+                    ProxyType.TOR -> getString(R.string.proxy_label_tor)
                     ProxyType.CUSTOM -> ""
                     ProxyType.NONE -> ""
                 }

@@ -515,7 +515,7 @@ class RadioService : Service() {
 
         val streamUrl = currentStreamUrl ?: run {
             android.util.Log.e("RadioService", "Cannot start recording: no stream URL")
-            broadcastRecordingError("No stream playing")
+            broadcastRecordingError(getString(R.string.recording_error_no_stream))
             return
         }
 
@@ -557,7 +557,7 @@ class RadioService : Service() {
                 android.util.Log.d("RadioService", "Created recordings directory: $created, path: ${recordingsDir.absolutePath}")
                 if (!created && !recordingsDir.exists()) {
                     android.util.Log.e("RadioService", "Failed to create recordings directory")
-                    broadcastRecordingError("Cannot create directory")
+                    broadcastRecordingError(getString(R.string.recording_error_cannot_create_directory))
                     return
                 }
             }
@@ -642,7 +642,7 @@ class RadioService : Service() {
                 if (response == null) {
                     android.util.Log.e("RadioService", "Recording: no response after retries")
                     handler.post {
-                        broadcastRecordingError("Connection failed")
+                        broadcastRecordingError(getString(R.string.recording_error_connection_failed))
                         cleanupRecording()
                     }
                     return@Thread
@@ -664,7 +664,7 @@ class RadioService : Service() {
                 if (responseBody == null) {
                     android.util.Log.e("RadioService", "Recording response has no body")
                     handler.post {
-                        broadcastRecordingError("Empty response")
+                        broadcastRecordingError(getString(R.string.recording_error_connection_failed))
                         cleanupRecording()
                     }
                     return@Thread
@@ -679,7 +679,7 @@ class RadioService : Service() {
                         if (docFile == null || !docFile.canWrite()) {
                             android.util.Log.e("RadioService", "Cannot write to custom directory")
                             handler.post {
-                                broadcastRecordingError("Cannot write to selected directory")
+                                broadcastRecordingError(getString(R.string.recording_error_cannot_write_directory))
                                 cleanupRecording()
                             }
                             return@Thread
@@ -689,7 +689,7 @@ class RadioService : Service() {
                         if (newFile == null) {
                             android.util.Log.e("RadioService", "Failed to create file in custom directory")
                             handler.post {
-                                broadcastRecordingError("Cannot create recording file")
+                                broadcastRecordingError(getString(R.string.recording_error_cannot_create_file))
                                 cleanupRecording()
                             }
                             return@Thread
@@ -703,7 +703,7 @@ class RadioService : Service() {
                             android.util.Log.e("RadioService", "Failed to open custom directory output stream")
                             newFile.delete()
                             handler.post {
-                                broadcastRecordingError("Cannot open file for writing")
+                                broadcastRecordingError(getString(R.string.recording_error_cannot_open_file))
                                 cleanupRecording()
                             }
                             return@Thread
@@ -713,7 +713,7 @@ class RadioService : Service() {
                     } catch (e: Exception) {
                         android.util.Log.e("RadioService", "Custom directory error: ${e.message}", e)
                         handler.post {
-                            broadcastRecordingError("Directory access error: ${e.message}")
+                            broadcastRecordingError(getString(R.string.recording_error_directory_access, e.message))
                             cleanupRecording()
                         }
                         return@Thread
@@ -733,7 +733,7 @@ class RadioService : Service() {
                     if (mediaStoreUri == null) {
                         android.util.Log.e("RadioService", "Failed to create MediaStore entry")
                         handler.post {
-                            broadcastRecordingError("Cannot create recording file")
+                            broadcastRecordingError(getString(R.string.recording_error_cannot_create_file))
                             cleanupRecording()
                         }
                         return@Thread
@@ -748,7 +748,7 @@ class RadioService : Service() {
                         android.util.Log.e("RadioService", "Failed to open MediaStore output stream")
                         resolver.delete(mediaStoreUri, null, null)
                         handler.post {
-                            broadcastRecordingError("Cannot open file for writing")
+                            broadcastRecordingError(getString(R.string.recording_error_cannot_open_file))
                             cleanupRecording()
                         }
                         return@Thread
@@ -903,19 +903,19 @@ class RadioService : Service() {
             } catch (e: java.net.SocketTimeoutException) {
                 android.util.Log.e("RadioService", "Recording connection timed out", e)
                 handler.post {
-                    broadcastRecordingError("Connection timed out")
+                    broadcastRecordingError(getString(R.string.recording_error_connection_timeout))
                     cleanupRecording()
                 }
             } catch (e: java.net.ConnectException) {
                 android.util.Log.e("RadioService", "Recording connection refused", e)
                 handler.post {
-                    broadcastRecordingError("Connection refused")
+                    broadcastRecordingError(getString(R.string.recording_error_connection_refused))
                     cleanupRecording()
                 }
             } catch (e: java.io.IOException) {
                 if (isRecordingActive.get()) {
                     android.util.Log.e("RadioService", "Recording I/O error: ${e.message}", e)
-                    handler.post { broadcastRecordingError("I/O error: ${e.message}") }
+                    handler.post { broadcastRecordingError(getString(R.string.recording_error_io, e.message)) }
                 } else {
                     android.util.Log.d("RadioService", "Recording stopped normally (${totalBytesWritten / 1024}KB saved)")
                 }
@@ -923,7 +923,7 @@ class RadioService : Service() {
                 android.util.Log.d("RadioService", "Recording thread interrupted")
             } catch (e: Exception) {
                 android.util.Log.e("RadioService", "Recording error: ${e.javaClass.simpleName}: ${e.message}", e)
-                handler.post { broadcastRecordingError("Error: ${e.message}") }
+                handler.post { broadcastRecordingError(getString(R.string.recording_error_generic, e.message)) }
             } finally {
                 // Close streams in reverse order
                 try {

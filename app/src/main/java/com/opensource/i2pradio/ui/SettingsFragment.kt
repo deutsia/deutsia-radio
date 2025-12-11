@@ -523,7 +523,7 @@ class SettingsFragment : Fragment() {
     private fun updateSleepTimerButtonText(button: MaterialButton) {
         val minutes = PreferencesHelper.getSleepTimerMinutes(requireContext())
         button.text = when (minutes) {
-            0 -> "Off"
+            0 -> getString(R.string.button_off)
             else -> "$minutes min"
         }
     }
@@ -783,7 +783,7 @@ class SettingsFragment : Fragment() {
             if (isChecked && !TorManager.isConnected() && !isInitializing) {
                 Toast.makeText(
                     requireContext(),
-                    "⚠️ Tor not connected! Streams will fail until Tor connects.",
+                    getString(R.string.warning_tor_not_connected),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -832,7 +832,7 @@ class SettingsFragment : Fragment() {
             if (isChecked && !TorManager.isConnected() && !isInitializing) {
                 Toast.makeText(
                     requireContext(),
-                    "⚠️ Tor not connected! Non-I2P streams will fail until Tor connects.",
+                    getString(R.string.warning_tor_not_connected_except_i2p),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -905,24 +905,24 @@ class SettingsFragment : Fragment() {
                     showForceTorWarning()
                 } else {
                     torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
-                    torStatusText?.text = "Disconnected"
-                    torStatusDetail?.text = "Tor is not running"
-                    torActionButton?.text = "Start"
+                    torStatusText?.text = getString(R.string.settings_tor_disconnected_status)
+                    torStatusDetail?.text = getString(R.string.settings_tor_not_running_detail)
+                    torActionButton?.text = getString(R.string.button_start_tor)
                     torActionButton?.isEnabled = true
                 }
             }
             TorManager.TorState.STARTING -> {
                 torStatusIcon?.setImageResource(R.drawable.ic_tor_connecting)
-                torStatusText?.text = "Connecting..."
-                torStatusDetail?.text = "Establishing Tor connection"
-                torActionButton?.text = "Starting..."
+                torStatusText?.text = getString(R.string.settings_tor_connecting_status)
+                torStatusDetail?.text = getString(R.string.settings_tor_establishing_connection)
+                torActionButton?.text = getString(R.string.button_starting)
                 torActionButton?.isEnabled = false
             }
             TorManager.TorState.CONNECTED -> {
                 torStatusIcon?.setImageResource(R.drawable.ic_tor_on)
-                torStatusText?.text = "Connected"
-                torStatusDetail?.text = "SOCKS port: ${TorManager.socksPort}"
-                torActionButton?.text = "Stop"
+                torStatusText?.text = getString(R.string.settings_tor_connected_status)
+                torStatusDetail?.text = getString(R.string.settings_tor_socks_port, TorManager.socksPort)
+                torActionButton?.text = getString(R.string.button_stop_tor)
                 // Don't override isEnabled here - it's already set based on force mode at line 887
             }
             TorManager.TorState.ERROR -> {
@@ -931,9 +931,9 @@ class SettingsFragment : Fragment() {
                     showForceTorWarning()
                 } else {
                     torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
-                    torStatusText?.text = "Connection Failed"
+                    torStatusText?.text = getString(R.string.settings_tor_connection_failed)
                     torStatusDetail?.text = TorManager.errorMessage ?: getString(R.string.error_unknown)
-                    torActionButton?.text = "Retry"
+                    torActionButton?.text = getString(R.string.button_retry)
                     torActionButton?.isEnabled = true
                 }
             }
@@ -946,9 +946,9 @@ class SettingsFragment : Fragment() {
                     showForceTorWarning()
                 } else {
                     torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
-                    torStatusText?.text = "Orbot Required"
-                    torStatusDetail?.text = "Please install Orbot to use Tor"
-                    torActionButton?.text = "Install Orbot"
+                    torStatusText?.text = getString(R.string.settings_tor_orbot_required_status)
+                    torStatusDetail?.text = getString(R.string.settings_tor_install_orbot_message)
+                    torActionButton?.text = getString(R.string.button_install_orbot_caps)
                     torActionButton?.isEnabled = true
                 }
             }
@@ -957,9 +957,9 @@ class SettingsFragment : Fragment() {
 
     private fun showConnectedStateForForceTor() {
         torStatusIcon?.setImageResource(R.drawable.ic_tor_on)
-        torStatusText?.text = "Connected"
-        torStatusDetail?.text = "SOCKS port: ${TorManager.socksPort}"
-        torActionButton?.text = "Stop"
+        torStatusText?.text = getString(R.string.settings_tor_connected_status)
+        torStatusDetail?.text = getString(R.string.settings_tor_socks_port, TorManager.socksPort)
+        torActionButton?.text = getString(R.string.button_stop_tor)
         // Keep button disabled and greyed out in force mode (handled by updateTorStatusUI)
         torActionButton?.isEnabled = false
         torActionButton?.alpha = 0.5f
@@ -967,9 +967,9 @@ class SettingsFragment : Fragment() {
 
     private fun showForceTorWarning() {
         torStatusIcon?.setImageResource(R.drawable.ic_tor_error)
-        torStatusText?.text = "Connection Failed"
-        torStatusDetail?.text = "Force Tor is enabled but not connected"
-        torActionButton?.text = "Retry"
+        torStatusText?.text = getString(R.string.settings_tor_force_warning)
+        torStatusDetail?.text = getString(R.string.settings_tor_force_warning_detail)
+        torActionButton?.text = getString(R.string.button_retry)
         // Keep button disabled and greyed out in force mode (handled by updateTorStatusUI)
         torActionButton?.isEnabled = false
         torActionButton?.alpha = 0.5f
@@ -983,14 +983,14 @@ class SettingsFragment : Fragment() {
                 val docFile = DocumentFile.fromTreeUri(requireContext(), uri)
                 val displayName = docFile?.name ?: getString(R.string.folder_custom)
                 recordingDirectoryPath?.text = displayName
-                recordingDirectoryButton?.text = "Change"
+                recordingDirectoryButton?.text = getString(R.string.button_change)
             } catch (e: Exception) {
-                recordingDirectoryPath?.text = "Default (Music/deutsia_radio)"
-                recordingDirectoryButton?.text = "Change"
+                recordingDirectoryPath?.text = getString(R.string.settings_recording_directory_default_label)
+                recordingDirectoryButton?.text = getString(R.string.button_change)
             }
         } else {
-            recordingDirectoryPath?.text = "Default (Music/deutsia_radio)"
-            recordingDirectoryButton?.text = "Change"
+            recordingDirectoryPath?.text = getString(R.string.settings_recording_directory_default_label)
+            recordingDirectoryButton?.text = getString(R.string.button_change)
         }
     }
 
@@ -1189,9 +1189,9 @@ class SettingsFragment : Fragment() {
 
     private fun showImportDialog() {
         AlertDialog.Builder(requireContext())
-            .setTitle("Import Stations")
-            .setMessage("Select a file to import radio stations from.\n\nSupported formats:\n• CSV\n• JSON\n• M3U playlist\n• PLS playlist")
-            .setPositiveButton("Select File") { _, _ ->
+            .setTitle(getString(R.string.dialog_import_stations))
+            .setMessage(getString(R.string.import_message))
+            .setPositiveButton(getString(R.string.button_select_file)) { _, _ ->
                 importFileLauncher.launch(arrayOf(
                     "text/csv",
                     "text/comma-separated-values",
@@ -1202,7 +1202,7 @@ class SettingsFragment : Fragment() {
                     "*/*"
                 ))
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .show()
     }
 
@@ -1214,12 +1214,12 @@ class SettingsFragment : Fragment() {
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Import $networkName Stations")
-            .setMessage("Import $count curated $networkName radio stations?\n\nThese stations are pre-configured with proxy settings and ready to use.")
-            .setPositiveButton("Import") { _, _ ->
+            .setTitle(getString(R.string.import_curated_title, networkName))
+            .setMessage(getString(R.string.import_curated_message, count, networkName))
+            .setPositiveButton(getString(R.string.button_import)) { _, _ ->
                 importCuratedList(fileName, networkName)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .show()
     }
 
@@ -1239,7 +1239,7 @@ class SettingsFragment : Fragment() {
                     if (result.stations.isEmpty()) {
                         Toast.makeText(
                             context,
-                            "No stations found in $networkName list",
+                            getString(R.string.no_stations_found_in_list, networkName),
                             Toast.LENGTH_SHORT
                         ).show()
                         return@withContext
@@ -1254,7 +1254,7 @@ class SettingsFragment : Fragment() {
 
                     Toast.makeText(
                         context,
-                        "Failed to import $networkName stations: ${e.message}",
+                        getString(R.string.failed_to_import_stations, networkName, e.message),
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -1267,14 +1267,14 @@ class SettingsFragment : Fragment() {
         val formatNames = formats.map { it.displayName }.toTypedArray()
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Export Stations")
+            .setTitle(getString(R.string.dialog_export_stations_title))
             .setItems(formatNames) { _, which ->
                 val format = formats[which]
                 pendingExportFormat = format
                 val filename = "i2pradio_stations.${format.extension}"
                 exportFileLauncher.launch(filename)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .show()
     }
 
@@ -1293,12 +1293,12 @@ class SettingsFragment : Fragment() {
                         val errorMsg = if (result.errors.isNotEmpty()) {
                             result.errors.joinToString("\n")
                         } else {
-                            "No stations found in the file"
+                            getString(R.string.no_stations_found_in_list, "file")
                         }
                         AlertDialog.Builder(requireContext())
-                            .setTitle("Import Failed")
+                            .setTitle(getString(R.string.dialog_import_failed))
                             .setMessage(errorMsg)
-                            .setPositiveButton("OK", null)
+                            .setPositiveButton(android.R.string.ok, null)
                             .show()
                         return@withContext
                     }
@@ -1306,25 +1306,25 @@ class SettingsFragment : Fragment() {
                     // Show confirmation dialog
                     val formatName = result.format?.displayName ?: "Unknown"
                     val message = buildString {
-                        append("Found ${result.stations.size} station(s) in $formatName format.\n\n")
+                        append(getString(R.string.found_stations_message, result.stations.size, formatName))
                         if (result.errors.isNotEmpty()) {
-                            append("Warnings:\n")
+                            append(getString(R.string.warnings_header))
                             result.errors.take(3).forEach { append("• $it\n") }
                             if (result.errors.size > 3) {
-                                append("• ...and ${result.errors.size - 3} more\n")
+                                append(getString(R.string.more_warnings, result.errors.size - 3))
                             }
                             append("\n")
                         }
-                        append("Do you want to import these stations?")
+                        append(getString(R.string.import_confirmation))
                     }
 
                     AlertDialog.Builder(requireContext())
-                        .setTitle("Import Stations")
+                        .setTitle(getString(R.string.dialog_import_stations))
                         .setMessage(message)
-                        .setPositiveButton("Import") { _, _ ->
+                        .setPositiveButton(getString(R.string.button_import)) { _, _ ->
                             performImport(result.stations)
                         }
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(getString(R.string.button_cancel), null)
                         .show()
                 }
             } catch (e: Exception) {
@@ -1334,7 +1334,7 @@ class SettingsFragment : Fragment() {
 
                     Toast.makeText(
                         requireContext(),
-                        "Import error: ${e.message}",
+                        getString(R.string.import_error_message, e.message),
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -1362,7 +1362,7 @@ class SettingsFragment : Fragment() {
 
                 Toast.makeText(
                     context,
-                    "Imported $imported station(s)",
+                    getString(R.string.imported_stations_success, imported),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -1383,7 +1383,7 @@ class SettingsFragment : Fragment() {
 
                         Toast.makeText(
                             context,
-                            "No stations to export",
+                            getString(R.string.no_stations_to_export),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -1409,7 +1409,7 @@ class SettingsFragment : Fragment() {
 
                     Toast.makeText(
                         context,
-                        "Exported ${stations.size} station(s) to ${format.displayName}",
+                        getString(R.string.exported_stations_success, stations.size, format.displayName),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -1420,7 +1420,7 @@ class SettingsFragment : Fragment() {
 
                     Toast.makeText(
                         context,
-                        "Export error: ${e.message}",
+                        getString(R.string.export_error_message, e.message),
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -1621,14 +1621,14 @@ class SettingsFragment : Fragment() {
 
         resetBandwidthButton?.setOnClickListener {
             AlertDialog.Builder(requireContext())
-                .setTitle("Reset Session Bandwidth")
-                .setMessage("Reset the session bandwidth counter to zero?")
-                .setPositiveButton("Reset") { _, _ ->
+                .setTitle(getString(R.string.dialog_reset_session_bandwidth))
+                .setMessage(getString(R.string.reset_bandwidth_message))
+                .setPositiveButton(getString(R.string.button_reset)) { _, _ ->
                     PreferencesHelper.resetSessionBandwidthUsage(requireContext())
                     updateBandwidthDisplay()
                     Toast.makeText(requireContext(), getString(R.string.toast_session_bandwidth_reset), Toast.LENGTH_SHORT).show()
                 }
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(getString(R.string.button_cancel), null)
                 .show()
         }
     }
@@ -1655,11 +1655,20 @@ class SettingsFragment : Fragment() {
         val testResultText = dialogView.findViewById<TextView>(R.id.testResultText)
 
         // Set up dropdowns
-        val protocols = arrayOf("HTTP", "HTTPS", "SOCKS4", "SOCKS5")
+        val protocols = arrayOf(
+            getString(R.string.default_protocol_http),
+            getString(R.string.default_protocol_https),
+            getString(R.string.default_protocol_socks4),
+            getString(R.string.default_protocol_socks5)
+        )
         val protocolAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, protocols)
         protocolInput.setAdapter(protocolAdapter)
 
-        val authTypes = arrayOf("None", "Basic", "Digest")
+        val authTypes = arrayOf(
+            getString(R.string.default_proxy_none),
+            getString(R.string.default_auth_basic),
+            getString(R.string.default_auth_digest)
+        )
         val authTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, authTypes)
         authTypeInput.setAdapter(authTypeAdapter)
 
@@ -1682,13 +1691,13 @@ class SettingsFragment : Fragment() {
             val authType = authTypeInput.text?.toString()?.uppercase() ?: "NONE"
 
             if (host.isEmpty()) {
-                testResultText.text = "❌ Please enter a proxy host"
+                testResultText.text = getString(R.string.validation_enter_proxy_host)
                 testResultText.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
                 testResultText.visibility = View.VISIBLE
                 return@setOnClickListener
             }
 
-            testResultText.text = "Testing connection..."
+            testResultText.text = getString(R.string.testing_connection)
             testResultText.setTextColor(resources.getColor(android.R.color.holo_orange_dark, null))
             testResultText.visibility = View.VISIBLE
             testButton.isEnabled = false
@@ -1712,9 +1721,9 @@ class SettingsFragment : Fragment() {
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Configure Global Custom Proxy")
+            .setTitle(getString(R.string.dialog_configure_global_proxy))
             .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton(getString(R.string.button_save)) { _, _ ->
                 val host = hostInput.text?.toString() ?: ""
                 val port = portInput.text?.toString()?.toIntOrNull() ?: 8080
                 val protocol = protocolInput.text?.toString() ?: "HTTP"
@@ -1766,7 +1775,7 @@ class SettingsFragment : Fragment() {
 
                 Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_saved), Toast.LENGTH_SHORT).show()
             }
-            .setNeutralButton("Clear Proxy") { _, _ ->
+            .setNeutralButton(getString(R.string.button_clear)) { _, _ ->
                 // Disable custom proxy
                 PreferencesHelper.setCustomProxyEnabled(requireContext(), false)
                 enableCustomProxySwitch?.isChecked = false
@@ -1797,7 +1806,7 @@ class SettingsFragment : Fragment() {
 
                 Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_cleared), Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .show()
     }
 
@@ -2261,7 +2270,7 @@ class SettingsFragment : Fragment() {
                                     withContext(Dispatchers.Main) {
                                         progressDialog.dismiss()
                                         android.util.Log.e("SettingsFragment", "Failed to re-key database", e)
-                                        Toast.makeText(requireContext(), "Password changed but failed to re-key database: ${e.message}", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(requireContext(), getString(R.string.password_change_rekey_failed, e.message), Toast.LENGTH_LONG).show()
                                     }
                                 }
                             }

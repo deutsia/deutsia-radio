@@ -184,9 +184,9 @@ class MiniPlayerView @JvmOverloads constructor(
         stationName.text = station.name
         val proxyIndicator = if (station.useProxy) {
             when (station.getProxyTypeEnum()) {
-                ProxyType.I2P -> " • I2P"
-                ProxyType.TOR -> " • Tor"
-                ProxyType.CUSTOM -> " • Custom"
+                ProxyType.I2P -> context.getString(R.string.proxy_label_i2p)
+                ProxyType.TOR -> context.getString(R.string.proxy_label_tor)
+                ProxyType.CUSTOM -> context.getString(R.string.proxy_label_custom)
                 ProxyType.NONE -> ""
             }
         } else ""
