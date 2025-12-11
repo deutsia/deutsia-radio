@@ -75,7 +75,6 @@ class RadioService : Service() {
     private var currentProxyHost: String? = null
     private var currentProxyPort: Int = 4444
     private var currentProxyType: ProxyType = ProxyType.NONE
-    // Custom proxy fields
     private var currentCustomProxyProtocol: String = "HTTP"
     private var currentProxyUsername: String = ""
     private var currentProxyPassword: String = ""
@@ -85,65 +84,46 @@ class RadioService : Service() {
     private var reconnectAttempts = 0
     private val maxReconnectAttempts = 10
 
-    // Service-scoped coroutine scope that gets cancelled in onDestroy
-    // Prevents coroutine leaks when service is destroyed
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    // Store OkHttp client for proper cleanup to prevent memory leaks
-    // @Volatile ensures visibility across threads when rapidly switching streams
     @Volatile private var currentOkHttpClient: OkHttpClient? = null
     private val okHttpClientLock = Any()
 
-    // Flag to track when we're switching between streams
-    // Prevents old player's IDLE state from clearing buffering animation during stream switch
-    // AtomicBoolean ensures thread-safe access from player callbacks and UI thread
     private val isStartingNewStream = AtomicBoolean(false)
 
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: android.media.AudioFocusRequest? = null
     @Volatile private var hasAudioFocus = false
 
-    // Audio focus change listener to handle interruptions gracefully
-    // This prevents static/scratches when other apps briefly request audio focus
-    // Note: ExoPlayer now handles audio focus automatically, but this listener
-    // provides additional logging and ensures proper cleanup on permanent loss
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
         when (focusChange) {
             AudioManager.AUDIOFOCUS_GAIN -> {
-                // Regained focus - ExoPlayer handles this automatically
                 hasAudioFocus = true
-                android.util.Log.d("RadioService", "Audio focus gained - ExoPlayer handling playback")
+                android.util.Log.d("RadioService", "Audio focus gained")
             }
             AudioManager.AUDIOFOCUS_LOSS -> {
-                // Permanent loss (e.g., Spotify, YouTube starts) - stop playback entirely
-                // ExoPlayer pauses automatically, but we should clean up properly
                 hasAudioFocus = false
-                android.util.Log.d("RadioService", "Audio focus lost permanently - stopping playback")
-                // Post to handler to avoid blocking the audio focus callback
+                android.util.Log.d("RadioService", "Audio focus lost permanently")
                 handler.post {
                     stopStream()
                 }
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                // Temporary loss (e.g., phone call, notification) - ExoPlayer pauses automatically
                 hasAudioFocus = false
-                android.util.Log.d("RadioService", "Audio focus lost transiently - ExoPlayer handling pause")
+                android.util.Log.d("RadioService", "Audio focus lost transiently")
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
-                // Can duck - ExoPlayer handles volume reduction automatically
-                android.util.Log.d("RadioService", "Audio focus ducking - ExoPlayer handling volume")
+                android.util.Log.d("RadioService", "Audio focus ducking")
             }
         }
     }
 
-    // MediaSession for Now Playing card on TV
     private var mediaSession: MediaSessionCompat? = null
     private var currentCoverArtUri: String? = null
     private val sessionDeactivateHandler = Handler(Looper.getMainLooper())
     private var sessionDeactivateRunnable: Runnable? = null
     private val SESSION_DEACTIVATE_DELAY = 5 * 60 * 1000L // 5 minutes
 
-    // Recording - uses separate network request to avoid affecting audio pipeline
     private var isRecording = false
     private var currentStationName: String = "Unknown Station"
     private var recordingCall: Call? = null
@@ -153,31 +133,25 @@ class RadioService : Service() {
     private var recordingFile: File? = null
     private var recordingMediaStoreUri: Uri? = null  // For Android 10+ MediaStore recordings
 
-    // Stream switching for "Record All Stations" feature
     @Volatile private var pendingRecordingStreamUrl: String? = null
     @Volatile private var pendingRecordingProxyHost: String? = null
     @Volatile private var pendingRecordingProxyPort: Int = 0
     @Volatile private var pendingRecordingProxyType: ProxyType = ProxyType.NONE
     private val switchStreamRequested = AtomicBoolean(false)
 
-    // Sleep timer
     private var sleepTimerRunnable: Runnable? = null
     private var sleepTimerEndTime: Long = 0L
 
-    // Reconnect runnable tracking
     private var reconnectRunnable: Runnable? = null
 
-    // Stream metadata
     private var currentMetadata: String? = null
     private var currentBitrate: Int = 0
     private var currentCodec: String? = null
 
-    // Playback time tracking
     private var playbackStartTimeMillis: Long = 0L
     private var playbackTimeUpdateRunnable: Runnable? = null
     private val playbackTimeUpdateInterval = 1000L // Update every second
 
-    // Built-in equalizer manager
     private var equalizerManager: EqualizerManager? = null
 
     companion object {
@@ -192,7 +166,6 @@ class RadioService : Service() {
         const val CHANNEL_ID = "DeutsiaRadioChannel"
         const val NOTIFICATION_ID = 1
 
-        // Broadcast actions for metadata updates
         const val BROADCAST_METADATA_CHANGED = "com.opensource.i2pradio.METADATA_CHANGED"
         const val BROADCAST_STREAM_INFO_CHANGED = "com.opensource.i2pradio.STREAM_INFO_CHANGED"
         const val BROADCAST_PLAYBACK_STATE_CHANGED = "com.opensource.i2pradio.PLAYBACK_STATE_CHANGED"
@@ -207,12 +180,10 @@ class RadioService : Service() {
         const val EXTRA_FILE_PATH = "file_path"
         const val EXTRA_FILE_SIZE = "file_size"
 
-        // Cover art update broadcast
         const val BROADCAST_COVER_ART_CHANGED = "com.opensource.i2pradio.COVER_ART_CHANGED"
         const val EXTRA_COVER_ART_URI = "cover_art_uri"
         const val EXTRA_STATION_ID = "station_id"
 
-        // Playback time tracking
         const val BROADCAST_PLAYBACK_TIME_UPDATE = "com.opensource.i2pradio.PLAYBACK_TIME_UPDATE"
         const val EXTRA_PLAYBACK_ELAPSED_MS = "playback_elapsed_ms"
         const val EXTRA_BUFFERED_POSITION_MS = "buffered_position_ms"
@@ -232,9 +203,7 @@ class RadioService : Service() {
     }
 
     private fun initializeMediaSession() {
-        // Create MediaSession for Now Playing card on TV
         mediaSession = MediaSessionCompat(this, "DeutsiaRadioSession").apply {
-            // Set session activity - opens app when Now Playing card is selected
             val sessionActivityIntent = Intent(this@RadioService, MainActivity::class.java)
             val sessionActivityPendingIntent = PendingIntent.getActivity(
                 this@RadioService,
@@ -244,11 +213,9 @@ class RadioService : Service() {
             )
             setSessionActivity(sessionActivityPendingIntent)
 
-            // Set flags for transport controls (needed for backwards compatibility)
             @Suppress("DEPRECATION")
             setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS)
 
-            // Set callback for transport controls
             setCallback(object : MediaSessionCompat.Callback() {
                 override fun onPlay() {
                     player?.play()
@@ -271,9 +238,6 @@ class RadioService : Service() {
         }
     }
 
-    /**
-     * Update the playback state in MediaSession
-     */
     private fun updatePlaybackState(state: Int) {
         val playbackStateBuilder = PlaybackStateCompat.Builder()
             .setActions(
@@ -287,9 +251,6 @@ class RadioService : Service() {
         mediaSession?.setPlaybackState(playbackStateBuilder.build())
     }
 
-    /**
-     * Update media metadata for the Now Playing card
-     */
     private fun updateMediaMetadata(stationName: String, coverArtUri: String?) {
         val metadataBuilder = MediaMetadataCompat.Builder()
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
@@ -297,12 +258,9 @@ class RadioService : Service() {
             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "deutsia radio")
             .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "deutsia radio")
 
-        // Load cover art if available
         if (!coverArtUri.isNullOrEmpty()) {
             serviceScope.launch(Dispatchers.IO) {
                 try {
-                    // Use SecureImageLoader to route remote URLs through Tor when Force Tor is enabled
-                    // Local content URIs (file://, content://) bypass the proxy automatically
                     val request = ImageRequest.Builder(this@RadioService)
                         .data(coverArtUri)
                         .allowHardware(false)
@@ -327,7 +285,6 @@ class RadioService : Service() {
                     android.util.Log.e("RadioService", "Failed to load cover art for media session", e)
                 }
 
-                // Set metadata without cover art if loading failed
                 handler.post {
                     mediaSession?.setMetadata(metadataBuilder.build())
                 }
@@ -337,26 +294,17 @@ class RadioService : Service() {
         }
     }
 
-    /**
-     * Activate the media session
-     */
     private fun activateMediaSession() {
         cancelSessionDeactivation()
         mediaSession?.isActive = true
         android.util.Log.d("RadioService", "MediaSession activated")
     }
 
-    /**
-     * Deactivate the media session
-     */
     private fun deactivateMediaSession() {
         mediaSession?.isActive = false
         android.util.Log.d("RadioService", "MediaSession deactivated")
     }
 
-    /**
-     * Schedule session deactivation after a delay (for pause state)
-     */
     private fun scheduleSessionDeactivation() {
         cancelSessionDeactivation()
         sessionDeactivateRunnable = Runnable {
@@ -368,9 +316,6 @@ class RadioService : Service() {
         }
     }
 
-    /**
-     * Cancel any pending session deactivation
-     */
     private fun cancelSessionDeactivation() {
         sessionDeactivateRunnable?.let {
             sessionDeactivateHandler.removeCallbacks(it)
@@ -413,14 +358,8 @@ class RadioService : Service() {
                 currentCoverArtUri = coverArtUri
                 reconnectAttempts = 0
 
-                // CRITICAL: Start foreground immediately to comply with Android 8+ requirements
-                // This must be called within 5 seconds of startForegroundService()
                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connecting)))
-
-                // Broadcast buffering state to UI immediately
                 broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
-
-                // Activate media session and set metadata
                 activateMediaSession()
                 updateMediaMetadata(stationName, coverArtUri)
                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
@@ -450,7 +389,6 @@ class RadioService : Service() {
                 stopRecording()
             }
             ACTION_SWITCH_RECORDING_STREAM -> {
-                // Switch recording to a new stream URL (for "Record All Stations" feature)
                 val newStreamUrl = intent.getStringExtra("stream_url") ?: return START_NOT_STICKY
                 val newProxyHost = intent.getStringExtra("proxy_host") ?: ""
                 val newProxyPort = intent.getIntExtra("proxy_port", 4444)
@@ -501,12 +439,6 @@ class RadioService : Service() {
         } else 0L
     }
 
-    /**
-     * Start recording using a COMPLETELY SEPARATE network request.
-     * This is critical: the recording stream uses its own OkHttpClient instance
-     * that is completely independent from the playback stream.
-     * This ensures recording cannot cause any audio glitches or affect playback.
-     */
     private fun startRecording(stationName: String) {
         if (isRecording) {
             android.util.Log.w("RadioService", "Recording already in progress")
@@ -527,7 +459,6 @@ class RadioService : Service() {
 
         android.util.Log.d("RadioService", "Starting recording for: $stationName, URL: $streamUrl")
 
-        // Determine MIME type for the format
         val mimeType = when (format) {
             "ogg" -> "audio/ogg"
             "opus" -> "audio/opus"
@@ -537,18 +468,12 @@ class RadioService : Service() {
             else -> "audio/mpeg"
         }
 
-        // Check for custom recording directory first
         val customDirUri = PreferencesHelper.getRecordingDirectoryUri(this)
         val useCustomDir = customDirUri != null
-
-        // For Android 10+ (API 29+), use MediaStore to save to public Music directory
-        // For older versions, use legacy file access
-        // Custom directory overrides both
         val useMediaStore = !useCustomDir && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         var recordingsDir: File? = null
 
         if (!useCustomDir && !useMediaStore) {
-            // Legacy: Use public Music directory for Android 9 and below
             @Suppress("DEPRECATION")
             val musicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
             recordingsDir = File(musicDir, "deutsia radio")
@@ -565,28 +490,21 @@ class RadioService : Service() {
 
         android.util.Log.d("RadioService", "Recording will use custom dir: $useCustomDir, MediaStore: $useMediaStore, format: $format, mimeType: $mimeType")
 
-        // Build a COMPLETELY SEPARATE OkHttp client for recording
-        // This is a NEW instance, independent from the playback client
         val recordingClient = buildRecordingHttpClient()
-
-        // Create request for the stream - using separate connection
         val request = Request.Builder()
             .url(streamUrl)
-            .header("User-Agent", "DeutsiaRadio-Recorder/1.0") // Different user agent to distinguish
-            .header("Icy-MetaData", "0") // Don't need metadata for recording
+            .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+            .header("Icy-MetaData", "0")
             .header("Accept", "*/*")
             .header("Connection", "keep-alive")
             .build()
 
-        // Set flags before starting
         isRecordingActive.set(true)
         isRecording = true
 
-        // Create and store the call
         val call = recordingClient.newCall(request)
         recordingCall = call
 
-        // Capture values for thread
         val finalFileName = fileName
         val finalRecordingsDir = recordingsDir
         val finalStreamUrl = streamUrl
@@ -596,15 +514,14 @@ class RadioService : Service() {
         val finalCustomDirUri = customDirUri
         val finalFormat = format
 
-        // Start recording on a dedicated background thread
         recordingThread = Thread({
             var response: Response? = null
             var outputStream: BufferedOutputStream? = null
             var totalBytesWritten = 0L
             var lastFlushBytes = 0L
             var lastLogTime = System.currentTimeMillis()
-            val flushInterval = 64 * 1024L // Flush every 64KB for data safety
-            val logInterval = 10_000L // Log every 10 seconds
+            val flushInterval = 64 * 1024L
+            val logInterval = 10_000L
             var file: File? = null
             var mediaStoreUri: Uri? = null
             var filePath: String? = null
@@ -614,17 +531,15 @@ class RadioService : Service() {
             try {
                 android.util.Log.d("RadioService", "Recording thread started, connecting to: $finalStreamUrl")
 
-                // Retry loop for connection
                 while (connectionRetries < maxConnectionRetries && isRecordingActive.get()) {
                     try {
-                        // Execute the request on this thread (blocking)
                         response = call.execute()
-                        break // Success, exit retry loop
+                        break
                     } catch (e: java.net.SocketTimeoutException) {
                         connectionRetries++
                         if (connectionRetries < maxConnectionRetries && isRecordingActive.get()) {
                             android.util.Log.w("RadioService", "Recording connection timeout, retry $connectionRetries/$maxConnectionRetries")
-                            Thread.sleep(1000L * connectionRetries) // Exponential backoff
+                            Thread.sleep(1000L * connectionRetries)
                         } else {
                             throw e
                         }
@@ -670,9 +585,7 @@ class RadioService : Service() {
                     return@Thread
                 }
 
-                // NOW create the file - only after we have a successful connection
                 if (finalUseCustomDir && finalCustomDirUri != null) {
-                    // Custom directory: Use Storage Access Framework
                     try {
                         val treeUri = Uri.parse(finalCustomDirUri)
                         val docFile = DocumentFile.fromTreeUri(this@RadioService, treeUri)
@@ -719,12 +632,11 @@ class RadioService : Service() {
                         return@Thread
                     }
                 } else if (finalUseMediaStore) {
-                    // Android 10+: Use MediaStore to save to public Music/deutsia radio directory
                     val contentValues = ContentValues().apply {
                         put(MediaStore.Audio.Media.DISPLAY_NAME, finalFileName)
                         put(MediaStore.Audio.Media.MIME_TYPE, finalMimeType)
                         put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/deutsia radio")
-                        put(MediaStore.Audio.Media.IS_PENDING, 1)  // Mark as pending while writing
+                        put(MediaStore.Audio.Media.IS_PENDING, 1)
                     }
 
                     val resolver = contentResolver
@@ -756,7 +668,6 @@ class RadioService : Service() {
 
                     outputStream = BufferedOutputStream(rawOutputStream, 64 * 1024)
                 } else {
-                    // Legacy: Direct file access for Android 9 and below
                     file = File(finalRecordingsDir!!, finalFileName)
                     recordingFile = file
                     filePath = file!!.absolutePath
@@ -764,27 +675,22 @@ class RadioService : Service() {
 
                     outputStream = BufferedOutputStream(
                         FileOutputStream(file),
-                        64 * 1024 // 64KB write buffer
+                        64 * 1024
                     )
                 }
 
                 recordingOutputStream = outputStream
-
-                // Update notification now that we're actually recording
                 handler.post { updateNotificationWithRecording() }
 
                 var currentInputStream = responseBody.byteStream()
                 var currentResponse: Response? = response
-                val buffer = ByteArray(8192) // 8KB read buffer - smaller for more responsive stopping
+                val buffer = ByteArray(8192)
 
-                // Outer loop for stream switching - continues until stopped
                 outerLoop@ while (isRecordingActive.get() && !Thread.currentThread().isInterrupted) {
-                    // Inner read loop - reads from current stream
                     while (isRecordingActive.get() && !Thread.currentThread().isInterrupted) {
                         val bytesRead = try {
                             currentInputStream.read(buffer)
                         } catch (e: java.io.IOException) {
-                            // Check if this is a stream switch request
                             if (switchStreamRequested.get()) {
                                 android.util.Log.d("RadioService", "Recording read interrupted for stream switch")
                                 -1
@@ -797,27 +703,23 @@ class RadioService : Service() {
                         }
 
                         if (bytesRead == -1) {
-                            // Stream ended or error - check if we should switch streams
                             if (switchStreamRequested.compareAndSet(true, false)) {
                                 val newStreamUrl = pendingRecordingStreamUrl
                                 if (newStreamUrl != null) {
                                     android.util.Log.d("RadioService", "Switching recording to new stream: $newStreamUrl")
 
-                                    // Flush before switching
                                     try {
                                         outputStream.flush()
                                     } catch (e: Exception) {
                                         android.util.Log.w("RadioService", "Error flushing before stream switch: ${e.message}")
                                     }
 
-                                    // Close old response
                                     try {
                                         currentResponse?.close()
                                     } catch (e: Exception) {
                                         android.util.Log.w("RadioService", "Error closing old response: ${e.message}")
                                     }
 
-                                    // Build new client and request
                                     val newRecordingClient = buildRecordingHttpClient()
                                     val newRequest = Request.Builder()
                                         .url(newStreamUrl)
@@ -827,7 +729,6 @@ class RadioService : Service() {
                                         .header("Connection", "keep-alive")
                                         .build()
 
-                                    // Connect to new stream
                                     try {
                                         val newCall = newRecordingClient.newCall(newRequest)
                                         recordingCall = newCall
@@ -838,19 +739,15 @@ class RadioService : Service() {
                                             currentInputStream = newResponse.body!!.byteStream()
                                             android.util.Log.d("RadioService", "Recording switched to new stream successfully")
                                             pendingRecordingStreamUrl = null
-
-                                            // Continue with the outer loop (new stream)
                                             continue@outerLoop
                                         } else {
                                             android.util.Log.e("RadioService", "Failed to connect to new stream: ${newResponse.code}")
                                             newResponse.close()
-                                            // Continue with same stream or exit
                                         }
                                     } catch (e: Exception) {
                                         android.util.Log.e("RadioService", "Error switching to new stream: ${e.message}")
                                     }
 
-                                    // Clear pending on failure
                                     pendingRecordingStreamUrl = null
                                 }
                             }
@@ -864,13 +761,11 @@ class RadioService : Service() {
                                 outputStream.write(buffer, 0, bytesRead)
                                 totalBytesWritten += bytesRead
 
-                                // Periodic flush for data safety
                                 if (totalBytesWritten - lastFlushBytes >= flushInterval) {
                                     outputStream.flush()
                                     lastFlushBytes = totalBytesWritten
                                 }
 
-                                // Periodic logging (not too frequent)
                                 val now = System.currentTimeMillis()
                                 if (now - lastLogTime >= logInterval) {
                                     android.util.Log.d("RadioService", "Recording: ${totalBytesWritten / 1024}KB written to ${filePath ?: file?.name ?: "unknown"}")
@@ -884,21 +779,17 @@ class RadioService : Service() {
                     }
                 }
 
-                // Final flush before closing
                 try {
                     outputStream.flush()
                 } catch (e: Exception) {
                     android.util.Log.w("RadioService", "Error during final flush: ${e.message}")
                 }
 
-                // Close the current response
                 try {
                     currentResponse?.close()
                 } catch (e: Exception) {
                     android.util.Log.w("RadioService", "Error closing final response: ${e.message}")
                 }
-
-                android.util.Log.d("RadioService", "Recording loop ended, total: ${totalBytesWritten / 1024}KB")
 
             } catch (e: java.net.SocketTimeoutException) {
                 android.util.Log.e("RadioService", "Recording connection timed out", e)
@@ -925,7 +816,6 @@ class RadioService : Service() {
                 android.util.Log.e("RadioService", "Recording error: ${e.javaClass.simpleName}: ${e.message}", e)
                 handler.post { broadcastRecordingError(getString(R.string.recording_error_generic, e.message)) }
             } finally {
-                // Close streams in reverse order
                 try {
                     outputStream?.flush()
                     outputStream?.close()
@@ -940,13 +830,10 @@ class RadioService : Service() {
 
                 recordingOutputStream = null
 
-                // Handle recording completion based on storage method
                 if (mediaStoreUri != null) {
-                    // Android 10+: Finalize or delete MediaStore entry
                     val resolver = contentResolver
                     val sizeKB = totalBytesWritten / 1024
                     if (sizeKB > 0) {
-                        // Finalize the recording by clearing IS_PENDING flag
                         val updateValues = ContentValues().apply {
                             put(MediaStore.Audio.Media.IS_PENDING, 0)
                         }
@@ -955,19 +842,16 @@ class RadioService : Service() {
                         val savedPath = filePath ?: "Music/i2pradio/unknown"
                         handler.post { broadcastRecordingComplete(savedPath, totalBytesWritten) }
                     } else {
-                        // Delete empty recording
                         android.util.Log.w("RadioService", "Recording is empty, deleting MediaStore entry: $filePath")
                         resolver.delete(mediaStoreUri, null, null)
                     }
                     recordingMediaStoreUri = null
                 } else if (file != null) {
-                    // Legacy: Handle file directly
                     file?.let { f ->
                         if (f.exists()) {
                             val sizeKB = f.length() / 1024
                             if (sizeKB > 0) {
                                 android.util.Log.d("RadioService", "Recording saved: ${f.absolutePath} (${sizeKB}KB)")
-                                // Broadcast success
                                 handler.post { broadcastRecordingComplete(f.absolutePath, totalBytesWritten) }
                             } else {
                                 android.util.Log.w("RadioService", "Recording file is empty, deleting: ${f.absolutePath}")
@@ -978,7 +862,6 @@ class RadioService : Service() {
                         }
                     }
                 } else if (finalUseCustomDir && filePath != null) {
-                    // Custom directory: File was created via SAF, just broadcast completion
                     val sizeKB = totalBytesWritten / 1024
                     if (sizeKB > 0) {
                         android.util.Log.d("RadioService", "Recording saved to custom dir: $filePath (${sizeKB}KB)")
@@ -989,18 +872,14 @@ class RadioService : Service() {
                 }
             }
         }, "RecordingThread-${System.currentTimeMillis()}").apply {
-            priority = Thread.MIN_PRIORITY // Low priority to not affect audio playback
-            isDaemon = false // Ensure thread completes even if app is closing
+            priority = Thread.MIN_PRIORITY
+            isDaemon = false
         }
 
         recordingThread?.start()
-        // Don't update notification until we have a successful connection (done in thread)
         android.util.Log.d("RadioService", "Recording thread started for: $stationName")
     }
 
-    /**
-     * Broadcast a recording error to the UI
-     */
     private fun broadcastRecordingError(message: String) {
         android.util.Log.e("RadioService", "Recording error: $message")
         val intent = Intent(BROADCAST_RECORDING_ERROR).apply {
@@ -1009,9 +888,6 @@ class RadioService : Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    /**
-     * Broadcast recording complete to the UI
-     */
     private fun broadcastRecordingComplete(filePath: String, fileSize: Long) {
         android.util.Log.d("RadioService", "Recording complete: $filePath (${fileSize / 1024}KB)")
         val intent = Intent(BROADCAST_RECORDING_COMPLETE).apply {
@@ -1021,15 +897,7 @@ class RadioService : Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    /**
-     * Build a COMPLETELY SEPARATE OkHttp client for recording.
-     * This client has its own connection pool, dispatcher, and settings
-     * to ensure it cannot interfere with the playback OkHttp client.
-     *
-     * BULLETPROOF: This method also enforces Force Tor settings for recording traffic.
-     */
     private fun buildRecordingHttpClient(): OkHttpClient {
-        // Check Force settings - bulletproof mode for recording too
         val forceTorAll = PreferencesHelper.isForceTorAll(this)
         val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
         val forceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
@@ -1037,7 +905,6 @@ class RadioService : Service() {
         val isI2PStream = currentProxyType == ProxyType.I2P || currentStreamUrl?.contains(".i2p") == true
         val isTorStream = currentProxyType == ProxyType.TOR || currentStreamUrl?.contains(".onion") == true
 
-        // RECORDING NETWORK ROUTING LOG
         android.util.Log.d("RadioService", "===== RECORDING CONNECTION REQUEST =====")
         android.util.Log.d("RadioService", "Recording URL: $currentStreamUrl")
         android.util.Log.d("RadioService", "Force Tor All: $forceTorAll")
@@ -1049,12 +916,10 @@ class RadioService : Service() {
         android.util.Log.d("RadioService", "Tor connected: ${TorManager.isConnected()}")
 
         val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
-            // FORCE TOR ALL: Everything goes through Tor, no exceptions
             forceTorAll && TorManager.isConnected() -> {
                 android.util.Log.d("RadioService", "FORCE TOR ALL (recording): Routing through Tor")
                 Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
             }
-            // FORCE TOR EXCEPT I2P: I2P streams use I2P proxy, everything else through Tor
             forceTorExceptI2P && isI2PStream -> {
                 if (currentProxyHost?.isNotEmpty() == true && currentProxyType == ProxyType.I2P) {
                     android.util.Log.d("RadioService", "FORCE TOR (except I2P) recording: Using I2P proxy")
@@ -1068,14 +933,12 @@ class RadioService : Service() {
                 android.util.Log.d("RadioService", "FORCE TOR (except I2P) recording: Routing through Tor")
                 Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
             }
-            // FORCE CUSTOM PROXY: Everything goes through custom proxy, no exceptions
             forceCustomProxy -> {
                 val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
                 val customProxyPort = PreferencesHelper.getCustomProxyPort(this)
                 android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (recording): Routing through custom proxy")
                 Triple(customProxyHost, customProxyPort, ProxyType.CUSTOM)
             }
-            // FORCE CUSTOM PROXY EXCEPT TOR/I2P: Tor/I2P streams use native proxies, everything else through custom proxy
             forceCustomProxyExceptTorI2P && isI2PStream -> {
                 if (currentProxyHost?.isNotEmpty() == true && currentProxyType == ProxyType.I2P) {
                     android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Using I2P proxy")
@@ -1095,14 +958,12 @@ class RadioService : Service() {
                 android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Routing through custom proxy")
                 Triple(customProxyHost, customProxyPort, ProxyType.CUSTOM)
             }
-            // Standard proxy logic when Force modes are disabled
             currentProxyType == ProxyType.TOR &&
             PreferencesHelper.isEmbeddedTorEnabled(this) &&
             TorManager.isConnected() -> {
                 Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
             }
             currentProxyHost?.isNotEmpty() == true && currentProxyType != ProxyType.NONE -> {
-                // BUG FIX: Don't use Tor proxy if Tor integration is disabled
                 if (currentProxyType == ProxyType.TOR && !PreferencesHelper.isEmbeddedTorEnabled(this)) {
                     android.util.Log.w("RadioService", "Recording requires Tor but Tor integration is disabled - using direct connection")
                     Triple("", 0, ProxyType.NONE)
@@ -1113,7 +974,6 @@ class RadioService : Service() {
             else -> Triple("", 0, ProxyType.NONE)
         }
 
-        // LOG RECORDING ROUTING DECISION
         android.util.Log.d("RadioService", "===== RECORDING ROUTING DECISION =====")
         android.util.Log.d("RadioService", "Recording proxy: $effectiveProxyHost:$effectiveProxyPort (${effectiveProxyType.name})")
         when (effectiveProxyType) {
@@ -1124,15 +984,12 @@ class RadioService : Service() {
         }
         android.util.Log.d("RadioService", "======================================")
 
-        // Create a completely new connection pool for recording
-        // This ensures recording uses separate TCP connections from playback
         val recordingConnectionPool = okhttp3.ConnectionPool(
             maxIdleConnections = 1,
             keepAliveDuration = 30,
             timeUnit = TimeUnit.SECONDS
         )
 
-        // Create a separate dispatcher for recording
         val recordingDispatcher = okhttp3.Dispatcher().apply {
             maxRequests = 1
             maxRequestsPerHost = 1
@@ -1143,17 +1000,15 @@ class RadioService : Service() {
             .dispatcher(recordingDispatcher)
             .addInterceptor(BandwidthTrackingInterceptor(this))
             .connectTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming
+            .readTimeout(0, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
 
-        // Apply proxy if needed
         if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
             val javaProxyType = when (effectiveProxyType) {
                 ProxyType.TOR -> Proxy.Type.SOCKS
                 ProxyType.I2P -> Proxy.Type.HTTP
                 ProxyType.CUSTOM -> {
-                    // Parse custom proxy protocol
                     when (currentCustomProxyProtocol.uppercase()) {
                         "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
                         "HTTP", "HTTPS" -> Proxy.Type.HTTP
@@ -1164,13 +1019,11 @@ class RadioService : Service() {
             }
             builder.proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
 
-            // Add proxy authentication if custom proxy with credentials
             if (effectiveProxyType == ProxyType.CUSTOM && currentProxyUsername.isNotEmpty() && currentProxyPassword.isNotEmpty()) {
                 android.util.Log.d("RadioService", "Adding proxy authentication for recording client (auth type: $currentProxyAuthType)")
                 builder.proxyAuthenticator { route, response ->
                     android.util.Log.d("RadioService", "Recording client authentication challenge received (${response.code})")
 
-                    // Check if we've already tried authentication to avoid infinite loops
                     val previousAuth = response.request.header("Proxy-Authorization")
                     if (previousAuth != null) {
                         android.util.Log.w("RadioService", "Recording client authentication already attempted - credentials may be incorrect")
@@ -1208,9 +1061,6 @@ class RadioService : Service() {
         return builder.build()
     }
 
-    /**
-     * Detect audio format from stream URL for proper file extension.
-     */
     private fun detectStreamFormat(streamUrl: String): String {
         val urlLower = streamUrl.lowercase()
         return when {
@@ -1219,14 +1069,10 @@ class RadioService : Service() {
             urlLower.contains(".aac") || urlLower.contains("/aac") -> "aac"
             urlLower.contains(".flac") || urlLower.contains("/flac") -> "flac"
             urlLower.contains(".m4a") -> "m4a"
-            else -> "mp3" // Default to mp3 as most common
+            else -> "mp3"
         }
     }
 
-    /**
-     * Switch the recording stream to a new URL without stopping the recording.
-     * This allows recording content from multiple stations into the same file.
-     */
     private fun switchRecordingStream(
         newStreamUrl: String,
         newProxyHost: String,
@@ -1241,30 +1087,21 @@ class RadioService : Service() {
 
         android.util.Log.d("RadioService", "Switching recording stream to: $newStreamUrl (station: $newStationName)")
 
-        // Update current station info for proxy routing
         currentStreamUrl = newStreamUrl
         currentProxyHost = newProxyHost
         currentProxyPort = newProxyPort
         currentProxyType = newProxyType
         currentStationName = newStationName
 
-        // Set pending stream info
         pendingRecordingStreamUrl = newStreamUrl
         pendingRecordingProxyHost = newProxyHost
         pendingRecordingProxyPort = newProxyPort
         pendingRecordingProxyType = newProxyType
 
-        // Signal the recording thread to switch
         switchStreamRequested.set(true)
-
-        // Cancel the current recording call to unblock the read
         recordingCall?.cancel()
     }
 
-    /**
-     * Stop recording and close the separate network connection.
-     * This method is safe to call from any thread.
-     */
     private fun stopRecording() {
         if (!isRecording) {
             android.util.Log.d("RadioService", "stopRecording called but not recording")
@@ -1273,39 +1110,30 @@ class RadioService : Service() {
 
         android.util.Log.d("RadioService", "Stopping recording...")
 
-        // Capture references before cleanup
         val currentCall = recordingCall
         val currentThread = recordingThread
         val currentFile = recordingFile
 
-        // Signal the recording thread to stop FIRST
-        // This allows the thread to finish its current write and flush
         isRecordingActive.set(false)
-
-        // Mark as not recording immediately to prevent double-stop
         isRecording = false
 
-        // Run cleanup in background to avoid blocking UI
         Thread({
             try {
-                // Give the thread a moment to notice the flag
                 Thread.sleep(200)
 
-                // Cancel the network call (this causes the read to fail and exit)
                 try {
                     currentCall?.cancel()
                 } catch (e: Exception) {
                     android.util.Log.w("RadioService", "Error canceling recording call: ${e.message}")
                 }
 
-                // Wait for the thread to finish (up to 5 seconds for proper cleanup)
                 currentThread?.let { thread ->
                     try {
-                        thread.join(5000) // Wait up to 5 seconds
+                        thread.join(5000)
                         if (thread.isAlive) {
                             android.util.Log.w("RadioService", "Recording thread still alive after 5s, interrupting")
                             thread.interrupt()
-                            thread.join(1000) // Wait 1 more second after interrupt
+                            thread.join(1000)
                         }
                     } catch (e: InterruptedException) {
                         android.util.Log.w("RadioService", "Interrupted while waiting for recording thread")
@@ -1313,7 +1141,6 @@ class RadioService : Service() {
                     }
                 }
 
-                // Log the recorded file info
                 currentFile?.let { file ->
                     if (file.exists()) {
                         val sizeKB = file.length() / 1024
@@ -1321,7 +1148,6 @@ class RadioService : Service() {
                             android.util.Log.d("RadioService", "Recording complete: ${file.absolutePath} (${sizeKB}KB)")
                         } else {
                             android.util.Log.w("RadioService", "Recording file is empty: ${file.absolutePath}")
-                            // Delete empty files
                             file.delete()
                         }
                     } else {
@@ -1332,7 +1158,6 @@ class RadioService : Service() {
             } catch (e: Exception) {
                 android.util.Log.e("RadioService", "Error during recording cleanup: ${e.message}", e)
             } finally {
-                // Final cleanup on main thread for notification update
                 handler.post {
                     cleanupRecording()
                     if (player?.isPlaying == true) {
@@ -1344,9 +1169,6 @@ class RadioService : Service() {
         }, "RecordingCleanup").start()
     }
 
-    /**
-     * Clean up recording resources.
-     */
     private fun cleanupRecording() {
         try {
             recordingOutputStream?.close()
@@ -1354,7 +1176,6 @@ class RadioService : Service() {
             android.util.Log.e("RadioService", "Error closing output stream", e)
         }
 
-        // Clean up any pending MediaStore entry (for aborted recordings on Android 10+)
         recordingMediaStoreUri?.let { uri ->
             try {
                 contentResolver.delete(uri, null, null)
@@ -1390,7 +1211,6 @@ class RadioService : Service() {
         proxyConnectionTimeout: Int = 30
     ) {
         try {
-            // Check Force settings FIRST - bulletproof mode
             val forceTorAll = PreferencesHelper.isForceTorAll(this)
             val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
             val forceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
@@ -1398,7 +1218,6 @@ class RadioService : Service() {
             val isI2PStream = proxyType == ProxyType.I2P || streamUrl.contains(".i2p")
             val isTorStream = proxyType == ProxyType.TOR || streamUrl.contains(".onion")
 
-            // NETWORK ROUTING LOG - For debugging Tor/leak detection
             android.util.Log.d("RadioService", "===== STREAM CONNECTION REQUEST =====")
             android.util.Log.d("RadioService", "Stream URL: $streamUrl")
             android.util.Log.d("RadioService", "Requested proxy: $proxyHost:$proxyPort (${proxyType.name})")
@@ -1411,25 +1230,22 @@ class RadioService : Service() {
             android.util.Log.d("RadioService", "Tor connected: ${TorManager.isConnected()}")
             android.util.Log.d("RadioService", "Tor SOCKS: ${TorManager.getProxyHost()}:${TorManager.getProxyPort()}")
 
-            // BULLETPROOF: If Force Tor All is enabled, Tor MUST be connected or we fail
             if (forceTorAll && !TorManager.isConnected()) {
                 android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
-                isStartingNewStream.set(false)  // Reset flag on early return
+                isStartingNewStream.set(false)
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_tor_blocked)))
                 return
             }
 
-            // BULLETPROOF: If Force Tor Except I2P is enabled and this is NOT an I2P stream, Tor MUST be connected
             if (forceTorExceptI2P && !isI2PStream && !TorManager.isConnected()) {
                 android.util.Log.e("RadioService", "FORCE TOR (except I2P): Tor not connected - BLOCKING non-I2P stream")
-                isStartingNewStream.set(false)  // Reset flag on early return
+                isStartingNewStream.set(false)
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_tor_blocked)))
                 return
             }
 
-            // BULLETPROOF: If Force Custom Proxy is enabled, custom proxy MUST be configured
             if (forceCustomProxy) {
                 val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
                 if (customProxyHost.isEmpty()) {
@@ -1441,7 +1257,6 @@ class RadioService : Service() {
                 }
             }
 
-            // BULLETPROOF: If Force Custom Proxy Except Tor/I2P is enabled and this is a clearnet stream, custom proxy MUST be configured
             if (forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream) {
                 val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
                 if (customProxyHost.isEmpty()) {
@@ -1453,9 +1268,7 @@ class RadioService : Service() {
                 }
             }
 
-            // Request audio focus with proper listener to handle interruptions
             val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                // Use AudioFocusRequest for API 26+
                 audioFocusRequest = android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                     .setAudioAttributes(
                         android.media.AudioAttributes.Builder()
@@ -1468,7 +1281,6 @@ class RadioService : Service() {
                     .build()
                 audioManager.requestAudioFocus(audioFocusRequest!!)
             } else {
-                // Legacy audio focus request for older APIs
                 @Suppress("DEPRECATION")
                 audioManager.requestAudioFocus(
                     audioFocusChangeListener,
@@ -1479,35 +1291,26 @@ class RadioService : Service() {
 
             if (focusResult != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 android.util.Log.w("RadioService", "Failed to gain audio focus")
-                isStartingNewStream.set(false)  // Reset flag on early return
-                // Broadcast failure to UI so it can update the play button state
+                isStartingNewStream.set(false)
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_audio_focus_denied)))
                 return
             }
             hasAudioFocus = true
-
-            // Set flag to prevent old player's IDLE state from clearing buffering animation
             isStartingNewStream.set(true)
 
             stopStream()
 
-            // Determine proxy configuration with Force settings enforcement
-            // BULLETPROOF: Force settings override normal proxy logic
             val (effectiveProxyHost, effectiveProxyPort, effectiveProxyType) = when {
-                // FORCE TOR ALL: Everything goes through Tor, no exceptions
                 forceTorAll && TorManager.isConnected() -> {
                     android.util.Log.d("RadioService", "FORCE TOR ALL: Routing ALL traffic through Tor")
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
-                // FORCE TOR EXCEPT I2P: I2P streams use I2P proxy, everything else through Tor
                 forceTorExceptI2P && isI2PStream -> {
-                    // I2P stream - use I2P proxy if provided, otherwise use default I2P settings
                     if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) {
                         android.util.Log.d("RadioService", "FORCE TOR (except I2P): Using I2P proxy for .i2p stream")
                         Triple(proxyHost, proxyPort, ProxyType.I2P)
                     } else {
-                        // Default I2P proxy settings
                         android.util.Log.d("RadioService", "FORCE TOR (except I2P): Using default I2P proxy (127.0.0.1:4444)")
                         Triple("127.0.0.1", 4444, ProxyType.I2P)
                     }
@@ -1516,21 +1319,17 @@ class RadioService : Service() {
                     android.util.Log.d("RadioService", "FORCE TOR (except I2P): Routing non-I2P stream through Tor")
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
-                // FORCE CUSTOM PROXY: Everything goes through custom proxy, no exceptions
                 forceCustomProxy -> {
                     val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
                     val customProxyPort = PreferencesHelper.getCustomProxyPort(this)
                     android.util.Log.d("RadioService", "FORCE CUSTOM PROXY: Routing ALL traffic through custom proxy")
                     Triple(customProxyHost, customProxyPort, ProxyType.CUSTOM)
                 }
-                // FORCE CUSTOM PROXY EXCEPT TOR/I2P: Tor/I2P streams use native proxies, everything else through custom proxy
                 forceCustomProxyExceptTorI2P && isI2PStream -> {
-                    // I2P stream - use I2P proxy if provided, otherwise use default I2P settings
                     if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) {
                         android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Using I2P proxy for .i2p stream")
                         Triple(proxyHost, proxyPort, ProxyType.I2P)
                     } else {
-                        // Default I2P proxy settings
                         android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Using default I2P proxy (127.0.0.1:4444)")
                         Triple("127.0.0.1", 4444, ProxyType.I2P)
                     }
@@ -1545,16 +1344,13 @@ class RadioService : Service() {
                     android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Routing clearnet stream through custom proxy")
                     Triple(customProxyHost, customProxyPort, ProxyType.CUSTOM)
                 }
-                // Use embedded Tor for Tor streams if enabled and connected
                 proxyType == ProxyType.TOR &&
                 PreferencesHelper.isEmbeddedTorEnabled(this) &&
                 TorManager.isConnected() -> {
                     android.util.Log.d("RadioService", "Using embedded Tor proxy for .onion stream")
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
-                // Use manual proxy configuration (but only if Tor integration is enabled for TOR proxies)
                 proxyHost.isNotEmpty() && proxyType != ProxyType.NONE -> {
-                    // BUG FIX: Don't use Tor proxy if Tor integration is disabled
                     if (proxyType == ProxyType.TOR && !PreferencesHelper.isEmbeddedTorEnabled(this)) {
                         android.util.Log.w("RadioService", "Station requires Tor but Tor integration is disabled - using direct connection")
                         Triple("", 0, ProxyType.NONE)
@@ -1562,11 +1358,9 @@ class RadioService : Service() {
                         Triple(proxyHost, proxyPort, proxyType)
                     }
                 }
-                // Direct connection (only if Force modes are disabled)
                 else -> Triple("", 0, ProxyType.NONE)
             }
 
-            // LOG FINAL ROUTING DECISION - Critical for leak detection
             android.util.Log.d("RadioService", "===== FINAL ROUTING DECISION =====")
             android.util.Log.d("RadioService", "Effective proxy: $effectiveProxyHost:$effectiveProxyPort (${effectiveProxyType.name})")
             when (effectiveProxyType) {
@@ -1582,16 +1376,12 @@ class RadioService : Service() {
             }
             android.util.Log.d("RadioService", "==================================")
 
-            // Simple, clean OkHttp client - let ExoPlayer handle buffering
-            // Store the client for proper cleanup to prevent memory leaks
-            // Synchronized to prevent race conditions when rapidly switching streams
             val okHttpClient = synchronized(okHttpClientLock) {
                 currentOkHttpClient = if (effectiveProxyHost.isNotEmpty() && effectiveProxyType != ProxyType.NONE) {
                     val javaProxyType = when (effectiveProxyType) {
                         ProxyType.TOR -> Proxy.Type.SOCKS
                         ProxyType.I2P -> Proxy.Type.HTTP
                         ProxyType.CUSTOM -> {
-                            // Parse custom proxy protocol
                             when (customProxyProtocol.uppercase()) {
                                 "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
                                 "HTTP", "HTTPS" -> Proxy.Type.HTTP
@@ -1667,7 +1457,6 @@ class RadioService : Service() {
                         }
                     }
 
-                    // Use custom connection timeout for CUSTOM proxy type
                     val timeout = if (effectiveProxyType == ProxyType.CUSTOM && proxyConnectionTimeout > 0) {
                         proxyConnectionTimeout.toLong()
                     } else {
@@ -1676,43 +1465,32 @@ class RadioService : Service() {
 
                     builder
                         .connectTimeout(timeout, TimeUnit.SECONDS)
-                        .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming - data arrives sporadically
-                        .retryOnConnectionFailure(true) // Retry on connection drops for better reliability
+                        .readTimeout(0, TimeUnit.SECONDS)
+                        .retryOnConnectionFailure(true)
                         .build()
                 } else {
                     OkHttpClient.Builder()
                         .addInterceptor(BandwidthTrackingInterceptor(this))
                         .connectTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(0, TimeUnit.SECONDS) // No read timeout for streaming - data arrives sporadically
-                        .retryOnConnectionFailure(true) // Retry on connection drops for better reliability
+                        .readTimeout(0, TimeUnit.SECONDS)
+                        .retryOnConnectionFailure(true)
                         .build()
                 }
                 currentOkHttpClient!!
             }
 
-            // Direct data source - no wrapper, no middleware
-            // This is the key simplification: let the stream go directly to ExoPlayer
             val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("DeutsiaRadio/1.0")
 
-            // Simple load control - trust ExoPlayer's defaults with minor tuning
-            // Key insight: smaller buffers = less latency = fewer sync issues
             val loadControl = DefaultLoadControl.Builder()
-                .setBufferDurationsMs(
-                    5_000,   // Min buffer (5s) - enough for network jitter
-                    15_000,  // Max buffer (15s) - don't over-buffer live streams
-                    1_000,   // Buffer for playback to start (1s) - fast start
-                    2_000    // Buffer for playback after rebuffer (2s) - quick recovery
-                )
+                .setBufferDurationsMs(5_000, 15_000, 1_000, 2_000)
                 .build()
 
-            // Simple audio attributes
             val audioAttributes = androidx.media3.common.AudioAttributes.Builder()
                 .setUsage(androidx.media3.common.C.USAGE_MEDIA)
                 .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
                 .build()
 
-            // Use ExoPlayer's default renderers and audio sink - they're highly optimized
             player = ExoPlayer.Builder(this)
                 .setLoadControl(loadControl)
                 .setAudioAttributes(audioAttributes, true)
@@ -1725,8 +1503,6 @@ class RadioService : Service() {
                 prepare()
                 playWhenReady = true
 
-                // Reset flag now that new player is set up
-                // The new player's state changes will handle buffering broadcasts from now on
                 isStartingNewStream.set(false)
 
                 addListener(object : Player.Listener {
@@ -1744,27 +1520,20 @@ class RadioService : Service() {
                                 startForeground(NOTIFICATION_ID, createNotification(status))
                                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
                                 activateMediaSession()
-                                // Initialize built-in equalizer with audio session
                                 player?.audioSessionId?.let { sessionId ->
                                     if (sessionId != 0) {
-                                        // Broadcast for external equalizer apps (compatibility)
                                         broadcastAudioSessionOpen(sessionId)
-                                        // Initialize built-in equalizer
                                         equalizerManager?.initialize(sessionId)
                                     }
                                 }
-                                // Extract stream info when ready
                                 extractStreamInfo()
-                                // Start playback time updates for buffer bar
                                 startPlaybackTimeUpdates()
-                                // Broadcast to UI that we're no longer buffering
                                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = true)
                                 android.util.Log.d("RadioService", "Stream playing successfully")
                             }
                             Player.STATE_BUFFERING -> {
                                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_buffering)))
                                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
-                                // Broadcast to UI that we're buffering
                                 broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
@@ -1776,8 +1545,6 @@ class RadioService : Service() {
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
-                                // Don't clear buffering state if we're switching to a new stream
-                                // (the old player going IDLE shouldn't affect new stream's loading animation)
                                 if (!isStartingNewStream.get()) {
                                     broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                                 }
@@ -1789,7 +1556,6 @@ class RadioService : Service() {
                         if (isPlaying) {
                             updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
                             cancelSessionDeactivation()
-                            // Resume playback time updates if we have a start time
                             if (playbackStartTimeMillis > 0 && playbackTimeUpdateRunnable == null) {
                                 playbackTimeUpdateRunnable = object : Runnable {
                                     override fun run() {
@@ -1802,7 +1568,6 @@ class RadioService : Service() {
                                 handler.post(playbackTimeUpdateRunnable!!)
                             }
                         } else if (player?.playbackState == Player.STATE_READY) {
-                            // Player is paused but ready - stop time updates but keep start time
                             updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
                             playbackTimeUpdateRunnable?.let { handler.removeCallbacks(it) }
                             playbackTimeUpdateRunnable = null
