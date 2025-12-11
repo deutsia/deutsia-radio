@@ -444,4 +444,120 @@
     <string name="auth_biometric_title">deutsia radioのロックを解除</string>
     <string name="auth_biometric_subtitle">続行するには認証してください</string>
     <string name="auth_biometric_negative">パスワードを使用</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">%d個のステーション%sを削除してもよろしいですか？</string>
+    <string name="delete_stations_message_single">%d個のステーションを削除してもよろしいですか？</string>
+    <string name="delete_stations_message_plural">%d個のステーションを削除してもよろしいですか？</string>
+    <string name="button_delete">削除</string>
+    <string name="deleted_stations_message">%d個のステーション%sを削除しました</string>
+    <string name="deleted_stations_message_single">%d個のステーションを削除しました</string>
+    <string name="deleted_stations_message_plural">%d個のステーションを削除しました</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • カスタム</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">カスタム</string>
+    <string name="proxy_type_none">なし</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Torは有効ではありません</string>
+    <string name="tor_status_connecting_network">Torネットワークに接続中...</string>
+    <string name="tor_status_connected_via_tor">Tor経由で接続されました</string>
+    <string name="tor_status_connection_error">接続エラー</string>
+    <string name="tor_status_orbot_required">Orbotアプリが必要です</string>
+    <string name="tor_status_detail_socks5">%1$s:%2$dにSOCKS5プロキシ</string>
+    <string name="tor_status_detail_establishing">接続を確立中...</string>
+    <string name="tor_status_detail_unknown_error">不明なエラーが発生しました</string>
+    <string name="tor_status_detail_tap_to_connect">タップして接続</string>
+    <string name="tor_status_detail_install_orbot">Play StoreまたはF-DroidからOrbotをインストールしてください</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">切断されました</string>
+    <string name="settings_tor_not_running_detail">Torは実行されていません</string>
+    <string name="button_start_tor">開始</string>
+    <string name="settings_tor_connecting_status">接続中...</string>
+    <string name="settings_tor_establishing_connection">Tor接続を確立中</string>
+    <string name="button_starting">開始中...</string>
+    <string name="settings_tor_connected_status">接続されました</string>
+    <string name="settings_tor_socks_port">SOCKSポート: %d</string>
+    <string name="button_stop_tor">停止</string>
+    <string name="settings_tor_connection_failed">接続に失敗しました</string>
+    <string name="settings_tor_orbot_required_status">Orbotが必要です</string>
+    <string name="settings_tor_install_orbot_message">Torを使用するにはOrbotをインストールしてください</string>
+    <string name="button_install_orbot_caps">Orbotをインストール</string>
+    <string name="settings_tor_force_warning">接続に失敗しました</string>
+    <string name="settings_tor_force_warning_detail">強制Torが有効ですが、接続されていません</string>
+    <string name="button_retry">再試行</string>
+    <string name="settings_recording_directory_default_label">デフォルト (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Torが接続されていません！Torが接続されるまでストリームは失敗します。</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Torが接続されていません！Torが接続されるまで非I2Pストリームは失敗します。</string>
+    <string name="button_off">オフ</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">ステーションをインポート</string>
+    <string name="import_message">ラジオステーションをインポートするファイルを選択してください。\n\nサポートされている形式:\n• CSV\n• JSON\n• M3Uプレイリスト\n• PLSプレイリスト</string>
+    <string name="button_select_file">ファイルを選択</string>
+    <string name="import_curated_title">%sステーションをインポート</string>
+    <string name="import_curated_message">%1$d個の厳選された%2$sラジオステーションをインポートしますか？\n\nこれらのステーションはプロキシ設定で事前設定されており、すぐに使用できます。</string>
+    <string name="no_stations_found_in_list">%sリストにステーションが見つかりません</string>
+    <string name="failed_to_import_stations">%sステーションのインポートに失敗しました: %s</string>
+    <string name="dialog_export_stations_title">ステーションをエクスポート</string>
+    <string name="no_stations_in_file">ファイルにステーションが見つかりません</string>
+    <string name="dialog_import_failed">インポートに失敗しました</string>
+    <string name="button_ok">OK</string>
+    <string name="format_unknown">不明</string>
+    <string name="found_stations_message">%2$s形式で%1$d個のステーションが見つかりました。\n\n</string>
+    <string name="warnings_header">警告:\n</string>
+    <string name="more_warnings">• ...他%d件\n</string>
+    <string name="import_confirmation">これらのステーションをインポートしますか？</string>
+    <string name="import_error_message">インポートエラー: %s</string>
+    <string name="imported_stations_success">%d個のステーションをインポートしました</string>
+    <string name="no_stations_to_export">エクスポートするステーションがありません</string>
+    <string name="exported_stations_success">%1$d個のステーションを%2$sにエクスポートしました</string>
+    <string name="export_error_message">エクスポートエラー: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">再生中のストリームがありません</string>
+    <string name="recording_error_cannot_create_directory">ディレクトリを作成できません</string>
+    <string name="recording_error_connection_failed">接続に失敗しました</string>
+    <string name="recording_error_cannot_write_directory">選択したディレクトリに書き込めません</string>
+    <string name="recording_error_cannot_create_file">録音ファイルを作成できません</string>
+    <string name="recording_error_cannot_open_file">書き込み用にファイルを開けません</string>
+    <string name="recording_error_directory_access">ディレクトリアクセスエラー: %s</string>
+    <string name="recording_error_connection_timeout">接続がタイムアウトしました</string>
+    <string name="recording_error_connection_refused">接続が拒否されました</string>
+    <string name="recording_error_io">I/Oエラー: %s</string>
+    <string name="recording_error_generic">エラー: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">カスタムプロキシが設定されていません</string>
+    <string name="custom_proxy_configured_description">カスタムプロキシが設定されています。タップして詳細を表示します。</string>
+    <string name="custom_proxy_not_configured_description">カスタムプロキシが設定されていません。タップして設定します。</string>
+    <string name="custom_proxy_privacy_warning_description">強制カスタムプロキシが有効ですが、設定されていません。プライバシーが危険にさらされる可能性があります。</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">グローバルカスタムプロキシを設定</string>
+    <string name="validation_enter_proxy_host">❌ プロキシホストを入力してください</string>
+    <string name="testing_connection">接続をテスト中...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">なし</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">セッション帯域幅をリセット</string>
+    <string name="reset_bandwidth_message">セッション帯域幅カウンターをゼロにリセットしますか？</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">すべてのフィルターがすでに適用されています</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">パスワードは変更されましたが、データベースの再暗号化に失敗しました: %s</string>
 </resources>

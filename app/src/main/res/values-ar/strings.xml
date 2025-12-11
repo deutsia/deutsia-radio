@@ -444,4 +444,120 @@
     <string name="auth_biometric_title">فتح قفل deutsia radio</string>
     <string name="auth_biometric_subtitle">المصادقة للمتابعة</string>
     <string name="auth_biometric_negative">استخدام كلمة المرور</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">هل أنت متأكد من حذف %d محطة%s؟</string>
+    <string name="delete_stations_message_single">هل أنت متأكد من حذف %d محطة؟</string>
+    <string name="delete_stations_message_plural">هل أنت متأكد من حذف %d محطة؟</string>
+    <string name="button_delete">حذف</string>
+    <string name="deleted_stations_message">تم حذف %d محطة%s</string>
+    <string name="deleted_stations_message_single">تم حذف %d محطة</string>
+    <string name="deleted_stations_message_plural">تم حذف %d محطة</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • مخصص</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">مخصص</string>
+    <string name="proxy_type_none">لا يوجد</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor غير نشط</string>
+    <string name="tor_status_connecting_network">الاتصال بشبكة Tor...</string>
+    <string name="tor_status_connected_via_tor">متصل عبر Tor</string>
+    <string name="tor_status_connection_error">خطأ في الاتصال</string>
+    <string name="tor_status_orbot_required">تطبيق Orbot مطلوب</string>
+    <string name="tor_status_detail_socks5">بروكسي SOCKS5 على %1$s:%2$d</string>
+    <string name="tor_status_detail_establishing">إنشاء الاتصال...</string>
+    <string name="tor_status_detail_unknown_error">حدث خطأ غير معروف</string>
+    <string name="tor_status_detail_tap_to_connect">اضغط للاتصال</string>
+    <string name="tor_status_detail_install_orbot">قم بتثبيت Orbot من Play Store أو F-Droid</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">غير متصل</string>
+    <string name="settings_tor_not_running_detail">Tor غير قيد التشغيل</string>
+    <string name="button_start_tor">ابدأ</string>
+    <string name="settings_tor_connecting_status">جاري الاتصال...</string>
+    <string name="settings_tor_establishing_connection">إنشاء اتصال Tor</string>
+    <string name="button_starting">جاري البدء...</string>
+    <string name="settings_tor_connected_status">متصل</string>
+    <string name="settings_tor_socks_port">منفذ SOCKS: %d</string>
+    <string name="button_stop_tor">إيقاف</string>
+    <string name="settings_tor_connection_failed">فشل الاتصال</string>
+    <string name="settings_tor_orbot_required_status">Orbot مطلوب</string>
+    <string name="settings_tor_install_orbot_message">يرجى تثبيت Orbot لاستخدام Tor</string>
+    <string name="button_install_orbot_caps">تثبيت Orbot</string>
+    <string name="settings_tor_force_warning">فشل الاتصال</string>
+    <string name="settings_tor_force_warning_detail">فرض Tor مفعّل لكنه غير متصل</string>
+    <string name="button_retry">إعادة المحاولة</string>
+    <string name="settings_recording_directory_default_label">افتراضي (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor غير متصل! ستفشل البثوث حتى يتصل Tor.</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor غير متصل! ستفشل البثوث غير I2P حتى يتصل Tor.</string>
+    <string name="button_off">إيقاف</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">استيراد المحطات</string>
+    <string name="import_message">حدد ملفًا لاستيراد محطات الراديو منه.\n\nالتنسيقات المدعومة:\n• CSV\n• JSON\n• قائمة تشغيل M3U\n• قائمة تشغيل PLS</string>
+    <string name="button_select_file">تحديد ملف</string>
+    <string name="import_curated_title">استيراد محطات %s</string>
+    <string name="import_curated_message">استيراد %1$d محطة راديو %2$s منتقاة؟\n\nهذه المحطات مهيأة مسبقًا بإعدادات البروكسي وجاهزة للاستخدام.</string>
+    <string name="no_stations_found_in_list">لم يتم العثور على محطات في قائمة %s</string>
+    <string name="failed_to_import_stations">فشل استيراد محطات %s: %s</string>
+    <string name="dialog_export_stations_title">تصدير المحطات</string>
+    <string name="no_stations_in_file">لم يتم العثور على محطات في الملف</string>
+    <string name="dialog_import_failed">فشل الاستيراد</string>
+    <string name="button_ok">حسنًا</string>
+    <string name="format_unknown">غير معروف</string>
+    <string name="found_stations_message">تم العثور على %1$d محطة بتنسيق %2$s.\n\n</string>
+    <string name="warnings_header">تحذيرات:\n</string>
+    <string name="more_warnings">• ...و %d أخرى\n</string>
+    <string name="import_confirmation">هل تريد استيراد هذه المحطات؟</string>
+    <string name="import_error_message">خطأ في الاستيراد: %s</string>
+    <string name="imported_stations_success">تم استيراد %d محطة</string>
+    <string name="no_stations_to_export">لا توجد محطات للتصدير</string>
+    <string name="exported_stations_success">تم تصدير %1$d محطة إلى %2$s</string>
+    <string name="export_error_message">خطأ في التصدير: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">لا يوجد بث قيد التشغيل</string>
+    <string name="recording_error_cannot_create_directory">لا يمكن إنشاء الدليل</string>
+    <string name="recording_error_connection_failed">فشل الاتصال</string>
+    <string name="recording_error_cannot_write_directory">لا يمكن الكتابة إلى الدليل المحدد</string>
+    <string name="recording_error_cannot_create_file">لا يمكن إنشاء ملف التسجيل</string>
+    <string name="recording_error_cannot_open_file">لا يمكن فتح الملف للكتابة</string>
+    <string name="recording_error_directory_access">خطأ في الوصول إلى الدليل: %s</string>
+    <string name="recording_error_connection_timeout">انتهت مهلة الاتصال</string>
+    <string name="recording_error_connection_refused">تم رفض الاتصال</string>
+    <string name="recording_error_io">خطأ إدخال/إخراج: %s</string>
+    <string name="recording_error_generic">خطأ: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">البروكسي المخصص غير مهيأ</string>
+    <string name="custom_proxy_configured_description">البروكسي المخصص مهيأ. اضغط لعرض التفاصيل.</string>
+    <string name="custom_proxy_not_configured_description">البروكسي المخصص غير مهيأ. اضغط للتهيئة.</string>
+    <string name="custom_proxy_privacy_warning_description">فرض البروكسي المخصص مفعّل لكنه غير مهيأ. قد تكون الخصوصية معرضة للخطر.</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">تهيئة البروكسي المخصص العام</string>
+    <string name="validation_enter_proxy_host">❌ يرجى إدخال مضيف البروكسي</string>
+    <string name="testing_connection">اختبار الاتصال...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">لا يوجد</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">إعادة تعيين عرض النطاق للجلسة</string>
+    <string name="reset_bandwidth_message">إعادة تعيين عداد عرض النطاق للجلسة إلى الصفر؟</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">جميع الفلاتر مطبقة بالفعل</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">تم تغيير كلمة المرور لكن فشل إعادة تشفير قاعدة البيانات: %s</string>
 </resources>

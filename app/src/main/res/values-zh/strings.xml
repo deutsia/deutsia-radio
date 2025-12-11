@@ -445,4 +445,120 @@
     <string name="auth_biometric_title">解锁 deutsia radio</string>
     <string name="auth_biometric_subtitle">认证以继续</string>
     <string name="auth_biometric_negative">使用密码</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">确定要删除 %d 个电台%s吗？</string>
+    <string name="delete_stations_message_single">确定要删除 %d 个电台吗？</string>
+    <string name="delete_stations_message_plural">确定要删除 %d 个电台吗？</string>
+    <string name="button_delete">删除</string>
+    <string name="deleted_stations_message">已删除 %d 个电台%s</string>
+    <string name="deleted_stations_message_single">已删除 %d 个电台</string>
+    <string name="deleted_stations_message_plural">已删除 %d 个电台</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • 自定义</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">自定义</string>
+    <string name="proxy_type_none">无</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor 未激活</string>
+    <string name="tor_status_connecting_network">正在连接到 Tor 网络...</string>
+    <string name="tor_status_connected_via_tor">已通过 Tor 连接</string>
+    <string name="tor_status_connection_error">连接错误</string>
+    <string name="tor_status_orbot_required">需要 Orbot 应用</string>
+    <string name="tor_status_detail_socks5">SOCKS5 代理：%1$s:%2$d</string>
+    <string name="tor_status_detail_establishing">正在建立连接...</string>
+    <string name="tor_status_detail_unknown_error">发生未知错误</string>
+    <string name="tor_status_detail_tap_to_connect">点击连接</string>
+    <string name="tor_status_detail_install_orbot">从 Play Store 或 F-Droid 安装 Orbot</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">已断开连接</string>
+    <string name="settings_tor_not_running_detail">Tor 未运行</string>
+    <string name="button_start_tor">启动</string>
+    <string name="settings_tor_connecting_status">正在连接...</string>
+    <string name="settings_tor_establishing_connection">正在建立 Tor 连接</string>
+    <string name="button_starting">正在启动...</string>
+    <string name="settings_tor_connected_status">已连接</string>
+    <string name="settings_tor_socks_port">SOCKS 端口：%d</string>
+    <string name="button_stop_tor">停止</string>
+    <string name="settings_tor_connection_failed">连接失败</string>
+    <string name="settings_tor_orbot_required_status">需要 Orbot</string>
+    <string name="settings_tor_install_orbot_message">请安装 Orbot 以使用 Tor</string>
+    <string name="button_install_orbot_caps">安装 Orbot</string>
+    <string name="settings_tor_force_warning">连接失败</string>
+    <string name="settings_tor_force_warning_detail">强制 Tor 已启用但未连接</string>
+    <string name="button_retry">重试</string>
+    <string name="settings_recording_directory_default_label">默认 (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor 未连接！在 Tor 连接之前，流将失败。</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor 未连接！在 Tor 连接之前，非 I2P 流将失败。</string>
+    <string name="button_off">关闭</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">导入电台</string>
+    <string name="import_message">选择一个文件以导入广播电台。\n\n支持的格式：\n• CSV\n• JSON\n• M3U 播放列表\n• PLS 播放列表</string>
+    <string name="button_select_file">选择文件</string>
+    <string name="import_curated_title">导入 %s 电台</string>
+    <string name="import_curated_message">导入 %1$d 个精选的 %2$s 广播电台？\n\n这些电台已预先配置代理设置，可立即使用。</string>
+    <string name="no_stations_found_in_list">在 %s 列表中未找到电台</string>
+    <string name="failed_to_import_stations">导入 %s 电台失败：%s</string>
+    <string name="dialog_export_stations_title">导出电台</string>
+    <string name="no_stations_in_file">文件中未找到电台</string>
+    <string name="dialog_import_failed">导入失败</string>
+    <string name="button_ok">确定</string>
+    <string name="format_unknown">未知</string>
+    <string name="found_stations_message">在 %2$s 格式中找到 %1$d 个电台。\n\n</string>
+    <string name="warnings_header">警告：\n</string>
+    <string name="more_warnings">• ...还有 %d 个\n</string>
+    <string name="import_confirmation">要导入这些电台吗？</string>
+    <string name="import_error_message">导入错误：%s</string>
+    <string name="imported_stations_success">已导入 %d 个电台</string>
+    <string name="no_stations_to_export">没有要导出的电台</string>
+    <string name="exported_stations_success">已将 %1$d 个电台导出到 %2$s</string>
+    <string name="export_error_message">导出错误：%s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">没有正在播放的流</string>
+    <string name="recording_error_cannot_create_directory">无法创建目录</string>
+    <string name="recording_error_connection_failed">连接失败</string>
+    <string name="recording_error_cannot_write_directory">无法写入所选目录</string>
+    <string name="recording_error_cannot_create_file">无法创建录音文件</string>
+    <string name="recording_error_cannot_open_file">无法打开文件进行写入</string>
+    <string name="recording_error_directory_access">目录访问错误：%s</string>
+    <string name="recording_error_connection_timeout">连接超时</string>
+    <string name="recording_error_connection_refused">连接被拒绝</string>
+    <string name="recording_error_io">I/O 错误：%s</string>
+    <string name="recording_error_generic">错误：%s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">自定义代理未配置</string>
+    <string name="custom_proxy_configured_description">自定义代理已配置。点击查看详情。</string>
+    <string name="custom_proxy_not_configured_description">自定义代理未配置。点击配置。</string>
+    <string name="custom_proxy_privacy_warning_description">强制自定义代理已启用但未配置。隐私可能受到威胁。</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">配置全局自定义代理</string>
+    <string name="validation_enter_proxy_host">❌ 请输入代理主机</string>
+    <string name="testing_connection">正在测试连接...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">无</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">重置会话带宽</string>
+    <string name="reset_bandwidth_message">将会话带宽计数器重置为零？</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">所有筛选器已应用</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">密码已更改，但数据库重新加密失败：%s</string>
 </resources>

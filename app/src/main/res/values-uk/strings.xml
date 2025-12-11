@@ -445,4 +445,120 @@
     <string name="auth_biometric_title">Розблокувати deutsia radio</string>
     <string name="auth_biometric_subtitle">Автентифікуйтеся для продовження</string>
     <string name="auth_biometric_negative">Використати пароль</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">Ви впевнені, що хочете видалити %d станці%s?</string>
+    <string name="delete_stations_message_single">Ви впевнені, що хочете видалити %d станцію?</string>
+    <string name="delete_stations_message_plural">Ви впевнені, що хочете видалити %d станцій?</string>
+    <string name="button_delete">Видалити</string>
+    <string name="deleted_stations_message">Видалено %d станці%s</string>
+    <string name="deleted_stations_message_single">Видалена %d станція</string>
+    <string name="deleted_stations_message_plural">Видалено %d станцій</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • Користувацький</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">Користувацький</string>
+    <string name="proxy_type_none">Немає</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor не активний</string>
+    <string name="tor_status_connecting_network">Підключення до мережі Tor...</string>
+    <string name="tor_status_connected_via_tor">Підключено через Tor</string>
+    <string name="tor_status_connection_error">Помилка підключення</string>
+    <string name="tor_status_orbot_required">Потрібен додаток Orbot</string>
+    <string name="tor_status_detail_socks5">Проксі SOCKS5 на %1$s:%2$d</string>
+    <string name="tor_status_detail_establishing">Встановлення з\'єднання...</string>
+    <string name="tor_status_detail_unknown_error">Виникла невідома помилка</string>
+    <string name="tor_status_detail_tap_to_connect">Торкніться для підключення</string>
+    <string name="tor_status_detail_install_orbot">Встановіть Orbot з Play Store або F-Droid</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">Відключено</string>
+    <string name="settings_tor_not_running_detail">Tor не запущено</string>
+    <string name="button_start_tor">Запустити</string>
+    <string name="settings_tor_connecting_status">Підключення...</string>
+    <string name="settings_tor_establishing_connection">Встановлення з\'єднання Tor</string>
+    <string name="button_starting">Запуск...</string>
+    <string name="settings_tor_connected_status">Підключено</string>
+    <string name="settings_tor_socks_port">Порт SOCKS: %d</string>
+    <string name="button_stop_tor">Зупинити</string>
+    <string name="settings_tor_connection_failed">Не вдалося підключитися</string>
+    <string name="settings_tor_orbot_required_status">Потрібен Orbot</string>
+    <string name="settings_tor_install_orbot_message">Будь ласка, встановіть Orbot для використання Tor</string>
+    <string name="button_install_orbot_caps">Встановити Orbot</string>
+    <string name="settings_tor_force_warning">Не вдалося підключитися</string>
+    <string name="settings_tor_force_warning_detail">Примусовий Tor увімкнено, але не підключено</string>
+    <string name="button_retry">Повторити</string>
+    <string name="settings_recording_directory_default_label">За замовчуванням (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor не підключено! Трансляції будуть недоступні до підключення Tor.</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor не підключено! Не-I2P трансляції будуть недоступні до підключення Tor.</string>
+    <string name="button_off">Вимк</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">Імпорт станцій</string>
+    <string name="import_message">Виберіть файл для імпорту радіостанцій.\n\nПідтримувані формати:\n• CSV\n• JSON\n• Плейлист M3U\n• Плейлист PLS</string>
+    <string name="button_select_file">Вибрати файл</string>
+    <string name="import_curated_title">Імпорт станцій %s</string>
+    <string name="import_curated_message">Імпортувати %1$d відібраних радіостанцій %2$s?\n\nЦі станції попередньо налаштовані з параметрами проксі і готові до використання.</string>
+    <string name="no_stations_found_in_list">Станції не знайдено в списку %s</string>
+    <string name="failed_to_import_stations">Не вдалося імпортувати станції %s: %s</string>
+    <string name="dialog_export_stations_title">Експорт станцій</string>
+    <string name="no_stations_in_file">Станції не знайдено у файлі</string>
+    <string name="dialog_import_failed">Імпорт не вдався</string>
+    <string name="button_ok">OK</string>
+    <string name="format_unknown">Невідомий</string>
+    <string name="found_stations_message">Знайдено %1$d станцій у форматі %2$s.\n\n</string>
+    <string name="warnings_header">Попередження:\n</string>
+    <string name="more_warnings">• ...і ще %d\n</string>
+    <string name="import_confirmation">Ви хочете імпортувати ці станції?</string>
+    <string name="import_error_message">Помилка імпорту: %s</string>
+    <string name="imported_stations_success">Імпортовано %d станцій</string>
+    <string name="no_stations_to_export">Немає станцій для експорту</string>
+    <string name="exported_stations_success">Експортовано %1$d станцій до %2$s</string>
+    <string name="export_error_message">Помилка експорту: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">Немає потоку, що відтворюється</string>
+    <string name="recording_error_cannot_create_directory">Неможливо створити директорію</string>
+    <string name="recording_error_connection_failed">Не вдалося підключитися</string>
+    <string name="recording_error_cannot_write_directory">Неможливо записати до вибраної директорії</string>
+    <string name="recording_error_cannot_create_file">Неможливо створити файл запису</string>
+    <string name="recording_error_cannot_open_file">Неможливо відкрити файл для запису</string>
+    <string name="recording_error_directory_access">Помилка доступу до директорії: %s</string>
+    <string name="recording_error_connection_timeout">Час підключення вичерпано</string>
+    <string name="recording_error_connection_refused">Підключення відхилено</string>
+    <string name="recording_error_io">Помилка вводу/виводу: %s</string>
+    <string name="recording_error_generic">Помилка: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">Користувацький проксі не налаштовано</string>
+    <string name="custom_proxy_configured_description">Користувацький проксі налаштовано. Торкніться для перегляду деталей.</string>
+    <string name="custom_proxy_not_configured_description">Користувацький проксі не налаштовано. Торкніться для налаштування.</string>
+    <string name="custom_proxy_privacy_warning_description">Примусовий користувацький проксі увімкнено, але не налаштовано. Конфіденційність може бути під загрозою.</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">Налаштування глобального користувацького проксі</string>
+    <string name="validation_enter_proxy_host">❌ Будь ласка, введіть хост проксі</string>
+    <string name="testing_connection">Перевірка з\'єднання...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">Немає</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">Скидання трафіку сесії</string>
+    <string name="reset_bandwidth_message">Скинути лічильник трафіку сесії до нуля?</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">Усі фільтри вже застосовано</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">Пароль змінено, але не вдалося перешифрувати базу даних: %s</string>
 </resources>

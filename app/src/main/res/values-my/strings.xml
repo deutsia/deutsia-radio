@@ -442,4 +442,120 @@
     <string name="auth_biometric_title">deutsia radio ကို သော့ဖွင့်ပါ</string>
     <string name="auth_biometric_subtitle">ဆက်လက်လုပ်ဆောင်ရန် အထောက်အထား အတည်ပြုပါ</string>
     <string name="auth_biometric_negative">စကားဝှက် သုံးပါ</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">%d ဘူတာ%s ကို ဖျက်ရန် သေချာပါသလား?</string>
+    <string name="delete_stations_message_single">%d ဘူတာကို ဖျက်ရန် သေချာပါသလား?</string>
+    <string name="delete_stations_message_plural">%d ဘူတာကို ဖျက်ရန် သေချာပါသလား?</string>
+    <string name="button_delete">ဖျက်ပါ</string>
+    <string name="deleted_stations_message">%d ဘူတာ%s ဖျက်လိုက်ပါပြီ</string>
+    <string name="deleted_stations_message_single">%d ဘူတာ ဖျက်လိုက်ပါပြီ</string>
+    <string name="deleted_stations_message_plural">%d ဘူတာ ဖျက်လိုက်ပါပြီ</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • စိတ်ကြိုက်</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">စိတ်ကြိုက်</string>
+    <string name="proxy_type_none">မရှိပါ</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor လုပ်ငန်းလည်ပတ်မှု မရှိပါ</string>
+    <string name="tor_status_connecting_network">Tor ကွန်ရက်သို့ ချိတ်ဆက်နေသည်...</string>
+    <string name="tor_status_connected_via_tor">Tor မှတစ်ဆင့် ချိတ်ဆက်ပြီး</string>
+    <string name="tor_status_connection_error">ချိတ်ဆက်မှု အမှား</string>
+    <string name="tor_status_orbot_required">Orbot အက်ပ် လိုအပ်သည်</string>
+    <string name="tor_status_detail_socks5">%1$s:%2$d တွင် SOCKS5 ပရောက်ဆီ</string>
+    <string name="tor_status_detail_establishing">ချိတ်ဆက်မှု ပြုလုပ်နေသည်...</string>
+    <string name="tor_status_detail_unknown_error">အမည်မသိ အမှား ဖြစ်ပေါ်ခဲ့သည်</string>
+    <string name="tor_status_detail_tap_to_connect">ချိတ်ဆက်ရန် တို့ပါ</string>
+    <string name="tor_status_detail_install_orbot">Play Store သို့မဟုတ် F-Droid မှ Orbot ကို ထည့်သွင်းပါ</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">ချိတ်ဆက်မှု ဖြတ်တောက်ထားသည်</string>
+    <string name="settings_tor_not_running_detail">Tor လုပ်ဆောင်နေခြင်း မရှိပါ</string>
+    <string name="button_start_tor">စတင်ပါ</string>
+    <string name="settings_tor_connecting_status">ချိတ်ဆက်နေသည်...</string>
+    <string name="settings_tor_establishing_connection">Tor ချိတ်ဆက်မှု ပြုလုပ်နေသည်</string>
+    <string name="button_starting">စတင်နေသည်...</string>
+    <string name="settings_tor_connected_status">ချိတ်ဆက်ပြီး</string>
+    <string name="settings_tor_socks_port">SOCKS ပို့: %d</string>
+    <string name="button_stop_tor">ရပ်ပါ</string>
+    <string name="settings_tor_connection_failed">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
+    <string name="settings_tor_orbot_required_status">Orbot လိုအပ်သည်</string>
+    <string name="settings_tor_install_orbot_message">Tor သုံးရန် Orbot ကို ထည့်သွင်းပါ</string>
+    <string name="button_install_orbot_caps">Orbot ထည့်သွင်းပါ</string>
+    <string name="settings_tor_force_warning">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
+    <string name="settings_tor_force_warning_detail">Tor အတင်းအကြပ် ဖွင့်ထားသည် သို့သော် ချိတ်ဆက်မထားပါ</string>
+    <string name="button_retry">ထပ်ကြိုးစားပါ</string>
+    <string name="settings_recording_directory_default_label">မူလ (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor ချိတ်ဆက်မထားပါ! Tor ချိတ်ဆက်သည်အထိ စထရင်များ ကျရှုံးလိမ့်မည်။</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor ချိတ်ဆက်မထားပါ! Tor ချိတ်ဆက်သည်အထိ I2P မဟုတ်သော စထရင်များ ကျရှုံးလိမ့်မည်။</string>
+    <string name="button_off">ပိတ်ထားသည်</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">ဘူတာများ တင်သွင်းပါ</string>
+    <string name="import_message">ရေဒီယိုဘူတာများ တင်သွင်းရန် ဖိုင်တစ်ခု ရွေးပါ။\n\nပံ့ပိုးသော ပုံစံများ:\n• CSV\n• JSON\n• M3U သီချင်းစာရင်း\n• PLS သီချင်းစာရင်း</string>
+    <string name="button_select_file">ဖိုင်ရွေးပါ</string>
+    <string name="import_curated_title">%s ဘူတာများ တင်သွင်းပါ</string>
+    <string name="import_curated_message">%1$d ရွေးချယ်ထားသော %2$s ရေဒီယိုဘူတာများ တင်သွင်းမလား?\n\nဤဘူတာများသည် ပရောက်ဆီ ဆက်တင်များဖြင့် ကြိုတင်ပြင်ဆင်ထားပြီး အသုံးပြုရန် အဆင်သင့်ဖြစ်ပါသည်။</string>
+    <string name="no_stations_found_in_list">%s စာရင်းတွင် ဘူတာများ မတွေ့ပါ</string>
+    <string name="failed_to_import_stations">%s ဘူတာများ တင်သွင်းမှု မအောင်မြင်ပါ: %s</string>
+    <string name="dialog_export_stations_title">ဘူတာများ တင်ပို့ပါ</string>
+    <string name="no_stations_in_file">ဖိုင်တွင် ဘူတာများ မတွေ့ပါ</string>
+    <string name="dialog_import_failed">တင်သွင်းမှု မအောင်မြင်ပါ</string>
+    <string name="button_ok">OK</string>
+    <string name="format_unknown">အမည်မသိ</string>
+    <string name="found_stations_message">%2$s ပုံစံတွင် ဘူတာ %1$d တွေ့ရှိသည်။\n\n</string>
+    <string name="warnings_header">သတိပေးချက်များ:\n</string>
+    <string name="more_warnings">• ...နှင့် နောက်ထပ် %d ခု\n</string>
+    <string name="import_confirmation">ဤဘူတာများကို တင်သွင်းမလား?</string>
+    <string name="import_error_message">တင်သွင်းမှု အမှား: %s</string>
+    <string name="imported_stations_success">ဘူတာ %d ခု တင်သွင်းပြီး</string>
+    <string name="no_stations_to_export">တင်ပို့ရန် ဘူတာများ မရှိပါ</string>
+    <string name="exported_stations_success">ဘူတာ %1$d ခုကို %2$s သို့ တင်ပို့ပြီး</string>
+    <string name="export_error_message">တင်ပို့မှု အမှား: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">ဖွင့်နေသော စထရင် မရှိပါ</string>
+    <string name="recording_error_cannot_create_directory">ဖိုင်တွဲ ဖန်တီး၍ မရပါ</string>
+    <string name="recording_error_connection_failed">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
+    <string name="recording_error_cannot_write_directory">ရွေးချယ်ထားသော ဖိုင်တွဲသို့ ရေး၍ မရပါ</string>
+    <string name="recording_error_cannot_create_file">မှတ်တမ်းတင်ဖိုင် ဖန်တီး၍ မရပါ</string>
+    <string name="recording_error_cannot_open_file">ရေးရန် ဖိုင်ကို ဖွင့်၍ မရပါ</string>
+    <string name="recording_error_directory_access">ဖိုင်တွဲ အသုံးပြုမှု အမှား: %s</string>
+    <string name="recording_error_connection_timeout">ချိတ်ဆက်မှု အချိန်ကုန်သွားပြီ</string>
+    <string name="recording_error_connection_refused">ချိတ်ဆက်မှု ငြင်းပယ်ခံရသည်</string>
+    <string name="recording_error_io">I/O အမှား: %s</string>
+    <string name="recording_error_generic">အမှား: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်မထားပါ</string>
+    <string name="custom_proxy_configured_description">စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်ထားပြီး။ အသေးစိတ် ကြည့်ရန် တို့ပါ။</string>
+    <string name="custom_proxy_not_configured_description">စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်မထားပါ။ ပြင်ဆင်ရန် တို့ပါ။</string>
+    <string name="custom_proxy_privacy_warning_description">စိတ်ကြိုက် ပရောက်ဆီ အတင်းအကြပ် ဖွင့်ထားသည် သို့သော် ပြင်ဆင်မထားပါ။ ကိုယ်ရေးလုံခြုံမှု အန္တရာယ်ရှိနိုင်သည်။</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">တစ်ကမ္ဘာလုံး စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်ပါ</string>
+    <string name="validation_enter_proxy_host">❌ ပရောက်ဆီ ဟိုစ် ထည့်ပါ</string>
+    <string name="testing_connection">ချိတ်ဆက်မှု စမ်းသပ်နေသည်...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">မရှိပါ</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">အစည်းအဝေး bandwidth ပြန်လည်သတ်မှတ်ပါ</string>
+    <string name="reset_bandwidth_message">အစည်းအဝေး bandwidth ကောင်တာကို သုညသို့ ပြန်လည်သတ်မှတ်မလား?</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">စစ်ထုတ်မှု အားလုံး အသုံးပြုပြီးပြီ</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">စကားဝှက် ပြောင်းလဲပြီးပါပြီ သို့သော် ဒေတာဘေ့စ် ပြန်လည်ကုဒ်ဝှက်မှု မအောင်မြင်ပါ: %s</string>
 </resources>

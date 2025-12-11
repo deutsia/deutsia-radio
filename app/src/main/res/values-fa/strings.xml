@@ -445,4 +445,120 @@
     <string name="auth_biometric_title">باز کردن قفل deutsia radio</string>
     <string name="auth_biometric_subtitle">برای ادامه احراز هویت کنید</string>
     <string name="auth_biometric_negative">استفاده از رمز عبور</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">آیا مطمئن هستید که می‌خواهید %d ایستگاه%s را حذف کنید؟</string>
+    <string name="delete_stations_message_single">آیا مطمئن هستید که می‌خواهید %d ایستگاه را حذف کنید؟</string>
+    <string name="delete_stations_message_plural">آیا مطمئن هستید که می‌خواهید %d ایستگاه را حذف کنید؟</string>
+    <string name="button_delete">حذف</string>
+    <string name="deleted_stations_message">%d ایستگاه%s حذف شد</string>
+    <string name="deleted_stations_message_single">%d ایستگاه حذف شد</string>
+    <string name="deleted_stations_message_plural">%d ایستگاه حذف شد</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • سفارشی</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">سفارشی</string>
+    <string name="proxy_type_none">هیچ</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor فعال نیست</string>
+    <string name="tor_status_connecting_network">در حال اتصال به شبکه Tor...</string>
+    <string name="tor_status_connected_via_tor">از طریق Tor متصل شد</string>
+    <string name="tor_status_connection_error">خطای اتصال</string>
+    <string name="tor_status_orbot_required">برنامه Orbot مورد نیاز است</string>
+    <string name="tor_status_detail_socks5">پروکسی SOCKS5 در %1$s:%2$d</string>
+    <string name="tor_status_detail_establishing">در حال برقراری اتصال...</string>
+    <string name="tor_status_detail_unknown_error">خطای ناشناخته رخ داد</string>
+    <string name="tor_status_detail_tap_to_connect">برای اتصال ضربه بزنید</string>
+    <string name="tor_status_detail_install_orbot">Orbot را از Play Store یا F-Droid نصب کنید</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">قطع شده</string>
+    <string name="settings_tor_not_running_detail">Tor در حال اجرا نیست</string>
+    <string name="button_start_tor">شروع</string>
+    <string name="settings_tor_connecting_status">در حال اتصال...</string>
+    <string name="settings_tor_establishing_connection">برقراری اتصال Tor</string>
+    <string name="button_starting">در حال شروع...</string>
+    <string name="settings_tor_connected_status">متصل شد</string>
+    <string name="settings_tor_socks_port">پورت SOCKS: %d</string>
+    <string name="button_stop_tor">توقف</string>
+    <string name="settings_tor_connection_failed">اتصال ناموفق</string>
+    <string name="settings_tor_orbot_required_status">Orbot مورد نیاز است</string>
+    <string name="settings_tor_install_orbot_message">لطفاً Orbot را برای استفاده از Tor نصب کنید</string>
+    <string name="button_install_orbot_caps">نصب Orbot</string>
+    <string name="settings_tor_force_warning">اتصال ناموفق</string>
+    <string name="settings_tor_force_warning_detail">Tor اجباری فعال است اما متصل نیست</string>
+    <string name="button_retry">تلاش مجدد</string>
+    <string name="settings_recording_directory_default_label">پیش‌فرض (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor متصل نیست! پخش‌ها تا زمان اتصال Tor ناموفق خواهند بود.</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor متصل نیست! پخش‌های غیر I2P تا زمان اتصال Tor ناموفق خواهند بود.</string>
+    <string name="button_off">خاموش</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">وارد کردن ایستگاه‌ها</string>
+    <string name="import_message">یک فایل برای وارد کردن ایستگاه‌های رادیویی انتخاب کنید.\n\nفرمت‌های پشتیبانی شده:\n• CSV\n• JSON\n• فهرست پخش M3U\n• فهرست پخش PLS</string>
+    <string name="button_select_file">انتخاب فایل</string>
+    <string name="import_curated_title">وارد کردن ایستگاه‌های %s</string>
+    <string name="import_curated_message">وارد کردن %1$d ایستگاه رادیویی %2$s منتخب؟\n\nاین ایستگاه‌ها از قبل با تنظیمات پروکسی پیکربندی شده و آماده استفاده هستند.</string>
+    <string name="no_stations_found_in_list">هیچ ایستگاهی در فهرست %s یافت نشد</string>
+    <string name="failed_to_import_stations">وارد کردن ایستگاه‌های %s ناموفق بود: %s</string>
+    <string name="dialog_export_stations_title">صادر کردن ایستگاه‌ها</string>
+    <string name="no_stations_in_file">هیچ ایستگاهی در فایل یافت نشد</string>
+    <string name="dialog_import_failed">وارد کردن ناموفق</string>
+    <string name="button_ok">باشه</string>
+    <string name="format_unknown">ناشناخته</string>
+    <string name="found_stations_message">%1$d ایستگاه در فرمت %2$s یافت شد.\n\n</string>
+    <string name="warnings_header">هشدارها:\n</string>
+    <string name="more_warnings">• ...و %d مورد دیگر\n</string>
+    <string name="import_confirmation">آیا می‌خواهید این ایستگاه‌ها را وارد کنید؟</string>
+    <string name="import_error_message">خطای وارد کردن: %s</string>
+    <string name="imported_stations_success">%d ایستگاه وارد شد</string>
+    <string name="no_stations_to_export">هیچ ایستگاهی برای صادر کردن وجود ندارد</string>
+    <string name="exported_stations_success">%1$d ایستگاه به %2$s صادر شد</string>
+    <string name="export_error_message">خطای صادر کردن: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">هیچ جریانی در حال پخش نیست</string>
+    <string name="recording_error_cannot_create_directory">نمی‌توان دایرکتوری ایجاد کرد</string>
+    <string name="recording_error_connection_failed">اتصال ناموفق بود</string>
+    <string name="recording_error_cannot_write_directory">نمی‌توان در دایرکتوری انتخاب شده نوشت</string>
+    <string name="recording_error_cannot_create_file">نمی‌توان فایل ضبط ایجاد کرد</string>
+    <string name="recording_error_cannot_open_file">نمی‌توان فایل را برای نوشتن باز کرد</string>
+    <string name="recording_error_directory_access">خطای دسترسی به دایرکتوری: %s</string>
+    <string name="recording_error_connection_timeout">زمان اتصال به پایان رسید</string>
+    <string name="recording_error_connection_refused">اتصال رد شد</string>
+    <string name="recording_error_io">خطای ورودی/خروجی: %s</string>
+    <string name="recording_error_generic">خطا: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">پروکسی سفارشی پیکربندی نشده است</string>
+    <string name="custom_proxy_configured_description">پروکسی سفارشی پیکربندی شده است. برای مشاهده جزئیات ضربه بزنید.</string>
+    <string name="custom_proxy_not_configured_description">پروکسی سفارشی پیکربندی نشده است. برای پیکربندی ضربه بزنید.</string>
+    <string name="custom_proxy_privacy_warning_description">پروکسی سفارشی اجباری فعال است اما پیکربندی نشده. حریم خصوصی ممکن است به خطر بیفتد.</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">پیکربندی پروکسی سفارشی سراسری</string>
+    <string name="validation_enter_proxy_host">❌ لطفاً یک میزبان پروکسی وارد کنید</string>
+    <string name="testing_connection">آزمایش اتصال...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">هیچ</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">بازنشانی پهنای باند جلسه</string>
+    <string name="reset_bandwidth_message">شمارنده پهنای باند جلسه به صفر بازنشانی شود؟</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">همه فیلترها از قبل اعمال شده‌اند</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">رمز عبور تغییر کرد اما رمزگذاری مجدد پایگاه داده ناموفق بود: %s</string>
 </resources>
