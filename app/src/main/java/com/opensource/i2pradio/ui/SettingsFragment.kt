@@ -571,6 +571,15 @@ class SettingsFragment : Fragment() {
         // Immediate notification would cancel that debouncing and cause UI flickering.
         TorManager.addStateListener(torStateListener, notifyImmediately = false)
 
+        // FIX: Sync UI with current Tor state when resuming from pause.
+        // This handles the case where Tor state changed while the fragment was paused
+        // (e.g., user switched tabs and Tor disconnected in the meantime).
+        // We manually trigger the listener to ensure UI reflects current state.
+        val currentState = TorManager.state
+        if (lastDisplayedTorState != currentState) {
+            torStateListener(currentState)
+        }
+
         // Register preference change listener to sync Tor switch with preference updates
         requireContext().getSharedPreferences("DeutsiaRadioPrefs", Context.MODE_PRIVATE)
             .registerOnSharedPreferenceChangeListener(preferenceChangeListener)
