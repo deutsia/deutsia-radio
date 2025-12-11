@@ -1114,7 +1114,7 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun playStation(station: RadioBrowserStation) {
-        val streamUrl = station.url_resolved ?: station.url
+        val streamUrl = station.urlResolved ?: station.url
         val isTorStation = streamUrl.contains(".onion")
         val isI2PStation = streamUrl.contains(".i2p")
 
