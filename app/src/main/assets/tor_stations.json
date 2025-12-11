@@ -23,9 +23,9 @@
       "proxyPort": 9050
     },
     {
-      "name": "Rap Radio",
-      "streamUrl": "http://vlk5dt267mteudjamvzmsr5q5eaibxt7mhtklijacdjqgbxy7a5wegyd.onion/radio",
-      "genre": "Hip-Hop",
+      "name": "Darknet EDM",
+      "streamUrl": "http://nlknejzzk2rrz6gsgliinbflfjsgjtdtgzj6r2txc6krjzntyi22uoyd.onion/radio",
+      "genre": "EDM",
       "useProxy": true,
       "proxyType": "TOR",
       "proxyHost": "127.0.0.1",

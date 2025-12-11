@@ -29,6 +29,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import android.widget.LinearLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
@@ -99,6 +101,14 @@ class SettingsFragment : Fragment() {
     private var requireAuthContainer: View? = null
     private var requireAuthSwitch: MaterialSwitch? = null
     private var databaseEncryptionSwitch: MaterialSwitch? = null
+
+    // ViewModel for observing current station (for miniplayer padding)
+    private val radioViewModel: RadioViewModel by activityViewModels()
+
+    // Miniplayer spacing for dynamic bottom padding
+    private var settingsContentContainer: LinearLayout? = null
+    private var miniplayerSpacing = 0
+    private var settingsBasePadding = 0
 
     // Bandwidth update broadcast receiver
     private val bandwidthUpdateReceiver = object : BroadcastReceiver() {
@@ -272,6 +282,16 @@ class SettingsFragment : Fragment() {
         forceTorExceptI2pSwitch = view.findViewById(R.id.forceTorExceptI2pSwitch)
         forceTorAllContainer = view.findViewById(R.id.forceTorAllContainer)
         forceTorExceptI2pContainer = view.findViewById(R.id.forceTorExceptI2pContainer)
+
+        // Miniplayer spacing for dynamic bottom padding
+        settingsContentContainer = view.findViewById(R.id.settingsContentContainer)
+        miniplayerSpacing = resources.getDimensionPixelSize(R.dimen.miniplayer_spacing)
+        settingsBasePadding = resources.getDimensionPixelSize(R.dimen.browse_base_padding)
+
+        // Observe current station to dynamically adjust bottom padding for miniplayer
+        radioViewModel.currentStation.observe(viewLifecycleOwner) { station ->
+            updateBottomPaddingForMiniplayer(station != null)
+        }
 
         // Show Material You option only on Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -2560,5 +2580,19 @@ class SettingsFragment : Fragment() {
         dialog.show()
     }
 
+    /**
+     * Update bottom padding on settings container based on miniplayer visibility.
+     * When a station is playing, the miniplayer is visible and we need extra padding.
+     * When nothing is playing, we still apply a small base padding for visual spacing.
+     */
+    private fun updateBottomPaddingForMiniplayer(isMiniplayerVisible: Boolean) {
+        val bottomPadding = if (isMiniplayerVisible) miniplayerSpacing else settingsBasePadding
 
+        settingsContentContainer?.setPadding(
+            settingsContentContainer?.paddingLeft ?: 0,
+            settingsContentContainer?.paddingTop ?: 0,
+            settingsContentContainer?.paddingRight ?: 0,
+            bottomPadding
+        )
+    }
 }
