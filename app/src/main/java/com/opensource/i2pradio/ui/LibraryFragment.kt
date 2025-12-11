@@ -912,8 +912,8 @@ class RadioStationAdapter(
             // Show proxy type indicator (I2P or Tor only - Custom proxy is indicated by top-right icon)
             val proxyIndicator = if (station.useProxy) {
                 when (station.getProxyTypeEnum()) {
-                    ProxyType.I2P -> getString(R.string.proxy_label_i2p)
-                    ProxyType.TOR -> getString(R.string.proxy_label_tor)
+                    ProxyType.I2P -> itemView.context.getString(R.string.proxy_label_i2p)
+                    ProxyType.TOR -> itemView.context.getString(R.string.proxy_label_tor)
                     ProxyType.CUSTOM -> ""
                     ProxyType.NONE -> ""
                 }
