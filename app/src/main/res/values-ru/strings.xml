@@ -98,6 +98,19 @@
     <string name="station_added_to_favorites">%s добавлена в избранное</string>
     <string name="station_removed_from_favorites">%s удалена из избранного</string>
     <string name="tor_required_warning">Принудительный Tor включён, но Tor не подключён. Подключитесь к Tor для просмотра станций.</string>
+    <string name="browse_by_genre">Обзор по жанрам</string>
+    <string name="browse_trending">В тренде сейчас</string>
+    <string name="browse_new_stations">Новые станции</string>
+    <string name="browse_popular_usa">Популярно в США</string>
+    <string name="browse_popular_germany">Популярно в Германии</string>
+    <string name="browse_spanish_radio">Испанское радио</string>
+    <string name="browse_french_radio">Французское радио</string>
+    <string name="see_all">Показать все</string>
+    <string name="add_filter">Фильтр</string>
+    <string name="browse_results_count">Загрузка…</string>
+    <string name="browse_results_format">%d станций</string>
+    <string name="back">Назад</string>
+    <string name="browse_all_stations">Все станции</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">Подключение...</string>

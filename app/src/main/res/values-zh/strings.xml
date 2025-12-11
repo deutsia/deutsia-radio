@@ -98,6 +98,19 @@
     <string name="station_added_to_favorites">%s 已添加到收藏</string>
     <string name="station_removed_from_favorites">%s 已从收藏移除</string>
     <string name="tor_required_warning">强制 Tor 已启用但 Tor 未连接。请连接到 Tor 以浏览电台。</string>
+    <string name="browse_by_genre">按类型浏览</string>
+    <string name="browse_trending">当前热门</string>
+    <string name="browse_new_stations">新电台</string>
+    <string name="browse_popular_usa">美国热门</string>
+    <string name="browse_popular_germany">德国热门</string>
+    <string name="browse_spanish_radio">西班牙语电台</string>
+    <string name="browse_french_radio">法语电台</string>
+    <string name="see_all">查看全部</string>
+    <string name="add_filter">筛选</string>
+    <string name="browse_results_count">加载中…</string>
+    <string name="browse_results_format">%d 个电台</string>
+    <string name="back">返回</string>
+    <string name="browse_all_stations">所有电台</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">连接中...</string>

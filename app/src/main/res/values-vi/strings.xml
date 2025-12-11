@@ -98,6 +98,19 @@
     <string name="station_added_to_favorites">Đã thêm %s vào yêu thích</string>
     <string name="station_removed_from_favorites">Đã xóa %s khỏi yêu thích</string>
     <string name="tor_required_warning">Bắt buộc Tor đã bật nhưng Tor chưa kết nối. Kết nối với Tor để duyệt các trạm.</string>
+    <string name="browse_by_genre">Duyệt theo thể loại</string>
+    <string name="browse_trending">Đang thịnh hành</string>
+    <string name="browse_new_stations">Trạm mới</string>
+    <string name="browse_popular_usa">Phổ biến ở Mỹ</string>
+    <string name="browse_popular_germany">Phổ biến ở Đức</string>
+    <string name="browse_spanish_radio">Radio tiếng Tây Ban Nha</string>
+    <string name="browse_french_radio">Radio tiếng Pháp</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="add_filter">Bộ lọc</string>
+    <string name="browse_results_count">Đang tải…</string>
+    <string name="browse_results_format">%d trạm</string>
+    <string name="back">Quay lại</string>
+    <string name="browse_all_stations">Tất cả các trạm</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">Đang kết nối...</string>

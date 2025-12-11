@@ -98,6 +98,19 @@
     <string name="station_added_to_favorites">تمت إضافة %s إلى المفضلة</string>
     <string name="station_removed_from_favorites">تمت إزالة %s من المفضلة</string>
     <string name="tor_required_warning">تم تمكين فرض Tor لكن Tor غير متصل. اتصل بـ Tor لتصفح المحطات.</string>
+    <string name="browse_by_genre">تصفح حسب النوع</string>
+    <string name="browse_trending">الأكثر رواجاً الآن</string>
+    <string name="browse_new_stations">محطات جديدة</string>
+    <string name="browse_popular_usa">شائع في الولايات المتحدة</string>
+    <string name="browse_popular_germany">شائع في ألمانيا</string>
+    <string name="browse_spanish_radio">الراديو الإسباني</string>
+    <string name="browse_french_radio">الراديو الفرنسي</string>
+    <string name="see_all">عرض الكل</string>
+    <string name="add_filter">فلتر</string>
+    <string name="browse_results_count">جارٍ التحميل…</string>
+    <string name="browse_results_format">%d محطة</string>
+    <string name="back">رجوع</string>
+    <string name="browse_all_stations">جميع المحطات</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">جارٍ الاتصال...</string>

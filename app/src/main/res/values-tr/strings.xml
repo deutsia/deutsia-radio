@@ -98,6 +98,19 @@
     <string name="station_added_to_favorites">%s favorilere eklendi</string>
     <string name="station_removed_from_favorites">%s favorilerden kaldırıldı</string>
     <string name="tor_required_warning">Tor Zorla etkin ancak Tor bağlı değil. İstasyonlara göz atmak için Tor\'a bağlanın.</string>
+    <string name="browse_by_genre">Türe göre göz at</string>
+    <string name="browse_trending">Şu anda popüler</string>
+    <string name="browse_new_stations">Yeni istasyonlar</string>
+    <string name="browse_popular_usa">ABD\'de popüler</string>
+    <string name="browse_popular_germany">Almanya\'da popüler</string>
+    <string name="browse_spanish_radio">İspanyol Radyosu</string>
+    <string name="browse_french_radio">Fransız Radyosu</string>
+    <string name="see_all">Tümünü gör</string>
+    <string name="add_filter">Filtre</string>
+    <string name="browse_results_count">Yükleniyor…</string>
+    <string name="browse_results_format">%d istasyon</string>
+    <string name="back">Geri</string>
+    <string name="browse_all_stations">Tüm istasyonlar</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">Bağlanıyor...</string>

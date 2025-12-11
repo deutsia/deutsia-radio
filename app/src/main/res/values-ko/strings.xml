@@ -98,6 +98,19 @@
     <string name="station_added_to_favorites">%s이(가) 즐겨찾기에 추가됨</string>
     <string name="station_removed_from_favorites">%s이(가) 즐겨찾기에서 제거됨</string>
     <string name="tor_required_warning">강제 Tor가 활성화되었지만 Tor가 연결되지 않았습니다. 방송국을 탐색하려면 Tor에 연결하세요.</string>
+    <string name="browse_by_genre">장르별로 탐색</string>
+    <string name="browse_trending">지금 인기</string>
+    <string name="browse_new_stations">새로운 스테이션</string>
+    <string name="browse_popular_usa">미국에서 인기</string>
+    <string name="browse_popular_germany">독일에서 인기</string>
+    <string name="browse_spanish_radio">스페인어 라디오</string>
+    <string name="browse_french_radio">프랑스어 라디오</string>
+    <string name="see_all">모두 보기</string>
+    <string name="add_filter">필터</string>
+    <string name="browse_results_count">로딩 중…</string>
+    <string name="browse_results_format">%d개 스테이션</string>
+    <string name="back">뒤로</string>
+    <string name="browse_all_stations">모든 스테이션</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">연결 중...</string>
