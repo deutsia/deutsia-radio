@@ -85,6 +85,12 @@ class NowPlayingFragment : Fragment() {
     private var bufferProgressBar: com.google.android.material.progressindicator.LinearProgressIndicator? = null
     private var liveIndicator: TextView? = null
 
+    // Loading state UI elements (Content-Aware Loading)
+    private var genreSkeletonContainer: View? = null
+    private var genreShimmerOverlay: View? = null
+    private var connectingStatusContainer: View? = null
+    private var genreShimmerAnimator: ValueAnimator? = null
+
     // Volume control state (0.0 to 1.0 for player volume)
     private var savedVolume: Float = 1f
     private var isMuted: Boolean = false
@@ -267,6 +273,11 @@ class NowPlayingFragment : Fragment() {
         playbackElapsedTime = view.findViewById(R.id.playbackElapsedTime)
         bufferProgressBar = view.findViewById(R.id.bufferProgressBar)
         liveIndicator = view.findViewById(R.id.liveIndicator)
+
+        // Loading state UI elements (Content-Aware Loading)
+        genreSkeletonContainer = view.findViewById(R.id.genreSkeletonContainer)
+        genreShimmerOverlay = view.findViewById(R.id.genreShimmerOverlay)
+        connectingStatusContainer = view.findViewById(R.id.connectingStatusContainer)
 
         // Initialize audio manager and volume control
         audioManager = requireContext().getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
@@ -882,6 +893,60 @@ class NowPlayingFragment : Fragment() {
         bufferingIndicator.visibility = if (buffering) View.VISIBLE else View.GONE
         playPauseButton.isEnabled = !buffering
         playPauseButton.alpha = if (buffering) 0.5f else 1f
+
+        // Content-Aware Loading: Show/hide loading UI elements
+        if (buffering && viewModel.getCurrentStation() != null) {
+            // Show loading state
+            genreText.visibility = View.GONE
+            genreSkeletonContainer?.visibility = View.VISIBLE
+            connectingStatusContainer?.visibility = View.VISIBLE
+            startGenreShimmer()
+        } else {
+            // Show connected state
+            genreText.visibility = View.VISIBLE
+            genreSkeletonContainer?.visibility = View.GONE
+            connectingStatusContainer?.visibility = View.GONE
+            stopGenreShimmer()
+        }
+    }
+
+    /**
+     * Start the shimmer animation on the genre skeleton placeholder.
+     */
+    private fun startGenreShimmer() {
+        genreShimmerAnimator?.cancel()
+
+        val overlay = genreShimmerOverlay ?: return
+        val container = genreSkeletonContainer ?: return
+
+        // Calculate animation range based on container width
+        container.post {
+            val containerWidth = container.width.takeIf { it > 0 } ?: return@post
+            val overlayWidth = overlay.width.takeIf { it > 0 } ?: 40.dpToPx()
+
+            genreShimmerAnimator = ValueAnimator.ofFloat(-overlayWidth.toFloat(), containerWidth.toFloat()).apply {
+                duration = 1200L
+                interpolator = android.view.animation.LinearInterpolator()
+                repeatCount = ValueAnimator.INFINITE
+                repeatMode = ValueAnimator.RESTART
+                addUpdateListener { animation ->
+                    overlay.translationX = animation.animatedValue as Float
+                }
+                start()
+            }
+        }
+    }
+
+    /**
+     * Stop the shimmer animation on the genre skeleton placeholder.
+     */
+    private fun stopGenreShimmer() {
+        genreShimmerAnimator?.cancel()
+        genreShimmerAnimator = null
+    }
+
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
 
     override fun onResume() {
@@ -900,6 +965,9 @@ class NowPlayingFragment : Fragment() {
         recordingDot?.clearAnimation()
         previousPlayingState = null
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(metadataReceiver)
+
+        // Clean up shimmer animator
+        stopGenreShimmer()
 
         // Clean up bottom sheet to prevent window leaks
         volumeBottomSheet?.dismiss()
