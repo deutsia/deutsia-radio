@@ -561,4 +561,9 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Пароль змінено, але не вдалося перешифрувати базу даних: %s</string>
+
+    <!-- Service Detection Toast Messages -->
+    <string name="toast_tor_not_running">Tor не запущено. Запустіть Orbot для відтворення .onion станцій.</string>
+    <string name="toast_i2p_not_running">I2P не запущено. Запустіть I2P роутер для відтворення .i2p станцій.</string>
+    <string name="toast_tor_not_installed">Orbot не встановлено. Встановіть Orbot для відтворення .onion станцій.</string>
 </resources>
