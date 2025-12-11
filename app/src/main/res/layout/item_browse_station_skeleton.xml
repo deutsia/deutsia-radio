@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Skeleton placeholder for list station items -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="5dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="1dp"
+    app:strokeWidth="0dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp">
+
+            <!-- Station Icon placeholder -->
+            <View
+                android:id="@+id/skeletonIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/skeleton_placeholder_image"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Station Name placeholder -->
+            <View
+                android:id="@+id/skeletonName"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="48dp"
+                android:background="@drawable/skeleton_placeholder"
+                app:layout_constraintBottom_toTopOf="@id/skeletonInfo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/skeletonIcon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <!-- Station Info placeholder -->
+            <View
+                android:id="@+id/skeletonInfo"
+                android:layout_width="0dp"
+                android:layout_height="13dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="80dp"
+                android:background="@drawable/skeleton_placeholder"
+                app:layout_constraintBottom_toTopOf="@id/skeletonQuality"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/skeletonIcon"
+                app:layout_constraintTop_toBottomOf="@id/skeletonName" />
+
+            <!-- Quality Info placeholder -->
+            <View
+                android:id="@+id/skeletonQuality"
+                android:layout_width="60dp"
+                android:layout_height="11dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/skeleton_placeholder"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/skeletonIcon"
+                app:layout_constraintTop_toBottomOf="@id/skeletonInfo" />
+
+            <!-- Action button placeholders -->
+            <View
+                android:id="@+id/skeletonLikeButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/skeleton_placeholder_circle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/skeletonActionButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/skeletonActionButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/skeleton_placeholder_circle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Shimmer overlay -->
+        <View
+            android:id="@+id/shimmerOverlay"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/skeleton_shimmer_gradient" />
+
+    </FrameLayout>
+
+</com.google.android.material.card.MaterialCardView>

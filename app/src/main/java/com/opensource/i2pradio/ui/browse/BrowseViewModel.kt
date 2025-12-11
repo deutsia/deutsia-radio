@@ -103,6 +103,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     // Track if discovery data has been loaded
     private var discoveryDataLoaded = false
 
+    // Discovery loading state
+    private val _isDiscoveryLoading = MutableLiveData(true)
+    val isDiscoveryLoading: LiveData<Boolean> = _isDiscoveryLoading
+
     // Pagination
     private var currentOffset = 0
     private val pageSize = 50
@@ -136,6 +140,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     fun loadDiscoveryData(forceRefresh: Boolean = false) {
         if (discoveryDataLoaded && !forceRefresh) return
         discoveryDataLoaded = true
+        _isDiscoveryLoading.value = true
 
         viewModelScope.launch {
             // Load USA stations
@@ -185,6 +190,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 is RadioBrowserResult.Success -> _newStations.value = result.data
                 else -> {}
             }
+
+            _isDiscoveryLoading.value = false
         }
     }
 
