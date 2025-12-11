@@ -95,6 +95,19 @@
     <string name="station_added_to_favorites">%s पसंदीदा में जोड़ा गया</string>
     <string name="station_removed_from_favorites">%s पसंदीदा से हटाया गया</string>
     <string name="tor_required_warning">Tor को फ़ोर्स करें सक्षम है लेकिन Tor कनेक्ट नहीं है। स्टेशनों को ब्राउज़ करने के लिए Tor से कनेक्ट करें।</string>
+    <string name="browse_by_genre">शैली के अनुसार ब्राउज़ करें</string>
+    <string name="browse_trending">अभी ट्रेंडिंग</string>
+    <string name="browse_new_stations">नए स्टेशन</string>
+    <string name="browse_popular_usa">अमेरिका में लोकप्रिय</string>
+    <string name="browse_popular_germany">जर्मनी में लोकप्रिय</string>
+    <string name="browse_spanish_radio">स्पैनिश रेडियो</string>
+    <string name="browse_french_radio">फ्रेंच रेडियो</string>
+    <string name="see_all">सभी देखें</string>
+    <string name="add_filter">फ़िल्टर</string>
+    <string name="browse_results_count">लोड हो रहा है…</string>
+    <string name="browse_results_format">%d स्टेशन</string>
+    <string name="back">वापस</string>
+    <string name="browse_all_stations">सभी स्टेशन</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">कनेक्ट हो रहा है...</string>

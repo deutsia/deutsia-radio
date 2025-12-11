@@ -95,6 +95,19 @@
     <string name="station_added_to_favorites">%s ကို အကြိုက်ဆုံးများသို့ ထည့်ပြီးပါပြီ</string>
     <string name="station_removed_from_favorites">%s ကို အကြိုက်ဆုံးများမှ ဖယ်ရှားပြီးပါပြီ</string>
     <string name="tor_required_warning">Tor ကို အတင်းအဓမ္မ သုံးရန် ဖွင့်ထားသော်လည်း Tor မချိတ်ဆက်ထားပါ။ စတေးရှင်းများကို ရှာကြည့်ရန် Tor သို့ ချိတ်ဆက်ပါ။</string>
+    <string name="browse_by_genre">အမျိုးအစားအလိုက် ရှာဖွေရန်</string>
+    <string name="browse_trending">လက်ရှိ လူကြိုက်များသော</string>
+    <string name="browse_new_stations">စခန်းအသစ်များ</string>
+    <string name="browse_popular_usa">အမေရိကတွင် လူကြိုက်များသော</string>
+    <string name="browse_popular_germany">ဂျာမနီတွင် လူကြိုက်များသော</string>
+    <string name="browse_spanish_radio">စပိန်ရေဒီယို</string>
+    <string name="browse_french_radio">ပြင်သစ်ရေဒီယို</string>
+    <string name="see_all">အားလုံးကြည့်ရန်</string>
+    <string name="add_filter">စစ်ထုတ်မှု</string>
+    <string name="browse_results_count">တင်နေသည်…</string>
+    <string name="browse_results_format">%d စခန်းများ</string>
+    <string name="back">နောက်သို့</string>
+    <string name="browse_all_stations">စခန်းအားလုံး</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">ချိတ်ဆက်နေသည်...</string>

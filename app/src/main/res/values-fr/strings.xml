@@ -105,6 +105,19 @@
     <string name="station_added_to_favorites">%s ajoutée aux favoris</string>
     <string name="station_removed_from_favorites">%s retirée des favoris</string>
     <string name="tor_required_warning">Forcer Tor est activé mais Tor n\'est pas connecté. Connectez-vous à Tor pour parcourir les stations.</string>
+    <string name="browse_by_genre">Parcourir par genre</string>
+    <string name="browse_trending">Tendances actuelles</string>
+    <string name="browse_new_stations">Nouvelles stations</string>
+    <string name="browse_popular_usa">Populaire aux États-Unis</string>
+    <string name="browse_popular_germany">Populaire en Allemagne</string>
+    <string name="browse_spanish_radio">Radio espagnole</string>
+    <string name="browse_french_radio">Radio française</string>
+    <string name="see_all">Tout voir</string>
+    <string name="add_filter">Filtre</string>
+    <string name="browse_results_count">Chargement…</string>
+    <string name="browse_results_format">%d stations</string>
+    <string name="back">Retour</string>
+    <string name="browse_all_stations">Toutes les stations</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">Connexion...</string>

@@ -98,6 +98,19 @@
     <string name="station_added_to_favorites">%s به علاقه‌مندی‌ها اضافه شد</string>
     <string name="station_removed_from_favorites">%s از علاقه‌مندی‌ها حذف شد</string>
     <string name="tor_required_warning">اجبار Tor فعال است اما Tor متصل نیست. برای مرور ایستگاه‌ها به Tor متصل شوید.</string>
+    <string name="browse_by_genre">مرور بر اساس ژانر</string>
+    <string name="browse_trending">پرطرفدار در حال حاضر</string>
+    <string name="browse_new_stations">ایستگاه‌های جدید</string>
+    <string name="browse_popular_usa">محبوب در ایالات متحده</string>
+    <string name="browse_popular_germany">محبوب در آلمان</string>
+    <string name="browse_spanish_radio">رادیو اسپانیایی</string>
+    <string name="browse_french_radio">رادیو فرانسوی</string>
+    <string name="see_all">مشاهده همه</string>
+    <string name="add_filter">فیلتر</string>
+    <string name="browse_results_count">در حال بارگذاری…</string>
+    <string name="browse_results_format">%d ایستگاه</string>
+    <string name="back">بازگشت</string>
+    <string name="browse_all_stations">همه ایستگاه‌ها</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">در حال اتصال...</string>

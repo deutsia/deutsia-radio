@@ -98,6 +98,19 @@
     <string name="station_added_to_favorites">%sをお気に入りに追加しました</string>
     <string name="station_removed_from_favorites">%sをお気に入りから削除しました</string>
     <string name="tor_required_warning">Tor強制が有効ですが、Torが接続されていません。ステーションを閲覧するにはTorに接続してください。</string>
+    <string name="browse_by_genre">ジャンル別に閲覧</string>
+    <string name="browse_trending">今人気</string>
+    <string name="browse_new_stations">新しいステーション</string>
+    <string name="browse_popular_usa">アメリカで人気</string>
+    <string name="browse_popular_germany">ドイツで人気</string>
+    <string name="browse_spanish_radio">スペイン語ラジオ</string>
+    <string name="browse_french_radio">フランス語ラジオ</string>
+    <string name="see_all">すべて表示</string>
+    <string name="add_filter">フィルター</string>
+    <string name="browse_results_count">読み込み中…</string>
+    <string name="browse_results_format">%d ステーション</string>
+    <string name="back">戻る</string>
+    <string name="browse_all_stations">すべてのステーション</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">接続中...</string>
