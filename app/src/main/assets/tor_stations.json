@@ -30,6 +30,15 @@
       "proxyType": "TOR",
       "proxyHost": "127.0.0.1",
       "proxyPort": 9050
+    },
+    {
+      "name": "Rap Radio",
+      "streamUrl": "http://vlk5dt267mteudjamvzmsr5q5eaibxt7mhtklijacdjqgbxy7a5wegyd.onion/radio",
+      "genre": "Hip-Hop",
+      "useProxy": true,
+      "proxyType": "TOR",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 9050
     }
   ]
 }
