@@ -574,9 +574,4 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Şifre değiştirildi ancak veritabanı yeniden şifrelenemedi: %s</string>
-
-    <!-- Service Detection Toast Messages -->
-    <string name="toast_tor_not_running">Tor çalışmıyor. .onion istasyonlarını oynatmak için Orbot\'u başlatın.</string>
-    <string name="toast_i2p_not_running">I2P çalışmıyor. .i2p istasyonlarını oynatmak için I2P yönlendiricinizi başlatın.</string>
-    <string name="toast_tor_not_installed">Orbot yüklü değil. .onion istasyonlarını oynatmak için Orbot\'u yükleyin.</string>
 </resources>

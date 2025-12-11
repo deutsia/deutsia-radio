@@ -574,9 +574,4 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Đã đổi mật khẩu nhưng không thể mã hóa lại cơ sở dữ liệu: %s</string>
-
-    <!-- Service Detection Toast Messages -->
-    <string name="toast_tor_not_running">Tor không chạy. Khởi động Orbot để phát các đài .onion.</string>
-    <string name="toast_i2p_not_running">I2P không chạy. Khởi động bộ định tuyến I2P để phát các đài .i2p.</string>
-    <string name="toast_tor_not_installed">Orbot chưa được cài đặt. Cài đặt Orbot để phát các đài .onion.</string>
 </resources>
