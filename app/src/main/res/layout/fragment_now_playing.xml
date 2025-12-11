@@ -105,6 +105,7 @@
             android:ellipsize="end"
             tools:text="BBC World Service" />
 
+        <!-- Genre text - visible when connected -->
         <TextView
             android:id="@+id/nowPlayingGenre"
             android:layout_width="match_parent"
@@ -115,6 +116,62 @@
             android:textSize="14sp"
             android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="News • I2P" />
+
+        <!-- Genre skeleton - visible while connecting -->
+        <FrameLayout
+            android:id="@+id/genreSkeletonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="4dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <View
+                android:id="@+id/genreSkeleton"
+                android:layout_width="120dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:background="@drawable/skeleton_placeholder" />
+
+            <View
+                android:id="@+id/genreShimmerOverlay"
+                android:layout_width="40dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/skeleton_shimmer_gradient" />
+
+        </FrameLayout>
+
+        <!-- Connecting status indicator -->
+        <LinearLayout
+            android:id="@+id/connectingStatusContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/connectingSpinner"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:indeterminate="true"
+                app:indicatorSize="16dp"
+                app:trackThickness="2dp" />
+
+            <TextView
+                android:id="@+id/connectingStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/now_playing_connecting"
+                android:textSize="13sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+        </LinearLayout>
 
         <!-- Metadata with marquee scrolling for long text -->
         <TextView

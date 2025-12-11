@@ -354,6 +354,7 @@
     <string name="now_playing_no_station_subtitle">Select a station from the list</string>
     <string name="now_playing_volume_title">Radio Volume</string>
     <string name="now_playing_volume_description">Adjusts radio stream only</string>
+    <string name="now_playing_connecting">Connecting…</string>
 
     <!-- Toast Messages -->
     <string name="toast_session_bandwidth_reset">Session bandwidth reset</string>
