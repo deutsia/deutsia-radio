@@ -1054,7 +1054,7 @@ class BrowseStationsFragment : Fragment() {
         }
 
         if (filters.isEmpty()) {
-            Toast.makeText(requireContext(), "All filters are already applied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.all_filters_applied), Toast.LENGTH_SHORT).show()
             return
         }
 

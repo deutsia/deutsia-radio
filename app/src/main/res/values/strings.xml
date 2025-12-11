@@ -458,4 +458,120 @@
     <string name="auth_biometric_title">Unlock deutsia radio</string>
     <string name="auth_biometric_subtitle">Authenticate to continue</string>
     <string name="auth_biometric_negative">Use Password</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">Are you sure you want to delete %d station%s?</string>
+    <string name="delete_stations_message_single">Are you sure you want to delete %d station?</string>
+    <string name="delete_stations_message_plural">Are you sure you want to delete %d stations?</string>
+    <string name="button_delete">Delete</string>
+    <string name="deleted_stations_message">Deleted %d station%s</string>
+    <string name="deleted_stations_message_single">Deleted %d station</string>
+    <string name="deleted_stations_message_plural">Deleted %d stations</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • Custom</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">Custom</string>
+    <string name="proxy_type_none">None</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor is not active</string>
+    <string name="tor_status_connecting_network">Connecting to Tor network...</string>
+    <string name="tor_status_connected_via_tor">Connected via Tor</string>
+    <string name="tor_status_connection_error">Connection error</string>
+    <string name="tor_status_orbot_required">Orbot app required</string>
+    <string name="tor_status_detail_socks5">SOCKS5 proxy at %1$s:%2$d</string>
+    <string name="tor_status_detail_establishing">Establishing connection...</string>
+    <string name="tor_status_detail_unknown_error">Unknown error occurred</string>
+    <string name="tor_status_detail_tap_to_connect">Tap to connect</string>
+    <string name="tor_status_detail_install_orbot">Install Orbot from Play Store or F-Droid</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">Disconnected</string>
+    <string name="settings_tor_not_running_detail">Tor is not running</string>
+    <string name="button_start_tor">Start</string>
+    <string name="settings_tor_connecting_status">Connecting...</string>
+    <string name="settings_tor_establishing_connection">Establishing Tor connection</string>
+    <string name="button_starting">Starting...</string>
+    <string name="settings_tor_connected_status">Connected</string>
+    <string name="settings_tor_socks_port">SOCKS port: %d</string>
+    <string name="button_stop_tor">Stop</string>
+    <string name="settings_tor_connection_failed">Connection Failed</string>
+    <string name="settings_tor_orbot_required_status">Orbot Required</string>
+    <string name="settings_tor_install_orbot_message">Please install Orbot to use Tor</string>
+    <string name="button_install_orbot_caps">Install Orbot</string>
+    <string name="settings_tor_force_warning">Connection Failed</string>
+    <string name="settings_tor_force_warning_detail">Force Tor is enabled but not connected</string>
+    <string name="button_retry">Retry</string>
+    <string name="settings_recording_directory_default_label">Default (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor not connected! Streams will fail until Tor connects.</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor not connected! Non-I2P streams will fail until Tor connects.</string>
+    <string name="button_off">Off</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">Import Stations</string>
+    <string name="import_message">Select a file to import radio stations from.\n\nSupported formats:\n• CSV\n• JSON\n• M3U playlist\n• PLS playlist</string>
+    <string name="button_select_file">Select File</string>
+    <string name="import_curated_title">Import %s Stations</string>
+    <string name="import_curated_message">Import %1$d curated %2$s radio stations?\n\nThese stations are pre-configured with proxy settings and ready to use.</string>
+    <string name="no_stations_found_in_list">No stations found in %s list</string>
+    <string name="failed_to_import_stations">Failed to import %s stations: %s</string>
+    <string name="dialog_export_stations_title">Export Stations</string>
+    <string name="no_stations_in_file">No stations found in the file</string>
+    <string name="dialog_import_failed">Import Failed</string>
+    <string name="button_ok">OK</string>
+    <string name="format_unknown">Unknown</string>
+    <string name="found_stations_message">Found %1$d station(s) in %2$s format.\n\n</string>
+    <string name="warnings_header">Warnings:\n</string>
+    <string name="more_warnings">• ...and %d more\n</string>
+    <string name="import_confirmation">Do you want to import these stations?</string>
+    <string name="import_error_message">Import error: %s</string>
+    <string name="imported_stations_success">Imported %d station(s)</string>
+    <string name="no_stations_to_export">No stations to export</string>
+    <string name="exported_stations_success">Exported %1$d station(s) to %2$s</string>
+    <string name="export_error_message">Export error: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">No stream playing</string>
+    <string name="recording_error_cannot_create_directory">Cannot create directory</string>
+    <string name="recording_error_connection_failed">Connection failed</string>
+    <string name="recording_error_cannot_write_directory">Cannot write to selected directory</string>
+    <string name="recording_error_cannot_create_file">Cannot create recording file</string>
+    <string name="recording_error_cannot_open_file">Cannot open file for writing</string>
+    <string name="recording_error_directory_access">Directory access error: %s</string>
+    <string name="recording_error_connection_timeout">Connection timed out</string>
+    <string name="recording_error_connection_refused">Connection refused</string>
+    <string name="recording_error_io">I/O error: %s</string>
+    <string name="recording_error_generic">Error: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">Custom proxy not configured</string>
+    <string name="custom_proxy_configured_description">Custom proxy is configured. Tap to view details.</string>
+    <string name="custom_proxy_not_configured_description">Custom proxy is not configured. Tap to configure.</string>
+    <string name="custom_proxy_privacy_warning_description">Force custom proxy enabled but not configured. Privacy may be compromised.</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">Configure Global Custom Proxy</string>
+    <string name="validation_enter_proxy_host">❌ Please enter a proxy host</string>
+    <string name="testing_connection">Testing connection...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">None</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">Reset Session Bandwidth</string>
+    <string name="reset_bandwidth_message">Reset the session bandwidth counter to zero?</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">All filters are already applied</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">Password changed but failed to re-key database: %s</string>
 </resources>
