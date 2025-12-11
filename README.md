@@ -31,7 +31,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 - 🎨 **Material You** - Dynamic theming along with 6 color schemes
 - 🔴 **Stream Recording** - Record across multiple stations
 - 🔐 **App Lock** - Secure your listening with biometric/PIN protection and optional database encrpytion 
-- 🌍 **14 Languages** - Multilingual interface support
+- 🌍 **17 Languages** - Multilingual interface support
 - 🌓 **Light/Dark/System** - Adaptive theme modes
 
 ---
