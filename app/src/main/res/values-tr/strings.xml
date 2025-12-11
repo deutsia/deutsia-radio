@@ -445,4 +445,120 @@
     <string name="auth_biometric_title">deutsia radio\'nun Kilidini Aç</string>
     <string name="auth_biometric_subtitle">Devam etmek için kimlik doğrulayın</string>
     <string name="auth_biometric_negative">Şifre Kullan</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">%d istasyon%s silmek istediğinizden emin misiniz?</string>
+    <string name="delete_stations_message_single">%d istasyonu silmek istediğinizden emin misiniz?</string>
+    <string name="delete_stations_message_plural">%d istasyonu silmek istediğinizden emin misiniz?</string>
+    <string name="button_delete">Sil</string>
+    <string name="deleted_stations_message">%d istasyon%s silindi</string>
+    <string name="deleted_stations_message_single">%d istasyon silindi</string>
+    <string name="deleted_stations_message_plural">%d istasyon silindi</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • Özel</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">Özel</string>
+    <string name="proxy_type_none">Yok</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor aktif değil</string>
+    <string name="tor_status_connecting_network">Tor ağına bağlanıyor...</string>
+    <string name="tor_status_connected_via_tor">Tor üzerinden bağlandı</string>
+    <string name="tor_status_connection_error">Bağlantı hatası</string>
+    <string name="tor_status_orbot_required">Orbot uygulaması gerekli</string>
+    <string name="tor_status_detail_socks5">%1$s:%2$d adresinde SOCKS5 proxy</string>
+    <string name="tor_status_detail_establishing">Bağlantı kuruluyor...</string>
+    <string name="tor_status_detail_unknown_error">Bilinmeyen hata oluştu</string>
+    <string name="tor_status_detail_tap_to_connect">Bağlanmak için dokunun</string>
+    <string name="tor_status_detail_install_orbot">Orbot\'u Play Store veya F-Droid\'den yükleyin</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">Bağlantı kesildi</string>
+    <string name="settings_tor_not_running_detail">Tor çalışmıyor</string>
+    <string name="button_start_tor">Başlat</string>
+    <string name="settings_tor_connecting_status">Bağlanıyor...</string>
+    <string name="settings_tor_establishing_connection">Tor bağlantısı kuruluyor</string>
+    <string name="button_starting">Başlatılıyor...</string>
+    <string name="settings_tor_connected_status">Bağlandı</string>
+    <string name="settings_tor_socks_port">SOCKS portu: %d</string>
+    <string name="button_stop_tor">Durdur</string>
+    <string name="settings_tor_connection_failed">Bağlantı başarısız</string>
+    <string name="settings_tor_orbot_required_status">Orbot Gerekli</string>
+    <string name="settings_tor_install_orbot_message">Tor kullanmak için lütfen Orbot\'u yükleyin</string>
+    <string name="button_install_orbot_caps">Orbot Yükle</string>
+    <string name="settings_tor_force_warning">Bağlantı başarısız</string>
+    <string name="settings_tor_force_warning_detail">Tor zorla etkinleştirildi ancak bağlı değil</string>
+    <string name="button_retry">Yeniden dene</string>
+    <string name="settings_recording_directory_default_label">Varsayılan (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor bağlı değil! Tor bağlanana kadar yayınlar başarısız olacak.</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor bağlı değil! Tor bağlanana kadar I2P olmayan yayınlar başarısız olacak.</string>
+    <string name="button_off">Kapalı</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">İstasyonları İçe Aktar</string>
+    <string name="import_message">Radyo istasyonlarını içe aktarmak için bir dosya seçin.\n\nDesteklenen formatlar:\n• CSV\n• JSON\n• M3U oynatma listesi\n• PLS oynatma listesi</string>
+    <string name="button_select_file">Dosya Seç</string>
+    <string name="import_curated_title">%s İstasyonlarını İçe Aktar</string>
+    <string name="import_curated_message">%1$d seçilmiş %2$s radyo istasyonu içe aktarılsın mı?\n\nBu istasyonlar proxy ayarlarıyla önceden yapılandırılmış ve kullanıma hazır.</string>
+    <string name="no_stations_found_in_list">%s listesinde istasyon bulunamadı</string>
+    <string name="failed_to_import_stations">%s istasyonları içe aktarılamadı: %s</string>
+    <string name="dialog_export_stations_title">İstasyonları Dışa Aktar</string>
+    <string name="no_stations_in_file">Dosyada istasyon bulunamadı</string>
+    <string name="dialog_import_failed">İçe Aktarma Başarısız</string>
+    <string name="button_ok">Tamam</string>
+    <string name="format_unknown">Bilinmeyen</string>
+    <string name="found_stations_message">%2$s formatında %1$d istasyon bulundu.\n\n</string>
+    <string name="warnings_header">Uyarılar:\n</string>
+    <string name="more_warnings">• ...ve %d tane daha\n</string>
+    <string name="import_confirmation">Bu istasyonları içe aktarmak istiyor musunuz?</string>
+    <string name="import_error_message">İçe aktarma hatası: %s</string>
+    <string name="imported_stations_success">%d istasyon içe aktarıldı</string>
+    <string name="no_stations_to_export">Dışa aktarılacak istasyon yok</string>
+    <string name="exported_stations_success">%1$d istasyon %2$s konumuna dışa aktarıldı</string>
+    <string name="export_error_message">Dışa aktarma hatası: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">Oynatılan akış yok</string>
+    <string name="recording_error_cannot_create_directory">Dizin oluşturulamıyor</string>
+    <string name="recording_error_connection_failed">Bağlantı başarısız</string>
+    <string name="recording_error_cannot_write_directory">Seçilen dizine yazılamıyor</string>
+    <string name="recording_error_cannot_create_file">Kayıt dosyası oluşturulamıyor</string>
+    <string name="recording_error_cannot_open_file">Dosya yazmak için açılamıyor</string>
+    <string name="recording_error_directory_access">Dizin erişim hatası: %s</string>
+    <string name="recording_error_connection_timeout">Bağlantı zaman aşımına uğradı</string>
+    <string name="recording_error_connection_refused">Bağlantı reddedildi</string>
+    <string name="recording_error_io">G/Ç hatası: %s</string>
+    <string name="recording_error_generic">Hata: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">Özel proxy yapılandırılmamış</string>
+    <string name="custom_proxy_configured_description">Özel proxy yapılandırıldı. Detayları görüntülemek için dokunun.</string>
+    <string name="custom_proxy_not_configured_description">Özel proxy yapılandırılmamış. Yapılandırmak için dokunun.</string>
+    <string name="custom_proxy_privacy_warning_description">Özel proxy zorla etkinleştirildi ancak yapılandırılmamış. Gizlilik tehlikede olabilir.</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">Genel Özel Proxy Yapılandır</string>
+    <string name="validation_enter_proxy_host">❌ Lütfen bir proxy sunucusu girin</string>
+    <string name="testing_connection">Bağlantı test ediliyor...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">Yok</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">Oturum Bant Genişliğini Sıfırla</string>
+    <string name="reset_bandwidth_message">Oturum bant genişliği sayacı sıfırlansın mı?</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">Tüm filtreler zaten uygulanmış</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">Şifre değiştirildi ancak veritabanı yeniden şifrelenemedi: %s</string>
 </resources>

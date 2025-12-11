@@ -441,4 +441,120 @@
     <string name="auth_biometric_title">deutsia radio अनलॉक करें</string>
     <string name="auth_biometric_subtitle">जारी रखने के लिए प्रमाणीकरण करें</string>
     <string name="auth_biometric_negative">पासवर्ड उपयोग करें</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">क्या आप वाकई %d स्टेशन%s को हटाना चाहते हैं?</string>
+    <string name="delete_stations_message_single">क्या आप वाकई %d स्टेशन को हटाना चाहते हैं?</string>
+    <string name="delete_stations_message_plural">क्या आप वाकई %d स्टेशन को हटाना चाहते हैं?</string>
+    <string name="button_delete">हटाएं</string>
+    <string name="deleted_stations_message">%d स्टेशन%s हटा दिया गया</string>
+    <string name="deleted_stations_message_single">%d स्टेशन हटा दिया गया</string>
+    <string name="deleted_stations_message_plural">%d स्टेशन हटा दिए गए</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • कस्टम</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">कस्टम</string>
+    <string name="proxy_type_none">कोई नहीं</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor सक्रिय नहीं है</string>
+    <string name="tor_status_connecting_network">Tor नेटवर्क से कनेक्ट हो रहा है...</string>
+    <string name="tor_status_connected_via_tor">Tor के माध्यम से कनेक्ट किया गया</string>
+    <string name="tor_status_connection_error">कनेक्शन त्रुटि</string>
+    <string name="tor_status_orbot_required">Orbot ऐप की आवश्यकता है</string>
+    <string name="tor_status_detail_socks5">%1$s:%2$d पर SOCKS5 प्रॉक्सी</string>
+    <string name="tor_status_detail_establishing">कनेक्शन स्थापित हो रहा है...</string>
+    <string name="tor_status_detail_unknown_error">अज्ञात त्रुटि हुई</string>
+    <string name="tor_status_detail_tap_to_connect">कनेक्ट करने के लिए टैप करें</string>
+    <string name="tor_status_detail_install_orbot">Play Store या F-Droid से Orbot इंस्टॉल करें</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">डिस्कनेक्ट किया गया</string>
+    <string name="settings_tor_not_running_detail">Tor चल नहीं रहा है</string>
+    <string name="button_start_tor">शुरू करें</string>
+    <string name="settings_tor_connecting_status">कनेक्ट हो रहा है...</string>
+    <string name="settings_tor_establishing_connection">Tor कनेक्शन स्थापित हो रहा है</string>
+    <string name="button_starting">शुरू हो रहा है...</string>
+    <string name="settings_tor_connected_status">कनेक्ट किया गया</string>
+    <string name="settings_tor_socks_port">SOCKS पोर्ट: %d</string>
+    <string name="button_stop_tor">रोकें</string>
+    <string name="settings_tor_connection_failed">कनेक्शन विफल</string>
+    <string name="settings_tor_orbot_required_status">Orbot आवश्यक</string>
+    <string name="settings_tor_install_orbot_message">कृपया Tor उपयोग करने के लिए Orbot इंस्टॉल करें</string>
+    <string name="button_install_orbot_caps">Orbot इंस्टॉल करें</string>
+    <string name="settings_tor_force_warning">कनेक्शन विफल</string>
+    <string name="settings_tor_force_warning_detail">फ़ोर्स Tor सक्षम है लेकिन कनेक्ट नहीं है</string>
+    <string name="button_retry">पुन: प्रयास करें</string>
+    <string name="settings_recording_directory_default_label">डिफ़ॉल्ट (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor कनेक्ट नहीं है! Tor कनेक्ट होने तक स्ट्रीम विफल हो जाएंगे।</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor कनेक्ट नहीं है! Tor कनेक्ट होने तक गैर-I2P स्ट्रीम विफल हो जाएंगे।</string>
+    <string name="button_off">बंद</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">स्टेशन आयात करें</string>
+    <string name="import_message">रेडियो स्टेशन आयात करने के लिए एक फ़ाइल चुनें।\n\nसमर्थित प्रारूप:\n• CSV\n• JSON\n• M3U प्लेलिस्ट\n• PLS प्लेलिस्ट</string>
+    <string name="button_select_file">फ़ाइल चुनें</string>
+    <string name="import_curated_title">%s स्टेशन आयात करें</string>
+    <string name="import_curated_message">%1$d चयनित %2$s रेडियो स्टेशन आयात करें?\n\nये स्टेशन प्रॉक्सी सेटिंग्स के साथ पूर्व-कॉन्फ़िगर हैं और उपयोग के लिए तैयार हैं।</string>
+    <string name="no_stations_found_in_list">%s सूची में कोई स्टेशन नहीं मिला</string>
+    <string name="failed_to_import_stations">%s स्टेशन आयात करने में विफल: %s</string>
+    <string name="dialog_export_stations_title">स्टेशन निर्यात करें</string>
+    <string name="no_stations_in_file">फ़ाइल में कोई स्टेशन नहीं मिला</string>
+    <string name="dialog_import_failed">आयात विफल</string>
+    <string name="button_ok">ठीक है</string>
+    <string name="format_unknown">अज्ञात</string>
+    <string name="found_stations_message">%2$s प्रारूप में %1$d स्टेशन मिले।\n\n</string>
+    <string name="warnings_header">चेतावनियां:\n</string>
+    <string name="more_warnings">• ...और %d और\n</string>
+    <string name="import_confirmation">क्या आप इन स्टेशनों को आयात करना चाहते हैं?</string>
+    <string name="import_error_message">आयात त्रुटि: %s</string>
+    <string name="imported_stations_success">%d स्टेशन आयात किए गए</string>
+    <string name="no_stations_to_export">निर्यात करने के लिए कोई स्टेशन नहीं</string>
+    <string name="exported_stations_success">%1$d स्टेशन %2$s में निर्यात किए गए</string>
+    <string name="export_error_message">निर्यात त्रुटि: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">कोई स्ट्रीम नहीं चल रहा है</string>
+    <string name="recording_error_cannot_create_directory">डायरेक्टरी नहीं बनाई जा सकती</string>
+    <string name="recording_error_connection_failed">कनेक्शन विफल</string>
+    <string name="recording_error_cannot_write_directory">चयनित डायरेक्टरी में नहीं लिखा जा सकता</string>
+    <string name="recording_error_cannot_create_file">रिकॉर्डिंग फ़ाइल नहीं बनाई जा सकती</string>
+    <string name="recording_error_cannot_open_file">लिखने के लिए फ़ाइल नहीं खोली जा सकती</string>
+    <string name="recording_error_directory_access">डायरेक्टरी एक्सेस त्रुटि: %s</string>
+    <string name="recording_error_connection_timeout">कनेक्शन टाइमआउट</string>
+    <string name="recording_error_connection_refused">कनेक्शन अस्वीकृत</string>
+    <string name="recording_error_io">I/O त्रुटि: %s</string>
+    <string name="recording_error_generic">त्रुटि: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">कस्टम प्रॉक्सी कॉन्फ़िगर नहीं है</string>
+    <string name="custom_proxy_configured_description">कस्टम प्रॉक्सी कॉन्फ़िगर है। विवरण देखने के लिए टैप करें।</string>
+    <string name="custom_proxy_not_configured_description">कस्टम प्रॉक्सी कॉन्फ़िगर नहीं है। कॉन्फ़िगर करने के लिए टैप करें।</string>
+    <string name="custom_proxy_privacy_warning_description">फ़ोर्स कस्टम प्रॉक्सी सक्षम है लेकिन कॉन्फ़िगर नहीं है। गोपनीयता खतरे में हो सकती है।</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">वैश्विक कस्टम प्रॉक्सी कॉन्फ़िगर करें</string>
+    <string name="validation_enter_proxy_host">❌ कृपया एक प्रॉक्सी होस्ट दर्ज करें</string>
+    <string name="testing_connection">कनेक्शन परीक्षण हो रहा है...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">कोई नहीं</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">सत्र बैंडविड्थ रीसेट करें</string>
+    <string name="reset_bandwidth_message">सत्र बैंडविड्थ काउंटर को शून्य पर रीसेट करें?</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">सभी फ़िल्टर पहले से लागू हैं</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">पासवर्ड बदल गया लेकिन डेटाबेस पुन: एन्क्रिप्ट करने में विफल: %s</string>
 </resources>

@@ -444,4 +444,120 @@
     <string name="auth_biometric_title">Разблокировать deutsia radio</string>
     <string name="auth_biometric_subtitle">Аутентифицируйтесь для продолжения</string>
     <string name="auth_biometric_negative">Использовать пароль</string>
+
+    <!-- Delete Confirmation Dialog -->
+    <string name="delete_stations_message">Вы уверены, что хотите удалить %d станци%s?</string>
+    <string name="delete_stations_message_single">Вы уверены, что хотите удалить %d станцию?</string>
+    <string name="delete_stations_message_plural">Вы уверены, что хотите удалить %d станций?</string>
+    <string name="button_delete">Удалить</string>
+    <string name="deleted_stations_message">Удалено %d станци%s</string>
+    <string name="deleted_stations_message_single">Удалена %d станция</string>
+    <string name="deleted_stations_message_plural">Удалено %d станций</string>
+
+    <!-- Proxy Type Labels -->
+    <string name="proxy_label_i2p"> • I2P</string>
+    <string name="proxy_label_tor"> • Tor</string>
+    <string name="proxy_label_custom"> • Пользовательский</string>
+    <string name="proxy_type_i2p">I2P</string>
+    <string name="proxy_type_tor">Tor</string>
+    <string name="proxy_type_custom">Пользовательский</string>
+    <string name="proxy_type_none">Нет</string>
+
+    <!-- Tor Status Messages (TorManager) -->
+    <string name="tor_status_not_active">Tor не активен</string>
+    <string name="tor_status_connecting_network">Подключение к сети Tor...</string>
+    <string name="tor_status_connected_via_tor">Подключено через Tor</string>
+    <string name="tor_status_connection_error">Ошибка подключения</string>
+    <string name="tor_status_orbot_required">Требуется приложение Orbot</string>
+    <string name="tor_status_detail_socks5">Прокси SOCKS5 на %1$s:%2$d</string>
+    <string name="tor_status_detail_establishing">Установка соединения...</string>
+    <string name="tor_status_detail_unknown_error">Произошла неизвестная ошибка</string>
+    <string name="tor_status_detail_tap_to_connect">Нажмите для подключения</string>
+    <string name="tor_status_detail_install_orbot">Установите Orbot из Play Store или F-Droid</string>
+
+    <!-- Settings Fragment Tor/Proxy Status -->
+    <string name="settings_tor_disconnected_status">Отключено</string>
+    <string name="settings_tor_not_running_detail">Tor не запущен</string>
+    <string name="button_start_tor">Запустить</string>
+    <string name="settings_tor_connecting_status">Подключение...</string>
+    <string name="settings_tor_establishing_connection">Установка соединения Tor</string>
+    <string name="button_starting">Запуск...</string>
+    <string name="settings_tor_connected_status">Подключено</string>
+    <string name="settings_tor_socks_port">Порт SOCKS: %d</string>
+    <string name="button_stop_tor">Остановить</string>
+    <string name="settings_tor_connection_failed">Не удалось подключиться</string>
+    <string name="settings_tor_orbot_required_status">Требуется Orbot</string>
+    <string name="settings_tor_install_orbot_message">Пожалуйста, установите Orbot для использования Tor</string>
+    <string name="button_install_orbot_caps">Установить Orbot</string>
+    <string name="settings_tor_force_warning">Не удалось подключиться</string>
+    <string name="settings_tor_force_warning_detail">Принудительный Tor включён, но не подключён</string>
+    <string name="button_retry">Повторить</string>
+    <string name="settings_recording_directory_default_label">По умолчанию (Music/deutsia_radio)</string>
+    <string name="warning_tor_not_connected">⚠️ Tor не подключён! Трансляции будут недоступны до подключения Tor.</string>
+    <string name="warning_tor_not_connected_except_i2p">⚠️ Tor не подключён! Не-I2P трансляции будут недоступны до подключения Tor.</string>
+    <string name="button_off">Выкл</string>
+
+    <!-- Import/Export Dialogs -->
+    <string name="dialog_import_stations">Импорт станций</string>
+    <string name="import_message">Выберите файл для импорта радиостанций.\n\nПоддерживаемые форматы:\n• CSV\n• JSON\n• Плейлист M3U\n• Плейлист PLS</string>
+    <string name="button_select_file">Выбрать файл</string>
+    <string name="import_curated_title">Импорт станций %s</string>
+    <string name="import_curated_message">Импортировать %1$d отобранных радиостанций %2$s?\n\nЭти станции предварительно настроены с параметрами прокси и готовы к использованию.</string>
+    <string name="no_stations_found_in_list">Станции не найдены в списке %s</string>
+    <string name="failed_to_import_stations">Не удалось импортировать станции %s: %s</string>
+    <string name="dialog_export_stations_title">Экспорт станций</string>
+    <string name="no_stations_in_file">Станции не найдены в файле</string>
+    <string name="dialog_import_failed">Импорт не удался</string>
+    <string name="button_ok">OK</string>
+    <string name="format_unknown">Неизвестный</string>
+    <string name="found_stations_message">Найдено %1$d станций в формате %2$s.\n\n</string>
+    <string name="warnings_header">Предупреждения:\n</string>
+    <string name="more_warnings">• ...и ещё %d\n</string>
+    <string name="import_confirmation">Вы хотите импортировать эти станции?</string>
+    <string name="import_error_message">Ошибка импорта: %s</string>
+    <string name="imported_stations_success">Импортировано %d станций</string>
+    <string name="no_stations_to_export">Нет станций для экспорта</string>
+    <string name="exported_stations_success">Экспортировано %1$d станций в %2$s</string>
+    <string name="export_error_message">Ошибка экспорта: %s</string>
+
+    <!-- Recording Error Messages -->
+    <string name="recording_error_no_stream">Нет воспроизводимого потока</string>
+    <string name="recording_error_cannot_create_directory">Невозможно создать директорию</string>
+    <string name="recording_error_connection_failed">Не удалось подключиться</string>
+    <string name="recording_error_cannot_write_directory">Невозможно записать в выбранную директорию</string>
+    <string name="recording_error_cannot_create_file">Невозможно создать файл записи</string>
+    <string name="recording_error_cannot_open_file">Невозможно открыть файл для записи</string>
+    <string name="recording_error_directory_access">Ошибка доступа к директории: %s</string>
+    <string name="recording_error_connection_timeout">Время подключения истекло</string>
+    <string name="recording_error_connection_refused">Подключение отклонено</string>
+    <string name="recording_error_io">Ошибка ввода/вывода: %s</string>
+    <string name="recording_error_generic">Ошибка: %s</string>
+
+    <!-- Custom Proxy Messages -->
+    <string name="custom_proxy_not_configured_notification">Пользовательский прокси не настроен</string>
+    <string name="custom_proxy_configured_description">Пользовательский прокси настроен. Нажмите для просмотра деталей.</string>
+    <string name="custom_proxy_not_configured_description">Пользовательский прокси не настроен. Нажмите для настройки.</string>
+    <string name="custom_proxy_privacy_warning_description">Принудительный пользовательский прокси включён, но не настроен. Конфиденциальность может быть под угрозой.</string>
+
+    <!-- Proxy Configuration Dialog -->
+    <string name="dialog_configure_global_proxy">Настройка глобального пользовательского прокси</string>
+    <string name="validation_enter_proxy_host">❌ Пожалуйста, введите хост прокси</string>
+    <string name="testing_connection">Проверка соединения...</string>
+    <string name="protocol_http_caps">HTTP</string>
+    <string name="protocol_https_caps">HTTPS</string>
+    <string name="protocol_socks4_caps">SOCKS4</string>
+    <string name="protocol_socks5_caps">SOCKS5</string>
+    <string name="auth_none_caps">Нет</string>
+    <string name="auth_basic_caps">Basic</string>
+    <string name="auth_digest_caps">Digest</string>
+
+    <!-- Reset Bandwidth Dialog -->
+    <string name="dialog_reset_session_bandwidth">Сброс трафика сессии</string>
+    <string name="reset_bandwidth_message">Сбросить счётчик трафика сессии до нуля?</string>
+
+    <!-- Browse Filter Messages -->
+    <string name="all_filters_applied">Все фильтры уже применены</string>
+
+    <!-- Database Encryption -->
+    <string name="password_change_rekey_failed">Пароль изменён, но не удалось перешифровать базу данных: %s</string>
 </resources>

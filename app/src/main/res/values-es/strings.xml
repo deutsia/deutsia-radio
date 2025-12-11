@@ -45,6 +45,8 @@
     <string name="genre_dance">Baile</string>
     <string name="genre_edm">EDM</string>
     <string name="genre_electronic">Electrónica</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
     <string name="genre_folk">Folk</string>
     <string name="genre_funk">Funk</string>
     <string name="genre_gospel">Gospel</string>
@@ -98,6 +100,19 @@
     <string name="station_added_to_favorites">%s agregada a favoritos</string>
     <string name="station_removed_from_favorites">%s eliminada de favoritos</string>
     <string name="tor_required_warning">Forzar Tor está habilitado pero Tor no está conectado. Conéctate a Tor para explorar estaciones.</string>
+    <string name="browse_by_genre">Explorar por género</string>
+    <string name="browse_trending">Tendencias actuales</string>
+    <string name="browse_new_stations">Estaciones nuevas</string>
+    <string name="browse_popular_usa">Popular en EE.UU.</string>
+    <string name="browse_popular_germany">Popular en Alemania</string>
+    <string name="browse_spanish_radio">Radio en español</string>
+    <string name="browse_french_radio">Radio en francés</string>
+    <string name="see_all">Ver todo</string>
+    <string name="add_filter">Filtro</string>
+    <string name="browse_results_count">Cargando…</string>
+    <string name="browse_results_format">%d estaciones</string>
+    <string name="back">Atrás</string>
+    <string name="browse_all_stations">Todas las estaciones</string>
 
     <!-- Notification and Status Messages -->
     <string name="notification_connecting">Conectando...</string>
@@ -153,6 +168,8 @@
     <string name="settings_material_you_description">Usar colores dinámicos basados en el fondo de pantalla</string>
     <string name="settings_color_scheme">Esquema de color</string>
     <string name="settings_color_scheme_description">Elige tu color preferido</string>
+    <string name="settings_color_classic">Clásico</string>
+    <string name="settings_color_classic_default">Clásico (Predeterminado)</string>
     <string name="settings_color_blue">Azul</string>
     <string name="settings_color_blue_default">Azul (Predeterminado)</string>
     <string name="settings_color_peach">Melocotón</string>
