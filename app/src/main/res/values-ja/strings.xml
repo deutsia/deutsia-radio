@@ -560,4 +560,9 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">パスワードは変更されましたが、データベースの再暗号化に失敗しました: %s</string>
+
+    <!-- Service Detection Toast Messages -->
+    <string name="toast_tor_not_running">Torが実行されていません。.onionステーションを再生するにはOrbotを起動してください。</string>
+    <string name="toast_i2p_not_running">I2Pが実行されていません。.i2pステーションを再生するにはI2Pルーターを起動してください。</string>
+    <string name="toast_tor_not_installed">Orbotがインストールされていません。.onionステーションを再生するにはOrbotをインストールしてください。</string>
 </resources>

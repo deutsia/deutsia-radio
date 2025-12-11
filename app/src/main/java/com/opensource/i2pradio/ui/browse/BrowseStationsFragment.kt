@@ -41,7 +41,11 @@ import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserResult
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
 import com.opensource.i2pradio.ui.RadioViewModel
+import com.opensource.i2pradio.i2p.I2PManager
+import com.opensource.i2pradio.tor.TorManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Fragment for browsing and searching RadioBrowser stations.
@@ -1110,6 +1114,54 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun playStation(station: RadioBrowserStation) {
+        val streamUrl = station.url_resolved ?: station.url
+        val isTorStation = streamUrl.contains(".onion")
+        val isI2PStation = streamUrl.contains(".i2p")
+
+        // Check if Tor is available for .onion stations
+        if (isTorStation) {
+            if (!TorManager.isOrbotInstalled(requireContext())) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_tor_not_installed),
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+            if (!TorManager.isConnected()) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_tor_not_running),
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+        }
+
+        // Check if I2P is available for .i2p stations
+        if (isI2PStation) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val isI2PAvailable = I2PManager.checkProxyAvailabilitySync()
+                withContext(Dispatchers.Main) {
+                    if (!isI2PAvailable) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.toast_i2p_not_running),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        startPlayback(station)
+                    }
+                }
+            }
+            return
+        }
+
+        // For non-Tor/I2P stations, proceed immediately
+        startPlayback(station)
+    }
+
+    private fun startPlayback(station: RadioBrowserStation) {
         lifecycleScope.launch {
             repository.addToBrowseHistory(station)
         }

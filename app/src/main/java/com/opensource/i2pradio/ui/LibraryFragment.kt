@@ -45,6 +45,8 @@ import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.data.RadioStationPasswordHelper
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.SortOrder
+import com.opensource.i2pradio.i2p.I2PManager
+import com.opensource.i2pradio.tor.TorManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -600,6 +602,56 @@ class LibraryFragment : Fragment() {
     }
 
     private fun playStation(station: RadioStation) {
+        val proxyType = station.getProxyTypeEnum()
+        val isTorStation = proxyType == ProxyType.TOR || station.streamUrl.contains(".onion")
+        val isI2PStation = proxyType == ProxyType.I2P || station.streamUrl.contains(".i2p")
+
+        // Check if Tor is available for .onion stations
+        if (isTorStation) {
+            if (!TorManager.isOrbotInstalled(requireContext())) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_tor_not_installed),
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+            if (!TorManager.isConnected()) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_tor_not_running),
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
+        }
+
+        // Check if I2P is available for .i2p stations
+        if (isI2PStation) {
+            // Do a quick synchronous check on a background thread
+            lifecycleScope.launch(Dispatchers.IO) {
+                val isI2PAvailable = I2PManager.checkProxyAvailabilitySync()
+                withContext(Dispatchers.Main) {
+                    if (!isI2PAvailable) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.toast_i2p_not_running),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        // I2P is available, proceed with playback
+                        startPlayback(station, proxyType)
+                    }
+                }
+            }
+            return
+        }
+
+        // For non-Tor/I2P stations, proceed immediately
+        startPlayback(station, proxyType)
+    }
+
+    private fun startPlayback(station: RadioStation, proxyType: ProxyType) {
         viewModel.setCurrentStation(station)
         viewModel.setBuffering(true)  // Show buffering state while connecting
 
@@ -608,7 +660,6 @@ class LibraryFragment : Fragment() {
             repository.updateLastPlayedAt(station.id)
         }
 
-        val proxyType = station.getProxyTypeEnum()
         val intent = Intent(requireContext(), RadioService::class.java).apply {
             action = RadioService.ACTION_PLAY
             putExtra("stream_url", station.streamUrl)

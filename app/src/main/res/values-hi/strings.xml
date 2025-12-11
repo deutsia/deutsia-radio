@@ -557,4 +557,9 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">पासवर्ड बदल गया लेकिन डेटाबेस पुन: एन्क्रिप्ट करने में विफल: %s</string>
+
+    <!-- Service Detection Toast Messages -->
+    <string name="toast_tor_not_running">Tor नहीं चल रहा है। .onion स्टेशन चलाने के लिए Orbot शुरू करें।</string>
+    <string name="toast_i2p_not_running">I2P नहीं चल रहा है। .i2p स्टेशन चलाने के लिए अपना I2P राउटर शुरू करें।</string>
+    <string name="toast_tor_not_installed">Orbot इंस्टॉल नहीं है। .onion स्टेशन चलाने के लिए Orbot इंस्टॉल करें।</string>
 </resources>
