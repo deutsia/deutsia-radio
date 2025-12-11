@@ -543,35 +543,51 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     fun toggleLike(station: RadioBrowserStation) {
         val uuid = station.stationuuid
 
-        viewModelScope.launch {
-            // Check current state from database to avoid race conditions
-            val existingStation = repository.getStationInfoByUuid(uuid)
-            val isCurrentlyLiked = existingStation?.isLiked == true
+        // Check current UI state (not database state) for immediate feedback
+        val isCurrentlyLiked = _likedStationUuids.value?.contains(uuid) == true
 
+        // IMMEDIATELY update UI state (optimistic update)
+        val savedCurrent = _savedStationUuids.value.orEmpty().toMutableSet()
+        val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
+
+        if (isCurrentlyLiked) {
+            // Optimistically remove from UI
+            savedCurrent.remove(uuid)
+            likedCurrent.remove(uuid)
+        } else {
+            // Optimistically add to UI
+            savedCurrent.add(uuid)
+            likedCurrent.add(uuid)
+        }
+
+        _savedStationUuids.value = savedCurrent
+        _likedStationUuids.value = likedCurrent
+
+        // Then perform database operations in background
+        viewModelScope.launch {
             if (isCurrentlyLiked) {
                 // Unlike: remove the station from library entirely
                 val deleted = repository.deleteStationByUuid(uuid)
-                if (deleted) {
-                    // Update both saved and liked UUIDs sets
-                    val savedCurrent = _savedStationUuids.value.orEmpty().toMutableSet()
-                    savedCurrent.remove(uuid)
-                    _savedStationUuids.value = savedCurrent
-
-                    val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
-                    likedCurrent.remove(uuid)
-                    _likedStationUuids.value = likedCurrent
+                if (!deleted) {
+                    // Revert optimistic update if database operation failed
+                    val revertSaved = _savedStationUuids.value.orEmpty().toMutableSet()
+                    val revertLiked = _likedStationUuids.value.orEmpty().toMutableSet()
+                    revertSaved.add(uuid)
+                    revertLiked.add(uuid)
+                    _savedStationUuids.postValue(revertSaved)
+                    _likedStationUuids.postValue(revertLiked)
                 }
             } else {
                 // Like: save and mark as liked
                 val id = repository.saveStationAsLiked(station)
-                if (id != null) {
-                    val savedCurrent = _savedStationUuids.value.orEmpty().toMutableSet()
-                    savedCurrent.add(uuid)
-                    _savedStationUuids.value = savedCurrent
-
-                    val likedCurrent = _likedStationUuids.value.orEmpty().toMutableSet()
-                    likedCurrent.add(uuid)
-                    _likedStationUuids.value = likedCurrent
+                if (id == null) {
+                    // Revert optimistic update if database operation failed
+                    val revertSaved = _savedStationUuids.value.orEmpty().toMutableSet()
+                    val revertLiked = _likedStationUuids.value.orEmpty().toMutableSet()
+                    revertSaved.remove(uuid)
+                    revertLiked.remove(uuid)
+                    _savedStationUuids.postValue(revertSaved)
+                    _likedStationUuids.postValue(revertLiked)
                 }
             }
         }
