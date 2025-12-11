@@ -259,7 +259,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">About</string>
-    <string name="settings_version">Version 1.2</string>
+    <string name="settings_version">Version 1.3</string>
     <string name="settings_view_github">View on GitHub</string>
     <string name="settings_donate">Donate</string>
     <string name="settings_donate_description">If this app helped you out, consider donating</string>

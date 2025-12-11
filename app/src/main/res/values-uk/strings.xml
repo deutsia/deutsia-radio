@@ -258,7 +258,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">Про програму</string>
-    <string name="settings_version">Версія 1.2</string>
+    <string name="settings_version">Версія 1.3</string>
     <string name="settings_view_github">Переглянути на GitHub</string>
     <string name="settings_donate">Підтримати</string>
     <string name="settings_donate_description">Якщо цей додаток вам допоміг, розгляньте можливість підтримки</string>
