@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -30,10 +28,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 object TorManager {
     private const val TAG = "TorManager"
 
-    // Orbot package identifiers
+    // Orbot package identifier
     private const val ORBOT_PACKAGE_NAME = "org.torproject.android"
-    private const val ORBOT_MARKET_URI = "market://details?id=$ORBOT_PACKAGE_NAME"
-    private const val ORBOT_FDROID_URI = "https://f-droid.org/packages/$ORBOT_PACKAGE_NAME/"
 
     // Orbot Intent actions
     private const val ACTION_START_TOR = "org.torproject.android.intent.action.START"
@@ -65,8 +61,7 @@ object TorManager {
         STOPPED,
         STARTING,
         CONNECTED,
-        ERROR,
-        ORBOT_NOT_INSTALLED
+        ERROR
     }
 
     private var _state: TorState = TorState.STOPPED
@@ -208,39 +203,6 @@ object TorManager {
     }
 
     /**
-     * Check if Orbot is installed on the device.
-     */
-    fun isOrbotInstalled(context: Context): Boolean {
-        return try {
-            context.packageManager.getPackageInfo(ORBOT_PACKAGE_NAME, 0)
-            true
-        } catch (e: PackageManager.NameNotFoundException) {
-            false
-        }
-    }
-
-    /**
-     * Open the app store to install Orbot.
-     */
-    fun openOrbotInstallPage(context: Context) {
-        try {
-            // Try Google Play first
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(ORBOT_MARKET_URI))
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(intent)
-        } catch (e: Exception) {
-            // Fall back to F-Droid web page
-            try {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(ORBOT_FDROID_URI))
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-            } catch (e2: Exception) {
-                Log.e(TAG, "Failed to open Orbot install page", e2)
-            }
-        }
-    }
-
-    /**
      * Request Orbot to start the Tor service.
      *
      * This sends an intent to Orbot to start Tor. The actual connection status
@@ -255,18 +217,6 @@ object TorManager {
 
         // Reset shutdown flag when starting
         isShuttingDown = false
-
-        // Check if Orbot is installed
-        if (!isOrbotInstalled(context)) {
-            Log.w(TAG, "Orbot is not installed")
-            // CRITICAL: Clear port state when transitioning to ORBOT_NOT_INSTALLED
-            _socksPort = -1
-            _httpPort = -1
-            _errorMessage = "Orbot is not installed. Please install Orbot to use Tor."
-            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
-            onComplete?.invoke(false)
-            return
-        }
 
         notifyStateChange(TorState.STARTING)
         _errorMessage = null
@@ -470,24 +420,12 @@ object TorManager {
      * UI components handle rapid state transitions via debouncing.
      */
     fun initialize(context: Context) {
-        // Register receiver first (even if Orbot check fails, the socket check will run)
+        // Register receiver first
         registerOrbotStatusReceiver(context, null)
 
         // Request current status from Orbot - this includes a socket check
         // which provides INSTANT leak detection (socket check completes in ~1-100ms)
         requestOrbotStatus(context)
-
-        // Only mark as not installed if BOTH the package check fails AND
-        // we're currently in a non-connected state. This prevents false positives
-        // during activity recreation when PackageManager might be slow to respond
-        // but Tor is actually running.
-        if (!isOrbotInstalled(context) && _state != TorState.CONNECTED) {
-            // CRITICAL: Clear port state when transitioning to ORBOT_NOT_INSTALLED
-            // to prevent UI showing leak warnings while ports are still set
-            _socksPort = -1
-            _httpPort = -1
-            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
-        }
     }
 
     /**
@@ -564,7 +502,6 @@ object TorManager {
             TorState.STARTING -> "Connecting to Tor network..."
             TorState.CONNECTED -> "Connected via Tor"
             TorState.ERROR -> _errorMessage ?: "Connection error"
-            TorState.ORBOT_NOT_INSTALLED -> "Orbot app required"
         }
     }
 
@@ -579,7 +516,6 @@ object TorManager {
             TorState.STARTING -> "Establishing connection..."
             TorState.ERROR -> _errorMessage ?: "Unknown error occurred"
             TorState.STOPPED -> "Tap to connect"
-            TorState.ORBOT_NOT_INSTALLED -> "Install Orbot from Play Store or F-Droid"
         }
     }
 

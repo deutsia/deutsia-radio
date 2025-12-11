@@ -1,7 +1,5 @@
 package com.opensource.i2pradio.ui
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -76,11 +74,6 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             handleSecondaryAction()
         }
 
-        // Setup Orbot info card click
-        orbotInfoCard.setOnClickListener {
-            openOrbotInStore()
-        }
-
         // Update UI with current state
         updateUI(TorManager.state)
     }
@@ -101,7 +94,6 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             TorManager.TorState.STARTING -> showConnectingState()
             TorManager.TorState.CONNECTED -> showConnectedState()
             TorManager.TorState.ERROR -> showErrorState()
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> showOrbotNotInstalledState()
         }
     }
 
@@ -121,7 +113,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
 
         secondaryActionButton.text = getString(R.string.tor_control_button_open_orbot)
         secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = TorManager.isOrbotInstalled(requireContext())
+        secondaryActionButton.isEnabled = true
     }
 
     private fun showConnectingState() {
@@ -243,24 +235,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
 
         secondaryActionButton.text = getString(R.string.tor_control_button_open_orbot)
         secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = TorManager.isOrbotInstalled(requireContext())
-    }
-
-    private fun showOrbotNotInstalledState() {
-        statusIcon.setImageResource(R.drawable.ic_orbot)
-        statusIcon.alpha = 1f
-        statusTitle.text = getString(R.string.tor_control_title_orbot_required)
-        statusSubtitle.text = getString(R.string.tor_control_subtitle_orbot_required)
-        connectionProgress.visibility = View.GONE
-        connectionDetailsContainer.visibility = View.GONE
-        orbotInfoCard.visibility = View.VISIBLE
-
-        primaryActionButton.text = getString(R.string.tor_control_button_install)
-        primaryActionButton.setIconResource(R.drawable.ic_download)
-        primaryActionButton.isEnabled = true
-        primaryActionButton.visibility = View.VISIBLE
-
-        secondaryActionButton.visibility = View.GONE
+        secondaryActionButton.isEnabled = true
     }
 
     private fun handlePrimaryAction() {
@@ -277,9 +252,6 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             }
             TorManager.TorState.STARTING -> {
                 // Do nothing
-            }
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                openOrbotInStore()
             }
         }
     }
@@ -303,21 +275,9 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             val intent = requireContext().packageManager.getLaunchIntentForPackage("org.torproject.android")
             if (intent != null) {
                 startActivity(intent)
-            } else {
-                openOrbotInStore()
             }
-        } catch (e: Exception) {
-            openOrbotInStore()
-        }
-    }
-
-    private fun openOrbotInStore() {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=org.torproject.android"))
-            startActivity(intent)
-        } catch (e: Exception) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/packages/org.torproject.android/"))
-            startActivity(intent)
+        } catch (_: Exception) {
+            // Orbot not installed - user needs to install it themselves
         }
     }
 

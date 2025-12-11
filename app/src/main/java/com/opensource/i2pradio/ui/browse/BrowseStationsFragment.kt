@@ -1127,16 +1127,8 @@ class BrowseStationsFragment : Fragment() {
         val isTorStation = streamUrl.contains(".onion")
         val isI2PStation = streamUrl.contains(".i2p")
 
-        // Check if Tor is available for .onion stations
+        // Check if Tor is connected for .onion stations
         if (isTorStation) {
-            if (!TorManager.isOrbotInstalled(requireContext())) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.toast_tor_not_installed),
-                    Toast.LENGTH_LONG
-                ).show()
-                return
-            }
             if (!TorManager.isConnected()) {
                 Toast.makeText(
                     requireContext(),
