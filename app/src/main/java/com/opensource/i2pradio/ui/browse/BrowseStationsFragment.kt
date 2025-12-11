@@ -109,6 +109,10 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var popularAdapter: BrowseCarouselAdapter
     private lateinit var newStationsAdapter: BrowseCarouselAdapter
 
+    // Skeleton adapters for loading state
+    private val skeletonCarouselAdapters = mutableListOf<SkeletonCarouselAdapter>()
+    private var skeletonListAdapter: SkeletonListAdapter? = null
+
     private val viewModel: BrowseViewModel by viewModels()
     private val radioViewModel: RadioViewModel by activityViewModels()
     private lateinit var repository: RadioBrowserRepository
@@ -450,101 +454,82 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun setupCarousels() {
-        // USA carousel
+        // Create real adapters first
         usaAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
             showRankBadge = false
         )
-        usaRecyclerView.adapter = usaAdapter
-        usaRecyclerView.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
-        )
-        setupCarouselTouchHandling(usaRecyclerView)
-
-        // Germany carousel
         germanyAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
             showRankBadge = false
         )
-        germanyRecyclerView.adapter = germanyAdapter
-        germanyRecyclerView.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
-        )
-        setupCarouselTouchHandling(germanyRecyclerView)
-
-        // Spanish carousel
         spanishAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
             showRankBadge = false
         )
-        spanishRecyclerView.adapter = spanishAdapter
-        spanishRecyclerView.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
-        )
-        setupCarouselTouchHandling(spanishRecyclerView)
-
-        // French carousel
         frenchAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
             showRankBadge = false
         )
-        frenchRecyclerView.adapter = frenchAdapter
-        frenchRecyclerView.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
-        )
-        setupCarouselTouchHandling(frenchRecyclerView)
-
-        // Trending carousel
         trendingAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
             showRankBadge = true
         )
-        trendingRecyclerView.adapter = trendingAdapter
-        trendingRecyclerView.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
-        )
-        setupCarouselTouchHandling(trendingRecyclerView)
-
-        // Top Voted preview (horizontal carousel)
         topVotedPreviewAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
             showRankBadge = true
         )
-        topVotedPreviewRecyclerView.adapter = topVotedPreviewAdapter
-        topVotedPreviewRecyclerView.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
-        )
-        setupCarouselTouchHandling(topVotedPreviewRecyclerView)
-
-        // Popular carousel
         popularAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
             showRankBadge = false
         )
-        popularRecyclerView.adapter = popularAdapter
-        popularRecyclerView.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
-        )
-        setupCarouselTouchHandling(popularRecyclerView)
-
-        // New Stations carousel
         newStationsAdapter = BrowseCarouselAdapter(
             onStationClick = { station -> playStation(station) },
             onLikeClick = { station -> likeStation(station) },
             showRankBadge = false
         )
-        newStationsRecyclerView.adapter = newStationsAdapter
-        newStationsRecyclerView.layoutManager = LinearLayoutManager(
-            requireContext(), LinearLayoutManager.HORIZONTAL, false
+
+        // Setup all carousels with skeleton adapters initially
+        val carouselRecyclerViews = listOf(
+            usaRecyclerView,
+            germanyRecyclerView,
+            spanishRecyclerView,
+            frenchRecyclerView,
+            trendingRecyclerView,
+            topVotedPreviewRecyclerView,
+            popularRecyclerView,
+            newStationsRecyclerView
         )
-        setupCarouselTouchHandling(newStationsRecyclerView)
+
+        skeletonCarouselAdapters.clear()
+        carouselRecyclerViews.forEach { recyclerView ->
+            val skeletonAdapter = SkeletonCarouselAdapter(itemCount = 4)
+            skeletonCarouselAdapters.add(skeletonAdapter)
+            recyclerView.adapter = skeletonAdapter
+            recyclerView.layoutManager = LinearLayoutManager(
+                requireContext(), LinearLayoutManager.HORIZONTAL, false
+            )
+            setupCarouselTouchHandling(recyclerView)
+        }
+    }
+
+    /**
+     * Swap skeleton adapters with real data adapters for a specific carousel.
+     */
+    private fun swapToRealAdapter(recyclerView: RecyclerView, realAdapter: RecyclerView.Adapter<*>) {
+        val currentAdapter = recyclerView.adapter
+        if (currentAdapter is SkeletonCarouselAdapter) {
+            currentAdapter.stopAllShimmers()
+            skeletonCarouselAdapters.remove(currentAdapter)
+        }
+        recyclerView.adapter = realAdapter
     }
 
     private fun setupResultsMode() {
@@ -755,34 +740,58 @@ class BrowseStationsFragment : Fragment() {
 
     private fun observeDiscoveryData() {
         viewModel.usaStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(usaRecyclerView, usaAdapter)
+            }
             usaAdapter.submitList(stations)
         }
 
         viewModel.germanyStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(germanyRecyclerView, germanyAdapter)
+            }
             germanyAdapter.submitList(stations)
         }
 
         viewModel.spanishStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(spanishRecyclerView, spanishAdapter)
+            }
             spanishAdapter.submitList(stations)
         }
 
         viewModel.frenchStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(frenchRecyclerView, frenchAdapter)
+            }
             frenchAdapter.submitList(stations)
         }
 
         viewModel.trendingStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(trendingRecyclerView, trendingAdapter)
+            }
             trendingAdapter.submitList(stations)
         }
 
         viewModel.topVotedPreviewStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(topVotedPreviewRecyclerView, topVotedPreviewAdapter)
+            }
             topVotedPreviewAdapter.submitList(stations)
         }
 
         viewModel.popularStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(popularRecyclerView, popularAdapter)
+            }
             popularAdapter.submitList(stations)
         }
 
         viewModel.newStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(newStationsRecyclerView, newStationsAdapter)
+            }
             newStationsAdapter.submitList(stations)
         }
     }
@@ -1795,5 +1804,11 @@ class BrowseStationsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+
+        // Clean up skeleton adapters
+        skeletonCarouselAdapters.forEach { it.stopAllShimmers() }
+        skeletonCarouselAdapters.clear()
+        skeletonListAdapter?.stopAllShimmers()
+        skeletonListAdapter = null
     }
 }
