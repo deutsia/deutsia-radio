@@ -574,9 +574,4 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Senha alterada mas falha ao re-codificar banco de dados: %s</string>
-
-    <!-- Service Detection Toast Messages -->
-    <string name="toast_tor_not_running">Tor não está em execução. Inicie o Orbot para reproduzir estações .onion.</string>
-    <string name="toast_i2p_not_running">I2P não está em execução. Inicie seu roteador I2P para reproduzir estações .i2p.</string>
-    <string name="toast_tor_not_installed">Orbot não está instalado. Instale o Orbot para reproduzir estações .onion.</string>
 </resources>

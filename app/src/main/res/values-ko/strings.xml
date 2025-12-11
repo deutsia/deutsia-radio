@@ -573,9 +573,4 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">비밀번호는 변경되었지만 데이터베이스 재암호화에 실패했습니다: %s</string>
-
-    <!-- Service Detection Toast Messages -->
-    <string name="toast_tor_not_running">Tor가 실행 중이 아닙니다. .onion 방송국을 재생하려면 Orbot을 시작하세요.</string>
-    <string name="toast_i2p_not_running">I2P가 실행 중이 아닙니다. .i2p 방송국을 재생하려면 I2P 라우터를 시작하세요.</string>
-    <string name="toast_tor_not_installed">Orbot이 설치되어 있지 않습니다. .onion 방송국을 재생하려면 Orbot을 설치하세요.</string>
 </resources>

@@ -571,9 +571,4 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">စကားဝှက် ပြောင်းလဲပြီးပါပြီ သို့သော် ဒေတာဘေ့စ် ပြန်လည်ကုဒ်ဝှက်မှု မအောင်မြင်ပါ: %s</string>
-
-    <!-- Service Detection Toast Messages -->
-    <string name="toast_tor_not_running">Tor မလည်ပတ်ပါ။ .onion ဘူတာများဖွင့်ရန် Orbot စတင်ပါ။</string>
-    <string name="toast_i2p_not_running">I2P မလည်ပတ်ပါ။ .i2p ဘူတာများဖွင့်ရန် သင့် I2P router စတင်ပါ။</string>
-    <string name="toast_tor_not_installed">Orbot ထည့်သွင်းမထားပါ။ .onion ဘူတာများဖွင့်ရန် Orbot ထည့်သွင်းပါ။</string>
 </resources>

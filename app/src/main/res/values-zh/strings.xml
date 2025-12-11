@@ -574,9 +574,4 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">密码已更改，但数据库重新加密失败：%s</string>
-
-    <!-- Service Detection Toast Messages -->
-    <string name="toast_tor_not_running">Tor未运行。启动Orbot以播放.onion电台。</string>
-    <string name="toast_i2p_not_running">I2P未运行。启动I2P路由器以播放.i2p电台。</string>
-    <string name="toast_tor_not_installed">未安装Orbot。安装Orbot以播放.onion电台。</string>
 </resources>

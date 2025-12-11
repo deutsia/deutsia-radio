@@ -578,9 +578,4 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Contraseña cambiada pero fallo al renovar clave de base de datos: %s</string>
-
-    <!-- Service Detection Toast Messages -->
-    <string name="toast_tor_not_running">Tor no está ejecutándose. Inicia Orbot para reproducir estaciones .onion.</string>
-    <string name="toast_i2p_not_running">I2P no está ejecutándose. Inicia tu enrutador I2P para reproducir estaciones .i2p.</string>
-    <string name="toast_tor_not_installed">Orbot no está instalado. Instala Orbot para reproducir estaciones .onion.</string>
 </resources>

@@ -574,9 +574,4 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">رمز عبور تغییر کرد اما رمزگذاری مجدد پایگاه داده ناموفق بود: %s</string>
-
-    <!-- Service Detection Toast Messages -->
-    <string name="toast_tor_not_running">Tor در حال اجرا نیست. Orbot را برای پخش ایستگاه‌های .onion راه‌اندازی کنید.</string>
-    <string name="toast_i2p_not_running">I2P در حال اجرا نیست. روتر I2P خود را برای پخش ایستگاه‌های .i2p راه‌اندازی کنید.</string>
-    <string name="toast_tor_not_installed">Orbot نصب نشده است. Orbot را برای پخش ایستگاه‌های .onion نصب کنید.</string>
 </resources>
