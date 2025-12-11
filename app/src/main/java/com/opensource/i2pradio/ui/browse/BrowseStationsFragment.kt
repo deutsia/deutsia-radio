@@ -124,6 +124,7 @@ class BrowseStationsFragment : Fragment() {
 
     // Miniplayer spacing for dynamic bottom padding
     private var miniplayerSpacing = 0
+    private var browseBasePadding = 0
 
     // Genre chips data
     private data class GenreChipData(val tag: String, val displayName: Int)
@@ -194,8 +195,9 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun findViews(view: View) {
-        // Get miniplayer spacing dimension
+        // Get miniplayer spacing dimensions
         miniplayerSpacing = resources.getDimensionPixelSize(R.dimen.miniplayer_spacing)
+        browseBasePadding = resources.getDimensionPixelSize(R.dimen.browse_base_padding)
 
         // Discovery mode views
         discoveryContainer = view.findViewById(R.id.discoveryContainer)
@@ -676,10 +678,10 @@ class BrowseStationsFragment : Fragment() {
     /**
      * Update bottom padding on scrollable containers based on miniplayer visibility.
      * When a station is playing, the miniplayer is visible and we need extra padding.
-     * When nothing is playing, the miniplayer is hidden and no extra padding is needed.
+     * When nothing is playing, we still apply a small base padding for visual spacing.
      */
     private fun updateBottomPaddingForMiniplayer(isMiniplayerVisible: Boolean) {
-        val bottomPadding = if (isMiniplayerVisible) miniplayerSpacing else 0
+        val bottomPadding = if (isMiniplayerVisible) miniplayerSpacing else browseBasePadding
 
         // Update discovery container padding
         discoveryContentContainer.setPadding(
