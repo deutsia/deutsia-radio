@@ -258,7 +258,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">درباره</string>
-    <string name="settings_version">نسخه 1.2</string>
+    <string name="settings_version">نسخه 1.3</string>
     <string name="settings_view_github">مشاهده در GitHub</string>
     <string name="settings_donate">کمک مالی</string>
     <string name="settings_donate_description">اگر این برنامه به شما کمک کرد، کمک مالی را در نظر بگیرید</string>
