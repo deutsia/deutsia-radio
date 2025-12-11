@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="chip_margin">8dp</dimen>
-    <dimen name="miniplayer_spacing">80dp</dimen>
+    <dimen name="miniplayer_spacing">96dp</dimen>
+    <dimen name="browse_base_padding">16dp</dimen>
 </resources>
