@@ -53,6 +53,7 @@ class BrowseStationsFragment : Fragment() {
 
     // Discovery mode views
     private lateinit var discoveryContainer: NestedScrollView
+    private lateinit var discoveryContentContainer: LinearLayout
     private lateinit var discoverySearchBar: MaterialCardView
     private lateinit var genreChipsRow1: LinearLayout
     private lateinit var genreChipsRow2: LinearLayout
@@ -120,6 +121,9 @@ class BrowseStationsFragment : Fragment() {
 
     // Current results mode category (for display)
     private var currentResultsTitle = ""
+
+    // Miniplayer spacing for dynamic bottom padding
+    private var miniplayerSpacing = 0
 
     // Genre chips data
     private data class GenreChipData(val tag: String, val displayName: Int)
@@ -190,8 +194,12 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun findViews(view: View) {
+        // Get miniplayer spacing dimension
+        miniplayerSpacing = resources.getDimensionPixelSize(R.dimen.miniplayer_spacing)
+
         // Discovery mode views
         discoveryContainer = view.findViewById(R.id.discoveryContainer)
+        discoveryContentContainer = view.findViewById(R.id.discoveryContentContainer)
         discoverySearchBar = view.findViewById(R.id.discoverySearchBar)
         genreChipsRow1 = view.findViewById(R.id.genreChipsRow1)
         genreChipsRow2 = view.findViewById(R.id.genreChipsRow2)
@@ -659,7 +667,35 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun setupSharedViews() {
-        // Any shared view setup if needed
+        // Observe current station to dynamically adjust bottom padding for miniplayer
+        radioViewModel.currentStation.observe(viewLifecycleOwner) { station ->
+            updateBottomPaddingForMiniplayer(station != null)
+        }
+    }
+
+    /**
+     * Update bottom padding on scrollable containers based on miniplayer visibility.
+     * When a station is playing, the miniplayer is visible and we need extra padding.
+     * When nothing is playing, the miniplayer is hidden and no extra padding is needed.
+     */
+    private fun updateBottomPaddingForMiniplayer(isMiniplayerVisible: Boolean) {
+        val bottomPadding = if (isMiniplayerVisible) miniplayerSpacing else 0
+
+        // Update discovery container padding
+        discoveryContentContainer.setPadding(
+            discoveryContentContainer.paddingLeft,
+            discoveryContentContainer.paddingTop,
+            discoveryContentContainer.paddingRight,
+            bottomPadding
+        )
+
+        // Update results list padding
+        stationsRecyclerView.setPadding(
+            stationsRecyclerView.paddingLeft,
+            stationsRecyclerView.paddingTop,
+            stationsRecyclerView.paddingRight,
+            bottomPadding
+        )
     }
 
     private fun observeViewModel() {
