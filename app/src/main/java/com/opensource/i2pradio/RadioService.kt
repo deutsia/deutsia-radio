@@ -1618,8 +1618,8 @@ class RadioService : Service() {
             return
         }
 
-        reconnectAttempts++
         val delay = minOf(1000L * reconnectAttempts, 5000L)
+        reconnectAttempts++
 
         android.util.Log.d("RadioService", "Reconnecting in ${delay}ms (attempt $reconnectAttempts)")
         // Keep buffering state while reconnecting
