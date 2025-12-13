@@ -87,6 +87,7 @@ class RadioService : Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     @Volatile private var currentOkHttpClient: OkHttpClient? = null
+    @Volatile private var currentDataSourceFactory: OkHttpDataSource.Factory? = null
     private val okHttpClientLock = Any()
 
     private val isStartingNewStream = AtomicBoolean(false)
@@ -1481,6 +1482,7 @@ class RadioService : Service() {
 
             val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("DeutsiaRadio/1.0")
+            currentDataSourceFactory = dataSourceFactory
 
             val loadControl = DefaultLoadControl.Builder()
                 .setBufferDurationsMs(5_000, 15_000, 1_000, 2_000)
@@ -1538,10 +1540,12 @@ class RadioService : Service() {
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
                             Player.STATE_ENDED -> {
-                                android.util.Log.d("RadioService", "Stream ended, reconnecting...")
+                                android.util.Log.d("RadioService", "Stream ended, attempting fast re-prepare...")
                                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
                                 broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
-                                scheduleReconnect()
+                                // For radio streams, try fast re-prepare using existing data source factory
+                                // This avoids creating a new HTTP client and is much faster than full reconnect
+                                tryFastRePrepare()
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
@@ -1639,6 +1643,41 @@ class RadioService : Service() {
         handler.postDelayed(reconnectRunnable!!, delay)
     }
 
+    /**
+     * Attempts a fast re-prepare of the stream using the existing data source factory.
+     * This is much faster than a full reconnect because it reuses the existing OkHttpClient
+     * and connection pool. For radio streams that briefly signal "ended" between songs,
+     * this allows near-instant resumption without missing audio.
+     *
+     * Falls back to full reconnect if fast re-prepare fails.
+     */
+    private fun tryFastRePrepare() {
+        val streamUrl = currentStreamUrl
+        val dataSourceFactory = currentDataSourceFactory
+        val currentPlayer = player
+
+        if (streamUrl == null || dataSourceFactory == null || currentPlayer == null) {
+            android.util.Log.d("RadioService", "Fast re-prepare not possible, falling back to reconnect")
+            scheduleReconnect()
+            return
+        }
+
+        try {
+            android.util.Log.d("RadioService", "Fast re-prepare: creating new media source")
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(streamUrl))
+
+            currentPlayer.setMediaSource(mediaSource)
+            currentPlayer.prepare()
+            currentPlayer.playWhenReady = true
+
+            android.util.Log.d("RadioService", "Fast re-prepare initiated successfully")
+        } catch (e: Exception) {
+            android.util.Log.e("RadioService", "Fast re-prepare failed, falling back to reconnect", e)
+            scheduleReconnect()
+        }
+    }
+
     private fun stopStream() {
         // Stop playback time updates first
         stopPlaybackTimeUpdates()
@@ -1686,6 +1725,7 @@ class RadioService : Service() {
                 }
             }
             currentOkHttpClient = null
+            currentDataSourceFactory = null
         }
 
         // Properly abandon audio focus with the correct listener/request
