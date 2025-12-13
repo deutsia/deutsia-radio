@@ -1541,10 +1541,9 @@ class RadioService : Service() {
                             }
                             Player.STATE_ENDED -> {
                                 android.util.Log.d("RadioService", "Stream ended, attempting fast re-prepare...")
-                                updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
-                                broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
-                                // For radio streams, try fast re-prepare using existing data source factory
-                                // This avoids creating a new HTTP client and is much faster than full reconnect
+                                // Don't update playback state or broadcast isPlaying=false here
+                                // The fast re-prepare is quick enough that we can keep the UI showing "playing"
+                                // This prevents the play/pause button from flickering during song transitions
                                 tryFastRePrepare()
                             }
                             Player.STATE_IDLE -> {
