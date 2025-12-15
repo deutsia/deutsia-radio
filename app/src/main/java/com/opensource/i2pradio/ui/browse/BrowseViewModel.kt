@@ -801,6 +801,11 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 is RadioBrowserResult.Success -> {
                     var newStations = result.data
 
+                    // Store original API response size BEFORE any filtering
+                    // This is critical for pagination - we need to know if the API
+                    // returned a full page, not how many survived filtering
+                    val apiResponseSize = result.data.size
+
                     // Track Top Voted stations for hiding in Popular
                     if (_currentCategory.value == BrowseCategory.TOP_VOTED) {
                         newStations.forEach { topVotedStationUuids.add(it.stationuuid) }
@@ -821,7 +826,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                     } else {
                         _stations.value = newStations
                     }
-                    _hasMoreResults.value = newStations.size >= pageSize
+                    // Use API response size (before filtering) to determine if more results exist
+                    // This fixes the bug where pagination stopped early because filtered results
+                    // were fewer than pageSize even though more stations exist in the API
+                    _hasMoreResults.value = apiResponseSize >= pageSize
 
                     // Check which stations are already saved
                     checkSavedStatus(newStations)
