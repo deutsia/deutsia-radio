@@ -143,6 +143,7 @@
     <string name="button_cancel">Cancel</string>
     <string name="button_import">Import</string>
     <string name="button_export">Export</string>
+    <string name="button_add">Add</string>
     <string name="button_open">Open</string>
     <string name="button_configure">Configure</string>
     <string name="button_apply">Apply</string>
@@ -208,6 +209,7 @@
     <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
     <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
     <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_privacy_notice">Privacy: Without Force Tor enabled, clearnet stations and images connect directly to the internet. Recordings use the same connection as the stream.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Custom Proxy</string>
@@ -219,6 +221,7 @@
     <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
+    <string name="settings_custom_proxy_privacy_notice">Privacy: Without Force Custom Proxy enabled, clearnet stations and images connect directly to the internet. Recordings use the same connection as the stream.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">Bandwidth Usage</string>
@@ -250,10 +253,10 @@
     <string name="settings_station_management">Station Management</string>
     <string name="settings_import_from_file">Import from File</string>
     <string name="settings_import_from_file_description">Import from CSV, JSON, M3U, or PLS</string>
-    <string name="settings_import_i2p_stations">Import I2P Stations</string>
-    <string name="settings_import_i2p_stations_description">14 curated I2P radio stations</string>
-    <string name="settings_import_tor_stations">Import Tor Stations</string>
-    <string name="settings_import_tor_stations_description">3 curated Tor radio stations</string>
+    <string name="settings_add_i2p_stations">Add I2P Stations</string>
+    <string name="settings_add_i2p_stations_description">14 bundled I2P stations (offline, no network)</string>
+    <string name="settings_add_tor_stations">Add Tor Stations</string>
+    <string name="settings_add_tor_stations_description">3 bundled Tor stations (offline, no network)</string>
     <string name="settings_export_stations">Export Stations</string>
     <string name="settings_export_stations_description">Export your stations to a file</string>
 
@@ -516,10 +519,10 @@
     <string name="dialog_import_stations">Import Stations</string>
     <string name="import_message">Select a file to import radio stations from.\n\nSupported formats:\n• CSV\n• JSON\n• M3U playlist\n• PLS playlist</string>
     <string name="button_select_file">Select File</string>
-    <string name="import_curated_title">Import %s Stations</string>
-    <string name="import_curated_message">Import %1$d curated %2$s radio stations?\n\nThese stations are pre-configured with proxy settings and ready to use.</string>
+    <string name="import_curated_title">Add %s Stations</string>
+    <string name="import_curated_message">Add %1$d bundled %2$s radio stations?\n\nThese stations are pre-configured with proxy settings and ready to use. This is an offline operation.</string>
     <string name="no_stations_found_in_list">No stations found in %s list</string>
-    <string name="failed_to_import_stations">Failed to import %s stations: %s</string>
+    <string name="failed_to_import_stations">Failed to add %s stations: %s</string>
     <string name="dialog_export_stations_title">Export Stations</string>
     <string name="no_stations_in_file">No stations found in the file</string>
     <string name="dialog_import_failed">Import Failed</string>
