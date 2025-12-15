@@ -801,6 +801,11 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                 is RadioBrowserResult.Success -> {
                     var newStations = result.data
 
+                    // Store original API response size BEFORE any filtering
+                    // This is critical for pagination - we need to know if the API
+                    // returned a full page, not how many survived filtering
+                    val apiResponseSize = result.data.size
+
                     // Track Top Voted stations for hiding in Popular
                     if (_currentCategory.value == BrowseCategory.TOP_VOTED) {
                         newStations.forEach { topVotedStationUuids.add(it.stationuuid) }
@@ -821,7 +826,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                     } else {
                         _stations.value = newStations
                     }
-                    _hasMoreResults.value = newStations.size >= pageSize
+                    // Use API response size (before filtering) to determine if more results exist
+                    // This fixes the bug where pagination stopped early because filtered results
+                    // were fewer than pageSize even though more stations exist in the API
+                    _hasMoreResults.value = apiResponseSize >= pageSize
 
                     // Check which stations are already saved
                     checkSavedStatus(newStations)
@@ -952,24 +960,15 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         val activeLanguage = _selectedLanguage.value
 
         // For pagination (offset > 0), search by name only for consistency
-        // but still apply active filters
+        // Language filter is applied by applyActiveFilters in fetchStations
         if (offset > 0) {
-            val result = repository.searchStations(
+            return repository.searchStations(
                 name = trimmedQuery,
                 tag = activeTag?.name,  // Include tag filter if active
                 countrycode = activeCountry?.iso3166_1,  // Include country filter if active
                 limit = limit,
                 offset = offset
             )
-            // Apply language filter client-side if active (API doesn't support combined language filter)
-            return if (activeLanguage != null && result is RadioBrowserResult.Success) {
-                val filtered = result.data.filter { station ->
-                    station.language.contains(activeLanguage.name, ignoreCase = true)
-                }
-                RadioBrowserResult.Success(filtered)
-            } else {
-                result
-            }
         }
 
         // Split query into words for intelligent multi-field search
@@ -1056,14 +1055,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             allResults
         }
 
-        // Apply language filter client-side if active
-        // (RadioBrowser API doesn't support combining language with other filters well)
-        if (activeLanguage != null) {
-            val langName = activeLanguage.name.lowercase()
-            filteredResults = filteredResults.filter { station ->
-                station.language.lowercase().contains(langName)
-            }
-        }
+        // Note: Language filter is applied by applyActiveFilters in fetchStations
+        // to ensure apiResponseSize is captured before filtering for pagination
 
         // Deduplicate and limit results
         val deduplicated = filteredResults
