@@ -209,6 +209,7 @@
     <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
     <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
     <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_privacy_notice">Privacy: Without Force Tor enabled, clearnet stations and images connect directly to the internet. Recordings use the same connection as the stream.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Custom Proxy</string>
@@ -220,6 +221,7 @@
     <string name="settings_force_custom_proxy_description">Route all traffic through custom proxy. Won\'t connect without proxy.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Force Custom Proxy Except Tor/I2P Stations</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Route all clearnet traffic through custom proxy, but allow Tor and I2P stations to use their native proxies.</string>
+    <string name="settings_custom_proxy_privacy_notice">Privacy: Without Force Custom Proxy enabled, clearnet stations and images connect directly to the internet. Recordings use the same connection as the stream.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">Bandwidth Usage</string>
@@ -257,10 +259,6 @@
     <string name="settings_add_tor_stations_description">3 bundled Tor stations (offline, no network)</string>
     <string name="settings_export_stations">Export Stations</string>
     <string name="settings_export_stations_description">Export your stations to a file</string>
-
-    <!-- Privacy Notice -->
-    <string name="settings_privacy_notice_title">Privacy Notice</string>
-    <string name="settings_privacy_notice_description">Without Force Tor enabled, clearnet stations and images connect directly to the internet. Recordings use the same connection as the stream. Enable Force Tor in the Tor Network section above for maximum privacy.</string>
 
     <!-- Settings - About -->
     <string name="settings_about">About</string>

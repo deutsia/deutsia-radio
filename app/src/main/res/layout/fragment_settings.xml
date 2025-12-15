@@ -634,6 +634,16 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:lineSpacingExtra="2dp" />
 
+                <!-- Tor Privacy Notice -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/settings_tor_privacy_notice"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:lineSpacingExtra="2dp" />
+
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -840,6 +850,16 @@
 
                 </LinearLayout>
                 <!-- End Custom Proxy Configuration Container -->
+
+                <!-- Custom Proxy Privacy Notice -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/settings_custom_proxy_privacy_notice"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:lineSpacingExtra="2dp" />
 
             </LinearLayout>
 
@@ -1398,43 +1418,6 @@
                         app:iconSize="18dp" />
 
                 </LinearLayout>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Privacy Notice -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_privacy_notice_title"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorPrimary"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_privacy_notice_description"
-                    android:textSize="12sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:lineSpacingExtra="2dp" />
 
             </LinearLayout>
 
