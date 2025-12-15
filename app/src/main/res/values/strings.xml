@@ -470,9 +470,9 @@
     <string name="deleted_stations_message_plural">Deleted %d stations</string>
 
     <!-- Proxy Type Labels -->
-    <string name="proxy_label_i2p"> • I2P</string>
-    <string name="proxy_label_tor"> • Tor</string>
-    <string name="proxy_label_custom"> • Custom</string>
+    <string name="proxy_label_i2p">• I2P</string>
+    <string name="proxy_label_tor">• Tor</string>
+    <string name="proxy_label_custom">• Custom</string>
     <string name="proxy_type_i2p">I2P</string>
     <string name="proxy_type_tor">Tor</string>
     <string name="proxy_type_custom">Custom</string>
