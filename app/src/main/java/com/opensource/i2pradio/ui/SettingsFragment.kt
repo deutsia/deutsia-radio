@@ -1236,20 +1236,35 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showImportCuratedListDialog(type: String) {
-        val (fileName, count, networkName) = when (type) {
-            "i2p" -> Triple("i2p_stations.json", 14, "I2P")
-            "tor" -> Triple("tor_stations.json", 3, "Tor")
+        val (fileName, networkName) = when (type) {
+            "i2p" -> Pair("i2p_stations.json", "I2P")
+            "tor" -> Pair("tor_stations.json", "Tor")
             else -> return
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.import_curated_title, networkName))
-            .setMessage(getString(R.string.import_curated_message, count, networkName))
-            .setPositiveButton(getString(R.string.button_import)) { _, _ ->
-                importCuratedList(fileName, networkName)
+        val context = requireContext()
+        lifecycleScope.launch(Dispatchers.IO) {
+            val count = try {
+                val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+                val result = StationImportExport.importFromJson(jsonString)
+                result.stations.size
+            } catch (e: Exception) {
+                0
             }
-            .setNegativeButton(getString(R.string.button_cancel), null)
-            .show()
+
+            withContext(Dispatchers.Main) {
+                if (!isAdded) return@withContext
+
+                AlertDialog.Builder(context)
+                    .setTitle(getString(R.string.import_curated_title, networkName))
+                    .setMessage(getString(R.string.import_curated_message, count, networkName))
+                    .setPositiveButton(getString(R.string.button_import)) { _, _ ->
+                        importCuratedList(fileName, networkName)
+                    }
+                    .setNegativeButton(getString(R.string.button_cancel), null)
+                    .show()
+            }
+        }
     }
 
     private fun importCuratedList(fileName: String, networkName: String) {
