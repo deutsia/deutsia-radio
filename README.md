@@ -69,7 +69,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 
 ## 📦 Requirements
 - Android 7.0 (API 24) or higher
-- **For Tor:** [InviZible Pro](https://invizible.net) - Use **proxy mode** (not VPN mode) for best compatibility. Proxy mode is easy to configure and allows running a separate VPN in the background if desired. Using Tor as a full device VPN will make I2P streaming almost impossible due to its latency.
+- **For Tor:** [InviZible Pro](https://invizible.net) - Use **proxy mode** (not VPN mode) for best compatibility (click on the three dot menu in the upper right hand corner to switch). Proxy mode is easy to configure and allows running a separate VPN in the background if desired. Using Tor as a full device VPN will make I2P streaming almost impossible due to its latency.
 - **For I2P:** [I2P Android](https://geti2p.net/en/download) or [InviZible Pro](https://invizible.net) via i2pd
 
 ---
