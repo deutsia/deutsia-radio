@@ -10,7 +10,7 @@ All notable changes to deutsia radio will be documented in this file.
 - Import UX improvements for I2P/Tor stations with privacy notices
 
 ### Changed
-- Switched from Orbot to InviZible Pro for Tor integration
+- Switched from Orbot to InviZible Pro for Tor integration as Invizible Pro proxy mode is easier to set up. 
 - Simplified now playing loading animations with spinners
 - Removed background color from station count bar for cleaner UI
 - API now uses hidebroken=true to only show working stations in counts
