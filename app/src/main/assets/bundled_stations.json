@@ -16,9 +16,10 @@
       "proxyPort": 4444
     },
     {
-      "name": "Darknet EDM",
-      "streamUrl": "http://nlknejzzk2rrz6gsgliinbflfjsgjtdtgzj6r2txc6krjzntyi22uoyd.onion/radio",
-      "genre": "EDM",
+      "name": "Lain Radio",
+      "streamUrl": "http://6z6g6lv4v7xhupvtjvo4jockd4af5dn47nrxcexu475tbhiflx6ln6ad.onion/radio/focus.mp3",
+      "genre": "Experimental",
+      "codec": "MP3",
       "useProxy": true,
       "proxyType": "TOR",
       "proxyHost": "127.0.0.1",
