@@ -71,7 +71,7 @@
     <string name="genre_other">Otro</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio es un reproductor de radio multired gratuito y de código abierto que reúne transmisiones de clearnet, Tor (.onion) y redes I2P. Disfruta de tus estaciones favoritas en una interfaz Material You con integración Orbot y prevención de fugas configurable</string>
+    <string name="about_description">deutsia radio es un reproductor de radio multired gratuito y de código abierto que reúne transmisiones de clearnet, Tor (.onion) y redes I2P. Disfruta de tus estaciones favoritas en una interfaz Material You con integración InviZible Pro y prevención de fugas configurable</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">Explorar</string>
@@ -202,7 +202,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Red Tor</string>
-    <string name="settings_enable_tor">Habilitar Tor (vía Orbot)</string>
+    <string name="settings_enable_tor">Habilitar Tor (vía InviZible Pro)</string>
     <string name="settings_enable_tor_description">Conectar a través de la red Tor</string>
     <string name="settings_tor_disconnected">Desconectado</string>
     <string name="settings_tor_not_running">Tor no está en ejecución</string>
@@ -210,7 +210,7 @@
     <string name="settings_force_tor_description">Enrutar todas las transmisiones a través de Tor. No se conectará sin Tor.</string>
     <string name="settings_force_tor_except_i2p">Forzar Tor excepto I2P</string>
     <string name="settings_force_tor_except_i2p_description">Enrutar clearnet a través de Tor, transmisiones I2P directamente al proxy I2P.</string>
-    <string name="settings_tor_info">Requiere Orbot (gratis desde Play Store o F-Droid). Toca el ícono de Tor en la barra de herramientas para acceso rápido.\n\nLos modos forzados bloquean conexiones cuando Tor no está disponible.</string>
+    <string name="settings_tor_info">Requiere InviZible Pro (gratis desde Play Store o F-Droid). Toca el ícono de Tor en la barra de herramientas para acceso rápido.\n\nLos modos forzados bloquean conexiones cuando Tor no está disponible.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Proxy personalizado</string>
@@ -253,16 +253,16 @@
     <string name="settings_station_management">Gestión de estaciones</string>
     <string name="settings_import_from_file">Importar desde archivo</string>
     <string name="settings_import_from_file_description">Importar desde CSV, JSON, M3U o PLS</string>
-    <string name="settings_import_i2p_stations">Importar estaciones I2P</string>
-    <string name="settings_import_i2p_stations_description">14 estaciones de radio I2P seleccionadas</string>
-    <string name="settings_import_tor_stations">Importar estaciones Tor</string>
-    <string name="settings_import_tor_stations_description">3 estaciones de radio Tor seleccionadas</string>
+    <string name="settings_add_i2p_stations">Agregar estaciones I2P</string>
+    <string name="settings_add_i2p_stations_description">%d estaciones I2P incluidas (sin conexión, sin red)</string>
+    <string name="settings_add_tor_stations">Agregar estaciones Tor</string>
+    <string name="settings_add_tor_stations_description">%d estaciones Tor incluidas (sin conexión, sin red)</string>
     <string name="settings_export_stations">Exportar estaciones</string>
     <string name="settings_export_stations_description">Exportar tus estaciones a un archivo</string>
 
     <!-- Settings - About -->
     <string name="settings_about">Acerca de</string>
-    <string name="settings_version">Versión 1.3</string>
+    <string name="settings_version">Versión 1.4</string>
     <string name="settings_view_github">Ver en GitHub</string>
     <string name="settings_donate">Donar</string>
     <string name="settings_donate_description">Si esta aplicación te ayudó, considera hacer una donación</string>
@@ -274,10 +274,10 @@
     <string name="tor_connection_details">Detalles de conexión</string>
     <string name="tor_proxy_host">Host del proxy</string>
     <string name="tor_socks_port">Puerto SOCKS</string>
-    <string name="tor_what_is_orbot">¿Qué es Orbot?</string>
-    <string name="tor_orbot_description">Orbot es el cliente Tor oficial para Android. Proporciona acceso seguro y cifrado a la red Tor.</string>
+    <string name="tor_what_is_invizible">¿Qué es InviZible Pro?</string>
+    <string name="tor_invizible_description">InviZible Pro proporciona Tor, DNSCrypt e I2P en una aplicación. Ve a Configuración → Inicio rápido → habilita \"Modo proxy\", luego inicia Tor.</string>
     <string name="tor_connect">Conectar a Tor</string>
-    <string name="tor_open_orbot">Abrir Orbot</string>
+    <string name="tor_open_invizible">Abrir InviZible Pro</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">Conectando...</string>
@@ -286,7 +286,7 @@
     <string name="tor_status_off">Tor apagado</string>
     <string name="tor_status_error">Error de Tor</string>
     <string name="tor_status_leak_warning">Advertencia de fuga</string>
-    <string name="tor_status_install_orbot">Instalar Orbot</string>
+    <string name="tor_status_install_invizible">Instalar InviZible Pro</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor está desconectado. Toca para conectar.</string>
@@ -294,29 +294,29 @@
     <string name="tor_status_connected_description">Tor está conectado. Toca para ver detalles.</string>
     <string name="tor_status_connected_force_description">Tor está conectado (Modo Forzado). Toca para ver detalles.</string>
     <string name="tor_status_error_description">Conexión de Tor falló. Toca para reintentar.</string>
-    <string name="tor_status_install_orbot_description">Orbot no está instalado. Toca para instalar.</string>
+    <string name="tor_status_install_invizible_description">InviZible Pro no está instalado. Toca para instalar.</string>
     <string name="tor_status_leak_warning_description">Modo Tor forzado está activado pero no conectado. La privacidad puede estar comprometida.</string>
 
     <string name="tor_status_connecting_message">Conectando a Tor...</string>
     <string name="tor_status_connected_message">Conectado vía Tor</string>
     <string name="tor_control_title_stopped">Tor desconectado</string>
     <string name="tor_control_subtitle_stopped">Toca Conectar para navegar de forma anónima vía Tor</string>
-    <string name="tor_control_subtitle_connecting">Estableciendo conexión segura vía Orbot</string>
+    <string name="tor_control_subtitle_connecting">Estableciendo conexión segura vía InviZible Pro</string>
     <string name="tor_control_title_connecting">Conectando a Tor...</string>
     <string name="tor_control_title_connected">Conectado a Tor</string>
     <string name="tor_control_title_connected_force">Conectado a Tor (Modo forzado)</string>
     <string name="tor_control_subtitle_connected">Tu conexión es privada y anónima</string>
-    <string name="tor_control_subtitle_connected_force">Desconecta vía Orbot o desactiva Forzar Tor en ajustes</string>
+    <string name="tor_control_subtitle_connected_force">Desconecta vía InviZible Pro o desactiva Forzar Tor en ajustes</string>
     <string name="tor_control_title_error">Conexión fallida</string>
     <string name="tor_control_subtitle_error">No se pudo conectar a la red Tor</string>
-    <string name="tor_control_title_orbot_required">Orbot requerido</string>
-    <string name="tor_control_subtitle_orbot_required">Instala Orbot para conectarte a la red Tor</string>
+    <string name="tor_control_title_invizible_required">InviZible Pro requerido</string>
+    <string name="tor_control_subtitle_invizible_required">Instala InviZible Pro para conectarte a la red Tor</string>
     <string name="tor_control_button_connecting">Conectando...</string>
     <string name="tor_control_button_disconnect">Desconectar</string>
     <string name="tor_control_button_cancel">Cancelar</string>
     <string name="tor_control_button_retry">Reintentar conexión</string>
-    <string name="tor_control_button_install">Instalar Orbot</string>
-    <string name="tor_control_button_open_orbot">Abrir Orbot</string>
+    <string name="tor_control_button_install">Instalar InviZible Pro</string>
+    <string name="tor_control_button_open_invizible">Abrir InviZible Pro</string>
 
 
     <!-- Add/Edit Radio Dialog -->
@@ -379,13 +379,13 @@
     <string name="tor_channel_description">Muestra el estado de conexión Tor</string>
     <string name="tor_notification_disconnected">Tor desconectado</string>
     <string name="tor_notification_tap_to_open">Toca para abrir la aplicación</string>
-    <string name="tor_notification_connecting">Conectando vía Orbot...</string>
+    <string name="tor_notification_connecting">Conectando vía InviZible Pro...</string>
     <string name="tor_notification_please_wait">Por favor espera</string>
     <string name="tor_notification_connected">Tor conectado</string>
     <string name="tor_notification_error">Error de Tor</string>
     <string name="tor_notification_connection_failed">Conexión fallida</string>
-    <string name="tor_notification_orbot_required">Orbot requerido</string>
-    <string name="tor_notification_install_orbot">Por favor instala Orbot para soporte Tor</string>
+    <string name="tor_notification_invizible_required">InviZible Pro requerido</string>
+    <string name="tor_notification_install_invizible">Por favor instala InviZible Pro para soporte Tor</string>
     <string name="tor_notification_action_stop">Detener Tor</string>
 
     <!-- Other Error Messages -->
@@ -486,12 +486,12 @@
     <string name="tor_status_connecting_network">Conectando a la red Tor...</string>
     <string name="tor_status_connected_via_tor">Conectado vía Tor</string>
     <string name="tor_status_connection_error">Error de conexión</string>
-    <string name="tor_status_orbot_required">Aplicación Orbot requerida</string>
+    <string name="tor_status_invizible_required">Aplicación InviZible Pro requerida</string>
     <string name="tor_status_detail_socks5">Proxy SOCKS5 en %1$s:%2$d</string>
     <string name="tor_status_detail_establishing">Estableciendo conexión...</string>
     <string name="tor_status_detail_unknown_error">Ocurrió un error desconocido</string>
     <string name="tor_status_detail_tap_to_connect">Toca para conectar</string>
-    <string name="tor_status_detail_install_orbot">Instala Orbot desde Play Store o F-Droid</string>
+    <string name="tor_status_detail_install_invizible">Instala InviZible Pro desde Play Store o F-Droid</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">Desconectado</string>
@@ -504,9 +504,9 @@
     <string name="settings_tor_socks_port">Puerto SOCKS: %d</string>
     <string name="button_stop_tor">Detener</string>
     <string name="settings_tor_connection_failed">Conexión fallida</string>
-    <string name="settings_tor_orbot_required_status">Orbot requerido</string>
-    <string name="settings_tor_install_orbot_message">Por favor instala Orbot para usar Tor</string>
-    <string name="button_install_orbot_caps">Instalar Orbot</string>
+    <string name="settings_tor_invizible_required_status">InviZible Pro requerido</string>
+    <string name="settings_tor_install_invizible_message">Por favor instala InviZible Pro para usar Tor</string>
+    <string name="button_install_invizible_caps">Instalar InviZible Pro</string>
     <string name="settings_tor_force_warning">Conexión fallida</string>
     <string name="settings_tor_force_warning_detail">Forzar Tor está habilitado pero no conectado</string>
     <string name="button_retry">Reintentar</string>

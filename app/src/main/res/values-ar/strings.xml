@@ -69,7 +69,7 @@
     <string name="genre_other">أخرى</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio هو مشغل راديو متعدد الشبكات مجاني ومفتوح المصدر يجمع البث من شبكات clearnet و Tor (.onion) و I2P. استمتع بمحطاتك المفضلة في واجهة Material You مع تكامل Orbot ومنع التسرب القابل للتكوين</string>
+    <string name="about_description">deutsia radio هو مشغل راديو متعدد الشبكات مجاني ومفتوح المصدر يجمع البث من شبكات clearnet و Tor (.onion) و I2P. استمتع بمحطاتك المفضلة في واجهة Material You مع تكامل InviZible Pro ومنع التسرب القابل للتكوين</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">تصفح</string>
@@ -198,7 +198,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">شبكة Tor</string>
-    <string name="settings_enable_tor">تمكين Tor (عبر Orbot)</string>
+    <string name="settings_enable_tor">تمكين Tor (عبر InviZible Pro)</string>
     <string name="settings_enable_tor_description">الاتصال عبر شبكة Tor</string>
     <string name="settings_tor_disconnected">غير متصل</string>
     <string name="settings_tor_not_running">Tor غير قيد التشغيل</string>
@@ -206,7 +206,7 @@
     <string name="settings_force_tor_description">توجيه جميع البث عبر Tor. لن يتصل بدون Tor.</string>
     <string name="settings_force_tor_except_i2p">فرض Tor باستثناء I2P</string>
     <string name="settings_force_tor_except_i2p_description">توجيه clearnet عبر Tor، وبث I2P مباشرة إلى وكيل I2P.</string>
-    <string name="settings_tor_info">يتطلب Orbot (مجاني من Play Store أو F-Droid). انقر على أيقونة Tor في شريط الأدوات للوصول السريع.\n\nتحظر أوضاع الفرض الاتصالات عندما يكون Tor غير متوفر.</string>
+    <string name="settings_tor_info">يتطلب InviZible Pro (مجاني من Play Store أو F-Droid). انقر على أيقونة Tor في شريط الأدوات للوصول السريع.\n\nتحظر أوضاع الفرض الاتصالات عندما يكون Tor غير متوفر.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">وكيل مخصص</string>
@@ -249,16 +249,16 @@
     <string name="settings_station_management">إدارة المحطات</string>
     <string name="settings_import_from_file">استيراد من ملف</string>
     <string name="settings_import_from_file_description">الاستيراد من CSV أو JSON أو M3U أو PLS</string>
-    <string name="settings_import_i2p_stations">استيراد محطات I2P</string>
-    <string name="settings_import_i2p_stations_description">14 محطة راديو I2P منتقاة</string>
-    <string name="settings_import_tor_stations">استيراد محطات Tor</string>
-    <string name="settings_import_tor_stations_description">3 محطات راديو Tor منتقاة</string>
+    <string name="settings_add_i2p_stations">إضافة محطات I2P</string>
+    <string name="settings_add_i2p_stations_description">%d محطة I2P مدمجة (بدون اتصال، بدون شبكة)</string>
+    <string name="settings_add_tor_stations">إضافة محطات Tor</string>
+    <string name="settings_add_tor_stations_description">%d محطة Tor مدمجة (بدون اتصال، بدون شبكة)</string>
     <string name="settings_export_stations">تصدير المحطات</string>
     <string name="settings_export_stations_description">تصدير محطاتك إلى ملف</string>
 
     <!-- Settings - About -->
     <string name="settings_about">حول</string>
-    <string name="settings_version">الإصدار 1.3</string>
+    <string name="settings_version">الإصدار 1.4</string>
     <string name="settings_view_github">عرض على GitHub</string>
     <string name="settings_donate">تبرع</string>
     <string name="settings_donate_description">إذا ساعدك هذا التطبيق، فكر في التبرع</string>
@@ -270,10 +270,10 @@
     <string name="tor_connection_details">تفاصيل الاتصال</string>
     <string name="tor_proxy_host">مضيف الوكيل</string>
     <string name="tor_socks_port">منفذ SOCKS</string>
-    <string name="tor_what_is_orbot">ما هو Orbot؟</string>
-    <string name="tor_orbot_description">Orbot هو عميل Tor الرسمي لنظام Android. يوفر وصولاً آمناً ومشفراً إلى شبكة Tor.</string>
+    <string name="tor_what_is_invizible">ما هو InviZible Pro؟</string>
+    <string name="tor_invizible_description">يوفر InviZible Pro خدمات Tor و DNSCrypt و I2P. لاستخدام Tor: افتح InviZible Pro، انتقل إلى الإعدادات ← البدء السريع ← قم بتفعيل \"وضع البروكسي\"، ثم قم بتشغيل Tor.</string>
     <string name="tor_connect">الاتصال بـ Tor</string>
-    <string name="tor_open_orbot">فتح Orbot</string>
+    <string name="tor_open_invizible">فتح InviZible Pro</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">جارٍ الاتصال...</string>
@@ -282,7 +282,7 @@
     <string name="tor_status_off">Tor متوقف</string>
     <string name="tor_status_error">خطأ في Tor</string>
     <string name="tor_status_leak_warning">تحذير من التسرب</string>
-    <string name="tor_status_install_orbot">تثبيت Orbot</string>
+    <string name="tor_status_install_invizible">تثبيت InviZible Pro</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">تم قطع اتصال Tor. انقر للاتصال.</string>
@@ -290,29 +290,29 @@
     <string name="tor_status_connected_description">متصل بـ Tor. انقر لعرض التفاصيل.</string>
     <string name="tor_status_connected_force_description">متصل بـ Tor (الوضع الإجباري). انقر لعرض التفاصيل.</string>
     <string name="tor_status_error_description">فشل اتصال Tor. انقر لإعادة المحاولة.</string>
-    <string name="tor_status_install_orbot_description">Orbot غير مثبت. انقر للتثبيت.</string>
+    <string name="tor_status_install_invizible_description">InviZible Pro غير مثبت. انقر للتثبيت.</string>
     <string name="tor_status_leak_warning_description">تم تمكين وضع Tor الإجباري ولكن غير متصل. قد تكون الخصوصية معرضة للخطر.</string>
 
     <string name="tor_status_connecting_message">جارٍ الاتصال بـ Tor...</string>
     <string name="tor_status_connected_message">متصل عبر Tor</string>
     <string name="tor_control_title_stopped">تم قطع اتصال Tor</string>
     <string name="tor_control_subtitle_stopped">انقر على الاتصال للتصفح بشكل مجهول عبر Tor</string>
-    <string name="tor_control_subtitle_connecting">إنشاء اتصال آمن عبر Orbot</string>
+    <string name="tor_control_subtitle_connecting">إنشاء اتصال آمن عبر InviZible Pro</string>
     <string name="tor_control_title_connecting">جارٍ الاتصال بـ Tor...</string>
     <string name="tor_control_title_connected">متصل بـ Tor</string>
     <string name="tor_control_title_connected_force">متصل بـ Tor (وضع الإجبار)</string>
     <string name="tor_control_subtitle_connected">اتصالك خاص ومجهول</string>
-    <string name="tor_control_subtitle_connected_force">قطع الاتصال عبر Orbot أو تعطيل فرض Tor في الإعدادات</string>
+    <string name="tor_control_subtitle_connected_force">قطع الاتصال عبر InviZible Pro أو تعطيل فرض Tor في الإعدادات</string>
     <string name="tor_control_title_error">فشل الاتصال</string>
     <string name="tor_control_subtitle_error">تعذر الاتصال بشبكة Tor</string>
-    <string name="tor_control_title_orbot_required">Orbot مطلوب</string>
-    <string name="tor_control_subtitle_orbot_required">قم بتثبيت Orbot للاتصال بشبكة Tor</string>
+    <string name="tor_control_title_invizible_required">InviZible Pro مطلوب</string>
+    <string name="tor_control_subtitle_invizible_required">قم بتثبيت InviZible Pro للاتصال بشبكة Tor</string>
     <string name="tor_control_button_connecting">جارٍ الاتصال...</string>
     <string name="tor_control_button_disconnect">قطع الاتصال</string>
     <string name="tor_control_button_cancel">إلغاء</string>
     <string name="tor_control_button_retry">إعادة المحاولة</string>
-    <string name="tor_control_button_install">تثبيت Orbot</string>
-    <string name="tor_control_button_open_orbot">فتح Orbot</string>
+    <string name="tor_control_button_install">تثبيت InviZible Pro</string>
+    <string name="tor_control_button_open_invizible">فتح InviZible Pro</string>
 
     <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">استخدام Tor المضمن - لا حاجة لتكوين الوكيل</string>
@@ -374,13 +374,13 @@
     <string name="tor_channel_description">يعرض حالة اتصال Tor</string>
     <string name="tor_notification_disconnected">تم قطع اتصال Tor</string>
     <string name="tor_notification_tap_to_open">انقر لفتح التطبيق</string>
-    <string name="tor_notification_connecting">جارٍ الاتصال عبر Orbot...</string>
+    <string name="tor_notification_connecting">جارٍ الاتصال عبر InviZible Pro...</string>
     <string name="tor_notification_please_wait">يرجى الانتظار</string>
     <string name="tor_notification_connected">تم الاتصال بـ Tor</string>
     <string name="tor_notification_error">خطأ في Tor</string>
     <string name="tor_notification_connection_failed">فشل الاتصال</string>
-    <string name="tor_notification_orbot_required">Orbot مطلوب</string>
-    <string name="tor_notification_install_orbot">يرجى تثبيت Orbot لدعم Tor</string>
+    <string name="tor_notification_invizible_required">InviZible Pro مطلوب</string>
+    <string name="tor_notification_install_invizible">يرجى تثبيت InviZible Pro لدعم Tor</string>
     <string name="tor_notification_action_stop">إيقاف Tor</string>
 
     <!-- Other Error Messages -->
@@ -481,12 +481,12 @@
     <string name="tor_status_connecting_network">الاتصال بشبكة Tor...</string>
     <string name="tor_status_connected_via_tor">متصل عبر Tor</string>
     <string name="tor_status_connection_error">خطأ في الاتصال</string>
-    <string name="tor_status_orbot_required">تطبيق Orbot مطلوب</string>
+    <string name="tor_status_invizible_required">تطبيق InviZible Pro مطلوب</string>
     <string name="tor_status_detail_socks5">بروكسي SOCKS5 على %1$s:%2$d</string>
     <string name="tor_status_detail_establishing">إنشاء الاتصال...</string>
     <string name="tor_status_detail_unknown_error">حدث خطأ غير معروف</string>
     <string name="tor_status_detail_tap_to_connect">اضغط للاتصال</string>
-    <string name="tor_status_detail_install_orbot">قم بتثبيت Orbot من Play Store أو F-Droid</string>
+    <string name="tor_status_detail_install_invizible">قم بتثبيت InviZible Pro من Play Store أو F-Droid</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">غير متصل</string>
@@ -499,9 +499,9 @@
     <string name="settings_tor_socks_port">منفذ SOCKS: %d</string>
     <string name="button_stop_tor">إيقاف</string>
     <string name="settings_tor_connection_failed">فشل الاتصال</string>
-    <string name="settings_tor_orbot_required_status">Orbot مطلوب</string>
-    <string name="settings_tor_install_orbot_message">يرجى تثبيت Orbot لاستخدام Tor</string>
-    <string name="button_install_orbot_caps">تثبيت Orbot</string>
+    <string name="settings_tor_invizible_required_status">InviZible Pro مطلوب</string>
+    <string name="settings_tor_install_invizible_message">يرجى تثبيت InviZible Pro لاستخدام Tor</string>
+    <string name="button_install_invizible_caps">تثبيت InviZible Pro</string>
     <string name="settings_tor_force_warning">فشل الاتصال</string>
     <string name="settings_tor_force_warning_detail">فرض Tor مفعّل لكنه غير متصل</string>
     <string name="button_retry">إعادة المحاولة</string>

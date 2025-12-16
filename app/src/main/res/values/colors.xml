@@ -11,8 +11,8 @@
     <color name="tor_disconnected">#9E9E9E</color>
     <color name="tor_error">#F44336</color>
 
-    <!-- Orbot brand color -->
-    <color name="orbot_purple">#8E24AA</color>
+    <!-- InviZible Pro brand color -->
+    <color name="invizible_blue">#1976D2</color>
 
     <!-- UI colors -->
     <color name="color_error">#F44336</color>

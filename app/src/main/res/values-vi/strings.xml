@@ -69,7 +69,7 @@
     <string name="genre_other">Khác</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio là trình phát radio đa mạng miễn phí và mã nguồn mở, tập hợp các luồng từ mạng clearnet, Tor (.onion) và I2P. Tận hưởng các trạm yêu thích của bạn trong giao diện Material You với tích hợp Orbot và ngăn chặn rò rỉ có thể cấu hình</string>
+    <string name="about_description">deutsia radio là trình phát radio đa mạng miễn phí và mã nguồn mở, tập hợp các luồng từ mạng clearnet, Tor (.onion) và I2P. Tận hưởng các trạm yêu thích của bạn trong giao diện Material You với tích hợp InviZible Pro và ngăn chặn rò rỉ có thể cấu hình</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">Duyệt</string>
@@ -198,7 +198,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Mạng Tor</string>
-    <string name="settings_enable_tor">Bật Tor (qua Orbot)</string>
+    <string name="settings_enable_tor">Bật Tor (qua InviZible Pro)</string>
     <string name="settings_enable_tor_description">Kết nối qua mạng Tor</string>
     <string name="settings_tor_disconnected">Đã ngắt kết nối</string>
     <string name="settings_tor_not_running">Tor không chạy</string>
@@ -206,7 +206,7 @@
     <string name="settings_force_tor_description">Định tuyến tất cả luồng qua Tor. Không kết nối nếu không có Tor.</string>
     <string name="settings_force_tor_except_i2p">Bắt buộc Tor trừ I2P</string>
     <string name="settings_force_tor_except_i2p_description">Định tuyến clearnet qua Tor, luồng I2P trực tiếp đến proxy I2P.</string>
-    <string name="settings_tor_info">Yêu cầu Orbot (miễn phí từ Play Store hoặc F-Droid). Nhấn vào biểu tượng Tor trên thanh công cụ để truy cập nhanh.\n\nChế độ bắt buộc chặn kết nối khi Tor không khả dụng.</string>
+    <string name="settings_tor_info">Yêu cầu InviZible Pro (miễn phí từ Play Store hoặc F-Droid). Nhấn vào biểu tượng Tor trên thanh công cụ để truy cập nhanh.\n\nChế độ bắt buộc chặn kết nối khi Tor không khả dụng.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Proxy tùy chỉnh</string>
@@ -249,16 +249,16 @@
     <string name="settings_station_management">Quản lý trạm</string>
     <string name="settings_import_from_file">Nhập từ tệp</string>
     <string name="settings_import_from_file_description">Nhập từ CSV, JSON, M3U hoặc PLS</string>
-    <string name="settings_import_i2p_stations">Nhập trạm I2P</string>
-    <string name="settings_import_i2p_stations_description">14 trạm radio I2P được tuyển chọn</string>
-    <string name="settings_import_tor_stations">Nhập trạm Tor</string>
-    <string name="settings_import_tor_stations_description">3 trạm radio Tor được tuyển chọn</string>
+    <string name="settings_add_i2p_stations">Thêm trạm I2P</string>
+    <string name="settings_add_i2p_stations_description">%d trạm I2P đi kèm (ngoại tuyến, không cần mạng)</string>
+    <string name="settings_add_tor_stations">Thêm trạm Tor</string>
+    <string name="settings_add_tor_stations_description">%d trạm Tor đi kèm (ngoại tuyến, không cần mạng)</string>
     <string name="settings_export_stations">Xuất trạm</string>
     <string name="settings_export_stations_description">Xuất các trạm của bạn ra tệp</string>
 
     <!-- Settings - About -->
     <string name="settings_about">Giới thiệu</string>
-    <string name="settings_version">Phiên bản 1.3</string>
+    <string name="settings_version">Phiên bản 1.4</string>
     <string name="settings_view_github">Xem trên GitHub</string>
     <string name="settings_donate">Quyên góp</string>
     <string name="settings_donate_description">Nếu ứng dụng này hữu ích cho bạn, hãy xem xét quyên góp</string>
@@ -270,10 +270,10 @@
     <string name="tor_connection_details">Chi tiết kết nối</string>
     <string name="tor_proxy_host">Máy chủ proxy</string>
     <string name="tor_socks_port">Cổng SOCKS</string>
-    <string name="tor_what_is_orbot">Orbot là gì?</string>
-    <string name="tor_orbot_description">Orbot là ứng dụng Tor chính thức cho Android. Nó cung cấp truy cập an toàn, được mã hóa đến mạng Tor.</string>
+    <string name="tor_what_is_invizible">InviZible Pro là gì?</string>
+    <string name="tor_invizible_description">InviZible Pro cung cấp Tor, DNSCrypt và I2P. Để sử dụng Tor: mở InviZible Pro, vào Cài đặt → Khởi động nhanh → bật \"Chế độ proxy\", sau đó khởi động Tor.</string>
     <string name="tor_connect">Kết nối với Tor</string>
-    <string name="tor_open_orbot">Mở Orbot</string>
+    <string name="tor_open_invizible">Mở InviZible Pro</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">Đang kết nối...</string>
@@ -282,7 +282,7 @@
     <string name="tor_status_off">Tor tắt</string>
     <string name="tor_status_error">Lỗi Tor</string>
     <string name="tor_status_leak_warning">Cảnh báo rò rỉ</string>
-    <string name="tor_status_install_orbot">Cài đặt Orbot</string>
+    <string name="tor_status_install_invizible">Cài đặt InviZible Pro</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor đã ngắt kết nối. Nhấn để kết nối.</string>
@@ -290,29 +290,29 @@
     <string name="tor_status_connected_description">Tor đã kết nối. Nhấn để xem chi tiết.</string>
     <string name="tor_status_connected_force_description">Tor đã kết nối (Chế độ Bắt buộc). Nhấn để xem chi tiết.</string>
     <string name="tor_status_error_description">Kết nối Tor thất bại. Nhấn để thử lại.</string>
-    <string name="tor_status_install_orbot_description">Orbot chưa được cài đặt. Nhấn để cài đặt.</string>
+    <string name="tor_status_install_invizible_description">InviZible Pro chưa được cài đặt. Nhấn để cài đặt.</string>
     <string name="tor_status_leak_warning_description">Chế độ Tor bắt buộc đã bật nhưng chưa kết nối. Quyền riêng tư có thể bị ảnh hưởng.</string>
 
     <string name="tor_status_connecting_message">Đang kết nối với Tor...</string>
     <string name="tor_status_connected_message">Đã kết nối qua Tor</string>
     <string name="tor_control_title_stopped">Tor đã ngắt kết nối</string>
     <string name="tor_control_subtitle_stopped">Nhấn Kết nối để duyệt ẩn danh qua Tor</string>
-    <string name="tor_control_subtitle_connecting">Đang thiết lập kết nối an toàn qua Orbot</string>
+    <string name="tor_control_subtitle_connecting">Đang thiết lập kết nối an toàn qua InviZible Pro</string>
     <string name="tor_control_title_connecting">Đang kết nối với Tor...</string>
     <string name="tor_control_title_connected">Đã kết nối với Tor</string>
     <string name="tor_control_title_connected_force">Đã kết nối với Tor (Chế độ bắt buộc)</string>
     <string name="tor_control_subtitle_connected">Kết nối của bạn là riêng tư và ẩn danh</string>
-    <string name="tor_control_subtitle_connected_force">Ngắt kết nối qua Orbot hoặc tắt Bắt buộc Tor trong cài đặt</string>
+    <string name="tor_control_subtitle_connected_force">Ngắt kết nối qua InviZible Pro hoặc tắt Bắt buộc Tor trong cài đặt</string>
     <string name="tor_control_title_error">Kết nối thất bại</string>
     <string name="tor_control_subtitle_error">Không thể kết nối với mạng Tor</string>
-    <string name="tor_control_title_orbot_required">Yêu cầu Orbot</string>
-    <string name="tor_control_subtitle_orbot_required">Cài đặt Orbot để kết nối với mạng Tor</string>
+    <string name="tor_control_title_invizible_required">Yêu cầu InviZible Pro</string>
+    <string name="tor_control_subtitle_invizible_required">Cài đặt InviZible Pro để kết nối với mạng Tor</string>
     <string name="tor_control_button_connecting">Đang kết nối...</string>
     <string name="tor_control_button_disconnect">Ngắt kết nối</string>
     <string name="tor_control_button_cancel">Hủy</string>
     <string name="tor_control_button_retry">Thử lại kết nối</string>
-    <string name="tor_control_button_install">Cài đặt Orbot</string>
-    <string name="tor_control_button_open_orbot">Mở Orbot</string>
+    <string name="tor_control_button_install">Cài đặt InviZible Pro</string>
+    <string name="tor_control_button_open_invizible">Mở InviZible Pro</string>
 
 
     <!-- Add/Edit Radio Dialog -->
@@ -375,13 +375,13 @@
     <string name="tor_channel_description">Hiển thị trạng thái kết nối Tor</string>
     <string name="tor_notification_disconnected">Đã ngắt kết nối Tor</string>
     <string name="tor_notification_tap_to_open">Nhấn để mở ứng dụng</string>
-    <string name="tor_notification_connecting">Đang kết nối qua Orbot...</string>
+    <string name="tor_notification_connecting">Đang kết nối qua InviZible Pro...</string>
     <string name="tor_notification_please_wait">Vui lòng đợi</string>
     <string name="tor_notification_connected">Đã kết nối Tor</string>
     <string name="tor_notification_error">Lỗi Tor</string>
     <string name="tor_notification_connection_failed">Kết nối thất bại</string>
-    <string name="tor_notification_orbot_required">Yêu cầu Orbot</string>
-    <string name="tor_notification_install_orbot">Vui lòng cài đặt Orbot để hỗ trợ Tor</string>
+    <string name="tor_notification_invizible_required">Yêu cầu InviZible Pro</string>
+    <string name="tor_notification_install_invizible">Vui lòng cài đặt InviZible Pro để hỗ trợ Tor</string>
     <string name="tor_notification_action_stop">Dừng Tor</string>
 
     <!-- Other Error Messages -->
@@ -482,12 +482,12 @@
     <string name="tor_status_connecting_network">Đang kết nối với mạng Tor...</string>
     <string name="tor_status_connected_via_tor">Đã kết nối qua Tor</string>
     <string name="tor_status_connection_error">Lỗi kết nối</string>
-    <string name="tor_status_orbot_required">Yêu cầu ứng dụng Orbot</string>
+    <string name="tor_status_invizible_required">Yêu cầu ứng dụng InviZible Pro</string>
     <string name="tor_status_detail_socks5">Proxy SOCKS5 tại %1$s:%2$d</string>
     <string name="tor_status_detail_establishing">Đang thiết lập kết nối...</string>
     <string name="tor_status_detail_unknown_error">Đã xảy ra lỗi không xác định</string>
     <string name="tor_status_detail_tap_to_connect">Nhấn để kết nối</string>
-    <string name="tor_status_detail_install_orbot">Cài đặt Orbot từ Play Store hoặc F-Droid</string>
+    <string name="tor_status_detail_install_invizible">Cài đặt InviZible Pro từ Play Store hoặc F-Droid</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">Đã ngắt kết nối</string>
@@ -500,9 +500,9 @@
     <string name="settings_tor_socks_port">Cổng SOCKS: %d</string>
     <string name="button_stop_tor">Dừng</string>
     <string name="settings_tor_connection_failed">Kết nối thất bại</string>
-    <string name="settings_tor_orbot_required_status">Yêu cầu Orbot</string>
-    <string name="settings_tor_install_orbot_message">Vui lòng cài đặt Orbot để sử dụng Tor</string>
-    <string name="button_install_orbot_caps">Cài đặt Orbot</string>
+    <string name="settings_tor_invizible_required_status">Yêu cầu InviZible Pro</string>
+    <string name="settings_tor_install_invizible_message">Vui lòng cài đặt InviZible Pro để sử dụng Tor</string>
+    <string name="button_install_invizible_caps">Cài đặt InviZible Pro</string>
     <string name="settings_tor_force_warning">Kết nối thất bại</string>
     <string name="settings_tor_force_warning_detail">Bắt buộc Tor được bật nhưng chưa kết nối</string>
     <string name="button_retry">Thử lại</string>

@@ -69,7 +69,7 @@
     <string name="genre_other">其他</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio 是一款免费开源的多网络电台播放器，整合了来自明网、Tor（.onion）和 I2P 网络的流媒体。在具有 Orbot 集成和可配置泄漏防护的 Material You 界面中享受您喜爱的电台</string>
+    <string name="about_description">deutsia radio 是一款免费开源的多网络电台播放器，整合了来自明网、Tor（.onion）和 I2P 网络的流媒体。在具有 InviZible Pro 集成和可配置泄漏防护的 Material You 界面中享受您喜爱的电台</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">浏览</string>
@@ -198,7 +198,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Tor 网络</string>
-    <string name="settings_enable_tor">启用 Tor（通过 Orbot）</string>
+    <string name="settings_enable_tor">启用 Tor（通过 InviZible Pro）</string>
     <string name="settings_enable_tor_description">通过 Tor 网络连接</string>
     <string name="settings_tor_disconnected">已断开</string>
     <string name="settings_tor_not_running">Tor 未运行</string>
@@ -206,7 +206,7 @@
     <string name="settings_force_tor_description">通过 Tor 路由所有流。没有 Tor 不会连接。</string>
     <string name="settings_force_tor_except_i2p">强制 Tor（I2P 除外）</string>
     <string name="settings_force_tor_except_i2p_description">明网通过 Tor 路由，I2P 流直接连接到 I2P 代理。</string>
-    <string name="settings_tor_info">需要 Orbot（可从 Play Store 或 F-Droid 免费获取）。点击工具栏中的 Tor 图标以快速访问。\n\n强制模式会在 Tor 不可用时阻止连接。</string>
+    <string name="settings_tor_info">需要 InviZible Pro（可从 Play Store 或 F-Droid 免费获取）。点击工具栏中的 Tor 图标以快速访问。\n\n强制模式会在 Tor 不可用时阻止连接。</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">自定义代理</string>
@@ -249,16 +249,16 @@
     <string name="settings_station_management">电台管理</string>
     <string name="settings_import_from_file">从文件导入</string>
     <string name="settings_import_from_file_description">从 CSV、JSON、M3U 或 PLS 导入</string>
-    <string name="settings_import_i2p_stations">导入 I2P 电台</string>
-    <string name="settings_import_i2p_stations_description">14 个精选 I2P 电台</string>
-    <string name="settings_import_tor_stations">导入 Tor 电台</string>
-    <string name="settings_import_tor_stations_description">3 个精选 Tor 电台</string>
+    <string name="settings_add_i2p_stations">添加 I2P 电台</string>
+    <string name="settings_add_i2p_stations_description">%d 个内置 I2P 电台（离线，无需网络）</string>
+    <string name="settings_add_tor_stations">添加 Tor 电台</string>
+    <string name="settings_add_tor_stations_description">%d 个内置 Tor 电台（离线，无需网络）</string>
     <string name="settings_export_stations">导出电台</string>
     <string name="settings_export_stations_description">将您的电台导出到文件</string>
 
     <!-- Settings - About -->
     <string name="settings_about">关于</string>
-    <string name="settings_version">版本 1.3</string>
+    <string name="settings_version">版本 1.4</string>
     <string name="settings_view_github">在 GitHub 上查看</string>
     <string name="settings_donate">捐赠</string>
     <string name="settings_donate_description">如果此应用对您有帮助，请考虑捐赠</string>
@@ -270,10 +270,10 @@
     <string name="tor_connection_details">连接详情</string>
     <string name="tor_proxy_host">代理主机</string>
     <string name="tor_socks_port">SOCKS 端口</string>
-    <string name="tor_what_is_orbot">什么是 Orbot？</string>
-    <string name="tor_orbot_description">Orbot 是 Android 的官方 Tor 客户端。它提供对 Tor 网络的安全加密访问。</string>
+    <string name="tor_what_is_invizible">什么是 InviZible Pro？</string>
+    <string name="tor_invizible_description">InviZible Pro 提供 Tor、DNSCrypt 和 I2P 功能。要启用代理模式：打开 InviZible Pro → 设置 → 快速启动 → 启用"代理模式"，然后启动 Tor。</string>
     <string name="tor_connect">连接到 Tor</string>
-    <string name="tor_open_orbot">打开 Orbot</string>
+    <string name="tor_open_invizible">打开 InviZible Pro</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">连接中...</string>
@@ -282,7 +282,7 @@
     <string name="tor_status_off">Tor已关闭</string>
     <string name="tor_status_error">Tor错误</string>
     <string name="tor_status_leak_warning">泄漏警告</string>
-    <string name="tor_status_install_orbot">安装Orbot</string>
+    <string name="tor_status_install_invizible">安装InviZible Pro</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor已断开连接。点击以连接。</string>
@@ -290,29 +290,29 @@
     <string name="tor_status_connected_description">Tor已连接。点击查看详情。</string>
     <string name="tor_status_connected_force_description">Tor已连接（强制模式）。点击查看详情。</string>
     <string name="tor_status_error_description">Tor连接失败。点击重试。</string>
-    <string name="tor_status_install_orbot_description">未安装Orbot。点击安装。</string>
+    <string name="tor_status_install_invizible_description">未安装InviZible Pro。点击安装。</string>
     <string name="tor_status_leak_warning_description">强制Tor模式已启用但未连接。隐私可能受到威胁。</string>
 
     <string name="tor_status_connecting_message">正在连接到Tor...</string>
     <string name="tor_status_connected_message">已通过Tor连接</string>
     <string name="tor_control_title_stopped">Tor已断开</string>
     <string name="tor_control_subtitle_stopped">点击连接以通过Tor匿名浏览</string>
-    <string name="tor_control_subtitle_connecting">正在通过Orbot建立安全连接</string>
+    <string name="tor_control_subtitle_connecting">正在通过InviZible Pro建立安全连接</string>
     <string name="tor_control_title_connecting">正在连接到Tor...</string>
     <string name="tor_control_title_connected">已连接到Tor</string>
     <string name="tor_control_title_connected_force">已连接到Tor（强制模式）</string>
     <string name="tor_control_subtitle_connected">您的连接是私密且匿名的</string>
-    <string name="tor_control_subtitle_connected_force">通过Orbot断开连接或在设置中禁用强制Tor</string>
+    <string name="tor_control_subtitle_connected_force">通过InviZible Pro断开连接或在设置中禁用强制Tor</string>
     <string name="tor_control_title_error">连接失败</string>
     <string name="tor_control_subtitle_error">无法连接到Tor网络</string>
-    <string name="tor_control_title_orbot_required">需要Orbot</string>
-    <string name="tor_control_subtitle_orbot_required">安装Orbot以连接到Tor网络</string>
+    <string name="tor_control_title_invizible_required">需要InviZible Pro</string>
+    <string name="tor_control_subtitle_invizible_required">安装InviZible Pro以连接到Tor网络</string>
     <string name="tor_control_button_connecting">连接中...</string>
     <string name="tor_control_button_disconnect">断开连接</string>
     <string name="tor_control_button_cancel">取消</string>
     <string name="tor_control_button_retry">重试连接</string>
-    <string name="tor_control_button_install">安装Orbot</string>
-    <string name="tor_control_button_open_orbot">打开Orbot</string>
+    <string name="tor_control_button_install">安装InviZible Pro</string>
+    <string name="tor_control_button_open_invizible">打开InviZible Pro</string>
 
 
     <!-- Add/Edit Radio Dialog -->
@@ -375,13 +375,13 @@
     <string name="tor_channel_description">显示 Tor 连接状态</string>
     <string name="tor_notification_disconnected">Tor 已断开</string>
     <string name="tor_notification_tap_to_open">点击打开应用</string>
-    <string name="tor_notification_connecting">通过 Orbot 连接中...</string>
+    <string name="tor_notification_connecting">通过 InviZible Pro 连接中...</string>
     <string name="tor_notification_please_wait">请稍候</string>
     <string name="tor_notification_connected">Tor 已连接</string>
     <string name="tor_notification_error">Tor 错误</string>
     <string name="tor_notification_connection_failed">连接失败</string>
-    <string name="tor_notification_orbot_required">需要 Orbot</string>
-    <string name="tor_notification_install_orbot">请安装 Orbot 以获得 Tor 支持</string>
+    <string name="tor_notification_invizible_required">需要 InviZible Pro</string>
+    <string name="tor_notification_install_invizible">请安装 InviZible Pro 以获得 Tor 支持</string>
     <string name="tor_notification_action_stop">停止 Tor</string>
 
     <!-- Other Error Messages -->
@@ -482,12 +482,12 @@
     <string name="tor_status_connecting_network">正在连接到 Tor 网络...</string>
     <string name="tor_status_connected_via_tor">已通过 Tor 连接</string>
     <string name="tor_status_connection_error">连接错误</string>
-    <string name="tor_status_orbot_required">需要 Orbot 应用</string>
+    <string name="tor_status_invizible_required">需要 InviZible Pro 应用</string>
     <string name="tor_status_detail_socks5">SOCKS5 代理：%1$s:%2$d</string>
     <string name="tor_status_detail_establishing">正在建立连接...</string>
     <string name="tor_status_detail_unknown_error">发生未知错误</string>
     <string name="tor_status_detail_tap_to_connect">点击连接</string>
-    <string name="tor_status_detail_install_orbot">从 Play Store 或 F-Droid 安装 Orbot</string>
+    <string name="tor_status_detail_install_invizible">从 Play Store 或 F-Droid 安装 InviZible Pro</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">已断开连接</string>
@@ -500,9 +500,9 @@
     <string name="settings_tor_socks_port">SOCKS 端口：%d</string>
     <string name="button_stop_tor">停止</string>
     <string name="settings_tor_connection_failed">连接失败</string>
-    <string name="settings_tor_orbot_required_status">需要 Orbot</string>
-    <string name="settings_tor_install_orbot_message">请安装 Orbot 以使用 Tor</string>
-    <string name="button_install_orbot_caps">安装 Orbot</string>
+    <string name="settings_tor_invizible_required_status">需要 InviZible Pro</string>
+    <string name="settings_tor_install_invizible_message">请安装 InviZible Pro 以使用 Tor</string>
+    <string name="button_install_invizible_caps">安装 InviZible Pro</string>
     <string name="settings_tor_force_warning">连接失败</string>
     <string name="settings_tor_force_warning_detail">强制 Tor 已启用但未连接</string>
     <string name="button_retry">重试</string>

@@ -119,8 +119,8 @@ class TorStatusView @JvmOverloads constructor(
                     showErrorAnimation()
                 }
             }
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                // If force Tor is enabled but Orbot says not installed, check if proxy is accessible
+            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
+                // If force Tor is enabled but InviZible Pro says not installed, check if proxy is accessible
                 // This prevents UI glitches during activity recreation
                 if (isForceTorEnabled && TorManager.isConnected()) {
                     showConnectedStateForForceTor()
@@ -129,9 +129,9 @@ class TorStatusView @JvmOverloads constructor(
                 } else {
                     statusIcon.setImageResource(R.drawable.ic_tor_off)
                     statusIcon.alpha = 0.5f
-                    statusText.text = context.getString(R.string.tor_status_install_orbot)
+                    statusText.text = context.getString(R.string.tor_status_install_invizible)
                     statusText.setTextColor(context.getColor(R.color.tor_disconnected))
-                    contentDescription = context.getString(R.string.tor_status_install_orbot_description)
+                    contentDescription = context.getString(R.string.tor_status_install_invizible_description)
                 }
             }
         }

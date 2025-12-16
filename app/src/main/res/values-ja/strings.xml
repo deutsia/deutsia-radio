@@ -69,7 +69,7 @@
     <string name="genre_other">その他</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radioは、clearnet、Tor（.onion）、I2Pネットワークからのストリームをまとめた無料のオープンソースマルチネットラジオプレーヤーです。Orbot統合と設定可能なリーク防止機能を備えたMaterial Youインターフェースでお気に入りのステーションをお楽しみください</string>
+    <string name="about_description">deutsia radioは、clearnet、Tor（.onion）、I2Pネットワークからのストリームをまとめた無料のオープンソースマルチネットラジオプレーヤーです。InviZible Pro統合と設定可能なリーク防止機能を備えたMaterial Youインターフェースでお気に入りのステーションをお楽しみください</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">閲覧</string>
@@ -198,7 +198,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Torネットワーク</string>
-    <string name="settings_enable_tor">Torを有効化（Orbot経由）</string>
+    <string name="settings_enable_tor">Torを有効化（InviZible Pro経由）</string>
     <string name="settings_enable_tor_description">Torネットワーク経由で接続</string>
     <string name="settings_tor_disconnected">切断</string>
     <string name="settings_tor_not_running">Torが実行されていません</string>
@@ -206,7 +206,7 @@
     <string name="settings_force_tor_description">すべてのストリームをTor経由でルーティング。Torなしでは接続しません。</string>
     <string name="settings_force_tor_except_i2p">I2P以外にTorを強制</string>
     <string name="settings_force_tor_except_i2p_description">clearnetをTor経由でルーティング、I2PストリームはI2Pプロキシに直接接続。</string>
-    <string name="settings_tor_info">Orbotが必要です（Play StoreまたはF-Droidから無料）。ツールバーのTorアイコンをタップして素早くアクセスできます。\n\n強制モードは、Torが利用できない場合に接続をブロックします。</string>
+    <string name="settings_tor_info">InviZible Proが必要です（Play StoreまたはF-Droidから無料）。ツールバーのTorアイコンをタップして素早くアクセスできます。\n\n強制モードは、Torが利用できない場合に接続をブロックします。</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">カスタムプロキシ</string>
@@ -249,16 +249,16 @@
     <string name="settings_station_management">ステーション管理</string>
     <string name="settings_import_from_file">ファイルからインポート</string>
     <string name="settings_import_from_file_description">CSV、JSON、M3U、またはPLSからインポート</string>
-    <string name="settings_import_i2p_stations">I2Pステーションをインポート</string>
-    <string name="settings_import_i2p_stations_description">厳選された14のI2Pラジオステーション</string>
-    <string name="settings_import_tor_stations">Torステーションをインポート</string>
-    <string name="settings_import_tor_stations_description">厳選された3つのTorラジオステーション</string>
+    <string name="settings_add_i2p_stations">I2Pステーションを追加</string>
+    <string name="settings_add_i2p_stations_description">%d個の同梱I2Pステーション（オフライン、ネットワーク不要）</string>
+    <string name="settings_add_tor_stations">Torステーションを追加</string>
+    <string name="settings_add_tor_stations_description">%d個の同梱Torステーション（オフライン、ネットワーク不要）</string>
     <string name="settings_export_stations">ステーションをエクスポート</string>
     <string name="settings_export_stations_description">ステーションをファイルにエクスポート</string>
 
     <!-- Settings - About -->
     <string name="settings_about">このアプリについて</string>
-    <string name="settings_version">バージョン 1.3</string>
+    <string name="settings_version">バージョン 1.4</string>
     <string name="settings_view_github">GitHubで見る</string>
     <string name="settings_donate">寄付</string>
     <string name="settings_donate_description">このアプリが役に立った場合は、寄付をご検討ください</string>
@@ -270,10 +270,10 @@
     <string name="tor_connection_details">接続の詳細</string>
     <string name="tor_proxy_host">プロキシホスト</string>
     <string name="tor_socks_port">SOCKSポート</string>
-    <string name="tor_what_is_orbot">Orbotとは？</string>
-    <string name="tor_orbot_description">OrbotはAndroid用の公式Torクライアントです。Torネットワークへの安全で暗号化されたアクセスを提供します。</string>
+    <string name="tor_what_is_invizible">InviZible Proとは？</string>
+    <string name="tor_invizible_description">InviZible ProはTor、DNSCrypt、I2Pを提供する強力なプライバシーアプリです。使用するには、設定 → クイックスタートに移動し、「プロキシモード」を有効にしてから、Torを起動してください。</string>
     <string name="tor_connect">Torに接続</string>
-    <string name="tor_open_orbot">Orbotを開く</string>
+    <string name="tor_open_invizible">InviZible Proを開く</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">接続中...</string>
@@ -282,7 +282,7 @@
     <string name="tor_status_off">Torオフ</string>
     <string name="tor_status_error">Torエラー</string>
     <string name="tor_status_leak_warning">リーク警告</string>
-    <string name="tor_status_install_orbot">Orbotをインストール</string>
+    <string name="tor_status_install_invizible">InviZible Proをインストール</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Torが切断されています。タップして接続します。</string>
@@ -290,29 +290,29 @@
     <string name="tor_status_connected_description">Torが接続されています。タップして詳細を表示します。</string>
     <string name="tor_status_connected_force_description">Torが接続されています（強制モード）。タップして詳細を表示します。</string>
     <string name="tor_status_error_description">Tor接続に失敗しました。タップして再試行します。</string>
-    <string name="tor_status_install_orbot_description">Orbotがインストールされていません。タップしてインストールします。</string>
+    <string name="tor_status_install_invizible_description">InviZible Proがインストールされていません。タップしてインストールします。</string>
     <string name="tor_status_leak_warning_description">強制Torモードが有効ですが接続されていません。プライバシーが危険にさらされている可能性があります。</string>
 
     <string name="tor_status_connecting_message">Torに接続中...</string>
     <string name="tor_status_connected_message">Tor経由で接続済み</string>
     <string name="tor_control_title_stopped">Tor切断済み</string>
     <string name="tor_control_subtitle_stopped">接続をタップしてTor経由で匿名ブラウジング</string>
-    <string name="tor_control_subtitle_connecting">Orbot経由で安全な接続を確立中</string>
+    <string name="tor_control_subtitle_connecting">InviZible Pro経由で安全な接続を確立中</string>
     <string name="tor_control_title_connecting">Torに接続中...</string>
     <string name="tor_control_title_connected">Torに接続済み</string>
     <string name="tor_control_title_connected_force">Torに接続済み（強制モード）</string>
     <string name="tor_control_subtitle_connected">接続はプライベートで匿名です</string>
-    <string name="tor_control_subtitle_connected_force">Orbot経由で切断するか、設定で強制Torを無効にしてください</string>
+    <string name="tor_control_subtitle_connected_force">InviZible Pro経由で切断するか、設定で強制Torを無効にしてください</string>
     <string name="tor_control_title_error">接続失敗</string>
     <string name="tor_control_subtitle_error">Torネットワークに接続できませんでした</string>
-    <string name="tor_control_title_orbot_required">Orbotが必要</string>
-    <string name="tor_control_subtitle_orbot_required">Torネットワークに接続するにはOrbotをインストールしてください</string>
+    <string name="tor_control_title_invizible_required">InviZible Proが必要</string>
+    <string name="tor_control_subtitle_invizible_required">Torネットワークに接続するにはInviZible Proをインストールしてください</string>
     <string name="tor_control_button_connecting">接続中...</string>
     <string name="tor_control_button_disconnect">切断</string>
     <string name="tor_control_button_cancel">キャンセル</string>
     <string name="tor_control_button_retry">再接続</string>
-    <string name="tor_control_button_install">Orbotをインストール</string>
-    <string name="tor_control_button_open_orbot">Orbotを開く</string>
+    <string name="tor_control_button_install">InviZible Proをインストール</string>
+    <string name="tor_control_button_open_invizible">InviZible Proを開く</string>
 
     <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">埋め込みTorを使用 - プロキシ設定は不要</string>
@@ -374,13 +374,13 @@
     <string name="tor_channel_description">Tor接続ステータスを表示</string>
     <string name="tor_notification_disconnected">Tor切断</string>
     <string name="tor_notification_tap_to_open">タップしてアプリを開く</string>
-    <string name="tor_notification_connecting">Orbot経由で接続中...</string>
+    <string name="tor_notification_connecting">InviZible Pro経由で接続中...</string>
     <string name="tor_notification_please_wait">お待ちください</string>
     <string name="tor_notification_connected">Tor接続済み</string>
     <string name="tor_notification_error">Torエラー</string>
     <string name="tor_notification_connection_failed">接続に失敗しました</string>
-    <string name="tor_notification_orbot_required">Orbotが必要です</string>
-    <string name="tor_notification_install_orbot">Torサポートのため、Orbotをインストールしてください</string>
+    <string name="tor_notification_invizible_required">InviZible Proが必要です</string>
+    <string name="tor_notification_install_invizible">Torサポートのため、InviZible Proをインストールしてください</string>
     <string name="tor_notification_action_stop">Torを停止</string>
 
     <!-- Other Error Messages -->
@@ -481,12 +481,12 @@
     <string name="tor_status_connecting_network">Torネットワークに接続中...</string>
     <string name="tor_status_connected_via_tor">Tor経由で接続されました</string>
     <string name="tor_status_connection_error">接続エラー</string>
-    <string name="tor_status_orbot_required">Orbotアプリが必要です</string>
+    <string name="tor_status_invizible_required">InviZible Proアプリが必要です</string>
     <string name="tor_status_detail_socks5">%1$s:%2$dにSOCKS5プロキシ</string>
     <string name="tor_status_detail_establishing">接続を確立中...</string>
     <string name="tor_status_detail_unknown_error">不明なエラーが発生しました</string>
     <string name="tor_status_detail_tap_to_connect">タップして接続</string>
-    <string name="tor_status_detail_install_orbot">Play StoreまたはF-DroidからOrbotをインストールしてください</string>
+    <string name="tor_status_detail_install_invizible">Play StoreまたはF-DroidからInviZible Proをインストールしてください</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">切断されました</string>
@@ -499,9 +499,9 @@
     <string name="settings_tor_socks_port">SOCKSポート: %d</string>
     <string name="button_stop_tor">停止</string>
     <string name="settings_tor_connection_failed">接続に失敗しました</string>
-    <string name="settings_tor_orbot_required_status">Orbotが必要です</string>
-    <string name="settings_tor_install_orbot_message">Torを使用するにはOrbotをインストールしてください</string>
-    <string name="button_install_orbot_caps">Orbotをインストール</string>
+    <string name="settings_tor_invizible_required_status">InviZible Proが必要です</string>
+    <string name="settings_tor_install_invizible_message">Torを使用するにはInviZible Proをインストールしてください</string>
+    <string name="button_install_invizible_caps">InviZible Proをインストール</string>
     <string name="settings_tor_force_warning">接続に失敗しました</string>
     <string name="settings_tor_force_warning_detail">強制Torが有効ですが、接続されていません</string>
     <string name="button_retry">再試行</string>

@@ -13,16 +13,17 @@ import android.util.Log
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
- * Manager for Tor connectivity using Orbot (the official Tor client for Android).
+ * Manager for Tor connectivity using InviZible Pro (privacy app with Tor/DNSCrypt/I2P support).
  *
- * This implementation provides seamless communication with Orbot, including:
+ * This implementation provides seamless communication with InviZible Pro, including:
  * - Real-time status updates via broadcast receiver
  * - Automatic connection state detection
  * - Periodic connection health checks
  * - Graceful error handling with user-friendly messages
  *
- * Orbot provides:
- * - A properly signed and sandboxed Tor implementation
+ * InviZible Pro provides:
+ * - Easy proxy mode configuration (no VPN workaround needed)
+ * - Tor, DNSCrypt, and I2P in one app
  * - System-level proxy support
  * - Automatic circuit management
  * - Regular security updates
@@ -30,32 +31,32 @@ import java.util.concurrent.CopyOnWriteArrayList
 object TorManager {
     private const val TAG = "TorManager"
 
-    // Orbot package identifiers
-    private const val ORBOT_PACKAGE_NAME = "org.torproject.android"
-    private const val ORBOT_MARKET_URI = "market://details?id=$ORBOT_PACKAGE_NAME"
-    private const val ORBOT_FDROID_URI = "https://f-droid.org/packages/$ORBOT_PACKAGE_NAME/"
+    // InviZible Pro package identifiers
+    private const val INVIZIBLE_PACKAGE_NAME = "pan.alexander.tordnscrypt"
+    private const val INVIZIBLE_MARKET_URI = "market://details?id=$INVIZIBLE_PACKAGE_NAME"
+    private const val INVIZIBLE_FDROID_URI = "https://f-droid.org/packages/$INVIZIBLE_PACKAGE_NAME/"
 
-    // Orbot Intent actions
+    // Tor Intent actions (standard Tor control protocol, works with InviZible Pro)
     private const val ACTION_START_TOR = "org.torproject.android.intent.action.START"
     private const val ACTION_REQUEST_HS = "org.torproject.android.REQUEST_HS_PORT"
     private const val ACTION_STATUS = "org.torproject.android.intent.action.STATUS"
 
-    // Orbot status broadcast
+    // Tor status broadcast
     private const val EXTRA_STATUS = "org.torproject.android.intent.extra.STATUS"
     private const val EXTRA_SOCKS_PROXY_HOST = "org.torproject.android.intent.extra.SOCKS_PROXY_HOST"
     private const val EXTRA_SOCKS_PROXY_PORT = "org.torproject.android.intent.extra.SOCKS_PROXY_PORT"
     private const val EXTRA_HTTP_PROXY_HOST = "org.torproject.android.intent.extra.HTTP_PROXY_HOST"
     private const val EXTRA_HTTP_PROXY_PORT = "org.torproject.android.intent.extra.HTTP_PROXY_PORT"
 
-    // Orbot status values
+    // Tor status values
     private const val STATUS_ON = "ON"
     private const val STATUS_OFF = "OFF"
     private const val STATUS_STARTING = "STARTING"
     private const val STATUS_STOPPING = "STOPPING"
 
-    // Default Orbot SOCKS port (when Orbot is running)
-    private const val DEFAULT_ORBOT_SOCKS_PORT = 9050
-    private const val DEFAULT_ORBOT_HTTP_PORT = 8118
+    // Default Tor SOCKS port (when InviZible Pro is running in proxy mode)
+    private const val DEFAULT_TOR_SOCKS_PORT = 9050
+    private const val DEFAULT_TOR_HTTP_PORT = 8118
 
     // Connection health check interval (30 seconds)
     private const val HEALTH_CHECK_INTERVAL = 30_000L
@@ -66,7 +67,7 @@ object TorManager {
         STARTING,
         CONNECTED,
         ERROR,
-        ORBOT_NOT_INSTALLED
+        INVIZIBLE_NOT_INSTALLED
     }
 
     private var _state: TorState = TorState.STOPPED
@@ -91,8 +92,8 @@ object TorManager {
     // Listeners for state changes (thread-safe)
     private val stateListeners = CopyOnWriteArrayList<(TorState) -> Unit>()
 
-    // Broadcast receiver for Orbot status updates
-    private var orbotStatusReceiver: BroadcastReceiver? = null
+    // Broadcast receiver for InviZible Pro status updates
+    private var invizibleStatusReceiver: BroadcastReceiver? = null
     private var isReceiverRegistered = false
 
     // Handler for periodic health checks
@@ -198,7 +199,7 @@ object TorManager {
                 Handler(Looper.getMainLooper()).post {
                     if (_state == TorState.CONNECTED && !isShuttingDown) {
                         Log.w(TAG, "Connection health check failed: ${e.message}")
-                        _errorMessage = "Tor connection lost. Please check Orbot."
+                        _errorMessage = "Tor connection lost. Please check InviZible Pro."
                         notifyStateChange(TorState.ERROR)
                     }
                 }
@@ -208,11 +209,11 @@ object TorManager {
     }
 
     /**
-     * Check if Orbot is installed on the device.
+     * Check if InviZible Pro is installed on the device.
      */
-    fun isOrbotInstalled(context: Context): Boolean {
+    fun isInviZibleInstalled(context: Context): Boolean {
         return try {
-            context.packageManager.getPackageInfo(ORBOT_PACKAGE_NAME, 0)
+            context.packageManager.getPackageInfo(INVIZIBLE_PACKAGE_NAME, 0)
             true
         } catch (e: PackageManager.NameNotFoundException) {
             false
@@ -220,30 +221,30 @@ object TorManager {
     }
 
     /**
-     * Open the app store to install Orbot.
+     * Open the app store to install InviZible Pro.
      */
-    fun openOrbotInstallPage(context: Context) {
+    fun openInviZibleInstallPage(context: Context) {
         try {
             // Try Google Play first
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(ORBOT_MARKET_URI))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(INVIZIBLE_MARKET_URI))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         } catch (e: Exception) {
             // Fall back to F-Droid web page
             try {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(ORBOT_FDROID_URI))
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(INVIZIBLE_FDROID_URI))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
             } catch (e2: Exception) {
-                Log.e(TAG, "Failed to open Orbot install page", e2)
+                Log.e(TAG, "Failed to open InviZible Pro install page", e2)
             }
         }
     }
 
     /**
-     * Request Orbot to start the Tor service.
+     * Request InviZible Pro to start the Tor service.
      *
-     * This sends an intent to Orbot to start Tor. The actual connection status
+     * This sends an intent to InviZible Pro to start Tor. The actual connection status
      * will be received via broadcast.
      */
     fun start(context: Context, onComplete: ((Boolean) -> Unit)? = null) {
@@ -256,14 +257,14 @@ object TorManager {
         // Reset shutdown flag when starting
         isShuttingDown = false
 
-        // Check if Orbot is installed
-        if (!isOrbotInstalled(context)) {
-            Log.w(TAG, "Orbot is not installed")
-            // CRITICAL: Clear port state when transitioning to ORBOT_NOT_INSTALLED
+        // Check if InviZible Pro is installed
+        if (!isInviZibleInstalled(context)) {
+            Log.w(TAG, "InviZible Pro is not installed")
+            // CRITICAL: Clear port state when transitioning to INVIZIBLE_NOT_INSTALLED
             _socksPort = -1
             _httpPort = -1
-            _errorMessage = "Orbot is not installed. Please install Orbot to use Tor."
-            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
+            _errorMessage = "InviZible Pro is not installed. Please install InviZible Pro to use Tor."
+            notifyStateChange(TorState.INVIZIBLE_NOT_INSTALLED)
             onComplete?.invoke(false)
             return
         }
@@ -271,49 +272,49 @@ object TorManager {
         notifyStateChange(TorState.STARTING)
         _errorMessage = null
 
-        // Register receiver for Orbot status updates
-        registerOrbotStatusReceiver(context, onComplete)
+        // Register receiver for InviZible Pro status updates
+        registerInviZibleStatusReceiver(context, onComplete)
 
-        // Send intent to start Orbot
+        // Send intent to start InviZible Pro
         try {
             val intent = Intent(ACTION_START_TOR)
-            intent.setPackage(ORBOT_PACKAGE_NAME)
+            intent.setPackage(INVIZIBLE_PACKAGE_NAME)
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
             context.sendBroadcast(intent)
-            Log.d(TAG, "Sent start request to Orbot")
+            Log.d(TAG, "Sent start request to InviZible Pro")
 
-            // Also try to launch Orbot activity if broadcast doesn't work
+            // Also try to launch InviZible Pro activity if broadcast doesn't work
             try {
-                val launchIntent = context.packageManager.getLaunchIntentForPackage(ORBOT_PACKAGE_NAME)
+                val launchIntent = context.packageManager.getLaunchIntentForPackage(INVIZIBLE_PACKAGE_NAME)
                 if (launchIntent != null) {
                     launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     context.startActivity(launchIntent)
                 }
             } catch (e: Exception) {
-                Log.d(TAG, "Could not launch Orbot activity (this is OK)", e)
+                Log.d(TAG, "Could not launch InviZible Pro activity (this is OK)", e)
             }
 
-            // Set a timeout to check if Orbot responded
+            // Set a timeout to check if InviZible Pro responded
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                 if (_state == TorState.STARTING) {
-                    // Assume Orbot is running on default ports if we haven't received a status update
-                    // This handles the case where Orbot is already running
-                    checkOrbotConnection(context, onComplete)
+                    // Assume InviZible Pro is running on default ports if we haven't received a status update
+                    // This handles the case where InviZible Pro is already running
+                    checkTorConnection(context, onComplete)
                 }
             }, 3000)
 
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to start Orbot", e)
-            _errorMessage = e.message ?: "Failed to start Orbot"
+            Log.e(TAG, "Failed to start InviZible Pro", e)
+            _errorMessage = e.message ?: "Failed to start InviZible Pro"
             notifyStateChange(TorState.ERROR)
             onComplete?.invoke(false)
         }
     }
 
     /**
-     * Check if Orbot's SOCKS proxy is accessible.
+     * Check if InviZible Pro's SOCKS proxy is accessible.
      */
-    private fun checkOrbotConnection(context: Context, onComplete: ((Boolean) -> Unit)?) {
+    private fun checkTorConnection(context: Context, onComplete: ((Boolean) -> Unit)?) {
         // Cancel any previous socket check thread to prevent accumulation
         socketCheckThread?.let { thread ->
             if (thread.isAlive) {
@@ -329,36 +330,36 @@ object TorManager {
             }
 
             try {
-                // Try to connect to Orbot's SOCKS port
+                // Try to connect to InviZible Pro's SOCKS port
                 val socket = java.net.Socket()
-                socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_ORBOT_SOCKS_PORT), 2000)
+                socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_TOR_SOCKS_PORT), 2000)
                 socket.close()
 
                 // Don't update state if shutting down
                 if (isShuttingDown) return@Thread
 
-                // Connection successful - Orbot is running
-                _socksPort = DEFAULT_ORBOT_SOCKS_PORT
-                _httpPort = DEFAULT_ORBOT_HTTP_PORT
+                // Connection successful - InviZible Pro is running
+                _socksPort = DEFAULT_TOR_SOCKS_PORT
+                _httpPort = DEFAULT_TOR_HTTP_PORT
                 _socksHost = "127.0.0.1"
 
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                     if (!isShuttingDown) {
-                        Log.d(TAG, "Orbot is running on SOCKS port $_socksPort")
+                        Log.d(TAG, "InviZible Pro is running on SOCKS port $_socksPort")
                         notifyStateChange(TorState.CONNECTED)
                         onComplete?.invoke(true)
                     }
                 }
             } catch (e: InterruptedException) {
-                Log.d(TAG, "Orbot connection check interrupted (normal during cleanup)")
+                Log.d(TAG, "InviZible Pro connection check interrupted (normal during cleanup)")
                 onComplete?.invoke(false)
             } catch (e: Exception) {
                 if (isShuttingDown) return@Thread
 
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                     if (!isShuttingDown) {
-                        Log.w(TAG, "Orbot SOCKS port not accessible: ${e.message}")
-                        _errorMessage = "Please open Orbot and start the Tor service"
+                        Log.w(TAG, "InviZible Pro SOCKS port not accessible: ${e.message}")
+                        _errorMessage = "Please open InviZible Pro and start Tor in proxy mode"
                         notifyStateChange(TorState.ERROR)
                         onComplete?.invoke(false)
                     }
@@ -369,41 +370,41 @@ object TorManager {
     }
 
     /**
-     * Register a broadcast receiver for Orbot status updates.
+     * Register a broadcast receiver for InviZible Pro status updates.
      */
-    private fun registerOrbotStatusReceiver(context: Context, onComplete: ((Boolean) -> Unit)?) {
+    private fun registerInviZibleStatusReceiver(context: Context, onComplete: ((Boolean) -> Unit)?) {
         if (isReceiverRegistered) {
             return
         }
 
-        orbotStatusReceiver = object : BroadcastReceiver() {
+        invizibleStatusReceiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context?, intent: Intent?) {
                 if (intent?.action == ACTION_STATUS) {
                     val status = intent.getStringExtra(EXTRA_STATUS)
-                    Log.d(TAG, "Received Orbot status: $status")
+                    Log.d(TAG, "Received InviZible Pro status: $status")
 
                     when (status) {
                         STATUS_ON -> {
                             _socksHost = intent.getStringExtra(EXTRA_SOCKS_PROXY_HOST) ?: "127.0.0.1"
-                            _socksPort = intent.getIntExtra(EXTRA_SOCKS_PROXY_PORT, DEFAULT_ORBOT_SOCKS_PORT)
-                            _httpPort = intent.getIntExtra(EXTRA_HTTP_PROXY_PORT, DEFAULT_ORBOT_HTTP_PORT)
+                            _socksPort = intent.getIntExtra(EXTRA_SOCKS_PROXY_PORT, DEFAULT_TOR_SOCKS_PORT)
+                            _httpPort = intent.getIntExtra(EXTRA_HTTP_PROXY_PORT, DEFAULT_TOR_HTTP_PORT)
 
-                            Log.d(TAG, "Orbot connected: SOCKS=$_socksHost:$_socksPort")
+                            Log.d(TAG, "InviZible Pro connected: SOCKS=$_socksHost:$_socksPort")
                             notifyStateChange(TorState.CONNECTED)
                             onComplete?.invoke(true)
                         }
                         STATUS_OFF -> {
                             _socksPort = -1
                             _httpPort = -1
-                            Log.d(TAG, "Orbot stopped")
+                            Log.d(TAG, "InviZible Pro stopped")
                             notifyStateChange(TorState.STOPPED)
                         }
                         STATUS_STARTING -> {
-                            Log.d(TAG, "Orbot is starting...")
+                            Log.d(TAG, "InviZible Pro is starting...")
                             notifyStateChange(TorState.STARTING)
                         }
                         STATUS_STOPPING -> {
-                            Log.d(TAG, "Orbot is stopping...")
+                            Log.d(TAG, "InviZible Pro is stopping...")
                         }
                     }
                 }
@@ -412,17 +413,17 @@ object TorManager {
 
         val filter = IntentFilter(ACTION_STATUS)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Use RECEIVER_EXPORTED to receive broadcasts from Orbot (external app)
-            context.registerReceiver(orbotStatusReceiver, filter, Context.RECEIVER_EXPORTED)
+            // Use RECEIVER_EXPORTED to receive broadcasts from InviZible Pro (external app)
+            context.registerReceiver(invizibleStatusReceiver, filter, Context.RECEIVER_EXPORTED)
         } else {
-            context.registerReceiver(orbotStatusReceiver, filter)
+            context.registerReceiver(invizibleStatusReceiver, filter)
         }
         isReceiverRegistered = true
     }
 
     /**
-     * Stop listening for Orbot status updates.
-     * Note: This doesn't stop Orbot itself - the user controls Orbot separately.
+     * Stop listening for InviZible Pro status updates.
+     * Note: This doesn't stop InviZible Pro itself - the user controls InviZible Pro separately.
      */
     fun stop() {
         Log.d(TAG, "Stopping Tor manager...")
@@ -434,7 +435,7 @@ object TorManager {
     }
 
     /**
-     * Unregister the Orbot status receiver.
+     * Unregister the InviZible Pro status receiver.
      * Call this when the app is being destroyed.
      */
     fun cleanup(context: Context) {
@@ -451,57 +452,57 @@ object TorManager {
         }
         socketCheckThread = null
 
-        if (isReceiverRegistered && orbotStatusReceiver != null) {
+        if (isReceiverRegistered && invizibleStatusReceiver != null) {
             try {
-                context.unregisterReceiver(orbotStatusReceiver)
+                context.unregisterReceiver(invizibleStatusReceiver)
             } catch (e: Exception) {
-                Log.w(TAG, "Error unregistering Orbot receiver", e)
+                Log.w(TAG, "Error unregistering InviZible Pro receiver", e)
             }
             isReceiverRegistered = false
-            orbotStatusReceiver = null
+            invizibleStatusReceiver = null
         }
     }
 
     /**
-     * Initialize and check for Orbot status.
-     * Call this when the app starts to detect if Orbot is already running.
+     * Initialize and check for InviZible Pro status.
+     * Call this when the app starts to detect if InviZible Pro is already running.
      *
      * CRITICAL: This ALWAYS performs a socket check to ensure instantaneous leak detection.
      * UI components handle rapid state transitions via debouncing.
      */
     fun initialize(context: Context) {
-        // Register receiver first (even if Orbot check fails, the socket check will run)
-        registerOrbotStatusReceiver(context, null)
+        // Register receiver first (even if InviZible Pro check fails, the socket check will run)
+        registerInviZibleStatusReceiver(context, null)
 
-        // Request current status from Orbot - this includes a socket check
+        // Request current status from InviZible Pro - this includes a socket check
         // which provides INSTANT leak detection (socket check completes in ~1-100ms)
-        requestOrbotStatus(context)
+        requestTorStatus(context)
 
         // Only mark as not installed if BOTH the package check fails AND
         // we're currently in a non-connected state. This prevents false positives
         // during activity recreation when PackageManager might be slow to respond
         // but Tor is actually running.
-        if (!isOrbotInstalled(context) && _state != TorState.CONNECTED) {
-            // CRITICAL: Clear port state when transitioning to ORBOT_NOT_INSTALLED
+        if (!isInviZibleInstalled(context) && _state != TorState.CONNECTED) {
+            // CRITICAL: Clear port state when transitioning to INVIZIBLE_NOT_INSTALLED
             // to prevent UI showing leak warnings while ports are still set
             _socksPort = -1
             _httpPort = -1
-            notifyStateChange(TorState.ORBOT_NOT_INSTALLED)
+            notifyStateChange(TorState.INVIZIBLE_NOT_INSTALLED)
         }
     }
 
     /**
-     * Request current status from Orbot.
-     * Orbot will respond with a STATUS broadcast.
+     * Request current status from InviZible Pro.
+     * InviZible Pro will respond with a STATUS broadcast.
      */
-    fun requestOrbotStatus(context: Context) {
+    fun requestTorStatus(context: Context) {
         try {
             val intent = Intent(ACTION_STATUS)
-            intent.setPackage(ORBOT_PACKAGE_NAME)
+            intent.setPackage(INVIZIBLE_PACKAGE_NAME)
             context.sendBroadcast(intent)
-            Log.d(TAG, "Requested Orbot status")
+            Log.d(TAG, "Requested InviZible Pro status")
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to request Orbot status", e)
+            Log.w(TAG, "Failed to request InviZible Pro status", e)
         }
 
         // Also check the socket as a fallback - this is the most reliable way to detect Tor status
@@ -518,28 +519,28 @@ object TorManager {
 
             try {
                 val socket = java.net.Socket()
-                socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_ORBOT_SOCKS_PORT), 1000)
+                socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_TOR_SOCKS_PORT), 1000)
                 socket.close()
 
                 // Don't update state if shutting down
                 if (isShuttingDown) return@Thread
 
-                // Orbot is running
+                // InviZible Pro is running
                 Handler(Looper.getMainLooper()).post {
                     if (_state != TorState.CONNECTED && !isShuttingDown) {
-                        _socksPort = DEFAULT_ORBOT_SOCKS_PORT
-                        _httpPort = DEFAULT_ORBOT_HTTP_PORT
+                        _socksPort = DEFAULT_TOR_SOCKS_PORT
+                        _httpPort = DEFAULT_TOR_HTTP_PORT
                         _socksHost = "127.0.0.1"
                         notifyStateChange(TorState.CONNECTED)
                     }
                 }
             } catch (e: InterruptedException) {
-                Log.d(TAG, "Orbot status check interrupted (normal during cleanup)")
+                Log.d(TAG, "InviZible Pro status check interrupted (normal during cleanup)")
             } catch (e: Exception) {
                 // Don't process if shutting down
                 if (isShuttingDown) return@Thread
 
-                // Orbot not running or not accessible - update state regardless of current state
+                // InviZible Pro not running or not accessible - update state regardless of current state
                 Handler(Looper.getMainLooper()).post {
                     if ((_state == TorState.CONNECTED || _state == TorState.STARTING) && !isShuttingDown) {
                         _socksPort = -1
@@ -564,7 +565,7 @@ object TorManager {
             TorState.STARTING -> "Connecting to Tor network..."
             TorState.CONNECTED -> "Connected via Tor"
             TorState.ERROR -> _errorMessage ?: "Connection error"
-            TorState.ORBOT_NOT_INSTALLED -> "Orbot app required"
+            TorState.INVIZIBLE_NOT_INSTALLED -> "InviZible Pro app required"
         }
     }
 
@@ -579,12 +580,12 @@ object TorManager {
             TorState.STARTING -> "Establishing connection..."
             TorState.ERROR -> _errorMessage ?: "Unknown error occurred"
             TorState.STOPPED -> "Tap to connect"
-            TorState.ORBOT_NOT_INSTALLED -> "Install Orbot from Play Store or F-Droid"
+            TorState.INVIZIBLE_NOT_INSTALLED -> "Install InviZible Pro from Play Store or F-Droid"
         }
     }
 
     /**
-     * Check if Tor is currently running and connected via Orbot.
+     * Check if Tor is currently running and connected via InviZible Pro.
      */
     fun isConnected(): Boolean {
         return _state == TorState.CONNECTED && _socksPort > 0
@@ -601,7 +602,7 @@ object TorManager {
     fun getProxyPort(): Int = if (isConnected()) _socksPort else -1
 
     /**
-     * Restart Tor (request Orbot to restart).
+     * Restart Tor (request InviZible Pro to restart).
      */
     fun restart(context: Context, onComplete: ((Boolean) -> Unit)? = null) {
         stop()

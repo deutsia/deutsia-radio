@@ -48,7 +48,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 - Hardware-backed encryption keys (when available)
 - Secure credential storage for custom proxy authentication
 
-**Tor Integration** via Orbot SOCKS5 proxy:
+**Tor Integration** via InviZible Pro SOCKS5 proxy:
 - Instant disconnect detection (< 100ms)
 - Fail-safe proxy enforcement - no clearnet fallback
 - Automatic stream termination on proxy changes
@@ -69,7 +69,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 
 ## 📦 Requirements
 - Android 7.0 (API 24) or higher
-- **For Tor:** [Orbot](https://guardianproject.info/apps/org.torproject.android/) Note: You can also use Invizible Pro or other Android apps that allow Tor proxy (non-vpn) implementation. Using Tor as a full device VPN will make I2P streaming almost impossible due to its latency. Using Tor as a proxy integrates with the app better and allows for a seperate full device VPN to run in the background if desired.
+- **For Tor:** [InviZible Pro](https://invizible.net) - Use **proxy mode** (not VPN mode) for best compatibility. Proxy mode is easy to configure and allows running a separate VPN in the background if desired. Using Tor as a full device VPN will make I2P streaming almost impossible due to its latency.
 - **For I2P:** [I2P Android](https://geti2p.net/en/download)
 
 ---
@@ -105,7 +105,7 @@ APK output: `app/build/outputs/apk/debug/`
 
 ##  Acknowledgments
 - [RadioBrowser](https://www.radio-browser.info/) - Station database
-- [Orbot](https://guardianproject.info/apps/org.torproject.android/) - Tor integration
+- [InviZible Pro](https://invizible.net) - Tor/DNSCrypt/I2P integration
 - [I2P Project](https://geti2p.net/) - Anonymous networking on Android
 - Built with [Claude Code](https://github.com/anthropics/claude-code)
 - [SQLCipher](https://www.zetetic.net/sqlcipher/) - Database encryption

@@ -615,9 +615,9 @@ class MainActivity : AppCompatActivity() {
         // Mark first launch as complete
         isFirstLaunch = false
 
-        // Refresh Tor status when app comes to foreground (only if Orbot integration is enabled)
+        // Refresh Tor status when app comes to foreground (only if InviZible Pro integration is enabled)
         if (PreferencesHelper.isEmbeddedTorEnabled(this)) {
-            TorManager.requestOrbotStatus(this)
+            TorManager.requestTorStatus(this)
         }
     }
 

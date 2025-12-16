@@ -78,6 +78,8 @@ class SettingsFragment : Fragment() {
     private var importI2pStationsButton: MaterialButton? = null
     private var importTorStationsButton: MaterialButton? = null
     private var exportStationsButton: MaterialButton? = null
+    private var i2pStationsDescription: TextView? = null
+    private var torStationsDescription: TextView? = null
     private lateinit var repository: RadioRepository
 
     // Custom Proxy UI elements
@@ -193,7 +195,7 @@ class SettingsFragment : Fragment() {
             when (state) {
                 TorManager.TorState.STOPPED,
                 TorManager.TorState.ERROR,
-                TorManager.TorState.ORBOT_NOT_INSTALLED -> {
+                TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
                     if (stateAge >= 100 || lastDisplayedTorState == state) {
                         // State has persisted for 100ms OR we're already showing it
                         // This is a REAL disconnection - update UI immediately
@@ -454,6 +456,12 @@ class SettingsFragment : Fragment() {
         importI2pStationsButton = view.findViewById(R.id.importI2pStationsButton)
         importTorStationsButton = view.findViewById(R.id.importTorStationsButton)
         exportStationsButton = view.findViewById(R.id.exportStationsButton)
+        i2pStationsDescription = view.findViewById(R.id.i2pStationsDescription)
+        torStationsDescription = view.findViewById(R.id.torStationsDescription)
+
+        // Update station counts dynamically
+        updateStationCounts()
+
         importStationsButton?.setOnClickListener {
             showImportDialog()
         }
@@ -686,8 +694,8 @@ class SettingsFragment : Fragment() {
                 TorManager.TorState.STARTING -> {
                     // Do nothing while starting
                 }
-                TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                    TorManager.openOrbotInstallPage(requireContext())
+                TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
+                    TorManager.openInviZibleInstallPage(requireContext())
                 }
             }
         }
@@ -966,8 +974,8 @@ class SettingsFragment : Fragment() {
                     torActionButton?.isEnabled = true
                 }
             }
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                // If force Tor is enabled but Orbot says not installed, check if proxy is accessible
+            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
+                // If force Tor is enabled but InviZible Pro says not installed, check if proxy is accessible
                 // This prevents UI glitches during activity recreation
                 if (isForceTorEnabled && TorManager.isConnected()) {
                     showConnectedStateForForceTor()
@@ -975,9 +983,9 @@ class SettingsFragment : Fragment() {
                     showForceTorWarning()
                 } else {
                     torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
-                    torStatusText?.text = getString(R.string.settings_tor_orbot_required_status)
-                    torStatusDetail?.text = getString(R.string.settings_tor_install_orbot_message)
-                    torActionButton?.text = getString(R.string.button_install_orbot_caps)
+                    torStatusText?.text = getString(R.string.settings_tor_invizible_required_status)
+                    torStatusDetail?.text = getString(R.string.settings_tor_install_invizible_message)
+                    torActionButton?.text = getString(R.string.button_install_invizible_caps)
                     torActionButton?.isEnabled = true
                 }
             }
@@ -1215,6 +1223,31 @@ class SettingsFragment : Fragment() {
     }
 
     // ==================== Import/Export Functions ====================
+
+    private fun updateStationCounts() {
+        val context = context ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
+            val i2pCount = try {
+                val jsonString = context.assets.open("i2p_stations.json").bufferedReader().use { it.readText() }
+                StationImportExport.importFromJson(jsonString).stations.size
+            } catch (e: Exception) {
+                0
+            }
+
+            val torCount = try {
+                val jsonString = context.assets.open("tor_stations.json").bufferedReader().use { it.readText() }
+                StationImportExport.importFromJson(jsonString).stations.size
+            } catch (e: Exception) {
+                0
+            }
+
+            withContext(Dispatchers.Main) {
+                if (!isAdded) return@withContext
+                i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_description, i2pCount)
+                torStationsDescription?.text = getString(R.string.settings_add_tor_stations_description, torCount)
+            }
+        }
+    }
 
     private fun showImportDialog() {
         AlertDialog.Builder(requireContext())

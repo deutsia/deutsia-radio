@@ -69,7 +69,7 @@
     <string name="genre_other">Diğer</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio, clearnet, Tor (.onion) ve I2P ağlarından yayınları bir araya getiren ücretsiz ve açık kaynaklı bir çoklu ağ radyo oynatıcısıdır. Orbot entegrasyonu ve yapılandırılabilir sızıntı önleme özellikli Material You arayüzünde favori istasyonlarınızın keyfini çıkarın</string>
+    <string name="about_description">deutsia radio, clearnet, Tor (.onion) ve I2P ağlarından yayınları bir araya getiren ücretsiz ve açık kaynaklı bir çoklu ağ radyo oynatıcısıdır. InviZible Pro entegrasyonu ve yapılandırılabilir sızıntı önleme özellikli Material You arayüzünde favori istasyonlarınızın keyfini çıkarın</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">Göz At</string>
@@ -198,7 +198,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Tor Ağı</string>
-    <string name="settings_enable_tor">Tor\'u Etkinleştir (Orbot üzerinden)</string>
+    <string name="settings_enable_tor">Tor\'u Etkinleştir (InviZible Pro üzerinden)</string>
     <string name="settings_enable_tor_description">Tor ağı üzerinden bağlan</string>
     <string name="settings_tor_disconnected">Bağlı Değil</string>
     <string name="settings_tor_not_running">Tor çalışmıyor</string>
@@ -206,7 +206,7 @@
     <string name="settings_force_tor_description">Tüm yayınları Tor üzerinden yönlendir. Tor olmadan bağlanmaz.</string>
     <string name="settings_force_tor_except_i2p">I2P Hariç Tor Zorla</string>
     <string name="settings_force_tor_except_i2p_description">Clearnet\'i Tor üzerinden yönlendir, I2P yayınlarını doğrudan I2P vekil sunucusuna bağla.</string>
-    <string name="settings_tor_info">Orbot gerektirir (Play Store veya F-Droid\'den ücretsiz). Hızlı erişim için araç çubuğundaki Tor simgesine dokunun.\n\nZorlama modları Tor kullanılamadığında bağlantıları engeller.</string>
+    <string name="settings_tor_info">InviZible Pro gerektirir (Play Store veya F-Droid\'den ücretsiz). Hızlı erişim için araç çubuğundaki Tor simgesine dokunun.\n\nZorlama modları Tor kullanılamadığında bağlantıları engeller.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Özel Vekil Sunucu</string>
@@ -249,16 +249,16 @@
     <string name="settings_station_management">İstasyon Yönetimi</string>
     <string name="settings_import_from_file">Dosyadan İçe Aktar</string>
     <string name="settings_import_from_file_description">CSV, JSON, M3U veya PLS\'den içe aktar</string>
-    <string name="settings_import_i2p_stations">I2P İstasyonlarını İçe Aktar</string>
-    <string name="settings_import_i2p_stations_description">14 seçilmiş I2P radyo istasyonu</string>
-    <string name="settings_import_tor_stations">Tor İstasyonlarını İçe Aktar</string>
-    <string name="settings_import_tor_stations_description">3 seçilmiş Tor radyo istasyonu</string>
+    <string name="settings_add_i2p_stations">I2P İstasyonlarını Ekle</string>
+    <string name="settings_add_i2p_stations_description">%d yerleşik I2P istasyonu (çevrimdışı, ağ gerektirmez)</string>
+    <string name="settings_add_tor_stations">Tor İstasyonlarını Ekle</string>
+    <string name="settings_add_tor_stations_description">%d yerleşik Tor istasyonu (çevrimdışı, ağ gerektirmez)</string>
     <string name="settings_export_stations">İstasyonları Dışa Aktar</string>
     <string name="settings_export_stations_description">İstasyonlarınızı bir dosyaya aktar</string>
 
     <!-- Settings - About -->
     <string name="settings_about">Hakkında</string>
-    <string name="settings_version">Sürüm 1.3</string>
+    <string name="settings_version">Sürüm 1.4</string>
     <string name="settings_view_github">GitHub\'da Görüntüle</string>
     <string name="settings_donate">Bağış Yap</string>
     <string name="settings_donate_description">Bu uygulama işinize yaradıysa bağış yapmayı düşünün</string>
@@ -270,10 +270,10 @@
     <string name="tor_connection_details">Bağlantı Detayları</string>
     <string name="tor_proxy_host">Vekil Sunucu Hostu</string>
     <string name="tor_socks_port">SOCKS Portu</string>
-    <string name="tor_what_is_orbot">Orbot nedir?</string>
-    <string name="tor_orbot_description">Orbot, Android için resmi Tor istemcisidir. Tor ağına güvenli, şifreli erişim sağlar.</string>
+    <string name="tor_what_is_invizible">InviZible Pro nedir?</string>
+    <string name="tor_invizible_description">InviZible Pro, Tor, DNSCrypt ve I2P sağlar. Proxy modunu etkinleştirmek için: InviZible Pro\'yu açın → Ayarlar → Hızlı Başlangıç → "Proxy modu"nu etkinleştirin, ardından Tor\'u başlatın.</string>
     <string name="tor_connect">Tor\'a Bağlan</string>
-    <string name="tor_open_orbot">Orbot\'u Aç</string>
+    <string name="tor_open_invizible">InviZible Pro\'yu Aç</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">Bağlanıyor...</string>
@@ -282,7 +282,7 @@
     <string name="tor_status_off">Tor Kapalı</string>
     <string name="tor_status_error">Tor Hatası</string>
     <string name="tor_status_leak_warning">Sızıntı Uyarısı</string>
-    <string name="tor_status_install_orbot">Orbot\'u Yükle</string>
+    <string name="tor_status_install_invizible">InviZible Pro\'yu Yükle</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor bağlantısı kesildi. Bağlanmak için dokunun.</string>
@@ -290,29 +290,29 @@
     <string name="tor_status_connected_description">Tor bağlandı. Ayrıntıları görüntülemek için dokunun.</string>
     <string name="tor_status_connected_force_description">Tor bağlandı (Zorunlu Mod). Ayrıntıları görüntülemek için dokunun.</string>
     <string name="tor_status_error_description">Tor bağlantısı başarısız oldu. Yeniden denemek için dokunun.</string>
-    <string name="tor_status_install_orbot_description">Orbot yüklü değil. Yüklemek için dokunun.</string>
+    <string name="tor_status_install_invizible_description">InviZible Pro yüklü değil. Yüklemek için dokunun.</string>
     <string name="tor_status_leak_warning_description">Zorunlu Tor modu etkin ancak bağlı değil. Gizlilik tehlikeye girebilir.</string>
 
     <string name="tor_status_connecting_message">Tor\'a bağlanıyor...</string>
     <string name="tor_status_connected_message">Tor üzerinden bağlandı</string>
     <string name="tor_control_title_stopped">Tor Bağlantısı Kesildi</string>
     <string name="tor_control_subtitle_stopped">Tor üzerinden anonim olarak gezinmek için Bağlan\'a dokunun</string>
-    <string name="tor_control_subtitle_connecting">Orbot üzerinden güvenli bağlantı kuruluyor</string>
+    <string name="tor_control_subtitle_connecting">InviZible Pro üzerinden güvenli bağlantı kuruluyor</string>
     <string name="tor_control_title_connecting">Tor\'a bağlanıyor...</string>
     <string name="tor_control_title_connected">Tor\'a Bağlandı</string>
     <string name="tor_control_title_connected_force">Tor\'a Bağlandı (Zorla Modu)</string>
     <string name="tor_control_subtitle_connected">Bağlantınız özel ve anonimdir</string>
-    <string name="tor_control_subtitle_connected_force">Orbot üzerinden bağlantıyı kesin veya ayarlarda Tor Zorlama\'yı devre dışı bırakın</string>
+    <string name="tor_control_subtitle_connected_force">InviZible Pro üzerinden bağlantıyı kesin veya ayarlarda Tor Zorlama\'yı devre dışı bırakın</string>
     <string name="tor_control_title_error">Bağlantı Başarısız</string>
     <string name="tor_control_subtitle_error">Tor ağına bağlanılamadı</string>
-    <string name="tor_control_title_orbot_required">Orbot Gerekli</string>
-    <string name="tor_control_subtitle_orbot_required">Tor ağına bağlanmak için Orbot\'u yükleyin</string>
+    <string name="tor_control_title_invizible_required">InviZible Pro Gerekli</string>
+    <string name="tor_control_subtitle_invizible_required">Tor ağına bağlanmak için InviZible Pro\'yu yükleyin</string>
     <string name="tor_control_button_connecting">Bağlanıyor...</string>
     <string name="tor_control_button_disconnect">Bağlantıyı Kes</string>
     <string name="tor_control_button_cancel">İptal</string>
     <string name="tor_control_button_retry">Bağlantıyı Yeniden Dene</string>
-    <string name="tor_control_button_install">Orbot\'u Yükle</string>
-    <string name="tor_control_button_open_orbot">Orbot\'u Aç</string>
+    <string name="tor_control_button_install">InviZible Pro\'yu Yükle</string>
+    <string name="tor_control_button_open_invizible">InviZible Pro\'yu Aç</string>
 
 
     <!-- Add/Edit Radio Dialog -->
@@ -375,13 +375,13 @@
     <string name="tor_channel_description">Tor bağlantı durumunu gösterir</string>
     <string name="tor_notification_disconnected">Tor Bağlantısı Kesildi</string>
     <string name="tor_notification_tap_to_open">Uygulamayı açmak için dokunun</string>
-    <string name="tor_notification_connecting">Orbot üzerinden bağlanıyor...</string>
+    <string name="tor_notification_connecting">InviZible Pro üzerinden bağlanıyor...</string>
     <string name="tor_notification_please_wait">Lütfen bekleyin</string>
     <string name="tor_notification_connected">Tor Bağlandı</string>
     <string name="tor_notification_error">Tor Hatası</string>
     <string name="tor_notification_connection_failed">Bağlantı başarısız</string>
-    <string name="tor_notification_orbot_required">Orbot Gerekli</string>
-    <string name="tor_notification_install_orbot">Tor desteği için lütfen Orbot\'u yükleyin</string>
+    <string name="tor_notification_invizible_required">InviZible Pro Gerekli</string>
+    <string name="tor_notification_install_invizible">Tor desteği için lütfen InviZible Pro\'yu yükleyin</string>
     <string name="tor_notification_action_stop">Tor\'u Durdur</string>
 
     <!-- Other Error Messages -->
@@ -482,12 +482,12 @@
     <string name="tor_status_connecting_network">Tor ağına bağlanıyor...</string>
     <string name="tor_status_connected_via_tor">Tor üzerinden bağlandı</string>
     <string name="tor_status_connection_error">Bağlantı hatası</string>
-    <string name="tor_status_orbot_required">Orbot uygulaması gerekli</string>
+    <string name="tor_status_invizible_required">InviZible Pro uygulaması gerekli</string>
     <string name="tor_status_detail_socks5">%1$s:%2$d adresinde SOCKS5 proxy</string>
     <string name="tor_status_detail_establishing">Bağlantı kuruluyor...</string>
     <string name="tor_status_detail_unknown_error">Bilinmeyen hata oluştu</string>
     <string name="tor_status_detail_tap_to_connect">Bağlanmak için dokunun</string>
-    <string name="tor_status_detail_install_orbot">Orbot\'u Play Store veya F-Droid\'den yükleyin</string>
+    <string name="tor_status_detail_install_invizible">InviZible Pro\'yu Play Store veya F-Droid\'den yükleyin</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">Bağlantı kesildi</string>
@@ -500,9 +500,9 @@
     <string name="settings_tor_socks_port">SOCKS portu: %d</string>
     <string name="button_stop_tor">Durdur</string>
     <string name="settings_tor_connection_failed">Bağlantı başarısız</string>
-    <string name="settings_tor_orbot_required_status">Orbot Gerekli</string>
-    <string name="settings_tor_install_orbot_message">Tor kullanmak için lütfen Orbot\'u yükleyin</string>
-    <string name="button_install_orbot_caps">Orbot Yükle</string>
+    <string name="settings_tor_invizible_required_status">InviZible Pro Gerekli</string>
+    <string name="settings_tor_install_invizible_message">Tor kullanmak için lütfen InviZible Pro\'yu yükleyin</string>
+    <string name="button_install_invizible_caps">InviZible Pro Yükle</string>
     <string name="settings_tor_force_warning">Bağlantı başarısız</string>
     <string name="settings_tor_force_warning_detail">Tor zorla etkinleştirildi ancak bağlı değil</string>
     <string name="button_retry">Yeniden dene</string>

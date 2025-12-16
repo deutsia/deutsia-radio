@@ -66,7 +66,7 @@
     <string name="genre_other">အခြား</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio သည် clearnet၊ Tor (.onion) နှင့် I2P ကွန်ရက်များမှ ထုတ်လွှင့်မှုများကို ပေါင်းစည်းထားသော အခမဲ့ပွင့်လင်းအရင်းအမြစ် မာလ်တီနက် ရေဒီယိုပလေယာဖြစ်သည်။ Orbot ပေါင်းစည်းမှုနှင့် ပြင်ဆင်နိုင်သော leak ကာကွယ်မှုဖြင့် Material You အင်တာဖေ့စ်တွင် သင့်အကြိုက်ဆုံး စတေးရှင်းများကို ခံစားပါ</string>
+    <string name="about_description">deutsia radio သည် clearnet၊ Tor (.onion) နှင့် I2P ကွန်ရက်များမှ ထုတ်လွှင့်မှုများကို ပေါင်းစည်းထားသော အခမဲ့ပွင့်လင်းအရင်းအမြစ် မာလ်တီနက် ရေဒီယိုပလေယာဖြစ်သည်။ InviZible Pro ပေါင်းစည်းမှုနှင့် ပြင်ဆင်နိုင်သော leak ကာကွယ်မှုဖြင့် Material You အင်တာဖေ့စ်တွင် သင့်အကြိုက်ဆုံး စတေးရှင်းများကို ခံစားပါ</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">ရှာဖွေရန်</string>
@@ -195,7 +195,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Tor ကွန်ရက်</string>
-    <string name="settings_enable_tor">Tor ကို ဖွင့်ရန် (Orbot မှတစ်ဆင့်)</string>
+    <string name="settings_enable_tor">Tor ကို ဖွင့်ရန် (InviZible Pro မှတစ်ဆင့်)</string>
     <string name="settings_enable_tor_description">Tor ကွန်ရက်မှတစ်ဆင့် ချိတ်ဆက်ပါ</string>
     <string name="settings_tor_disconnected">ချိတ်ဆက်မထားပါ</string>
     <string name="settings_tor_not_running">Tor မလုပ်ဆောင်နေပါ</string>
@@ -203,7 +203,7 @@
     <string name="settings_force_tor_description">ထုတ်လွှင့်မှုအားလုံးကို Tor မှတစ်ဆင့် ပို့ပါ။ Tor မရှိဘဲ ချိတ်ဆက်မည်မဟုတ်ပါ။</string>
     <string name="settings_force_tor_except_i2p">I2P မှလွဲ၍ Tor ကို အတင်းအဓမ္မသုံးရန်</string>
     <string name="settings_force_tor_except_i2p_description">clearnet ကို Tor မှတစ်ဆင့်၊ I2P ထုတ်လွှင့်မှုများကို I2P proxy သို့ တိုက်ရိုက် ပို့ပါ။</string>
-    <string name="settings_tor_info">Orbot လိုအပ်သည် (Play Store သို့မဟုတ် F-Droid မှ အခမဲ့)။ အမြန်ဝင်ရောက်ရန် toolbar ရှိ Tor အိုင်ကွန်ကို တို့ပါ။\n\nအတင်းအဓမ္မ မုဒ်များသည် Tor မရနိုင်သောအခါ ချိတ်ဆက်မှုများကို ပိတ်ဆို့သည်။</string>
+    <string name="settings_tor_info">InviZible Pro လိုအပ်သည် (Play Store သို့မဟုတ် F-Droid မှ အခမဲ့)။ အမြန်ဝင်ရောက်ရန် toolbar ရှိ Tor အိုင်ကွန်ကို တို့ပါ။\n\nအတင်းအဓမ္မ မုဒ်များသည် Tor မရနိုင်သောအခါ ချိတ်ဆက်မှုများကို ပိတ်ဆို့သည်။</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">စိတ်ကြိုက် Proxy</string>
@@ -246,16 +246,16 @@
     <string name="settings_station_management">စတေးရှင်း စီမံခန့်ခွဲမှု</string>
     <string name="settings_import_from_file">ဖိုင်မှ တင်သွင်းရန်</string>
     <string name="settings_import_from_file_description">CSV၊ JSON၊ M3U သို့မဟုတ် PLS မှ တင်သွင်းပါ</string>
-    <string name="settings_import_i2p_stations">I2P စတေးရှင်းများကို တင်သွင်းရန်</string>
-    <string name="settings_import_i2p_stations_description">ရွေးချယ်ထားသော I2P ရေဒီယိုစတေးရှင်း ၁၄ ခု</string>
-    <string name="settings_import_tor_stations">Tor စတေးရှင်းများကို တင်သွင်းရန်</string>
-    <string name="settings_import_tor_stations_description">ရွေးချယ်ထားသော Tor ရေဒီယိုစတေးရှင်း ၃ ခု</string>
+    <string name="settings_add_i2p_stations">I2P စတေးရှင်းများ ထည့်ရန်</string>
+    <string name="settings_add_i2p_stations_description">%d ပါဝင်သော I2P စတေးရှင်း (အော့ဖ်လိုင်း၊ ကွန်ရက်မလို)</string>
+    <string name="settings_add_tor_stations">Tor စတေးရှင်းများ ထည့်ရန်</string>
+    <string name="settings_add_tor_stations_description">%d ပါဝင်သော Tor စတေးရှင်း (အော့ဖ်လိုင်း၊ ကွန်ရက်မလို)</string>
     <string name="settings_export_stations">စတေးရှင်းများကို ထုတ်ယူရန်</string>
     <string name="settings_export_stations_description">သင့်စတေးရှင်းများကို ဖိုင်သို့ ထုတ်ယူပါ</string>
 
     <!-- Settings - About -->
     <string name="settings_about">အကြောင်း</string>
-    <string name="settings_version">ဗားရှင်း 1.3</string>
+    <string name="settings_version">ဗားရှင်း 1.4</string>
     <string name="settings_view_github">GitHub တွင် ကြည့်ရန်</string>
     <string name="settings_donate">လှူဒါန်းရန်</string>
     <string name="settings_donate_description">ဒီအက်ပ်က သင့်ကို ကူညီခဲ့ရင် လှူဒါန်းရန် စဉ်းစားပါ</string>
@@ -267,10 +267,10 @@
     <string name="tor_connection_details">ချိတ်ဆက်မှု အသေးစိတ်</string>
     <string name="tor_proxy_host">Proxy လက်ခံဌာန</string>
     <string name="tor_socks_port">SOCKS Port</string>
-    <string name="tor_what_is_orbot">Orbot ဆိုတာ ဘာလဲ?</string>
-    <string name="tor_orbot_description">Orbot သည် Android အတွက် တရားဝင် Tor ကလိုင်းယင့်ဖြစ်သည်။ ၎င်းသည် Tor ကွန်ရက်သို့ လုံခြုံသော၊ ကုဒ်ဝှက်ထားသော ဝင်ရောက်မှုကို ပေးသည်။</string>
+    <string name="tor_what_is_invizible">InviZible Pro ဆိုတာ ဘာလဲ?</string>
+    <string name="tor_invizible_description">InviZible Pro သည် Tor၊ DNSCrypt နှင့် I2P ကို ပံ့ပိုးပေးသည်။ Tor ကို အသုံးပြုရန်: InviZible Pro ကို ဖွင့်ပါ၊ ဆက်တင်များ → အမြန်စတင်ရန် သို့ သွားပါ → \"Proxy mode\" ကို ဖွင့်ပါ၊ ထို့နောက် Tor ကို စတင်ပါ။</string>
     <string name="tor_connect">Tor သို့ ချိတ်ဆက်ရန်</string>
-    <string name="tor_open_orbot">Orbot ကို ဖွင့်ရန်</string>
+    <string name="tor_open_invizible">InviZible Pro ကို ဖွင့်ရန်</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">ချိတ်ဆက်နေသည်...</string>
@@ -279,7 +279,7 @@
     <string name="tor_status_off">Tor ပိတ်ထားသည်</string>
     <string name="tor_status_error">Tor အမှား</string>
     <string name="tor_status_leak_warning">Leak သတိပေးချက်</string>
-    <string name="tor_status_install_orbot">Orbot ကို တပ်ဆင်ပါ</string>
+    <string name="tor_status_install_invizible">InviZible Pro ကို တပ်ဆင်ပါ</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor ချိတ်ဆက်မထားပါ။ ချိတ်ဆက်ရန် တို့ပါ။</string>
@@ -287,29 +287,29 @@
     <string name="tor_status_connected_description">Tor ချိတ်ဆက်ပြီးပါပြီ။ အသေးစိတ်ကြည့်ရန် တို့ပါ။</string>
     <string name="tor_status_connected_force_description">Tor ချိတ်ဆက်ပြီးပါပြီ (အတင်းအဓမ္မ မုဒ်)။ အသေးစိတ်ကြည့်ရန် တို့ပါ။</string>
     <string name="tor_status_error_description">Tor ချိတ်ဆက်မှု မအောင်မြင်ပါ။ ပြန်ကြိုးစားရန် တို့ပါ။</string>
-    <string name="tor_status_install_orbot_description">Orbot တပ်ဆင်မထားပါ။ တပ်ဆင်ရန် တို့ပါ။</string>
+    <string name="tor_status_install_invizible_description">InviZible Pro တပ်ဆင်မထားပါ။ တပ်ဆင်ရန် တို့ပါ။</string>
     <string name="tor_status_leak_warning_description">အတင်းအဓမ္မ Tor မုဒ် ဖွင့်ထားသည် သို့သော် ချိတ်ဆက်မထားပါ။ ကိုယ်ရေးကိုယ်တာ အန္တရာယ်ရှိနိုင်သည်။</string>
 
     <string name="tor_status_connecting_message">Tor သို့ ချိတ်ဆက်နေသည်...</string>
     <string name="tor_status_connected_message">Tor မှတစ်ဆင့် ချိတ်ဆက်ပြီးပါပြီ</string>
     <string name="tor_control_title_stopped">Tor ချိတ်ဆက်မထားပါ</string>
     <string name="tor_control_subtitle_stopped">Tor မှတစ်ဆင့် အမည်မဖော်ဘဲ ရှာကြည့်ရန် ချိတ်ဆက်ရန်ကို တို့ပါ</string>
-    <string name="tor_control_subtitle_connecting">Orbot မှတစ်ဆင့် လုံခြုံသော ချိတ်ဆက်မှုကို ထူထောင်နေသည်</string>
+    <string name="tor_control_subtitle_connecting">InviZible Pro မှတစ်ဆင့် လုံခြုံသော ချိတ်ဆက်မှုကို ထူထောင်နေသည်</string>
     <string name="tor_control_title_connecting">Tor သို့ ချိတ်ဆက်နေသည်...</string>
     <string name="tor_control_title_connected">Tor သို့ ချိတ်ဆက်ပြီးပါပြီ</string>
     <string name="tor_control_title_connected_force">Tor သို့ ချိတ်ဆက်ပြီးပါပြီ (အတင်းအဓမ္မ မုဒ်)</string>
     <string name="tor_control_subtitle_connected">သင့်ချိတ်ဆက်မှုသည် ကိုယ်ရေးကိုယ်တာ နှင့် အမည်မဖော်ဘဲ ရှိသည်</string>
-    <string name="tor_control_subtitle_connected_force">Orbot မှတစ်ဆင့် ချိတ်ဆက်မှုကို ဖြုတ်ပါ သို့မဟုတ် ဆက်တင်များတွင် အတင်းအဓမ္မ Tor ကို ပိတ်ပါ</string>
+    <string name="tor_control_subtitle_connected_force">InviZible Pro မှတစ်ဆင့် ချိတ်ဆက်မှုကို ဖြုတ်ပါ သို့မဟုတ် ဆက်တင်များတွင် အတင်းအဓမ္မ Tor ကို ပိတ်ပါ</string>
     <string name="tor_control_title_error">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
     <string name="tor_control_subtitle_error">Tor ကွန်ရက်သို့ ချိတ်ဆက်၍ မရပါ</string>
-    <string name="tor_control_title_orbot_required">Orbot လိုအပ်သည်</string>
-    <string name="tor_control_subtitle_orbot_required">Tor ကွန်ရက်သို့ ချိတ်ဆက်ရန် Orbot ကို တပ်ဆင်ပါ</string>
+    <string name="tor_control_title_invizible_required">InviZible Pro လိုအပ်သည်</string>
+    <string name="tor_control_subtitle_invizible_required">Tor ကွန်ရက်သို့ ချိတ်ဆက်ရန် InviZible Pro ကို တပ်ဆင်ပါ</string>
     <string name="tor_control_button_connecting">ချိတ်ဆက်နေသည်...</string>
     <string name="tor_control_button_disconnect">ချိတ်ဆက်မှုကို ဖြုတ်ပါ</string>
     <string name="tor_control_button_cancel">ပယ်ဖျက်ပါ</string>
     <string name="tor_control_button_retry">ချိတ်ဆက်မှုကို ပြန်လည်ကြိုးစားပါ</string>
-    <string name="tor_control_button_install">Orbot ကို တပ်ဆင်ပါ</string>
-    <string name="tor_control_button_open_orbot">Orbot ကို ဖွင့်ပါ</string>
+    <string name="tor_control_button_install">InviZible Pro ကို တပ်ဆင်ပါ</string>
+    <string name="tor_control_button_open_invizible">InviZible Pro ကို ဖွင့်ပါ</string>
 
 
     <!-- Add/Edit Radio Dialog -->
@@ -372,13 +372,13 @@
     <string name="tor_channel_description">Tor ချိတ်ဆက်မှု အခြေအနေကို ပြသည်</string>
     <string name="tor_notification_disconnected">Tor ချိတ်ဆက်မထားပါ</string>
     <string name="tor_notification_tap_to_open">အက်ပ်ကို ဖွင့်ရန် တို့ပါ</string>
-    <string name="tor_notification_connecting">Orbot မှတစ်ဆင့် ချိတ်ဆက်နေသည်...</string>
+    <string name="tor_notification_connecting">InviZible Pro မှတစ်ဆင့် ချိတ်ဆက်နေသည်...</string>
     <string name="tor_notification_please_wait">ခဏစောင့်ပါ</string>
     <string name="tor_notification_connected">Tor ချိတ်ဆက်ပြီးပါပြီ</string>
     <string name="tor_notification_error">Tor အမှား</string>
     <string name="tor_notification_connection_failed">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
-    <string name="tor_notification_orbot_required">Orbot လိုအပ်သည်</string>
-    <string name="tor_notification_install_orbot">Tor ပံ့ပိုးမှုအတွက် Orbot ကို တပ်ဆင်ပါ</string>
+    <string name="tor_notification_invizible_required">InviZible Pro လိုအပ်သည်</string>
+    <string name="tor_notification_install_invizible">Tor ပံ့ပိုးမှုအတွက် InviZible Pro ကို တပ်ဆင်ပါ</string>
     <string name="tor_notification_action_stop">Tor ကို ရပ်ရန်</string>
 
     <!-- Other Error Messages -->
@@ -479,12 +479,12 @@
     <string name="tor_status_connecting_network">Tor ကွန်ရက်သို့ ချိတ်ဆက်နေသည်...</string>
     <string name="tor_status_connected_via_tor">Tor မှတစ်ဆင့် ချိတ်ဆက်ပြီး</string>
     <string name="tor_status_connection_error">ချိတ်ဆက်မှု အမှား</string>
-    <string name="tor_status_orbot_required">Orbot အက်ပ် လိုအပ်သည်</string>
+    <string name="tor_status_invizible_required">InviZible Pro အက်ပ် လိုအပ်သည်</string>
     <string name="tor_status_detail_socks5">%1$s:%2$d တွင် SOCKS5 ပရောက်ဆီ</string>
     <string name="tor_status_detail_establishing">ချိတ်ဆက်မှု ပြုလုပ်နေသည်...</string>
     <string name="tor_status_detail_unknown_error">အမည်မသိ အမှား ဖြစ်ပေါ်ခဲ့သည်</string>
     <string name="tor_status_detail_tap_to_connect">ချိတ်ဆက်ရန် တို့ပါ</string>
-    <string name="tor_status_detail_install_orbot">Play Store သို့မဟုတ် F-Droid မှ Orbot ကို ထည့်သွင်းပါ</string>
+    <string name="tor_status_detail_install_invizible">Play Store သို့မဟုတ် F-Droid မှ InviZible Pro ကို ထည့်သွင်းပါ</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">ချိတ်ဆက်မှု ဖြတ်တောက်ထားသည်</string>
@@ -497,9 +497,9 @@
     <string name="settings_tor_socks_port">SOCKS ပို့: %d</string>
     <string name="button_stop_tor">ရပ်ပါ</string>
     <string name="settings_tor_connection_failed">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
-    <string name="settings_tor_orbot_required_status">Orbot လိုအပ်သည်</string>
-    <string name="settings_tor_install_orbot_message">Tor သုံးရန် Orbot ကို ထည့်သွင်းပါ</string>
-    <string name="button_install_orbot_caps">Orbot ထည့်သွင်းပါ</string>
+    <string name="settings_tor_invizible_required_status">InviZible Pro လိုအပ်သည်</string>
+    <string name="settings_tor_install_invizible_message">Tor သုံးရန် InviZible Pro ကို ထည့်သွင်းပါ</string>
+    <string name="button_install_invizible_caps">InviZible Pro ထည့်သွင်းပါ</string>
     <string name="settings_tor_force_warning">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
     <string name="settings_tor_force_warning_detail">Tor အတင်းအကြပ် ဖွင့်ထားသည် သို့သော် ချိတ်ဆက်မထားပါ</string>
     <string name="button_retry">ထပ်ကြိုးစားပါ</string>
