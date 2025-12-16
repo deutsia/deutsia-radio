@@ -13,7 +13,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 </div>
 
 <div align="center">
-    <img src="assets/5.PNG" width="30%"  alt=""/>
+    <img src="assets/browse_fixed.png" width="30%"  alt=""/>
     <img src="assets/2.png" width="30%"  alt=""/>
     <img src="assets/3.png" width="30%"  alt=""/>
 </div>
