@@ -78,6 +78,8 @@ class SettingsFragment : Fragment() {
     private var importI2pStationsButton: MaterialButton? = null
     private var importTorStationsButton: MaterialButton? = null
     private var exportStationsButton: MaterialButton? = null
+    private var i2pStationsDescription: TextView? = null
+    private var torStationsDescription: TextView? = null
     private lateinit var repository: RadioRepository
 
     // Custom Proxy UI elements
@@ -454,6 +456,12 @@ class SettingsFragment : Fragment() {
         importI2pStationsButton = view.findViewById(R.id.importI2pStationsButton)
         importTorStationsButton = view.findViewById(R.id.importTorStationsButton)
         exportStationsButton = view.findViewById(R.id.exportStationsButton)
+        i2pStationsDescription = view.findViewById(R.id.i2pStationsDescription)
+        torStationsDescription = view.findViewById(R.id.torStationsDescription)
+
+        // Update station counts dynamically
+        updateStationCounts()
+
         importStationsButton?.setOnClickListener {
             showImportDialog()
         }
@@ -1215,6 +1223,31 @@ class SettingsFragment : Fragment() {
     }
 
     // ==================== Import/Export Functions ====================
+
+    private fun updateStationCounts() {
+        val context = context ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
+            val i2pCount = try {
+                val jsonString = context.assets.open("i2p_stations.json").bufferedReader().use { it.readText() }
+                StationImportExport.importFromJson(jsonString).stations.size
+            } catch (e: Exception) {
+                0
+            }
+
+            val torCount = try {
+                val jsonString = context.assets.open("tor_stations.json").bufferedReader().use { it.readText() }
+                StationImportExport.importFromJson(jsonString).stations.size
+            } catch (e: Exception) {
+                0
+            }
+
+            withContext(Dispatchers.Main) {
+                if (!isAdded) return@withContext
+                i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_description, i2pCount)
+                torStationsDescription?.text = getString(R.string.settings_add_tor_stations_description, torCount)
+            }
+        }
+    }
 
     private fun showImportDialog() {
         AlertDialog.Builder(requireContext())

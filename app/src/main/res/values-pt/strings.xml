@@ -249,16 +249,16 @@
     <string name="settings_station_management">Gerenciamento de estações</string>
     <string name="settings_import_from_file">Importar de arquivo</string>
     <string name="settings_import_from_file_description">Importar de CSV, JSON, M3U ou PLS</string>
-    <string name="settings_import_i2p_stations">Importar estações I2P</string>
-    <string name="settings_import_i2p_stations_description">14 estações de rádio I2P selecionadas</string>
-    <string name="settings_import_tor_stations">Importar estações Tor</string>
-    <string name="settings_import_tor_stations_description">3 estações de rádio Tor selecionadas</string>
+    <string name="settings_add_i2p_stations">Adicionar estações I2P</string>
+    <string name="settings_add_i2p_stations_description">%d estações I2P incluídas (offline, sem rede)</string>
+    <string name="settings_add_tor_stations">Adicionar estações Tor</string>
+    <string name="settings_add_tor_stations_description">%d estações Tor incluídas (offline, sem rede)</string>
     <string name="settings_export_stations">Exportar estações</string>
     <string name="settings_export_stations_description">Exportar suas estações para um arquivo</string>
 
     <!-- Settings - About -->
     <string name="settings_about">Sobre</string>
-    <string name="settings_version">Versão 1.3</string>
+    <string name="settings_version">Versão 1.4</string>
     <string name="settings_view_github">Ver no GitHub</string>
     <string name="settings_donate">Doar</string>
     <string name="settings_donate_description">Se este aplicativo ajudou você, considere fazer uma doação</string>

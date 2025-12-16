@@ -249,16 +249,16 @@
     <string name="settings_station_management">Керування станціями</string>
     <string name="settings_import_from_file">Імпорт з файлу</string>
     <string name="settings_import_from_file_description">Імпорт з CSV, JSON, M3U або PLS</string>
-    <string name="settings_import_i2p_stations">Імпорт I2P станцій</string>
-    <string name="settings_import_i2p_stations_description">14 відібраних I2P радіостанцій</string>
-    <string name="settings_import_tor_stations">Імпорт Tor станцій</string>
-    <string name="settings_import_tor_stations_description">3 відібрані Tor радіостанції</string>
+    <string name="settings_add_i2p_stations">Додати I2P станції</string>
+    <string name="settings_add_i2p_stations_description">%d вбудованих I2P станцій (офлайн, без мережі)</string>
+    <string name="settings_add_tor_stations">Додати Tor станції</string>
+    <string name="settings_add_tor_stations_description">%d вбудованих Tor станцій (офлайн, без мережі)</string>
     <string name="settings_export_stations">Експорт станцій</string>
     <string name="settings_export_stations_description">Експортувати ваші станції у файл</string>
 
     <!-- Settings - About -->
     <string name="settings_about">Про програму</string>
-    <string name="settings_version">Версія 1.3</string>
+    <string name="settings_version">Версія 1.4</string>
     <string name="settings_view_github">Переглянути на GitHub</string>
     <string name="settings_donate">Підтримати</string>
     <string name="settings_donate_description">Якщо цей додаток вам допоміг, розгляньте можливість підтримки</string>

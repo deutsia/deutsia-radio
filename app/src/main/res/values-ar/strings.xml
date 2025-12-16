@@ -249,16 +249,16 @@
     <string name="settings_station_management">إدارة المحطات</string>
     <string name="settings_import_from_file">استيراد من ملف</string>
     <string name="settings_import_from_file_description">الاستيراد من CSV أو JSON أو M3U أو PLS</string>
-    <string name="settings_import_i2p_stations">استيراد محطات I2P</string>
-    <string name="settings_import_i2p_stations_description">14 محطة راديو I2P منتقاة</string>
-    <string name="settings_import_tor_stations">استيراد محطات Tor</string>
-    <string name="settings_import_tor_stations_description">3 محطات راديو Tor منتقاة</string>
+    <string name="settings_add_i2p_stations">إضافة محطات I2P</string>
+    <string name="settings_add_i2p_stations_description">%d محطة I2P مدمجة (بدون اتصال، بدون شبكة)</string>
+    <string name="settings_add_tor_stations">إضافة محطات Tor</string>
+    <string name="settings_add_tor_stations_description">%d محطة Tor مدمجة (بدون اتصال، بدون شبكة)</string>
     <string name="settings_export_stations">تصدير المحطات</string>
     <string name="settings_export_stations_description">تصدير محطاتك إلى ملف</string>
 
     <!-- Settings - About -->
     <string name="settings_about">حول</string>
-    <string name="settings_version">الإصدار 1.3</string>
+    <string name="settings_version">الإصدار 1.4</string>
     <string name="settings_view_github">عرض على GitHub</string>
     <string name="settings_donate">تبرع</string>
     <string name="settings_donate_description">إذا ساعدك هذا التطبيق، فكر في التبرع</string>
