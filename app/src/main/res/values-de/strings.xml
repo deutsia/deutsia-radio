@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">Tor erzwingen außer I2P</string>
     <string name="settings_force_tor_except_i2p_description">Clearnet über Tor leiten, I2P-Streams direkt zum I2P-Proxy.</string>
     <string name="settings_tor_info">Erfordert InviZible Pro (kostenlos im Play Store oder F-Droid). Tippen Sie auf das Tor-Symbol in der Symbolleiste für schnellen Zugriff.\n\nErzwingungsmodi blockieren Verbindungen, wenn Tor nicht verfügbar ist.</string>
+    <string name="settings_tor_privacy_notice">Datenschutz: Ohne aktiviertes Tor erzwingen verbinden sich Clearnet-Sender und Bilder direkt mit dem Internet. Aufnahmen verwenden dieselbe Verbindung wie der Stream.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Benutzerdefinierter Proxy</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">Gesamten Datenverkehr über benutzerdefinierten Proxy leiten. Verbindet nicht ohne Proxy.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Benutzerdefinierten Proxy erzwingen außer Tor/I2P-Sender</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Gesamten Clearnet-Datenverkehr über benutzerdefinierten Proxy leiten, aber Tor- und I2P-Sendern erlauben, ihre nativen Proxys zu verwenden.</string>
+    <string name="settings_custom_proxy_privacy_notice">Datenschutz: Ohne aktivierten benutzerdefinierten Proxy erzwingen verbinden sich Clearnet-Sender und Bilder direkt mit dem Internet. Aufnahmen verwenden dieselbe Verbindung wie der Stream.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">Bandbreitennutzung</string>

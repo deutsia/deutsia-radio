@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">Bắt buộc Tor trừ I2P</string>
     <string name="settings_force_tor_except_i2p_description">Định tuyến clearnet qua Tor, luồng I2P trực tiếp đến proxy I2P.</string>
     <string name="settings_tor_info">Yêu cầu InviZible Pro (miễn phí từ Play Store hoặc F-Droid). Nhấn vào biểu tượng Tor trên thanh công cụ để truy cập nhanh.\n\nChế độ bắt buộc chặn kết nối khi Tor không khả dụng.</string>
+    <string name="settings_tor_privacy_notice">Quyền riêng tư: Nếu không bật Bắt buộc Tor, các trạm clearnet và hình ảnh sẽ kết nối trực tiếp với internet. Các bản ghi âm sử dụng cùng kết nối với luồng.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Proxy tùy chỉnh</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">Định tuyến tất cả lưu lượng qua proxy tùy chỉnh. Không kết nối nếu không có proxy.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Bắt buộc proxy tùy chỉnh trừ trạm Tor/I2P</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Định tuyến tất cả lưu lượng clearnet qua proxy tùy chỉnh, nhưng cho phép các trạm Tor và I2P sử dụng proxy gốc của chúng.</string>
+    <string name="settings_custom_proxy_privacy_notice">Quyền riêng tư: Nếu không bật Bắt buộc proxy tùy chỉnh, các trạm clearnet và hình ảnh sẽ kết nối trực tiếp với internet. Các bản ghi âm sử dụng cùng kết nối với luồng.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">Sử dụng băng thông</string>

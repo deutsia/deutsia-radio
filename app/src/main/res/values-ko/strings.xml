@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">I2P 제외하고 Tor 강제</string>
     <string name="settings_force_tor_except_i2p_description">클리어넷을 Tor를 통해 라우팅하고, I2P 스트림은 I2P 프록시로 직접 연결.</string>
     <string name="settings_tor_info">InviZible Pro 필요 (Play Store 또는 F-Droid에서 무료). 빠른 접근을 위해 도구 모음의 Tor 아이콘을 탭하세요.\n\n강제 모드는 Tor를 사용할 수 없을 때 연결을 차단합니다.</string>
+    <string name="settings_tor_privacy_notice">개인정보: Tor 강제가 활성화되지 않으면 클리어넷 방송국 및 이미지가 인터넷에 직접 연결됩니다. 녹음은 스트림과 동일한 연결을 사용합니다.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">사용자 지정 프록시</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">모든 트래픽을 사용자 지정 프록시를 통해 라우팅. 프록시 없이는 연결되지 않습니다.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2P 방송국 제외 사용자 지정 프록시 강제</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">모든 클리어넷 트래픽을 사용자 지정 프록시를 통해 라우팅하지만, Tor 및 I2P 방송국은 네이티브 프록시를 사용하도록 허용.</string>
+    <string name="settings_custom_proxy_privacy_notice">개인정보: 사용자 지정 프록시 강제가 활성화되지 않으면 클리어넷 방송국 및 이미지가 인터넷에 직접 연결됩니다. 녹음은 스트림과 동일한 연결을 사용합니다.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">대역폭 사용량</string>

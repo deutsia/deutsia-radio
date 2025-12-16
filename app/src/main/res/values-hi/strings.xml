@@ -204,6 +204,7 @@
     <string name="settings_force_tor_except_i2p">I2P को छोड़कर Tor फ़ोर्स करें</string>
     <string name="settings_force_tor_except_i2p_description">clearnet को Tor के माध्यम से रूट करें, I2P स्ट्रीम सीधे I2P प्रॉक्सी पर।</string>
     <string name="settings_tor_info">InviZible Pro की आवश्यकता है (Play Store या F-Droid से मुफ़्त)। त्वरित पहुंच के लिए टूलबार में Tor आइकन पर टैप करें।\n\nफ़ोर्स मोड Tor उपलब्ध न होने पर कनेक्शन ब्लॉक करते हैं।</string>
+    <string name="settings_tor_privacy_notice">गोपनीयता: Tor फ़ोर्स सक्षम किए बिना, clearnet स्टेशन और चित्र सीधे इंटरनेट से कनेक्ट होते हैं। रिकॉर्डिंग स्ट्रीम के समान कनेक्शन का उपयोग करती हैं।</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">कस्टम प्रॉक्सी</string>
@@ -215,6 +216,7 @@
     <string name="settings_force_custom_proxy_description">सभी ट्रैफ़िक को कस्टम प्रॉक्सी के माध्यम से रूट करें। प्रॉक्सी के बिना कनेक्ट नहीं होगा।</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2P स्टेशनों को छोड़कर कस्टम प्रॉक्सी फ़ोर्स करें</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">सभी clearnet ट्रैफ़िक को कस्टम प्रॉक्सी के माध्यम से रूट करें, लेकिन Tor और I2P स्टेशनों को उनके मूल प्रॉक्सी का उपयोग करने दें।</string>
+    <string name="settings_custom_proxy_privacy_notice">गोपनीयता: कस्टम प्रॉक्सी फ़ोर्स सक्षम किए बिना, clearnet स्टेशन और चित्र सीधे इंटरनेट से कनेक्ट होते हैं। रिकॉर्डिंग स्ट्रीम के समान कनेक्शन का उपयोग करती हैं।</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">बैंडविड्थ उपयोग</string>

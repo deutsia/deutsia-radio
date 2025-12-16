@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">强制 Tor（I2P 除外）</string>
     <string name="settings_force_tor_except_i2p_description">明网通过 Tor 路由，I2P 流直接连接到 I2P 代理。</string>
     <string name="settings_tor_info">需要 InviZible Pro（可从 Play Store 或 F-Droid 免费获取）。点击工具栏中的 Tor 图标以快速访问。\n\n强制模式会在 Tor 不可用时阻止连接。</string>
+    <string name="settings_tor_privacy_notice">隐私提示：未启用强制 Tor 时，明网电台和图片会直接连接到互联网。录制使用与流相同的连接。</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">自定义代理</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">通过自定义代理路由所有流量。没有代理不会连接。</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">强制自定义代理（Tor/I2P 电台除外）</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">通过自定义代理路由所有明网流量，但允许 Tor 和 I2P 电台使用其原生代理。</string>
+    <string name="settings_custom_proxy_privacy_notice">隐私提示：未启用强制自定义代理时，明网电台和图片会直接连接到互联网。录制使用与流相同的连接。</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">带宽使用</string>
