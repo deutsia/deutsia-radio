@@ -300,7 +300,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
 
     private fun openInviZibleApp() {
         try {
-            val intent = requireContext().packageManager.getLaunchIntentForPackage("pan.alexander.tordnscrypt")
+            val intent = requireContext().packageManager.getLaunchIntentForPackage("pan.alexander.tordnscrypt.gp")
             if (intent != null) {
                 startActivity(intent)
             } else {
@@ -313,7 +313,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
 
     private fun openInviZibleInStore() {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=pan.alexander.tordnscrypt"))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=pan.alexander.tordnscrypt.gp"))
             startActivity(intent)
         } catch (e: Exception) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/packages/pan.alexander.tordnscrypt/"))

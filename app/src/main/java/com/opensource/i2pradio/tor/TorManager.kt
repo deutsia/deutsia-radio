@@ -32,9 +32,9 @@ object TorManager {
     private const val TAG = "TorManager"
 
     // InviZible Pro package identifiers
-    private const val INVIZIBLE_PACKAGE_NAME = "pan.alexander.tordnscrypt"
-    private const val INVIZIBLE_MARKET_URI = "market://details?id=$INVIZIBLE_PACKAGE_NAME"
-    private const val INVIZIBLE_FDROID_URI = "https://f-droid.org/packages/$INVIZIBLE_PACKAGE_NAME/"
+    private const val INVIZIBLE_PACKAGE_NAME = "pan.alexander.tordnscrypt.gp"
+    private const val INVIZIBLE_MARKET_URI = "https://play.google.com/store/apps/details?id=$INVIZIBLE_PACKAGE_NAME"
+    private const val INVIZIBLE_FDROID_URI = "https://f-droid.org/packages/pan.alexander.tordnscrypt/"
 
     // Tor Intent actions (standard Tor control protocol, works with InviZible Pro)
     private const val ACTION_START_TOR = "org.torproject.android.intent.action.START"
