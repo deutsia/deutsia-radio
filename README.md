@@ -21,7 +21,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 ---
 
 ## 📢 Updates
-- **New Release: v1.2** Fixed App crash, improved search functionality, fixed recording bug
+- **New Release: v1.4** Switched from Orbot to Invizible Pro, improved UI/UX, bug fixes
 ---
 
 ## 🎉 Features
