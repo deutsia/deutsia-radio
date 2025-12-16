@@ -33,7 +33,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     private lateinit var connectionProgress: ProgressBar
     private lateinit var primaryActionButton: MaterialButton
     private lateinit var secondaryActionButton: MaterialButton
-    private lateinit var orbotInfoCard: MaterialCardView
+    private lateinit var invizibleInfoCard: MaterialCardView
     private lateinit var connectionDetailsContainer: MaterialCardView
     private lateinit var proxyHostText: TextView
     private lateinit var proxyPortText: TextView
@@ -62,7 +62,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         connectionProgress = view.findViewById(R.id.connectionProgress)
         primaryActionButton = view.findViewById(R.id.primaryActionButton)
         secondaryActionButton = view.findViewById(R.id.secondaryActionButton)
-        orbotInfoCard = view.findViewById(R.id.orbotInfoCard)
+        invizibleInfoCard = view.findViewById(R.id.invizibleInfoCard)
         connectionDetailsContainer = view.findViewById(R.id.connectionDetailsContainer)
         proxyHostText = view.findViewById(R.id.proxyHostText)
         proxyPortText = view.findViewById(R.id.proxyPortText)
@@ -76,9 +76,9 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             handleSecondaryAction()
         }
 
-        // Setup Orbot info card click
-        orbotInfoCard.setOnClickListener {
-            openOrbotInStore()
+        // Setup InviZible Pro info card click
+        invizibleInfoCard.setOnClickListener {
+            openInviZibleInStore()
         }
 
         // Update UI with current state
@@ -101,7 +101,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             TorManager.TorState.STARTING -> showConnectingState()
             TorManager.TorState.CONNECTED -> showConnectedState()
             TorManager.TorState.ERROR -> showErrorState()
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> showOrbotNotInstalledState()
+            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> showInviZibleNotInstalledState()
         }
     }
 
@@ -112,16 +112,16 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         statusSubtitle.text = getString(R.string.tor_control_subtitle_stopped)
         connectionProgress.visibility = View.GONE
         connectionDetailsContainer.visibility = View.GONE
-        orbotInfoCard.visibility = View.GONE
+        invizibleInfoCard.visibility = View.GONE
 
         primaryActionButton.text = getString(R.string.tor_connect)
         primaryActionButton.setIconResource(R.drawable.ic_tor_on)
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = getString(R.string.tor_control_button_open_orbot)
+        secondaryActionButton.text = getString(R.string.tor_control_button_open_invizible)
         secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = TorManager.isOrbotInstalled(requireContext())
+        secondaryActionButton.isEnabled = TorManager.isInviZibleInstalled(requireContext())
     }
 
     private fun showConnectingState() {
@@ -131,7 +131,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         statusSubtitle.text = getString(R.string.tor_control_subtitle_connecting)
         connectionProgress.visibility = View.VISIBLE
         connectionDetailsContainer.visibility = View.GONE
-        orbotInfoCard.visibility = View.GONE
+        invizibleInfoCard.visibility = View.GONE
 
         // Pulse animation on icon
         statusIcon.animate()
@@ -175,7 +175,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         }
 
         connectionProgress.visibility = View.GONE
-        orbotInfoCard.visibility = View.GONE
+        invizibleInfoCard.visibility = View.GONE
 
         // Show connection details
         connectionDetailsContainer.visibility = View.VISIBLE
@@ -216,7 +216,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         statusSubtitle.text = TorManager.errorMessage ?: getString(R.string.tor_control_subtitle_error)
         connectionProgress.visibility = View.GONE
         connectionDetailsContainer.visibility = View.GONE
-        orbotInfoCard.visibility = View.GONE
+        invizibleInfoCard.visibility = View.GONE
 
         // Shake animation on error
         statusIcon.animate()
@@ -241,19 +241,19 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = getString(R.string.tor_control_button_open_orbot)
+        secondaryActionButton.text = getString(R.string.tor_control_button_open_invizible)
         secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = TorManager.isOrbotInstalled(requireContext())
+        secondaryActionButton.isEnabled = TorManager.isInviZibleInstalled(requireContext())
     }
 
-    private fun showOrbotNotInstalledState() {
-        statusIcon.setImageResource(R.drawable.ic_orbot)
+    private fun showInviZibleNotInstalledState() {
+        statusIcon.setImageResource(R.drawable.ic_invizible)
         statusIcon.alpha = 1f
-        statusTitle.text = getString(R.string.tor_control_title_orbot_required)
-        statusSubtitle.text = getString(R.string.tor_control_subtitle_orbot_required)
+        statusTitle.text = getString(R.string.tor_control_title_invizible_required)
+        statusSubtitle.text = getString(R.string.tor_control_subtitle_invizible_required)
         connectionProgress.visibility = View.GONE
         connectionDetailsContainer.visibility = View.GONE
-        orbotInfoCard.visibility = View.VISIBLE
+        invizibleInfoCard.visibility = View.VISIBLE
 
         primaryActionButton.text = getString(R.string.tor_control_button_install)
         primaryActionButton.setIconResource(R.drawable.ic_download)
@@ -278,8 +278,8 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             TorManager.TorState.STARTING -> {
                 // Do nothing
             }
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                openOrbotInStore()
+            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
+                openInviZibleInStore()
             }
         }
     }
@@ -292,31 +292,31 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
                 TorService.stop(requireContext())
             }
             else -> {
-                // Open Orbot app
-                openOrbotApp()
+                // Open InviZible Pro app
+                openInviZibleApp()
             }
         }
     }
 
-    private fun openOrbotApp() {
+    private fun openInviZibleApp() {
         try {
-            val intent = requireContext().packageManager.getLaunchIntentForPackage("org.torproject.android")
+            val intent = requireContext().packageManager.getLaunchIntentForPackage("pan.alexander.tordnscrypt")
             if (intent != null) {
                 startActivity(intent)
             } else {
-                openOrbotInStore()
+                openInviZibleInStore()
             }
         } catch (e: Exception) {
-            openOrbotInStore()
+            openInviZibleInStore()
         }
     }
 
-    private fun openOrbotInStore() {
+    private fun openInviZibleInStore() {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=org.torproject.android"))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=pan.alexander.tordnscrypt"))
             startActivity(intent)
         } catch (e: Exception) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/packages/org.torproject.android/"))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/packages/pan.alexander.tordnscrypt/"))
             startActivity(intent)
         }
     }

@@ -131,7 +131,7 @@ class TorService : Service() {
             TorManager.TorState.STARTING -> Triple(getString(R.string.tor_notification_connecting), getString(R.string.tor_notification_please_wait), R.drawable.ic_tor_connecting)
             TorManager.TorState.CONNECTED -> Triple(getString(R.string.tor_notification_connected), "SOCKS port: ${TorManager.socksPort}", R.drawable.ic_tor_on)
             TorManager.TorState.ERROR -> Triple(getString(R.string.tor_notification_error), TorManager.errorMessage ?: getString(R.string.tor_notification_connection_failed), R.drawable.ic_tor_off)
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> Triple(getString(R.string.tor_notification_orbot_required), getString(R.string.tor_notification_install_orbot), R.drawable.ic_tor_off)
+            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> Triple(getString(R.string.tor_notification_invizible_required), getString(R.string.tor_notification_install_invizible), R.drawable.ic_tor_off)
         }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)

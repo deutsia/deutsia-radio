@@ -68,7 +68,7 @@
     <string name="genre_other">Other</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with Orbot integration and configurable leak prevention</string>
+    <string name="about_description">deutsia radio is a free and open-source multinet radio player that brings together streams from the clearnet, Tor (.onion) and I2P networks. Enjoy your favorite stations in a Material You interface with InviZible Pro integration and configurable leak prevention</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">Browse</string>
@@ -200,7 +200,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Tor Network</string>
-    <string name="settings_enable_tor">Enable Tor (via Orbot)</string>
+    <string name="settings_enable_tor">Enable Tor (via InviZible Pro)</string>
     <string name="settings_enable_tor_description">Connect through the Tor network</string>
     <string name="settings_tor_disconnected">Disconnected</string>
     <string name="settings_tor_not_running">Tor is not running</string>
@@ -208,7 +208,7 @@
     <string name="settings_force_tor_description">Route all streams through Tor. Won\'t connect without Tor.</string>
     <string name="settings_force_tor_except_i2p">Force Tor Except I2P</string>
     <string name="settings_force_tor_except_i2p_description">Route clearnet through Tor, I2P streams direct to I2P proxy.</string>
-    <string name="settings_tor_info">Requires Orbot (free from Play Store or F-Droid). Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
+    <string name="settings_tor_info">Requires InviZible Pro (free from Play Store or F-Droid). Use proxy mode for best compatibility. Tap the Tor icon in the toolbar for quick access.\n\nForce modes block connections when Tor is unavailable.</string>
     <string name="settings_tor_privacy_notice">Privacy: Without Force Tor enabled, clearnet stations and images connect directly to the internet. Recordings use the same connection as the stream.</string>
 
     <!-- Settings - Custom Proxy -->
@@ -274,10 +274,10 @@
     <string name="tor_connection_details">Connection Details</string>
     <string name="tor_proxy_host">Proxy Host</string>
     <string name="tor_socks_port">SOCKS Port</string>
-    <string name="tor_what_is_orbot">What is Orbot?</string>
-    <string name="tor_orbot_description">Orbot is the official Tor client for Android. It provides secure, encrypted access to the Tor network.</string>
+    <string name="tor_what_is_invizible">What is InviZible Pro?</string>
+    <string name="tor_invizible_description">InviZible Pro provides Tor, DNSCrypt, and I2P in one app. Use proxy mode for best compatibility with this app.</string>
     <string name="tor_connect">Connect to Tor</string>
-    <string name="tor_open_orbot">Open Orbot</string>
+    <string name="tor_open_invizible">Open InviZible Pro</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">Connecting...</string>
@@ -286,7 +286,7 @@
     <string name="tor_status_off">Tor Off</string>
     <string name="tor_status_error">Tor Error</string>
     <string name="tor_status_leak_warning">Leak Warning</string>
-    <string name="tor_status_install_orbot">Install Orbot</string>
+    <string name="tor_status_install_invizible">Install InviZible Pro</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor is disconnected. Tap to connect.</string>
@@ -294,29 +294,29 @@
     <string name="tor_status_connected_description">Tor is connected. Tap to view details.</string>
     <string name="tor_status_connected_force_description">Tor is connected (Force Mode). Tap to view details.</string>
     <string name="tor_status_error_description">Tor connection failed. Tap to retry.</string>
-    <string name="tor_status_install_orbot_description">Orbot is not installed. Tap to install.</string>
+    <string name="tor_status_install_invizible_description">InviZible Pro is not installed. Tap to install.</string>
     <string name="tor_status_leak_warning_description">Force Tor is enabled but not connected. Privacy may be compromised.</string>
 
     <string name="tor_status_connecting_message">Connecting to Tor...</string>
     <string name="tor_status_connected_message">Connected via Tor</string>
     <string name="tor_control_title_stopped">Tor Disconnected</string>
     <string name="tor_control_subtitle_stopped">Tap Connect to browse anonymously via Tor</string>
-    <string name="tor_control_subtitle_connecting">Establishing secure connection via Orbot</string>
+    <string name="tor_control_subtitle_connecting">Establishing secure connection via InviZible Pro</string>
     <string name="tor_control_title_connecting">Connecting to Tor...</string>
     <string name="tor_control_title_connected">Connected to Tor</string>
     <string name="tor_control_title_connected_force">Connected to Tor (Force Mode)</string>
     <string name="tor_control_subtitle_connected">Your connection is private and anonymous</string>
-    <string name="tor_control_subtitle_connected_force">Disconnect via Orbot or disable Force Tor in settings</string>
+    <string name="tor_control_subtitle_connected_force">Disconnect via InviZible Pro or disable Force Tor in settings</string>
     <string name="tor_control_title_error">Connection Failed</string>
     <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
-    <string name="tor_control_title_orbot_required">Orbot Required</string>
-    <string name="tor_control_subtitle_orbot_required">Install Orbot to connect to the Tor network</string>
+    <string name="tor_control_title_invizible_required">InviZible Pro Required</string>
+    <string name="tor_control_subtitle_invizible_required">Install InviZible Pro to connect to the Tor network</string>
     <string name="tor_control_button_connecting">Connecting...</string>
     <string name="tor_control_button_disconnect">Disconnect</string>
     <string name="tor_control_button_cancel">Cancel</string>
     <string name="tor_control_button_retry">Retry Connection</string>
-    <string name="tor_control_button_install">Install Orbot</string>
-    <string name="tor_control_button_open_orbot">Open Orbot</string>
+    <string name="tor_control_button_install">Install InviZible Pro</string>
+    <string name="tor_control_button_open_invizible">Open InviZible Pro</string>
 
     <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
@@ -379,13 +379,13 @@
     <string name="tor_channel_description">Shows Tor connection status</string>
     <string name="tor_notification_disconnected">Tor Disconnected</string>
     <string name="tor_notification_tap_to_open">Tap to open app</string>
-    <string name="tor_notification_connecting">Connecting via Orbot...</string>
+    <string name="tor_notification_connecting">Connecting via InviZible Pro...</string>
     <string name="tor_notification_please_wait">Please wait</string>
     <string name="tor_notification_connected">Tor Connected</string>
     <string name="tor_notification_error">Tor Error</string>
     <string name="tor_notification_connection_failed">Connection failed</string>
-    <string name="tor_notification_orbot_required">Orbot Required</string>
-    <string name="tor_notification_install_orbot">Please install Orbot for Tor support</string>
+    <string name="tor_notification_invizible_required">InviZible Pro Required</string>
+    <string name="tor_notification_install_invizible">Please install InviZible Pro for Tor support</string>
     <string name="tor_notification_action_stop">Stop Tor</string>
 
     <!-- Other Error Messages -->
@@ -486,12 +486,12 @@
     <string name="tor_status_connecting_network">Connecting to Tor network...</string>
     <string name="tor_status_connected_via_tor">Connected via Tor</string>
     <string name="tor_status_connection_error">Connection error</string>
-    <string name="tor_status_orbot_required">Orbot app required</string>
+    <string name="tor_status_invizible_required">InviZible Pro app required</string>
     <string name="tor_status_detail_socks5">SOCKS5 proxy at %1$s:%2$d</string>
     <string name="tor_status_detail_establishing">Establishing connection...</string>
     <string name="tor_status_detail_unknown_error">Unknown error occurred</string>
     <string name="tor_status_detail_tap_to_connect">Tap to connect</string>
-    <string name="tor_status_detail_install_orbot">Install Orbot from Play Store or F-Droid</string>
+    <string name="tor_status_detail_install_invizible">Install InviZible Pro from Play Store or F-Droid</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">Disconnected</string>
@@ -504,9 +504,9 @@
     <string name="settings_tor_socks_port">SOCKS port: %d</string>
     <string name="button_stop_tor">Stop</string>
     <string name="settings_tor_connection_failed">Connection Failed</string>
-    <string name="settings_tor_orbot_required_status">Orbot Required</string>
-    <string name="settings_tor_install_orbot_message">Please install Orbot to use Tor</string>
-    <string name="button_install_orbot_caps">Install Orbot</string>
+    <string name="settings_tor_invizible_required_status">InviZible Pro Required</string>
+    <string name="settings_tor_install_invizible_message">Please install InviZible Pro to use Tor</string>
+    <string name="button_install_invizible_caps">Install InviZible Pro</string>
     <string name="settings_tor_force_warning">Connection Failed</string>
     <string name="settings_tor_force_warning_detail">Force Tor is enabled but not connected</string>
     <string name="button_retry">Retry</string>

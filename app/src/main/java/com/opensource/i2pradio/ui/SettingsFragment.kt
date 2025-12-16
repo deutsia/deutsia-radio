@@ -195,7 +195,7 @@ class SettingsFragment : Fragment() {
             when (state) {
                 TorManager.TorState.STOPPED,
                 TorManager.TorState.ERROR,
-                TorManager.TorState.ORBOT_NOT_INSTALLED -> {
+                TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
                     if (stateAge >= 100 || lastDisplayedTorState == state) {
                         // State has persisted for 100ms OR we're already showing it
                         // This is a REAL disconnection - update UI immediately
@@ -694,8 +694,8 @@ class SettingsFragment : Fragment() {
                 TorManager.TorState.STARTING -> {
                     // Do nothing while starting
                 }
-                TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                    TorManager.openOrbotInstallPage(requireContext())
+                TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
+                    TorManager.openInviZibleInstallPage(requireContext())
                 }
             }
         }
@@ -974,8 +974,8 @@ class SettingsFragment : Fragment() {
                     torActionButton?.isEnabled = true
                 }
             }
-            TorManager.TorState.ORBOT_NOT_INSTALLED -> {
-                // If force Tor is enabled but Orbot says not installed, check if proxy is accessible
+            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
+                // If force Tor is enabled but InviZible Pro says not installed, check if proxy is accessible
                 // This prevents UI glitches during activity recreation
                 if (isForceTorEnabled && TorManager.isConnected()) {
                     showConnectedStateForForceTor()
@@ -983,9 +983,9 @@ class SettingsFragment : Fragment() {
                     showForceTorWarning()
                 } else {
                     torStatusIcon?.setImageResource(R.drawable.ic_tor_off)
-                    torStatusText?.text = getString(R.string.settings_tor_orbot_required_status)
-                    torStatusDetail?.text = getString(R.string.settings_tor_install_orbot_message)
-                    torActionButton?.text = getString(R.string.button_install_orbot_caps)
+                    torStatusText?.text = getString(R.string.settings_tor_invizible_required_status)
+                    torStatusDetail?.text = getString(R.string.settings_tor_install_invizible_message)
+                    torActionButton?.text = getString(R.string.button_install_invizible_caps)
                     torActionButton?.isEnabled = true
                 }
             }
