@@ -2,7 +2,7 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
-## [Unreleased] - v1.4
+## [1.4.0]
 
 ### Added
 - Dynamic station counts in import dialog (no more hardcoded values)
