@@ -16,9 +16,6 @@ import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
@@ -85,11 +82,8 @@ class NowPlayingFragment : Fragment() {
     private var bufferProgressBar: com.google.android.material.progressindicator.LinearProgressIndicator? = null
     private var liveIndicator: TextView? = null
 
-    // Loading state UI elements (Content-Aware Loading)
-    private var genreSkeletonContainer: View? = null
-    private var genreShimmerOverlay: View? = null
-    private var connectingStatusContainer: View? = null
-    private var genreShimmerAnimator: ValueAnimator? = null
+    // Loading spinner for play/pause button
+    private var playPauseSpinner: CircularProgressIndicator? = null
 
     // Volume control state (0.0 to 1.0 for player volume)
     private var savedVolume: Float = 1f
@@ -274,10 +268,8 @@ class NowPlayingFragment : Fragment() {
         bufferProgressBar = view.findViewById(R.id.bufferProgressBar)
         liveIndicator = view.findViewById(R.id.liveIndicator)
 
-        // Loading state UI elements (Content-Aware Loading)
-        genreSkeletonContainer = view.findViewById(R.id.genreSkeletonContainer)
-        genreShimmerOverlay = view.findViewById(R.id.genreShimmerOverlay)
-        connectingStatusContainer = view.findViewById(R.id.connectingStatusContainer)
+        // Loading spinner for play/pause button
+        playPauseSpinner = view.findViewById(R.id.playPauseSpinner)
 
         // Initialize audio manager and volume control
         audioManager = requireContext().getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
@@ -886,67 +878,22 @@ class NowPlayingFragment : Fragment() {
 
     /**
      * Sets the buffering state and updates UI accordingly.
-     * Disables play/pause button during buffering to prevent spam-clicking.
+     * Shows spinners on play/pause button and cover art during buffering.
      */
     private fun setBufferingState(buffering: Boolean) {
         isBuffering = buffering
-        bufferingIndicator.visibility = if (buffering) View.VISIBLE else View.GONE
-        playPauseButton.isEnabled = !buffering
-        playPauseButton.alpha = if (buffering) 0.5f else 1f
 
-        // Content-Aware Loading: Show/hide loading UI elements
         if (buffering && viewModel.getCurrentStation() != null) {
-            // Show loading state
-            genreText.visibility = View.GONE
-            genreSkeletonContainer?.visibility = View.VISIBLE
-            connectingStatusContainer?.visibility = View.VISIBLE
-            startGenreShimmer()
+            // Show loading spinners
+            bufferingIndicator.visibility = View.VISIBLE
+            playPauseButton.visibility = View.INVISIBLE
+            playPauseSpinner?.visibility = View.VISIBLE
         } else {
-            // Show connected state
-            genreText.visibility = View.VISIBLE
-            genreSkeletonContainer?.visibility = View.GONE
-            connectingStatusContainer?.visibility = View.GONE
-            stopGenreShimmer()
+            // Hide loading spinners
+            bufferingIndicator.visibility = View.GONE
+            playPauseButton.visibility = View.VISIBLE
+            playPauseSpinner?.visibility = View.GONE
         }
-    }
-
-    /**
-     * Start the shimmer animation on the genre skeleton placeholder.
-     */
-    private fun startGenreShimmer() {
-        genreShimmerAnimator?.cancel()
-
-        val overlay = genreShimmerOverlay ?: return
-        val container = genreSkeletonContainer ?: return
-
-        // Calculate animation range based on container width
-        container.post {
-            val containerWidth = container.width.takeIf { it > 0 } ?: return@post
-            val overlayWidth = overlay.width.takeIf { it > 0 } ?: 40.dpToPx()
-
-            genreShimmerAnimator = ValueAnimator.ofFloat(-overlayWidth.toFloat(), containerWidth.toFloat()).apply {
-                duration = 1200L
-                interpolator = android.view.animation.LinearInterpolator()
-                repeatCount = ValueAnimator.INFINITE
-                repeatMode = ValueAnimator.RESTART
-                addUpdateListener { animation ->
-                    overlay.translationX = animation.animatedValue as Float
-                }
-                start()
-            }
-        }
-    }
-
-    /**
-     * Stop the shimmer animation on the genre skeleton placeholder.
-     */
-    private fun stopGenreShimmer() {
-        genreShimmerAnimator?.cancel()
-        genreShimmerAnimator = null
-    }
-
-    private fun Int.dpToPx(): Int {
-        return (this * resources.displayMetrics.density).toInt()
     }
 
     override fun onResume() {
@@ -965,9 +912,6 @@ class NowPlayingFragment : Fragment() {
         recordingDot?.clearAnimation()
         previousPlayingState = null
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(metadataReceiver)
-
-        // Clean up shimmer animator
-        stopGenreShimmer()
 
         // Clean up bottom sheet to prevent window leaks
         volumeBottomSheet?.dismiss()
