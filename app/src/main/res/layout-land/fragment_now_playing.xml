@@ -256,6 +256,22 @@
                 app:layout_constraintStart_toEndOf="@id/recordButton"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Play/Pause Loading Spinner - shown during buffering -->
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/playPauseSpinner"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:indicatorSize="72dp"
+                app:trackThickness="4dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:trackColor="?attr/colorSurfaceContainerHighest"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/volumeButton"
+                app:layout_constraintStart_toEndOf="@id/recordButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <!-- Volume Button (Right) - Primary container for Material You consistency -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/volumeButton"
