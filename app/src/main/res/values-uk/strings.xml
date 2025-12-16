@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">Примусовий Tor крім I2P</string>
     <string name="settings_force_tor_except_i2p_description">Маршрутизувати clearnet через Tor, I2P потоки безпосередньо до I2P проксі.</string>
     <string name="settings_tor_info">Потрібен InviZible Pro (безплатно з Play Store або F-Droid). Натисніть іконку Tor на панелі інструментів для швидкого доступу.\n\nРежими примусу блокують з\'єднання, коли Tor недоступний.</string>
+    <string name="settings_tor_privacy_notice">Конфіденційність: Без увімкненого примусового Tor, clearnet станції та зображення підключаються безпосередньо до інтернету. Записи використовують те саме з\'єднання, що й потік.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Власний проксі</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">Маршрутизувати весь трафік через власний проксі. Не підключатиметься без проксі.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Примусовий власний проксі крім Tor/I2P станцій</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Маршрутизувати весь clearnet трафік через власний проксі, але дозволяти Tor та I2P станціям використовувати їх власні проксі.</string>
+    <string name="settings_custom_proxy_privacy_notice">Конфіденційність: Без увімкненого примусового власного проксі, clearnet станції та зображення підключаються безпосередньо до інтернету. Записи використовують те саме з\'єднання, що й потік.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">Використання трафіку</string>

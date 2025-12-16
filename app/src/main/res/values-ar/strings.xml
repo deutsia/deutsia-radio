@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">فرض Tor باستثناء I2P</string>
     <string name="settings_force_tor_except_i2p_description">توجيه clearnet عبر Tor، وبث I2P مباشرة إلى وكيل I2P.</string>
     <string name="settings_tor_info">يتطلب InviZible Pro (مجاني من Play Store أو F-Droid). انقر على أيقونة Tor في شريط الأدوات للوصول السريع.\n\nتحظر أوضاع الفرض الاتصالات عندما يكون Tor غير متوفر.</string>
+    <string name="settings_tor_privacy_notice">الخصوصية: بدون تفعيل فرض Tor، تتصل محطات clearnet والصور مباشرة بالإنترنت. تستخدم التسجيلات نفس الاتصال المستخدم للبث.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">وكيل مخصص</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">توجيه كل حركة المرور عبر وكيل مخصص. لن يتصل بدون وكيل.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">فرض وكيل مخصص باستثناء محطات Tor/I2P</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">توجيه جميع حركة المرور clearnet عبر وكيل مخصص، ولكن السماح لمحطات Tor و I2P باستخدام وكلائها الأصليين.</string>
+    <string name="settings_custom_proxy_privacy_notice">الخصوصية: بدون تفعيل فرض الوكيل المخصص، تتصل محطات clearnet والصور مباشرة بالإنترنت. تستخدم التسجيلات نفس الاتصال المستخدم للبث.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">استخدام النطاق الترددي</string>

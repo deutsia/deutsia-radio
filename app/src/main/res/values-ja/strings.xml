@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">I2P以外にTorを強制</string>
     <string name="settings_force_tor_except_i2p_description">clearnetをTor経由でルーティング、I2PストリームはI2Pプロキシに直接接続。</string>
     <string name="settings_tor_info">InviZible Proが必要です（Play StoreまたはF-Droidから無料）。ツールバーのTorアイコンをタップして素早くアクセスできます。\n\n強制モードは、Torが利用できない場合に接続をブロックします。</string>
+    <string name="settings_tor_privacy_notice">プライバシー：Tor強制が無効の場合、clearnetステーションと画像はインターネットに直接接続されます。録音はストリームと同じ接続を使用します。</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">カスタムプロキシ</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">すべてのトラフィックをカスタムプロキシ経由でルーティング。プロキシなしでは接続しません。</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2Pステーション以外にカスタムプロキシを強制</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">すべてのclearnetトラフィックをカスタムプロキシ経由でルーティングしますが、TorとI2Pステーションがネイティブプロキシを使用することを許可します。</string>
+    <string name="settings_custom_proxy_privacy_notice">プライバシー：カスタムプロキシ強制が無効の場合、clearnetステーションと画像はインターネットに直接接続されます。録音はストリームと同じ接続を使用します。</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">帯域幅使用量</string>

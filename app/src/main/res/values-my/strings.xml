@@ -204,6 +204,7 @@
     <string name="settings_force_tor_except_i2p">I2P မှလွဲ၍ Tor ကို အတင်းအဓမ္မသုံးရန်</string>
     <string name="settings_force_tor_except_i2p_description">clearnet ကို Tor မှတစ်ဆင့်၊ I2P ထုတ်လွှင့်မှုများကို I2P proxy သို့ တိုက်ရိုက် ပို့ပါ။</string>
     <string name="settings_tor_info">InviZible Pro လိုအပ်သည် (Play Store သို့မဟုတ် F-Droid မှ အခမဲ့)။ အမြန်ဝင်ရောက်ရန် toolbar ရှိ Tor အိုင်ကွန်ကို တို့ပါ။\n\nအတင်းအဓမ္မ မုဒ်များသည် Tor မရနိုင်သောအခါ ချိတ်ဆက်မှုများကို ပိတ်ဆို့သည်။</string>
+    <string name="settings_tor_privacy_notice">ကိုယ်ရေးလုံခြုံမှု: Tor အတင်းအဓမ္မ ဖွင့်မထားပါက၊ clearnet စတေးရှင်းများနှင့် ပုံများသည် အင်တာနက်သို့ တိုက်ရိုက်ချိတ်ဆက်သည်။ အသံဖမ်းယူမှုများသည် ထုတ်လွှင့်မှုကဲ့သို့ တူညီသော ချိတ်ဆက်မှုကို သုံးသည်။</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">စိတ်ကြိုက် Proxy</string>
@@ -215,6 +216,7 @@
     <string name="settings_force_custom_proxy_description">အသွားအလာအားလုံးကို စိတ်ကြိုက် proxy မှတစ်ဆင့် ပို့ပါ။ proxy မရှိဘဲ ချိတ်ဆက်မည်မဟုတ်ပါ။</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2P စတေးရှင်းများမှလွဲ၍ စိတ်ကြိုက် Proxy ကို အတင်းအဓမ္မသုံးရန်</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">clearnet အသွားအလာအားလုံးကို စိတ်ကြိုက် proxy မှတစ်ဆင့် ပို့ပါ၊ သို့သော် Tor နှင့် I2P စတေးရှင်းများကို ၎င်းတို့၏ မူရင်း proxies များကို သုံးခွင့်ပြုပါ။</string>
+    <string name="settings_custom_proxy_privacy_notice">ကိုယ်ရေးလုံခြုံမှု: စိတ်ကြိုက် Proxy အတင်းအဓမ္မ ဖွင့်မထားပါက၊ clearnet စတေးရှင်းများနှင့် ပုံများသည် အင်တာနက်သို့ တိုက်ရိုက်ချိတ်ဆက်သည်။ အသံဖမ်းယူမှုများသည် ထုတ်လွှင့်မှုကဲ့သို့ တူညီသော ချိတ်ဆက်မှုကို သုံးသည်။</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">အင်တာနက် အသုံးပြုမှု</string>

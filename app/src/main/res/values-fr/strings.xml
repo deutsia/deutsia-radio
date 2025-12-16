@@ -214,6 +214,7 @@
     <string name="settings_force_tor_except_i2p">Forcer Tor sauf I2P</string>
     <string name="settings_force_tor_except_i2p_description">Acheminer le clearnet via Tor, flux I2P directement vers le proxy I2P.</string>
     <string name="settings_tor_info">Nécessite InviZible Pro (gratuit sur Play Store ou F-Droid). Utilisez le mode proxy pour une meilleure compatibilité. Appuyez sur l\'icône Tor dans la barre d\'outils pour un accès rapide.\n\nLes modes forcés bloquent les connexions lorsque Tor n\'est pas disponible.</string>
+    <string name="settings_tor_privacy_notice">Confidentialité : Sans forcer Tor activé, les stations clearnet et les images se connectent directement à Internet. Les enregistrements utilisent la même connexion que le flux.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Proxy personnalisé</string>
@@ -225,6 +226,7 @@
     <string name="settings_force_custom_proxy_description">Acheminer tout le trafic via le proxy personnalisé. Ne se connectera pas sans proxy.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Forcer le proxy personnalisé sauf stations Tor/I2P</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Acheminer tout le trafic clearnet via le proxy personnalisé, mais autoriser les stations Tor et I2P à utiliser leurs proxys natifs.</string>
+    <string name="settings_custom_proxy_privacy_notice">Confidentialité : Sans forcer le proxy personnalisé activé, les stations clearnet et les images se connectent directement à Internet. Les enregistrements utilisent la même connexion que le flux.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">Utilisation de la bande passante</string>

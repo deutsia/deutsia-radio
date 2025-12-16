@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">I2P Hariç Tor Zorla</string>
     <string name="settings_force_tor_except_i2p_description">Clearnet\'i Tor üzerinden yönlendir, I2P yayınlarını doğrudan I2P vekil sunucusuna bağla.</string>
     <string name="settings_tor_info">InviZible Pro gerektirir (Play Store veya F-Droid\'den ücretsiz). Hızlı erişim için araç çubuğundaki Tor simgesine dokunun.\n\nZorlama modları Tor kullanılamadığında bağlantıları engeller.</string>
+    <string name="settings_tor_privacy_notice">Gizlilik: Tor Zorla etkinleştirilmeden, clearnet istasyonları ve görseller doğrudan internete bağlanır. Kayıtlar, yayınla aynı bağlantıyı kullanır.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Özel Vekil Sunucu</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">Tüm trafiği özel vekil sunucu üzerinden yönlendir. Vekil sunucu olmadan bağlanmaz.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">Tor/I2P İstasyonları Hariç Özel Vekil Sunucu Zorla</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Tüm clearnet trafiğini özel vekil sunucu üzerinden yönlendir, ancak Tor ve I2P istasyonlarının yerel vekil sunucularını kullanmasına izin ver.</string>
+    <string name="settings_custom_proxy_privacy_notice">Gizlilik: Özel Vekil Sunucu Zorla etkinleştirilmeden, clearnet istasyonları ve görseller doğrudan internete bağlanır. Kayıtlar, yayınla aynı bağlantıyı kullanır.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">Bant Genişliği Kullanımı</string>

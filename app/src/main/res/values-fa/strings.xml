@@ -207,6 +207,7 @@
     <string name="settings_force_tor_except_i2p">اجبار Tor به جز I2P</string>
     <string name="settings_force_tor_except_i2p_description">مسیریابی clearnet از طریق Tor، جریان‌های I2P مستقیماً به پروکسی I2P.</string>
     <string name="settings_tor_info">به InviZible Pro نیاز دارد (رایگان از Play Store یا F-Droid). برای دسترسی سریع روی آیکون Tor در نوار ابزار ضربه بزنید.\n\nحالت‌های اجبار هنگامی که Tor در دسترس نیست، اتصالات را مسدود می‌کنند.</string>
+    <string name="settings_tor_privacy_notice">حریم خصوصی: بدون فعال‌سازی اجبار Tor، ایستگاه‌های clearnet و تصاویر مستقیماً به اینترنت متصل می‌شوند. ضبط‌ها از همان اتصال جریان استفاده می‌کنند.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">پروکسی سفارشی</string>
@@ -218,6 +219,7 @@
     <string name="settings_force_custom_proxy_description">مسیریابی همه ترافیک از طریق پروکسی سفارشی. بدون پروکسی متصل نمی‌شود.</string>
     <string name="settings_force_custom_proxy_except_tor_i2p">اجبار پروکسی سفارشی به جز ایستگاه‌های Tor/I2P</string>
     <string name="settings_force_custom_proxy_except_tor_i2p_description">مسیریابی همه ترافیک clearnet از طریق پروکسی سفارشی، اما اجازه دهید ایستگاه‌های Tor و I2P از پروکسی‌های بومی خود استفاده کنند.</string>
+    <string name="settings_custom_proxy_privacy_notice">حریم خصوصی: بدون فعال‌سازی اجبار پروکسی سفارشی، ایستگاه‌های clearnet و تصاویر مستقیماً به اینترنت متصل می‌شوند. ضبط‌ها از همان اتصال جریان استفاده می‌کنند.</string>
 
     <!-- Settings - Bandwidth -->
     <string name="settings_bandwidth_usage">مصرف پهنای باند</string>
