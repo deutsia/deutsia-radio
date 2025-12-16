@@ -204,7 +204,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.alpha = if (isForceTorEnabled) 0.5f else 1.0f
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = getString(R.string.tor_control_button_open_orbot)
+        secondaryActionButton.text = getString(R.string.tor_control_button_open_invizible)
         secondaryActionButton.visibility = View.VISIBLE
         secondaryActionButton.isEnabled = true
     }
