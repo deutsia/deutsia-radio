@@ -248,7 +248,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:text="@string/tor_open_orbot"
+            android:text="@string/tor_open_invizible"
             android:textSize="14sp"
             app:cornerRadius="24dp" />
 

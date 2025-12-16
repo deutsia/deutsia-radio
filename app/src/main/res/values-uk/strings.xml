@@ -69,7 +69,7 @@
     <string name="genre_other">Інше</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio — це безплатний радіоплеєр з відкритим кодом, який об\'єднує потоки з clearnet, Tor (.onion) та I2P мереж. Насолоджуйтесь улюбленими станціями в Material You інтерфейсі з інтеграцією Orbot та налаштованим запобіганням витоків</string>
+    <string name="about_description">deutsia radio — це безплатний радіоплеєр з відкритим кодом, який об\'єднує потоки з clearnet, Tor (.onion) та I2P мереж. Насолоджуйтесь улюбленими станціями в Material You інтерфейсі з інтеграцією InviZible Pro та налаштованим запобіганням витоків</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">Огляд</string>
@@ -198,7 +198,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Мережа Tor</string>
-    <string name="settings_enable_tor">Увімкнути Tor (через Orbot)</string>
+    <string name="settings_enable_tor">Увімкнути Tor (через InviZible Pro)</string>
     <string name="settings_enable_tor_description">Підключатися через мережу Tor</string>
     <string name="settings_tor_disconnected">Відключено</string>
     <string name="settings_tor_not_running">Tor не запущено</string>
@@ -206,7 +206,7 @@
     <string name="settings_force_tor_description">Маршрутизувати всі потоки через Tor. Не підключатиметься без Tor.</string>
     <string name="settings_force_tor_except_i2p">Примусовий Tor крім I2P</string>
     <string name="settings_force_tor_except_i2p_description">Маршрутизувати clearnet через Tor, I2P потоки безпосередньо до I2P проксі.</string>
-    <string name="settings_tor_info">Потрібен Orbot (безплатно з Play Store або F-Droid). Натисніть іконку Tor на панелі інструментів для швидкого доступу.\n\nРежими примусу блокують з\'єднання, коли Tor недоступний.</string>
+    <string name="settings_tor_info">Потрібен InviZible Pro (безплатно з Play Store або F-Droid). Натисніть іконку Tor на панелі інструментів для швидкого доступу.\n\nРежими примусу блокують з\'єднання, коли Tor недоступний.</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">Власний проксі</string>
@@ -270,10 +270,10 @@
     <string name="tor_connection_details">Деталі з\'єднання</string>
     <string name="tor_proxy_host">Хост проксі</string>
     <string name="tor_socks_port">Порт SOCKS</string>
-    <string name="tor_what_is_orbot">Що таке Orbot?</string>
-    <string name="tor_orbot_description">Orbot — це офіційний Tor клієнт для Android. Він забезпечує безпечний, зашифрований доступ до мережі Tor.</string>
+    <string name="tor_what_is_invizible">Що таке InviZible Pro?</string>
+    <string name="tor_invizible_description">InviZible Pro надає Tor, DNSCrypt та I2P в одному додатку. Перейдіть до Налаштування → Швидкий старт → увімкніть "Режим проксі", потім запустіть Tor.</string>
     <string name="tor_connect">Підключитися до Tor</string>
-    <string name="tor_open_orbot">Відкрити Orbot</string>
+    <string name="tor_open_invizible">Відкрити InviZible Pro</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">Підключення...</string>
@@ -282,7 +282,7 @@
     <string name="tor_status_off">Tor вимкнено</string>
     <string name="tor_status_error">Помилка Tor</string>
     <string name="tor_status_leak_warning">Попередження про витік</string>
-    <string name="tor_status_install_orbot">Встановити Orbot</string>
+    <string name="tor_status_install_invizible">Встановити InviZible Pro</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor відключено. Натисніть для підключення.</string>
@@ -290,29 +290,29 @@
     <string name="tor_status_connected_description">Tor підключено. Натисніть для перегляду деталей.</string>
     <string name="tor_status_connected_force_description">Tor підключено (Примусовий режим). Натисніть для перегляду деталей.</string>
     <string name="tor_status_error_description">Підключення до Tor не вдалося. Натисніть для повтору.</string>
-    <string name="tor_status_install_orbot_description">Orbot не встановлено. Натисніть для встановлення.</string>
+    <string name="tor_status_install_invizible_description">InviZible Pro не встановлено. Натисніть для встановлення.</string>
     <string name="tor_status_leak_warning_description">Примусовий режим Tor увімкнено, але не підключено. Конфіденційність може бути під загрозою.</string>
 
     <string name="tor_status_connecting_message">Підключення до Tor...</string>
     <string name="tor_status_connected_message">Підключено через Tor</string>
     <string name="tor_control_title_stopped">Tor відключено</string>
     <string name="tor_control_subtitle_stopped">Натисніть Підключитися для анонімного перегляду через Tor</string>
-    <string name="tor_control_subtitle_connecting">Встановлення безпечного з\'єднання через Orbot</string>
+    <string name="tor_control_subtitle_connecting">Встановлення безпечного з\'єднання через InviZible Pro</string>
     <string name="tor_control_title_connecting">Підключення до Tor...</string>
     <string name="tor_control_title_connected">Підключено до Tor</string>
     <string name="tor_control_title_connected_force">Підключено до Tor (Примусовий режим)</string>
     <string name="tor_control_subtitle_connected">Ваше з\'єднання приватне та анонімне</string>
-    <string name="tor_control_subtitle_connected_force">Відключіться через Orbot або вимкніть Примусовий Tor у налаштуваннях</string>
+    <string name="tor_control_subtitle_connected_force">Відключіться через InviZible Pro або вимкніть Примусовий Tor у налаштуваннях</string>
     <string name="tor_control_title_error">Помилка підключення</string>
     <string name="tor_control_subtitle_error">Не вдалося підключитися до мережі Tor</string>
-    <string name="tor_control_title_orbot_required">Потрібен Orbot</string>
-    <string name="tor_control_subtitle_orbot_required">Встановіть Orbot для підключення до мережі Tor</string>
+    <string name="tor_control_title_invizible_required">Потрібен InviZible Pro</string>
+    <string name="tor_control_subtitle_invizible_required">Встановіть InviZible Pro для підключення до мережі Tor</string>
     <string name="tor_control_button_connecting">Підключення...</string>
     <string name="tor_control_button_disconnect">Відключити</string>
     <string name="tor_control_button_cancel">Скасувати</string>
     <string name="tor_control_button_retry">Повторити підключення</string>
-    <string name="tor_control_button_install">Встановити Orbot</string>
-    <string name="tor_control_button_open_orbot">Відкрити Orbot</string>
+    <string name="tor_control_button_install">Встановити InviZible Pro</string>
+    <string name="tor_control_button_open_invizible">Відкрити InviZible Pro</string>
 
 
     <!-- Add/Edit Radio Dialog -->
@@ -375,13 +375,13 @@
     <string name="tor_channel_description">Показує статус з\'єднання Tor</string>
     <string name="tor_notification_disconnected">Tor відключено</string>
     <string name="tor_notification_tap_to_open">Натисніть, щоб відкрити додаток</string>
-    <string name="tor_notification_connecting">Підключення через Orbot...</string>
+    <string name="tor_notification_connecting">Підключення через InviZible Pro...</string>
     <string name="tor_notification_please_wait">Будь ласка, зачекайте</string>
     <string name="tor_notification_connected">Tor підключено</string>
     <string name="tor_notification_error">Помилка Tor</string>
     <string name="tor_notification_connection_failed">Помилка підключення</string>
-    <string name="tor_notification_orbot_required">Потрібен Orbot</string>
-    <string name="tor_notification_install_orbot">Будь ласка, встановіть Orbot для підтримки Tor</string>
+    <string name="tor_notification_invizible_required">Потрібен InviZible Pro</string>
+    <string name="tor_notification_install_invizible">Будь ласка, встановіть InviZible Pro для підтримки Tor</string>
     <string name="tor_notification_action_stop">Зупинити Tor</string>
 
     <!-- Other Error Messages -->
@@ -482,12 +482,12 @@
     <string name="tor_status_connecting_network">Підключення до мережі Tor...</string>
     <string name="tor_status_connected_via_tor">Підключено через Tor</string>
     <string name="tor_status_connection_error">Помилка підключення</string>
-    <string name="tor_status_orbot_required">Потрібен додаток Orbot</string>
+    <string name="tor_status_invizible_required">Потрібен додаток InviZible Pro</string>
     <string name="tor_status_detail_socks5">Проксі SOCKS5 на %1$s:%2$d</string>
     <string name="tor_status_detail_establishing">Встановлення з\'єднання...</string>
     <string name="tor_status_detail_unknown_error">Виникла невідома помилка</string>
     <string name="tor_status_detail_tap_to_connect">Торкніться для підключення</string>
-    <string name="tor_status_detail_install_orbot">Встановіть Orbot з Play Store або F-Droid</string>
+    <string name="tor_status_detail_install_invizible">Встановіть InviZible Pro з Play Store або F-Droid</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">Відключено</string>
@@ -500,9 +500,9 @@
     <string name="settings_tor_socks_port">Порт SOCKS: %d</string>
     <string name="button_stop_tor">Зупинити</string>
     <string name="settings_tor_connection_failed">Не вдалося підключитися</string>
-    <string name="settings_tor_orbot_required_status">Потрібен Orbot</string>
-    <string name="settings_tor_install_orbot_message">Будь ласка, встановіть Orbot для використання Tor</string>
-    <string name="button_install_orbot_caps">Встановити Orbot</string>
+    <string name="settings_tor_invizible_required_status">Потрібен InviZible Pro</string>
+    <string name="settings_tor_install_invizible_message">Будь ласка, встановіть InviZible Pro для використання Tor</string>
+    <string name="button_install_invizible_caps">Встановити InviZible Pro</string>
     <string name="settings_tor_force_warning">Не вдалося підключитися</string>
     <string name="settings_tor_force_warning_detail">Примусовий Tor увімкнено, але не підключено</string>
     <string name="button_retry">Повторити</string>

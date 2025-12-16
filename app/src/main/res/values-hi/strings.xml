@@ -66,7 +66,7 @@
     <string name="genre_other">अन्य</string>
 
      <!-- about -->
-    <string name="about_description">deutsia radio एक मुफ़्त और ओपन-सोर्स मल्टीनेट रेडियो प्लेयर है जो clearnet, Tor (.onion) और I2P नेटवर्क से स्ट्रीम को एक साथ लाता है। Material You इंटरफ़ेस में Orbot एकीकरण और कॉन्फ़िगर करने योग्य लीक रोकथाम के साथ अपने पसंदीदा स्टेशनों का आनंद लें</string>
+    <string name="about_description">deutsia radio एक मुफ़्त और ओपन-सोर्स मल्टीनेट रेडियो प्लेयर है जो clearnet, Tor (.onion) और I2P नेटवर्क से स्ट्रीम को एक साथ लाता है। Material You इंटरफ़ेस में InviZible Pro एकीकरण और कॉन्फ़िगर करने योग्य लीक रोकथाम के साथ अपने पसंदीदा स्टेशनों का आनंद लें</string>
 
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">ब्राउज़ करें</string>
@@ -195,7 +195,7 @@
 
     <!-- Settings - Tor Network -->
     <string name="settings_tor_network">Tor नेटवर्क</string>
-    <string name="settings_enable_tor">Tor सक्षम करें (Orbot के माध्यम से)</string>
+    <string name="settings_enable_tor">Tor सक्षम करें (InviZible Pro के माध्यम से)</string>
     <string name="settings_enable_tor_description">Tor नेटवर्क के माध्यम से कनेक्ट करें</string>
     <string name="settings_tor_disconnected">डिसकनेक्ट किया गया</string>
     <string name="settings_tor_not_running">Tor चल नहीं रहा है</string>
@@ -203,7 +203,7 @@
     <string name="settings_force_tor_description">सभी स्ट्रीम को Tor के माध्यम से रूट करें। Tor के बिना कनेक्ट नहीं होगा।</string>
     <string name="settings_force_tor_except_i2p">I2P को छोड़कर Tor फ़ोर्स करें</string>
     <string name="settings_force_tor_except_i2p_description">clearnet को Tor के माध्यम से रूट करें, I2P स्ट्रीम सीधे I2P प्रॉक्सी पर।</string>
-    <string name="settings_tor_info">Orbot की आवश्यकता है (Play Store या F-Droid से मुफ़्त)। त्वरित पहुंच के लिए टूलबार में Tor आइकन पर टैप करें।\n\nफ़ोर्स मोड Tor उपलब्ध न होने पर कनेक्शन ब्लॉक करते हैं।</string>
+    <string name="settings_tor_info">InviZible Pro की आवश्यकता है (Play Store या F-Droid से मुफ़्त)। त्वरित पहुंच के लिए टूलबार में Tor आइकन पर टैप करें।\n\nफ़ोर्स मोड Tor उपलब्ध न होने पर कनेक्शन ब्लॉक करते हैं।</string>
 
     <!-- Settings - Custom Proxy -->
     <string name="settings_custom_proxy">कस्टम प्रॉक्सी</string>
@@ -267,10 +267,10 @@
     <string name="tor_connection_details">कनेक्शन विवरण</string>
     <string name="tor_proxy_host">प्रॉक्सी होस्ट</string>
     <string name="tor_socks_port">SOCKS पोर्ट</string>
-    <string name="tor_what_is_orbot">Orbot क्या है?</string>
-    <string name="tor_orbot_description">Orbot Android के लिए आधिकारिक Tor क्लाइंट है। यह Tor नेटवर्क तक सुरक्षित, एन्क्रिप्टेड पहुंच प्रदान करता है।</string>
+    <string name="tor_what_is_invizible">InviZible Pro क्या है?</string>
+    <string name="tor_invizible_description">InviZible Pro Tor, DNSCrypt और I2P प्रदान करता है। प्रॉक्सी मोड सक्षम करने के लिए: InviZible Pro खोलें → सेटिंग्स → क्विक स्टार्ट → "प्रॉक्सी मोड" सक्षम करें, फिर Tor शुरू करें।</string>
     <string name="tor_connect">Tor से कनेक्ट करें</string>
-    <string name="tor_open_orbot">Orbot खोलें</string>
+    <string name="tor_open_invizible">InviZible Pro खोलें</string>
 
     <!-- Tor Status Messages -->
     <string name="tor_status_connecting">कनेक्ट हो रहा है...</string>
@@ -279,7 +279,7 @@
     <string name="tor_status_off">Tor बंद</string>
     <string name="tor_status_error">Tor त्रुटि</string>
     <string name="tor_status_leak_warning">लीक चेतावनी</string>
-    <string name="tor_status_install_orbot">Orbot इंस्टॉल करें</string>
+    <string name="tor_status_install_invizible">InviZible Pro इंस्टॉल करें</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
     <string name="tor_status_off_description">Tor डिसकनेक्ट है। कनेक्ट करने के लिए टैप करें।</string>
@@ -287,29 +287,29 @@
     <string name="tor_status_connected_description">Tor कनेक्ट है। विवरण देखने के लिए टैप करें।</string>
     <string name="tor_status_connected_force_description">Tor कनेक्ट है (फ़ोर्स मोड)। विवरण देखने के लिए टैप करें।</string>
     <string name="tor_status_error_description">Tor कनेक्शन विफल रहा। पुनः प्रयास के लिए टैप करें।</string>
-    <string name="tor_status_install_orbot_description">Orbot इंस्टॉल नहीं है। इंस्टॉल करने के लिए टैप करें।</string>
+    <string name="tor_status_install_invizible_description">InviZible Pro इंस्टॉल नहीं है। इंस्टॉल करने के लिए टैप करें।</string>
     <string name="tor_status_leak_warning_description">फ़ोर्स Tor मोड सक्षम है लेकिन कनेक्ट नहीं है। गोपनीयता खतरे में हो सकती है।</string>
 
     <string name="tor_status_connecting_message">Tor से कनेक्ट हो रहा है...</string>
     <string name="tor_status_connected_message">Tor के माध्यम से कनेक्ट किया गया</string>
     <string name="tor_control_title_stopped">Tor डिसकनेक्ट किया गया</string>
     <string name="tor_control_subtitle_stopped">Tor के माध्यम से गुमनाम रूप से ब्राउज़ करने के लिए कनेक्ट पर टैप करें</string>
-    <string name="tor_control_subtitle_connecting">Orbot के माध्यम से सुरक्षित कनेक्शन स्थापित हो रहा है</string>
+    <string name="tor_control_subtitle_connecting">InviZible Pro के माध्यम से सुरक्षित कनेक्शन स्थापित हो रहा है</string>
     <string name="tor_control_title_connecting">Tor से कनेक्ट हो रहा है...</string>
     <string name="tor_control_title_connected">Tor से कनेक्ट किया गया</string>
     <string name="tor_control_title_connected_force">Tor से कनेक्ट किया गया (फ़ोर्स मोड)</string>
     <string name="tor_control_subtitle_connected">आपका कनेक्शन निजी और गुमनाम है</string>
-    <string name="tor_control_subtitle_connected_force">Orbot के माध्यम से डिसकनेक्ट करें या सेटिंग्स में Tor फ़ोर्स करें अक्षम करें</string>
+    <string name="tor_control_subtitle_connected_force">InviZible Pro के माध्यम से डिसकनेक्ट करें या सेटिंग्स में Tor फ़ोर्स करें अक्षम करें</string>
     <string name="tor_control_title_error">कनेक्शन विफल</string>
     <string name="tor_control_subtitle_error">Tor नेटवर्क से कनेक्ट नहीं हो सका</string>
-    <string name="tor_control_title_orbot_required">Orbot आवश्यक</string>
-    <string name="tor_control_subtitle_orbot_required">Tor नेटवर्क से कनेक्ट करने के लिए Orbot इंस्टॉल करें</string>
+    <string name="tor_control_title_invizible_required">InviZible Pro आवश्यक</string>
+    <string name="tor_control_subtitle_invizible_required">Tor नेटवर्क से कनेक्ट करने के लिए InviZible Pro इंस्टॉल करें</string>
     <string name="tor_control_button_connecting">कनेक्ट हो रहा है...</string>
     <string name="tor_control_button_disconnect">डिसकनेक्ट करें</string>
     <string name="tor_control_button_cancel">रद्द करें</string>
     <string name="tor_control_button_retry">कनेक्शन पुनः प्रयास करें</string>
-    <string name="tor_control_button_install">Orbot इंस्टॉल करें</string>
-    <string name="tor_control_button_open_orbot">Orbot खोलें</string>
+    <string name="tor_control_button_install">InviZible Pro इंस्टॉल करें</string>
+    <string name="tor_control_button_open_invizible">InviZible Pro खोलें</string>
 
     <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">एम्बेडेड Tor का उपयोग - कोई प्रॉक्सी कॉन्फ़िगरेशन आवश्यक नहीं</string>
@@ -371,13 +371,13 @@
     <string name="tor_channel_description">Tor कनेक्शन स्थिति दिखाता है</string>
     <string name="tor_notification_disconnected">Tor डिसकनेक्ट किया गया</string>
     <string name="tor_notification_tap_to_open">ऐप खोलने के लिए टैप करें</string>
-    <string name="tor_notification_connecting">Orbot के माध्यम से कनेक्ट हो रहा है...</string>
+    <string name="tor_notification_connecting">InviZible Pro के माध्यम से कनेक्ट हो रहा है...</string>
     <string name="tor_notification_please_wait">कृपया प्रतीक्षा करें</string>
     <string name="tor_notification_connected">Tor कनेक्ट किया गया</string>
     <string name="tor_notification_error">Tor त्रुटि</string>
     <string name="tor_notification_connection_failed">कनेक्शन विफल</string>
-    <string name="tor_notification_orbot_required">Orbot आवश्यक</string>
-    <string name="tor_notification_install_orbot">कृपया Tor समर्थन के लिए Orbot इंस्टॉल करें</string>
+    <string name="tor_notification_invizible_required">InviZible Pro आवश्यक</string>
+    <string name="tor_notification_install_invizible">कृपया Tor समर्थन के लिए InviZible Pro इंस्टॉल करें</string>
     <string name="tor_notification_action_stop">Tor बंद करें</string>
 
     <!-- Other Error Messages -->
@@ -478,12 +478,12 @@
     <string name="tor_status_connecting_network">Tor नेटवर्क से कनेक्ट हो रहा है...</string>
     <string name="tor_status_connected_via_tor">Tor के माध्यम से कनेक्ट किया गया</string>
     <string name="tor_status_connection_error">कनेक्शन त्रुटि</string>
-    <string name="tor_status_orbot_required">Orbot ऐप की आवश्यकता है</string>
+    <string name="tor_status_invizible_required">InviZible Pro ऐप की आवश्यकता है</string>
     <string name="tor_status_detail_socks5">%1$s:%2$d पर SOCKS5 प्रॉक्सी</string>
     <string name="tor_status_detail_establishing">कनेक्शन स्थापित हो रहा है...</string>
     <string name="tor_status_detail_unknown_error">अज्ञात त्रुटि हुई</string>
     <string name="tor_status_detail_tap_to_connect">कनेक्ट करने के लिए टैप करें</string>
-    <string name="tor_status_detail_install_orbot">Play Store या F-Droid से Orbot इंस्टॉल करें</string>
+    <string name="tor_status_detail_install_invizible">Play Store या F-Droid से InviZible Pro इंस्टॉल करें</string>
 
     <!-- Settings Fragment Tor/Proxy Status -->
     <string name="settings_tor_disconnected_status">डिस्कनेक्ट किया गया</string>
@@ -496,9 +496,9 @@
     <string name="settings_tor_socks_port">SOCKS पोर्ट: %d</string>
     <string name="button_stop_tor">रोकें</string>
     <string name="settings_tor_connection_failed">कनेक्शन विफल</string>
-    <string name="settings_tor_orbot_required_status">Orbot आवश्यक</string>
-    <string name="settings_tor_install_orbot_message">कृपया Tor उपयोग करने के लिए Orbot इंस्टॉल करें</string>
-    <string name="button_install_orbot_caps">Orbot इंस्टॉल करें</string>
+    <string name="settings_tor_invizible_required_status">InviZible Pro आवश्यक</string>
+    <string name="settings_tor_install_invizible_message">कृपया Tor उपयोग करने के लिए InviZible Pro इंस्टॉल करें</string>
+    <string name="button_install_invizible_caps">InviZible Pro इंस्टॉल करें</string>
     <string name="settings_tor_force_warning">कनेक्शन विफल</string>
     <string name="settings_tor_force_warning_detail">फ़ोर्स Tor सक्षम है लेकिन कनेक्ट नहीं है</string>
     <string name="button_retry">पुन: प्रयास करें</string>
