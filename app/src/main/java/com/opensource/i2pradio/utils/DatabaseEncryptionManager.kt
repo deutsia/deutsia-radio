@@ -310,12 +310,10 @@ object DatabaseEncryptionManager {
             // Clean up WAL and SHM files from Room's WAL mode
             deleteWalFiles(dbPath)
 
-            // Open encrypted database using hex blob syntax for the key
-            // Must use PRAGMA key with x'...' syntax, not passing hex string directly
-            // as SQLCipher would interpret the hex string as a literal passphrase
+            // Open encrypted database with raw hex key
+            // For raw keys, pass "x'hexstring'" format to openOrCreateDatabase
             val passphraseHex = passphrase.toHexString()
-            encryptedDb = SQLiteDatabase.openOrCreateDatabase(dbPath, "", null, null)
-            encryptedDb.rawExecSQL("PRAGMA key = x'$passphraseHex';")
+            encryptedDb = SQLiteDatabase.openOrCreateDatabase(dbPath, "x'$passphraseHex'", null, null)
 
             // Verify we can read the encrypted database
             encryptedDb.rawExecSQL("SELECT count(*) FROM sqlite_master;")
@@ -378,11 +376,9 @@ object DatabaseEncryptionManager {
             val oldPassphrase = getDatabasePassphrase(context, oldPassword)
                 ?: throw IllegalStateException("No encryption salt found")
 
-            // Open database with old passphrase using hex blob syntax
-            // Must use PRAGMA key with x'...' syntax for consistency with other operations
+            // Open database with old passphrase using raw hex key format
             val oldPassphraseHex = oldPassphrase.toHexString()
-            db = SQLiteDatabase.openOrCreateDatabase(dbPath, "", null, null)
-            db.rawExecSQL("PRAGMA key = x'$oldPassphraseHex';")
+            db = SQLiteDatabase.openOrCreateDatabase(dbPath, "x'$oldPassphraseHex'", null, null)
 
             // Verify we can read the database
             db.rawExecSQL("SELECT count(*) FROM sqlite_master;")
