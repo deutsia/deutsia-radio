@@ -20,23 +20,23 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 
 ---
 
-## 📢 Updates
-- **New Release: v1.4** Switched from Orbot to Invizible Pro, improved UI/UX, bug fixes
+## Updates
+- **New Release: v1.4** Switched from Orbot to Invizible Pro, improved UI/UX, bug fixes, added stations
 ---
 
-## 🎉 Features
-- 🌐 **Multinet Support** - Clearnet, I2P (.i2p), and Tor (.onion)
-- 🔒 **Force Tor Modes** - Proxy-or-fail enforcement with instant leak prevention
-- 📡 **50,000+ Stations** - Access RadioBrowser API or add custom streams
-- 🎨 **Material You** - Dynamic theming along with 6 color schemes
-- 🔴 **Stream Recording** - Record across multiple stations
-- 🔐 **App Lock** - Secure your listening with biometric/PIN protection and optional database encrpytion 
-- 🌍 **17 Languages** - Multilingual interface support
-- 🌓 **Light/Dark/System** - Adaptive theme modes
+## Features
+- **Multinet Support** - Clearnet, I2P (.i2p), and Tor (.onion)
+- **Force Tor Modes** - Proxy-or-fail enforcement with instant leak prevention
+- **50,000+ Stations** - Access RadioBrowser API or add custom streams
+- **Material You** - Dynamic theming along with 6 color schemes
+- **Stream Recording** - Record across multiple stations
+- **App Lock** - Secure your listening with biometric/PIN protection and optional database encrpytion 
+- **17 Languages** - Multilingual interface support
+- **Light/Dark/System** - Adaptive theme modes
 
 ---
 
-## 🔐 Privacy & Security
+## Privacy & Security
 
 **Optional Database Encryption** via SQLCipher:
 - All local data encrypted at rest (stations, settings, history)
@@ -67,14 +67,14 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 
 ---
 
-## 📦 Requirements
+## Requirements
 - Android 7.0 (API 24) or higher
 - **For Tor:** [InviZible Pro](https://invizible.net) - Use **proxy mode** (not VPN mode) for best compatibility (click on the three dot menu in the upper right hand corner to switch). Proxy mode is easy to configure and allows running a separate VPN in the background if desired. Using Tor as a full device VPN will make I2P streaming almost impossible due to its latency.
 - **For I2P:** [I2P Android](https://geti2p.net/en/download) or [InviZible Pro](https://invizible.net) via i2pd
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 - Kotlin + Material Design 3
 - ExoPlayer (Media3) for audio
 - OkHttp with SOCKS/HTTP proxy support
@@ -82,7 +82,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 
 ---
 
-## 🏗️ Building
+## Building
 
 ```bash
 git clone https://github.com/deutsia/deutsia-radio.git
@@ -94,7 +94,15 @@ APK output: `app/build/outputs/apk/debug/`
 
 ---
 
-## 💬 Support Development
+## Submit Stations
+
+You can submit darknet stations (I2P/Tor) to be added to the bundled JSON list in the app by opening an issue, creating a pull request with the added stations, or by emailing me at **bb7x89uo at anonaddy dot me**.
+
+Please do **not** submit clearnet stations here, even if they are part of a darknet website. If the stream source is not `.i2p` or `.onion`, please submit it to the [RadioBrowser database](https://www.radio-browser.info/add) instead.
+
+---
+
+## Support Development
 
 **Monero (XMR):**
 ```
@@ -111,7 +119,7 @@ APK output: `app/build/outputs/apk/debug/`
 - [SQLCipher](https://www.zetetic.net/sqlcipher/) - Database encryption
 ---
 
-## ⚠️ License
+## License
 
     deutsia radio
 
