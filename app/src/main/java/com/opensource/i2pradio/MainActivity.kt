@@ -593,22 +593,23 @@ class MainActivity : AppCompatActivity() {
         val isDbEncryptionEnabled = com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(this)
 
         // Show authentication if:
-        // 1. App lock is enabled OR database encryption is enabled
-        // 2. Password is set
-        // 3. Either this is first launch (and require on launch is enabled) OR app is resuming and not already authenticated
+        // 1. Password is set AND
+        // 2. Either:
+        //    a) App lock is enabled AND require auth on launch is enabled AND not authenticated, OR
+        //    b) Database encryption is enabled AND not authenticated
         // Note: Database encryption ALWAYS requires authentication on launch
         val shouldAuthenticate = hasPassword &&
-            ((isAppLockEnabled && ((isFirstLaunch && requireAuthOnLaunch) || (!isFirstLaunch && !isAuthenticated))) ||
+            ((isAppLockEnabled && requireAuthOnLaunch && !isAuthenticated) ||
              (isDbEncryptionEnabled && !isAuthenticated))
 
         if (shouldAuthenticate) {
             // Launch authentication activity
             val intent = Intent(this, AuthenticationActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_AUTHENTICATION)
-        } else if (isFirstLaunch) {
-            // Mark as authenticated on first launch if no auth required
+        } else if (!isAuthenticated) {
+            // Mark as authenticated if no auth required (first launch or auth on launch disabled)
             isAuthenticated = true
-            // Initialize repositories if not already done (for non-encrypted case on first launch)
+            // Initialize repositories if not already done (for non-encrypted case)
             initializeRepositories()
         }
 
