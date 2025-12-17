@@ -33,6 +33,8 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 - **App Lock** - Secure your listening with biometric/PIN protection and optional database encrpytion 
 - **17 Languages** - Multilingual interface support
 - **Light/Dark/System** - Adaptive theme modes
+- **Bundled Darknet Stations** Choose to add pre-curated i2p/tor station lists to your local library
+- **Add any station** Add any station with support for Tor, Clearnet, I2P and individual station level custom proxy
 
 ---
 
