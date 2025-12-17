@@ -109,13 +109,15 @@ object DatabaseEncryptionManager {
     /**
      * Disable database encryption
      * WARNING: This should trigger database migration to unencrypted format
+     * Uses commit() instead of apply() to ensure preference is written synchronously
+     * before the process is killed
      */
     fun disableDatabaseEncryption(context: Context) {
         getEncryptedPreferences(context)
             .edit()
             .remove(KEY_DB_SALT)
             .putBoolean(KEY_DB_ENCRYPTION_ENABLED, false)
-            .apply()
+            .commit()  // Synchronous - must complete before process kill
     }
 
     /**
