@@ -2595,14 +2595,12 @@ class SettingsFragment : Fragment() {
 
                             // Disable database encryption
                             com.opensource.i2pradio.utils.DatabaseEncryptionManager.disableDatabaseEncryption(requireContext())
-                        }
 
-                        withContext(Dispatchers.Main) {
-                            progressDialog.dismiss()
-                            Toast.makeText(requireContext(), R.string.settings_database_encryption_disabled, Toast.LENGTH_SHORT).show()
-
-                            // Restart the app
-                            restartApp()
+                            // Kill process immediately to prevent Room from trying to access
+                            // the decrypted database with the old encryption SupportFactory.
+                            // We can't switch to Main thread first because Room's background
+                            // threads would race and crash.
+                            android.os.Process.killProcess(android.os.Process.myPid())
                         }
                     } catch (e: Exception) {
                         withContext(Dispatchers.Main) {
