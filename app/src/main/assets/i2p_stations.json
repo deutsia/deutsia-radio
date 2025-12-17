@@ -143,6 +143,16 @@
       "proxyType": "I2P",
       "proxyHost": "127.0.0.1",
       "proxyPort": 4444
+    },
+    {
+      "name": "Radio TGFB",
+      "streamUrl": "http://tgfb6wl5n4eaa5p6tdw56gqcmtevnxsjgwifrud4iffmural6z7q.b32.i2p/listen/tgfb/aac",
+      "genre": "Jazz",
+      "codec": "AAC",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
     }
   ]
 }
