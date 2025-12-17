@@ -2,6 +2,11 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.4.1] 
+
+### Fixed
+- Disable decryption bug
+
 ## [1.4.0]
 
 ### Added
