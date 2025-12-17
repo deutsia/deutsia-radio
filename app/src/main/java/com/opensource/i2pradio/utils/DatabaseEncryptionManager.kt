@@ -109,13 +109,15 @@ object DatabaseEncryptionManager {
     /**
      * Disable database encryption
      * WARNING: This should trigger database migration to unencrypted format
+     * Uses commit() instead of apply() to ensure preference is written synchronously
+     * before the process is killed
      */
     fun disableDatabaseEncryption(context: Context) {
         getEncryptedPreferences(context)
             .edit()
             .remove(KEY_DB_SALT)
             .putBoolean(KEY_DB_ENCRYPTION_ENABLED, false)
-            .apply()
+            .commit()  // Synchronous - must complete before process kill
     }
 
     /**
@@ -306,13 +308,15 @@ object DatabaseEncryptionManager {
         val tempDbPath = "$dbPath.decrypted"
 
         var encryptedDb: SQLiteDatabase? = null
+        // Make a copy of passphrase since we'll zero the original in finally block
+        val passphraseCopy = passphrase.copyOf()
         try {
             // Clean up WAL and SHM files from Room's WAL mode
             deleteWalFiles(dbPath)
 
-            // Open encrypted database using passphrase
-            val passphraseHex = passphrase.toHexString()
-            encryptedDb = SQLiteDatabase.openOrCreateDatabase(dbPath, passphraseHex, null, null)
+            // Open encrypted database using raw bytes - same as SupportFactory/Room
+            // This ensures we use the exact same key derivation path as Room
+            encryptedDb = SQLiteDatabase.openOrCreateDatabase(dbPath, passphraseCopy, null, null)
 
             // Verify we can read the encrypted database
             encryptedDb.rawExecSQL("SELECT count(*) FROM sqlite_master;")
@@ -351,6 +355,7 @@ object DatabaseEncryptionManager {
         } finally {
             encryptedDb?.close()
             passphrase.fill(0)
+            passphraseCopy.fill(0)
         }
     }
 
@@ -367,6 +372,7 @@ object DatabaseEncryptionManager {
         val dbPath = context.getDatabasePath(dbName).absolutePath
 
         var db: SQLiteDatabase? = null
+        var oldPassphraseCopy: ByteArray? = null
         try {
             // Clean up WAL and SHM files from Room's WAL mode
             deleteWalFiles(dbPath)
@@ -374,10 +380,10 @@ object DatabaseEncryptionManager {
             // Get old passphrase
             val oldPassphrase = getDatabasePassphrase(context, oldPassword)
                 ?: throw IllegalStateException("No encryption salt found")
+            oldPassphraseCopy = oldPassphrase.copyOf()
 
-            // Open database with old passphrase
-            val oldPassphraseHex = oldPassphrase.toHexString()
-            db = SQLiteDatabase.openOrCreateDatabase(dbPath, oldPassphraseHex, null, null)
+            // Open database with old passphrase using raw bytes - same as SupportFactory/Room
+            db = SQLiteDatabase.openOrCreateDatabase(dbPath, oldPassphraseCopy, null, null)
 
             // Verify we can read the database
             db.rawExecSQL("SELECT count(*) FROM sqlite_master;")
@@ -385,10 +391,25 @@ object DatabaseEncryptionManager {
             // Generate new salt and derive new passphrase
             val newSalt = PasswordHashUtil.generateSalt()
             val newPassphrase = PasswordHashUtil.deriveKey(newPassword, newSalt)
-            val newPassphraseHex = newPassphrase.toHexString()
 
-            // Re-key the database using SQLCipher PRAGMA
-            db.rawExecSQL("PRAGMA rekey = x'$newPassphraseHex';")
+            // Re-key requires using PRAGMA with the new passphrase
+            // SQLCipher's rekey with raw bytes isn't directly supported via PRAGMA,
+            // so we export to a new encrypted database instead
+            val tempDbPath = "$dbPath.rekeyed"
+            val newPassphraseHex = newPassphrase.toHexString()
+            db.rawExecSQL("ATTACH DATABASE '$tempDbPath' AS rekeyed KEY x'$newPassphraseHex';")
+            db.rawExecSQL("SELECT sqlcipher_export('rekeyed');")
+            db.rawExecSQL("DETACH DATABASE rekeyed;")
+            db.close()
+            db = null
+
+            // Replace original with rekeyed version
+            val originalFile = java.io.File(dbPath)
+            val rekeyedFile = java.io.File(tempDbPath)
+            originalFile.delete()
+            if (!rekeyedFile.renameTo(originalFile)) {
+                throw IllegalStateException("Failed to rename rekeyed database")
+            }
 
             // Update stored salt
             val newSaltHex = newSalt.toHexString()
@@ -404,9 +425,12 @@ object DatabaseEncryptionManager {
             android.util.Log.i("DatabaseEncryption", "Database re-keyed successfully")
         } catch (e: Exception) {
             android.util.Log.e("DatabaseEncryption", "Failed to re-key database", e)
+            // Clean up temp file on failure
+            java.io.File("$dbPath.rekeyed").delete()
             throw e
         } finally {
             db?.close()
+            oldPassphraseCopy?.fill(0)
         }
     }
 
