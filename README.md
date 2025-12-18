@@ -81,7 +81,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 - ExoPlayer (Media3) for audio
 - OkHttp with SOCKS/HTTP proxy support
 - Coil for proxy-aware image loading
-
+/home/skladje/Downloads/
 ---
 
 ## Building
@@ -144,4 +144,5 @@ Please do **not** submit clearnet stations here, even if they are part of a dark
 <div align="center">
     <img src="assets/4.png" width="30%"  alt=""/>
     <img src="assets/1.png" width="30%"  alt=""/>
+    <img src="assets/gps.png" width="30%"  alt=""/>
 </div>
