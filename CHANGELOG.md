@@ -2,6 +2,11 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.4.3]
+
+### Added
+- **Android 7 fallback icons support**: Android 7.x (API 24-25) now uses PNG files from mipmap-{density}/ folders
+
 ## [1.4.2]
 
 ### Fixed
