@@ -68,6 +68,15 @@ class MainActivity : AppCompatActivity() {
     private val torStateListener: (TorManager.TorState) -> Unit = { state ->
         runOnUiThread {
             torStatusView.updateState(state)
+
+            // Sync preference when Tor becomes connected
+            // This ensures the Settings toggle reflects the actual connection state
+            // and prevents confusion where the status shows "Connected" but the toggle is off
+            if (state == TorManager.TorState.CONNECTED) {
+                if (!PreferencesHelper.isEmbeddedTorEnabled(this@MainActivity)) {
+                    PreferencesHelper.setEmbeddedTorEnabled(this@MainActivity, true)
+                }
+            }
         }
     }
 
