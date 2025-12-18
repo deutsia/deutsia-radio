@@ -2,6 +2,17 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.4.2]
+
+### Fixed
+- **Tor state UI sync**: Auto-enable Tor preference when Tor connectivity is detected
+- **Search & browse filtering**: Multiple filters now properly combine in API requests
+- **UI layout**: Record and volume buttons no longer cut off in landscape mode
+
+### Other
+- Added privacy policy for Play Store compliance
+- Updated assets and UI graphics
+
 ## [1.4.1] 
 
 ### Fixed
