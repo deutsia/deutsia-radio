@@ -43,13 +43,14 @@ class RadioBrowserRepository(context: Context) {
     }
 
     /**
-     * Search stations with filters
+     * Search stations with filters (supports combining multiple filters)
      */
     suspend fun searchStations(
         name: String? = null,
         tag: String? = null,
         country: String? = null,
         countrycode: String? = null,
+        language: String? = null,
         limit: Int = 50,
         offset: Int = 0
     ): RadioBrowserResult<List<RadioBrowserStation>> {
@@ -58,6 +59,7 @@ class RadioBrowserRepository(context: Context) {
             tag = tag,
             country = country,
             countrycode = countrycode,
+            language = language,
             limit = limit,
             offset = offset
         )
