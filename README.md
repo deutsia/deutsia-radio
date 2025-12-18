@@ -81,7 +81,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 - ExoPlayer (Media3) for audio
 - OkHttp with SOCKS/HTTP proxy support
 - Coil for proxy-aware image loading
-/home/skladje/Downloads/
+
 ---
 
 ## Building
