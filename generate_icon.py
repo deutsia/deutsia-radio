@@ -4,50 +4,69 @@ Convert Android Vector Drawable to PNG for Play Store
 """
 import cairosvg
 import xml.etree.ElementTree as ET
+import os
 
 # Read the Android Vector Drawable
 tree = ET.parse('app/src/main/res/drawable/ic_launcher_foreground.xml')
 root = tree.getroot()
 
+# Android namespace
+android_ns = '{http://schemas.android.com/apk/res/android}'
+
 # Extract viewBox dimensions
-width = root.get('{http://schemas.android.com/apk/res/android}width', '108dp').replace('dp', '')
-height = root.get('{http://schemas.android.com/apk/res/android}height', '108dp').replace('dp', '')
-viewportWidth = root.get('{http://schemas.android.com/apk/res/android}viewportWidth', '108')
-viewportHeight = root.get('{http://schemas.android.com/apk/res/android}viewportHeight', '108')
+viewportWidth = root.get(f'{android_ns}viewportWidth', '108')
+viewportHeight = root.get(f'{android_ns}viewportHeight', '108')
 
 # Start building SVG
-svg_parts = [
-    f'<?xml version="1.0" encoding="UTF-8"?>',
-    f'<svg xmlns="http://www.w3.org/2000/svg" ',
-    f'width="{width}" height="{height}" ',
-    f'viewBox="0 0 {viewportWidth} {viewportHeight}">'
-]
+svg_content = f'''<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="512" height="512"
+     viewBox="0 0 {viewportWidth} {viewportHeight}">
+'''
 
-# Convert path elements
-for path_elem in root.findall('.//{http://schemas.android.com/apk/res/android}path'):
-    path_data = path_elem.get('{http://schemas.android.com/apk/res/android}pathData', '')
-    fill_color = path_elem.get('{http://schemas.android.com/apk/res/android}fillColor', 'none')
-    stroke_color = path_elem.get('{http://schemas.android.com/apk/res/android}strokeColor', 'none')
-    stroke_width = path_elem.get('{http://schemas.android.com/apk/res/android}strokeWidth', '0')
-    stroke_linecap = path_elem.get('{http://schemas.android.com/apk/res/android}strokeLineCap', 'butt')
+# Debug: Print what we find
+print(f"Root tag: {root.tag}")
+print(f"Root attribs: {root.attrib}")
 
-    svg_parts.append(f'  <path d="{path_data}" ')
-    svg_parts.append(f'fill="{fill_color}" ')
-    if stroke_color != 'none' and stroke_color != '#00000000':
-        svg_parts.append(f'stroke="{stroke_color}" ')
-        svg_parts.append(f'stroke-width="{stroke_width}" ')
-        svg_parts.append(f'stroke-linecap="{stroke_linecap}" ')
-    svg_parts.append('/>')
+# Convert path elements - try different ways to find them
+paths_found = 0
+for path_elem in root.iter():
+    if path_elem.tag.endswith('path'):
+        paths_found += 1
+        path_data = path_elem.get(f'{android_ns}pathData', '')
+        fill_color = path_elem.get(f'{android_ns}fillColor', 'none')
+        stroke_color = path_elem.get(f'{android_ns}strokeColor', 'none')
+        stroke_width = path_elem.get(f'{android_ns}strokeWidth', '0')
+        stroke_linecap = path_elem.get(f'{android_ns}strokeLineCap', 'butt')
 
-svg_parts.append('</svg>')
+        if not path_data:
+            print(f"Warning: path element {paths_found} has no pathData")
+            continue
 
-svg_content = '\n'.join(svg_parts)
+        # Convert fill color
+        if fill_color == '#00000000':
+            fill_color = 'none'
 
-# Save as SVG
+        svg_content += f'  <path d="{path_data}" '
+        svg_content += f'fill="{fill_color}" '
+
+        if stroke_color != 'none' and stroke_color != '#00000000':
+            svg_content += f'stroke="{stroke_color}" '
+            svg_content += f'stroke-width="{stroke_width}" '
+            svg_content += f'stroke-linecap="{stroke_linecap}" '
+
+        svg_content += '/>\n'
+
+print(f"Found {paths_found} path elements")
+
+svg_content += '</svg>'
+
+# Save as SVG for debugging
 with open('icon_temp.svg', 'w') as f:
     f.write(svg_content)
 
-print("Converting to 512x512 PNG...")
+print("SVG saved to icon_temp.svg")
+print("\nConverting to 512x512 PNG...")
 
 # Convert to 512x512 PNG
 cairosvg.svg2png(
@@ -68,7 +87,6 @@ sizes = {
     'xxxhdpi': 192
 }
 
-import os
 for density, size in sizes.items():
     # Create directory if it doesn't exist
     os.makedirs(f'app/src/main/res/mipmap-{density}', exist_ok=True)
