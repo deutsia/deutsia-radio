@@ -34,7 +34,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 - **17 Languages** - Multilingual interface support
 - **Light/Dark/System** - Adaptive theme modes
 - **Bundled Darknet Stations** Add pre-curated i2p/tor station lists to local library
-- **Add any station** Support for Tor, Clearnet, I2P and per-station level custom proxy
+- **Add any station** Support for Tor, Clearnet, I2P and per-station level custom proxy stations
 
 ---
 
