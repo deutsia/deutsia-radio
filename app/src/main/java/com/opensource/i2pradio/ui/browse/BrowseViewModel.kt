@@ -773,26 +773,19 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 }
                 BrowseCategory.ALL_STATIONS -> {
-                    // Fetch all stations based on active filters without any ranking
-                    // Priority: tag > country > language > fallback to all stations
+                    // Use searchStations with combined filters to properly support
+                    // multiple active filters (e.g., tag + country + language)
                     val tag = _selectedTag.value
                     val country = _selectedCountry.value
                     val language = _selectedLanguage.value
-                    when {
-                        tag != null -> repository.getByTag(tag.name, pageSize, currentOffset)
-                        country != null -> repository.getByCountryCode(country.iso3166_1, pageSize, currentOffset)
-                        language != null -> repository.getByLanguage(language.name, pageSize, currentOffset)
-                        else -> {
-                            // No filter active, use advanced search to get any stations
-                            repository.searchStations(
-                                name = null,
-                                tag = null,
-                                country = null,
-                                limit = pageSize,
-                                offset = currentOffset
-                            )
-                        }
-                    }
+                    repository.searchStations(
+                        name = null,
+                        tag = tag?.name,
+                        countrycode = country?.iso3166_1,
+                        language = language?.name,
+                        limit = pageSize,
+                        offset = currentOffset
+                    )
                 }
                 null -> RadioBrowserResult.Error("No category selected")
             }
