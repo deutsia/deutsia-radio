@@ -21,7 +21,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.4.1** Fixed disable decryption bug
+- **New Release: v1.4.2** Improved Tor connection UI, improved search filtering behavior, and fixed UI layout across orientations
 ---
 
 ## Features
