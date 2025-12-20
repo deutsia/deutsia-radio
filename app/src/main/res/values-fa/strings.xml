@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">در حال اتصال به Tor...</string>
     <string name="tor_control_title_connected">به Tor متصل شد</string>
     <string name="tor_control_title_connected_force">به Tor متصل شد (حالت اجبار)</string>
-    <string name="tor_control_subtitle_connected">اتصال شما خصوصی و ناشناس است</string>
+    <string name="tor_control_subtitle_connected">استریم‌های Onion اکنون در دسترس هستند. از حالت اجباری برای مسیریابی تمام ترافیک از طریق Tor استفاده کنید.</string>
     <string name="tor_control_subtitle_connected_force">از طریق InviZible Pro قطع کنید یا اجبار Tor را در تنظیمات غیرفعال کنید</string>
     <string name="tor_control_title_error">اتصال ناموفق بود</string>
     <string name="tor_control_subtitle_error">اتصال به شبکه Tor ممکن نیست</string>

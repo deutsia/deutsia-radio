@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">Подключение к Tor...</string>
     <string name="tor_control_title_connected">Подключено к Tor</string>
     <string name="tor_control_title_connected_force">Подключено к Tor (принудительный режим)</string>
-    <string name="tor_control_subtitle_connected">Ваше соединение приватное и анонимное</string>
+    <string name="tor_control_subtitle_connected">Onion-потоки теперь доступны. Используйте принудительный режим для маршрутизации всего трафика через Tor.</string>
     <string name="tor_control_subtitle_connected_force">Отключитесь через InviZible Pro или отключите принудительный Tor в настройках</string>
     <string name="tor_control_title_error">Ошибка подключения</string>
     <string name="tor_control_subtitle_error">Не удалось подключиться к сети Tor</string>

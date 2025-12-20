@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">Verbinde mit Tor...</string>
     <string name="tor_control_title_connected">Mit Tor verbunden</string>
     <string name="tor_control_title_connected_force">Mit Tor verbunden (Zwangsmodus)</string>
-    <string name="tor_control_subtitle_connected">Ihre Verbindung ist privat und anonym</string>
+    <string name="tor_control_subtitle_connected">Onion-Streams sind jetzt verfügbar. Verwenden Sie den Zwangsmodus, um allen Datenverkehr über Tor zu leiten.</string>
     <string name="tor_control_subtitle_connected_force">Über InviZible Pro trennen oder Tor-Zwang in Einstellungen deaktivieren</string>
     <string name="tor_control_title_error">Verbindung fehlgeschlagen</string>
     <string name="tor_control_subtitle_error">Konnte nicht mit Tor-Netzwerk verbinden</string>

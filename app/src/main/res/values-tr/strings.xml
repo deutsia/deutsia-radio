@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">Tor\'a bağlanıyor...</string>
     <string name="tor_control_title_connected">Tor\'a Bağlandı</string>
     <string name="tor_control_title_connected_force">Tor\'a Bağlandı (Zorla Modu)</string>
-    <string name="tor_control_subtitle_connected">Bağlantınız özel ve anonimdir</string>
+    <string name="tor_control_subtitle_connected">Onion yayınları artık kullanılabilir. Tüm trafiği Tor üzerinden yönlendirmek için Zorla Modunu kullanın.</string>
     <string name="tor_control_subtitle_connected_force">InviZible Pro üzerinden bağlantıyı kesin veya ayarlarda Tor Zorlama\'yı devre dışı bırakın</string>
     <string name="tor_control_title_error">Bağlantı Başarısız</string>
     <string name="tor_control_subtitle_error">Tor ağına bağlanılamadı</string>

@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">Tor에 연결 중...</string>
     <string name="tor_control_title_connected">Tor에 연결됨</string>
     <string name="tor_control_title_connected_force">Tor에 연결됨 (강제 모드)</string>
-    <string name="tor_control_subtitle_connected">연결이 비공개이며 익명입니다</string>
+    <string name="tor_control_subtitle_connected">Onion 스트림을 사용할 수 있습니다. 모든 트래픽을 Tor를 통해 라우팅하려면 강제 모드를 사용하세요.</string>
     <string name="tor_control_subtitle_connected_force">InviZible Pro를 통해 연결을 끊거나 설정에서 강제 Tor를 비활성화하세요</string>
     <string name="tor_control_title_error">연결 실패</string>
     <string name="tor_control_subtitle_error">Tor 네트워크에 연결할 수 없습니다</string>
