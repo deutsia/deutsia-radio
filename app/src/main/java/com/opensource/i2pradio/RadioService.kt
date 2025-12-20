@@ -952,6 +952,16 @@ class RadioService : Service() {
                 android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Routing through Tor")
                 Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
             }
+            forceCustomProxyExceptTorI2P && isTorStream -> {
+                // Tor stream but Tor not enabled/connected - for recording, use direct connection fallback
+                // (Recording should still work if the playStream already established the connection)
+                android.util.Log.w("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Tor stream but Tor not available - using station proxy config")
+                if (currentProxyHost?.isNotEmpty() == true && currentProxyType == ProxyType.TOR) {
+                    Triple(currentProxyHost!!, currentProxyPort, ProxyType.TOR)
+                } else {
+                    Triple("", 0, ProxyType.NONE)
+                }
+            }
             forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream -> {
                 val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
                 val customProxyPort = PreferencesHelper.getCustomProxyPort(this)
@@ -974,12 +984,42 @@ class RadioService : Service() {
             else -> Triple("", 0, ProxyType.NONE)
         }
 
+        // When using force custom proxy modes, load all settings from global preferences
+        // instead of using station-specific values (which may be empty)
+        val useGlobalCustomProxySettings = effectiveProxyType == ProxyType.CUSTOM &&
+            (forceCustomProxy || forceCustomProxyExceptTorI2P)
+
+        val effectiveCustomProxyProtocol = if (useGlobalCustomProxySettings) {
+            PreferencesHelper.getCustomProxyProtocol(this)
+        } else {
+            currentCustomProxyProtocol
+        }
+
+        val effectiveProxyUsername = if (useGlobalCustomProxySettings) {
+            PreferencesHelper.getCustomProxyUsername(this)
+        } else {
+            currentProxyUsername
+        }
+
+        val effectiveProxyPassword = if (useGlobalCustomProxySettings) {
+            PreferencesHelper.getCustomProxyPassword(this)
+        } else {
+            currentProxyPassword
+        }
+
+        val effectiveProxyAuthType = if (useGlobalCustomProxySettings) {
+            PreferencesHelper.getCustomProxyAuthType(this)
+        } else {
+            currentProxyAuthType
+        }
+
         android.util.Log.d("RadioService", "===== RECORDING ROUTING DECISION =====")
         android.util.Log.d("RadioService", "Recording proxy: $effectiveProxyHost:$effectiveProxyPort (${effectiveProxyType.name})")
+        android.util.Log.d("RadioService", "Using global custom proxy settings: $useGlobalCustomProxySettings")
         when (effectiveProxyType) {
             ProxyType.TOR -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through TOR SOCKS proxy")
             ProxyType.I2P -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through I2P HTTP proxy")
-            ProxyType.CUSTOM -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through CUSTOM proxy")
+            ProxyType.CUSTOM -> android.util.Log.d("RadioService", "RECORDING ROUTING: Through CUSTOM $effectiveCustomProxyProtocol proxy")
             ProxyType.NONE -> android.util.Log.w("RadioService", "RECORDING ROUTING: DIRECT - No proxy!")
         }
         android.util.Log.d("RadioService", "======================================")
@@ -1009,7 +1049,7 @@ class RadioService : Service() {
                 ProxyType.TOR -> Proxy.Type.SOCKS
                 ProxyType.I2P -> Proxy.Type.HTTP
                 ProxyType.CUSTOM -> {
-                    when (currentCustomProxyProtocol.uppercase()) {
+                    when (effectiveCustomProxyProtocol.uppercase()) {
                         "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
                         "HTTP", "HTTPS" -> Proxy.Type.HTTP
                         else -> Proxy.Type.HTTP
@@ -1019,8 +1059,8 @@ class RadioService : Service() {
             }
             builder.proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
 
-            if (effectiveProxyType == ProxyType.CUSTOM && currentProxyUsername.isNotEmpty() && currentProxyPassword.isNotEmpty()) {
-                android.util.Log.d("RadioService", "Adding proxy authentication for recording client (auth type: $currentProxyAuthType)")
+            if (effectiveProxyType == ProxyType.CUSTOM && effectiveProxyUsername.isNotEmpty() && effectiveProxyPassword.isNotEmpty()) {
+                android.util.Log.d("RadioService", "Adding proxy authentication for recording client (auth type: $effectiveProxyAuthType)")
                 builder.proxyAuthenticator { route, response ->
                     android.util.Log.d("RadioService", "Recording client authentication challenge received (${response.code})")
 
@@ -1030,21 +1070,21 @@ class RadioService : Service() {
                         return@proxyAuthenticator null
                     }
 
-                    when (currentProxyAuthType.uppercase()) {
+                    when (effectiveProxyAuthType.uppercase()) {
                         "BASIC" -> {
                             android.util.Log.d("RadioService", "Recording client using Basic authentication")
-                            val credential = okhttp3.Credentials.basic(currentProxyUsername, currentProxyPassword)
+                            val credential = okhttp3.Credentials.basic(effectiveProxyUsername, effectiveProxyPassword)
                             response.request.newBuilder()
                                 .header("Proxy-Authorization", credential)
                                 .build()
                         }
                         "DIGEST" -> {
                             android.util.Log.d("RadioService", "Recording client using Digest authentication")
-                            DigestAuthenticator.authenticate(response, currentProxyUsername, currentProxyPassword)
+                            DigestAuthenticator.authenticate(response, effectiveProxyUsername, effectiveProxyPassword)
                         }
                         else -> {
-                            android.util.Log.w("RadioService", "Recording client unknown auth type: $currentProxyAuthType, falling back to Basic")
-                            val credential = okhttp3.Credentials.basic(currentProxyUsername, currentProxyPassword)
+                            android.util.Log.w("RadioService", "Recording client unknown auth type: $effectiveProxyAuthType, falling back to Basic")
+                            val credential = okhttp3.Credentials.basic(effectiveProxyUsername, effectiveProxyPassword)
                             response.request.newBuilder()
                                 .header("Proxy-Authorization", credential)
                                 .build()
@@ -1338,6 +1378,19 @@ class RadioService : Service() {
                     android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Routing .onion stream through Tor")
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
+                forceCustomProxyExceptTorI2P && isTorStream -> {
+                    // Tor stream but Tor not enabled/connected - block the stream to prevent leak
+                    android.util.Log.e("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Tor stream requested but Tor not available - BLOCKING")
+                    isStartingNewStream.set(false)
+                    broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                    val message = if (!PreferencesHelper.isEmbeddedTorEnabled(this)) {
+                        "Tor not enabled - enable Tor for .onion streams"
+                    } else {
+                        getString(R.string.notification_tor_blocked)
+                    }
+                    startForeground(NOTIFICATION_ID, createNotification(message))
+                    return
+                }
                 forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream -> {
                     val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
                     val customProxyPort = PreferencesHelper.getCustomProxyPort(this)
@@ -1361,15 +1414,51 @@ class RadioService : Service() {
                 else -> Triple("", 0, ProxyType.NONE)
             }
 
+            // When using force custom proxy modes, load all settings from global preferences
+            // instead of using station-specific parameters (which may be empty)
+            val useGlobalCustomProxySettings = effectiveProxyType == ProxyType.CUSTOM &&
+                (forceCustomProxy || forceCustomProxyExceptTorI2P)
+
+            val effectiveCustomProxyProtocol = if (useGlobalCustomProxySettings) {
+                PreferencesHelper.getCustomProxyProtocol(this)
+            } else {
+                customProxyProtocol
+            }
+
+            val effectiveProxyUsername = if (useGlobalCustomProxySettings) {
+                PreferencesHelper.getCustomProxyUsername(this)
+            } else {
+                proxyUsername
+            }
+
+            val effectiveProxyPassword = if (useGlobalCustomProxySettings) {
+                PreferencesHelper.getCustomProxyPassword(this)
+            } else {
+                proxyPassword
+            }
+
+            val effectiveProxyAuthType = if (useGlobalCustomProxySettings) {
+                PreferencesHelper.getCustomProxyAuthType(this)
+            } else {
+                proxyAuthType
+            }
+
+            val effectiveProxyConnectionTimeout = if (useGlobalCustomProxySettings) {
+                PreferencesHelper.getCustomProxyConnectionTimeout(this)
+            } else {
+                proxyConnectionTimeout
+            }
+
             android.util.Log.d("RadioService", "===== FINAL ROUTING DECISION =====")
             android.util.Log.d("RadioService", "Effective proxy: $effectiveProxyHost:$effectiveProxyPort (${effectiveProxyType.name})")
+            android.util.Log.d("RadioService", "Using global custom proxy settings: $useGlobalCustomProxySettings")
             when (effectiveProxyType) {
                 ProxyType.TOR -> android.util.Log.d("RadioService", "ROUTING: Traffic will go through TOR SOCKS proxy")
                 ProxyType.I2P -> android.util.Log.d("RadioService", "ROUTING: Traffic will go through I2P HTTP proxy")
                 ProxyType.CUSTOM -> {
-                    android.util.Log.d("RadioService", "ROUTING: Traffic will go through CUSTOM $customProxyProtocol proxy")
-                    if (proxyUsername.isNotEmpty()) {
-                        android.util.Log.d("RadioService", "CUSTOM PROXY: Using authentication (username: $proxyUsername, auth type: $proxyAuthType)")
+                    android.util.Log.d("RadioService", "ROUTING: Traffic will go through CUSTOM $effectiveCustomProxyProtocol proxy")
+                    if (effectiveProxyUsername.isNotEmpty()) {
+                        android.util.Log.d("RadioService", "CUSTOM PROXY: Using authentication (username: $effectiveProxyUsername, auth type: $effectiveProxyAuthType)")
                     }
                 }
                 ProxyType.NONE -> android.util.Log.w("RadioService", "ROUTING: DIRECT CONNECTION - No proxy! (potential leak if unintended)")
@@ -1382,7 +1471,7 @@ class RadioService : Service() {
                         ProxyType.TOR -> Proxy.Type.SOCKS
                         ProxyType.I2P -> Proxy.Type.HTTP
                         ProxyType.CUSTOM -> {
-                            when (customProxyProtocol.uppercase()) {
+                            when (effectiveCustomProxyProtocol.uppercase()) {
                                 "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
                                 "HTTP", "HTTPS" -> Proxy.Type.HTTP
                                 else -> Proxy.Type.HTTP
@@ -1422,8 +1511,8 @@ class RadioService : Service() {
                         }
 
                     // Add proxy authentication if custom proxy with credentials
-                    if (effectiveProxyType == ProxyType.CUSTOM && proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()) {
-                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy (user: $proxyUsername, auth type: $proxyAuthType)")
+                    if (effectiveProxyType == ProxyType.CUSTOM && effectiveProxyUsername.isNotEmpty() && effectiveProxyPassword.isNotEmpty()) {
+                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy (user: $effectiveProxyUsername, auth type: $effectiveProxyAuthType)")
                         builder.proxyAuthenticator { route, response ->
                             android.util.Log.d("RadioService", "Proxy authentication challenge received (${response.code})")
 
@@ -1434,21 +1523,21 @@ class RadioService : Service() {
                                 return@proxyAuthenticator null
                             }
 
-                            when (proxyAuthType.uppercase()) {
+                            when (effectiveProxyAuthType.uppercase()) {
                                 "BASIC" -> {
                                     android.util.Log.d("RadioService", "Using Basic authentication")
-                                    val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
+                                    val credential = okhttp3.Credentials.basic(effectiveProxyUsername, effectiveProxyPassword)
                                     response.request.newBuilder()
                                         .header("Proxy-Authorization", credential)
                                         .build()
                                 }
                                 "DIGEST" -> {
                                     android.util.Log.d("RadioService", "Using Digest authentication")
-                                    DigestAuthenticator.authenticate(response, proxyUsername, proxyPassword)
+                                    DigestAuthenticator.authenticate(response, effectiveProxyUsername, effectiveProxyPassword)
                                 }
                                 else -> {
-                                    android.util.Log.w("RadioService", "Unknown auth type: $proxyAuthType, falling back to Basic")
-                                    val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
+                                    android.util.Log.w("RadioService", "Unknown auth type: $effectiveProxyAuthType, falling back to Basic")
+                                    val credential = okhttp3.Credentials.basic(effectiveProxyUsername, effectiveProxyPassword)
                                     response.request.newBuilder()
                                         .header("Proxy-Authorization", credential)
                                         .build()
@@ -1457,8 +1546,8 @@ class RadioService : Service() {
                         }
                     }
 
-                    val timeout = if (effectiveProxyType == ProxyType.CUSTOM && proxyConnectionTimeout > 0) {
-                        proxyConnectionTimeout.toLong()
+                    val timeout = if (effectiveProxyType == ProxyType.CUSTOM && effectiveProxyConnectionTimeout > 0) {
+                        effectiveProxyConnectionTimeout.toLong()
                     } else {
                         60L
                     }
