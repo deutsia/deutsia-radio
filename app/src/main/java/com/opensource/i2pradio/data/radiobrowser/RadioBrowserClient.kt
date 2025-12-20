@@ -86,6 +86,9 @@ class RadioBrowserClient(private val context: Context) {
             val proxyHost = PreferencesHelper.getCustomProxyHost(context)
             val proxyPort = PreferencesHelper.getCustomProxyPort(context)
             val proxyProtocol = PreferencesHelper.getCustomProxyProtocol(context)
+            val proxyUsername = PreferencesHelper.getCustomProxyUsername(context)
+            val proxyPassword = PreferencesHelper.getCustomProxyPassword(context)
+            val proxyAuthType = PreferencesHelper.getCustomProxyAuthType(context)
 
             if (proxyHost.isNotEmpty() && proxyPort > 0) {
                 val proxyType = when (proxyProtocol.uppercase()) {
@@ -96,6 +99,24 @@ class RadioBrowserClient(private val context: Context) {
 
                 Log.d(TAG, "Routing RadioBrowser API through CUSTOM proxy ($proxyProtocol) at $proxyHost:$proxyPort")
                 builder.proxy(Proxy(proxyType, InetSocketAddress(proxyHost, proxyPort)))
+
+                // Add proxy authentication if credentials are configured
+                if (proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()) {
+                    Log.d(TAG, "Adding proxy authentication for RadioBrowser API (user: $proxyUsername, auth type: $proxyAuthType)")
+                    builder.proxyAuthenticator { _, response ->
+                        // Check if we've already tried authentication to avoid infinite loops
+                        val previousAuth = response.request.header("Proxy-Authorization")
+                        if (previousAuth != null) {
+                            Log.w(TAG, "Proxy authentication already attempted - credentials may be incorrect")
+                            return@proxyAuthenticator null
+                        }
+
+                        val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
+                        response.request.newBuilder()
+                            .header("Proxy-Authorization", credential)
+                            .build()
+                    }
+                }
 
                 // Use longer timeouts for proxy connections
                 builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
