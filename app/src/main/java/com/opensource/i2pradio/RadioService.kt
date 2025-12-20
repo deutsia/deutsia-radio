@@ -948,14 +948,14 @@ class RadioService : Service() {
                     Triple("127.0.0.1", 4444, ProxyType.I2P)
                 }
             }
-            forceCustomProxyExceptTorI2P && isTorStream && PreferencesHelper.isEmbeddedTorEnabled(this) && TorManager.isConnected() -> {
+            forceCustomProxyExceptTorI2P && isTorStream && TorManager.isConnected() -> {
+                // In "except Tor/I2P" mode, Tor integration is implicitly enabled for .onion streams
                 android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Routing through Tor")
                 Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
             }
             forceCustomProxyExceptTorI2P && isTorStream -> {
-                // Tor stream but Tor not enabled/connected - for recording, use direct connection fallback
-                // (Recording should still work if the playStream already established the connection)
-                android.util.Log.w("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Tor stream but Tor not available - using station proxy config")
+                // Tor stream but Tor not connected - for recording, use current proxy config as fallback
+                android.util.Log.w("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Tor not connected - using station proxy config")
                 if (currentProxyHost?.isNotEmpty() == true && currentProxyType == ProxyType.TOR) {
                     Triple(currentProxyHost!!, currentProxyPort, ProxyType.TOR)
                 } else {
@@ -1374,21 +1374,17 @@ class RadioService : Service() {
                         Triple("127.0.0.1", 4444, ProxyType.I2P)
                     }
                 }
-                forceCustomProxyExceptTorI2P && isTorStream && PreferencesHelper.isEmbeddedTorEnabled(this) && TorManager.isConnected() -> {
+                forceCustomProxyExceptTorI2P && isTorStream && TorManager.isConnected() -> {
+                    // In "except Tor/I2P" mode, Tor integration is implicitly enabled for .onion streams
                     android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Routing .onion stream through Tor")
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
                 forceCustomProxyExceptTorI2P && isTorStream -> {
-                    // Tor stream but Tor not enabled/connected - block the stream to prevent leak
-                    android.util.Log.e("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Tor stream requested but Tor not available - BLOCKING")
+                    // Tor stream but Tor not connected - block the stream to prevent leak
+                    android.util.Log.e("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Tor stream requested but Tor not connected - BLOCKING")
                     isStartingNewStream.set(false)
                     broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                    val message = if (!PreferencesHelper.isEmbeddedTorEnabled(this)) {
-                        "Tor not enabled - enable Tor for .onion streams"
-                    } else {
-                        getString(R.string.notification_tor_blocked)
-                    }
-                    startForeground(NOTIFICATION_ID, createNotification(message))
+                    startForeground(NOTIFICATION_ID, createNotification("Tor not connected - start InviZible Pro for .onion streams"))
                     return
                 }
                 forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream -> {
