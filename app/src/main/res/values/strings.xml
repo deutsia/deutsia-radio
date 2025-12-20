@@ -305,7 +305,7 @@
     <string name="tor_control_title_connecting">Connecting to Tor...</string>
     <string name="tor_control_title_connected">Connected to Tor</string>
     <string name="tor_control_title_connected_force">Connected to Tor (Force Mode)</string>
-    <string name="tor_control_subtitle_connected">Your connection is private and anonymous</string>
+    <string name="tor_control_subtitle_connected">Onion streams are now available. Use Force Mode to route all traffic through Tor.</string>
     <string name="tor_control_subtitle_connected_force">Disconnect via InviZible Pro or disable Force Tor in settings</string>
     <string name="tor_control_title_error">Connection Failed</string>
     <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
