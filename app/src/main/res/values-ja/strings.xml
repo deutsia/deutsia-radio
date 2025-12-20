@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">Torに接続中...</string>
     <string name="tor_control_title_connected">Torに接続済み</string>
     <string name="tor_control_title_connected_force">Torに接続済み（強制モード）</string>
-    <string name="tor_control_subtitle_connected">接続はプライベートで匿名です</string>
+    <string name="tor_control_subtitle_connected">Onionストリームが利用可能になりました。すべてのトラフィックをTor経由にするには強制モードを使用してください。</string>
     <string name="tor_control_subtitle_connected_force">InviZible Pro経由で切断するか、設定で強制Torを無効にしてください</string>
     <string name="tor_control_title_error">接続失敗</string>
     <string name="tor_control_subtitle_error">Torネットワークに接続できませんでした</string>

@@ -300,7 +300,7 @@
     <string name="tor_control_title_connecting">Tor သို့ ချိတ်ဆက်နေသည်...</string>
     <string name="tor_control_title_connected">Tor သို့ ချိတ်ဆက်ပြီးပါပြီ</string>
     <string name="tor_control_title_connected_force">Tor သို့ ချိတ်ဆက်ပြီးပါပြီ (အတင်းအဓမ္မ မုဒ်)</string>
-    <string name="tor_control_subtitle_connected">သင့်ချိတ်ဆက်မှုသည် ကိုယ်ရေးကိုယ်တာ နှင့် အမည်မဖော်ဘဲ ရှိသည်</string>
+    <string name="tor_control_subtitle_connected">Onion တိုက်ရိုက်လွှင့်မှုများ ရရှိနိုင်ပါပြီ။ အသွားအလာအားလုံးကို Tor မှတစ်ဆင့် ပို့ဆောင်ရန် အတင်းအဓမ္မ မုဒ်ကို အသုံးပြုပါ။</string>
     <string name="tor_control_subtitle_connected_force">InviZible Pro မှတစ်ဆင့် ချိတ်ဆက်မှုကို ဖြုတ်ပါ သို့မဟုတ် ဆက်တင်များတွင် အတင်းအဓမ္မ Tor ကို ပိတ်ပါ</string>
     <string name="tor_control_title_error">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
     <string name="tor_control_subtitle_error">Tor ကွန်ရက်သို့ ချိတ်ဆက်၍ မရပါ</string>

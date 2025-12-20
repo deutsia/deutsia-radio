@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">Đang kết nối với Tor...</string>
     <string name="tor_control_title_connected">Đã kết nối với Tor</string>
     <string name="tor_control_title_connected_force">Đã kết nối với Tor (Chế độ bắt buộc)</string>
-    <string name="tor_control_subtitle_connected">Kết nối của bạn là riêng tư và ẩn danh</string>
+    <string name="tor_control_subtitle_connected">Các luồng Onion hiện đã có sẵn. Sử dụng Chế độ Bắt buộc để định tuyến tất cả lưu lượng qua Tor.</string>
     <string name="tor_control_subtitle_connected_force">Ngắt kết nối qua InviZible Pro hoặc tắt Bắt buộc Tor trong cài đặt</string>
     <string name="tor_control_title_error">Kết nối thất bại</string>
     <string name="tor_control_subtitle_error">Không thể kết nối với mạng Tor</string>

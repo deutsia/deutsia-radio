@@ -309,7 +309,7 @@
     <string name="tor_control_title_connecting">Connexion à Tor...</string>
     <string name="tor_control_title_connected">Connecté à Tor</string>
     <string name="tor_control_title_connected_force">Connecté à Tor (mode forcé)</string>
-    <string name="tor_control_subtitle_connected">Votre connexion est privée et anonyme</string>
+    <string name="tor_control_subtitle_connected">Les flux Onion sont maintenant disponibles. Utilisez le Mode Forcé pour acheminer tout le trafic via Tor.</string>
     <string name="tor_control_subtitle_connected_force">Déconnectez-vous via InviZible Pro ou désactivez Forcer Tor dans les paramètres</string>
     <string name="tor_control_title_error">Échec de connexion</string>
     <string name="tor_control_subtitle_error">Impossible de se connecter au réseau Tor</string>

@@ -300,7 +300,7 @@
     <string name="tor_control_title_connecting">Tor से कनेक्ट हो रहा है...</string>
     <string name="tor_control_title_connected">Tor से कनेक्ट किया गया</string>
     <string name="tor_control_title_connected_force">Tor से कनेक्ट किया गया (फ़ोर्स मोड)</string>
-    <string name="tor_control_subtitle_connected">आपका कनेक्शन निजी और गुमनाम है</string>
+    <string name="tor_control_subtitle_connected">Onion स्ट्रीम अब उपलब्ध हैं। सभी ट्रैफ़िक को Tor के माध्यम से रूट करने के लिए फ़ोर्स मोड का उपयोग करें।</string>
     <string name="tor_control_subtitle_connected_force">InviZible Pro के माध्यम से डिसकनेक्ट करें या सेटिंग्स में Tor फ़ोर्स करें अक्षम करें</string>
     <string name="tor_control_title_error">कनेक्शन विफल</string>
     <string name="tor_control_subtitle_error">Tor नेटवर्क से कनेक्ट नहीं हो सका</string>

@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">正在连接到Tor...</string>
     <string name="tor_control_title_connected">已连接到Tor</string>
     <string name="tor_control_title_connected_force">已连接到Tor（强制模式）</string>
-    <string name="tor_control_subtitle_connected">您的连接是私密且匿名的</string>
+    <string name="tor_control_subtitle_connected">Onion流媒体现已可用。使用强制模式将所有流量通过Tor路由。</string>
     <string name="tor_control_subtitle_connected_force">通过InviZible Pro断开连接或在设置中禁用强制Tor</string>
     <string name="tor_control_title_error">连接失败</string>
     <string name="tor_control_subtitle_error">无法连接到Tor网络</string>

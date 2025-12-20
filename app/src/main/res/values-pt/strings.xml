@@ -303,7 +303,7 @@
     <string name="tor_control_title_connecting">Conectando ao Tor...</string>
     <string name="tor_control_title_connected">Conectado ao Tor</string>
     <string name="tor_control_title_connected_force">Conectado ao Tor (Modo Forçado)</string>
-    <string name="tor_control_subtitle_connected">Sua conexão é privada e anônima</string>
+    <string name="tor_control_subtitle_connected">Streams Onion agora estão disponíveis. Use o Modo Forçado para rotear todo o tráfego através do Tor.</string>
     <string name="tor_control_subtitle_connected_force">Desconecte via InviZible Pro ou desative Forçar Tor nas configurações</string>
     <string name="tor_control_title_error">Conexão falhou</string>
     <string name="tor_control_subtitle_error">Não foi possível conectar à rede Tor</string>
