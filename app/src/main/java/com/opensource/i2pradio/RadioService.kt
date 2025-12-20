@@ -954,12 +954,13 @@ class RadioService : Service() {
                 Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
             }
             forceCustomProxyExceptTorI2P && isTorStream -> {
-                // Tor stream but Tor not connected - for recording, use current proxy config as fallback
-                android.util.Log.w("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Tor not connected - using station proxy config")
+                // Embedded Tor not connected - fall back to default Tor SOCKS port for external proxies (InviZible Pro, Orbot)
                 if (currentProxyHost?.isNotEmpty() == true && currentProxyType == ProxyType.TOR) {
+                    android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Using station Tor proxy config")
                     Triple(currentProxyHost!!, currentProxyPort, ProxyType.TOR)
                 } else {
-                    Triple("", 0, ProxyType.NONE)
+                    android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P) recording: Using default Tor proxy (127.0.0.1:9050)")
+                    Triple("127.0.0.1", 9050, ProxyType.TOR)
                 }
             }
             forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream -> {
@@ -1380,12 +1381,14 @@ class RadioService : Service() {
                     Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
                 }
                 forceCustomProxyExceptTorI2P && isTorStream -> {
-                    // Tor stream but Tor not connected - block the stream to prevent leak
-                    android.util.Log.e("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Tor stream requested but Tor not connected - BLOCKING")
-                    isStartingNewStream.set(false)
-                    broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                    startForeground(NOTIFICATION_ID, createNotification("Tor not connected - start InviZible Pro for .onion streams"))
-                    return
+                    // Embedded Tor not connected - fall back to default Tor SOCKS port for external proxies (InviZible Pro, Orbot)
+                    if (proxyHost.isNotEmpty() && proxyType == ProxyType.TOR) {
+                        android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Using station Tor proxy config")
+                        Triple(proxyHost, proxyPort, ProxyType.TOR)
+                    } else {
+                        android.util.Log.d("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Using default Tor proxy (127.0.0.1:9050)")
+                        Triple("127.0.0.1", 9050, ProxyType.TOR)
+                    }
                 }
                 forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream -> {
                     val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
