@@ -316,7 +316,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=pan.alexander.tordnscrypt.gp"))
             startActivity(intent)
         } catch (e: Exception) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/packages/pan.alexander.tordnscrypt/"))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/en/packages/pan.alexander.tordnscrypt.stable/"))
             startActivity(intent)
         }
     }
