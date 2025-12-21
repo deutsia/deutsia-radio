@@ -153,6 +153,15 @@
       "proxyType": "I2P",
       "proxyHost": "127.0.0.1",
       "proxyPort": 4444
+    },
+    {
+      "name": "I.A.C. Radio",
+      "streamUrl": "http://uudm2w73gijhevl5xd7arfhusdr2axfyiytdblg7zo66aa4kpswa.b32.i2p/radio-stream",
+      "genre": "Psychedelic",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
     }
   ]
 }
