@@ -162,6 +162,24 @@
       "proxyType": "I2P",
       "proxyHost": "127.0.0.1",
       "proxyPort": 4444
+    },
+    {
+      "name": "CoS Radio",
+      "streamUrl": "http://eba7h47sp5mmrew6ido6jkn75jhqoqa52slgx47fnpddb4d7hsrq.b32.i2p/stream.ogg",
+      "genre": "Rock",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
+    }, 
+    {
+      "name": "Sonya Radio",
+      "streamUrl": "http://doyrau6xuwew2xfxbhluvoy5rmy7u4ou46c5x4ozlrtyo3sdrs5q.b32.i2p/sonya.ogg",
+      "genre": "Rock",
+      "useProxy": true,
+      "proxyType": "I2P",
+      "proxyHost": "127.0.0.1",
+      "proxyPort": 4444
     }
   ]
 }
