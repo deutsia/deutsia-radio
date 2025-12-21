@@ -2,6 +2,10 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.4.4]
+- **Fix Tor/I2P Loading in forceCustomProxyExceptTorI2P mode**
+- **Updated Tor station**: Updated Tor address in bundled Tor radio station list
+- **UI/UX Improvements**
 ## [1.4.3]
 
 ### Added

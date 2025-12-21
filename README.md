@@ -21,7 +21,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.4.3** Added Android 7.x (API 24-25) app icon support, now uses PNG files from mipmap-{density}/ folders
+- **New Release: v1.4.4** Fix Tor/I2P Loading in forceCustomProxyExceptTorI2P mode, UI/UX improvements
 ---
 
 ## Features
