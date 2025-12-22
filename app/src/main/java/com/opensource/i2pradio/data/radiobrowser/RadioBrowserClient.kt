@@ -6,11 +6,17 @@ import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.Dns
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
+import org.json.JSONObject
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.net.UnknownHostException
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 /**
@@ -46,11 +52,22 @@ class RadioBrowserClient(private val context: Context) {
         // User agent to identify our app to RadioBrowser
         private const val USER_AGENT = "DeutsiaRadio/1.0 (Android; +https://github.com/deutsia/i2pradio)"
 
+        // DNS cache TTL in milliseconds (5 minutes)
+        private const val DNS_CACHE_TTL_MS = 5 * 60 * 1000L
+
         // Cached HTTP client for connection reuse
         @Volatile
         private var cachedClient: OkHttpClient? = null
         @Volatile
         private var cachedClientConfig: ClientConfig? = null
+
+        // DNS cache to avoid repeated lookups when system DNS is slow/flaky
+        private val dnsCache = ConcurrentHashMap<String, DnsCacheEntry>()
+
+        private data class DnsCacheEntry(
+            val addresses: List<InetAddress>,
+            val timestamp: Long
+        )
 
         /**
          * Invalidate the cached HTTP client.
@@ -60,6 +77,46 @@ class RadioBrowserClient(private val context: Context) {
             cachedClient = null
             cachedClientConfig = null
             Log.d(TAG, "HTTP client cache invalidated")
+        }
+
+        /**
+         * Clear the DNS cache.
+         */
+        fun clearDnsCache() {
+            dnsCache.clear()
+            Log.d(TAG, "DNS cache cleared")
+        }
+    }
+
+    /**
+     * Custom DNS resolver with caching.
+     * Caches DNS results to survive momentary DNS hiccups that can occur
+     * when running alongside VPN apps like InviZible Pro.
+     */
+    private val cachingDns = object : Dns {
+        override fun lookup(hostname: String): List<InetAddress> {
+            // Check cache first
+            val cached = dnsCache[hostname]
+            if (cached != null && System.currentTimeMillis() - cached.timestamp < DNS_CACHE_TTL_MS) {
+                Log.d(TAG, "DNS cache hit for $hostname")
+                return cached.addresses
+            }
+
+            // Perform actual DNS lookup
+            return try {
+                val addresses = Dns.SYSTEM.lookup(hostname)
+                // Cache the result
+                dnsCache[hostname] = DnsCacheEntry(addresses, System.currentTimeMillis())
+                Log.d(TAG, "DNS resolved $hostname -> ${addresses.size} addresses (cached)")
+                addresses
+            } catch (e: UnknownHostException) {
+                // If we have a stale cache entry, use it as fallback
+                if (cached != null) {
+                    Log.w(TAG, "DNS lookup failed for $hostname, using stale cache")
+                    return cached.addresses
+                }
+                throw e
+            }
         }
     }
 
@@ -184,6 +241,9 @@ class RadioBrowserClient(private val context: Context) {
             // No forced proxy - use DIRECT clearnet connection for best performance
             // This is the expected path for "Tor mode (non-force)" - API goes via clearnet
             Log.d(TAG, "Using DIRECT clearnet connection for RadioBrowser API (no Force proxy enabled)")
+            // Use caching DNS resolver to survive momentary DNS hiccups
+            // This is important when running alongside VPN apps like InviZible Pro
+            builder.dns(cachingDns)
             builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         }
@@ -213,11 +273,16 @@ class RadioBrowserClient(private val context: Context) {
     }
 
     /**
-     * Execute an API request with retry logic
+     * Execute an API request with retry logic and exponential backoff.
+     *
+     * Uses exponential backoff (500ms, 1s, 2s) between retries to allow
+     * network/DNS to recover from momentary hiccups. This is critical when
+     * running alongside apps like InviZible Pro that may affect network timing.
      */
     private suspend fun executeRequest(endpoint: String, retries: Int = 2): RadioBrowserResult<List<RadioBrowserStation>> {
         return withContext(Dispatchers.IO) {
             var lastException: Exception? = null
+            val baseDelayMs = 500L  // Start with 500ms delay
 
             repeat(retries + 1) { attempt ->
                 try {
@@ -239,6 +304,10 @@ class RadioBrowserClient(private val context: Context) {
                         Log.w(TAG, "API request failed with code: ${response.code}")
                         response.close()
                         if (attempt < retries) {
+                            // Exponential backoff before retry
+                            val delayMs = baseDelayMs * (1 shl attempt)  // 500ms, 1s, 2s...
+                            Log.d(TAG, "Waiting ${delayMs}ms before retry...")
+                            Thread.sleep(delayMs)
                             cycleServer()
                         }
                         lastException = Exception("HTTP ${response.code}")
@@ -252,6 +321,9 @@ class RadioBrowserClient(private val context: Context) {
                         Log.w(TAG, "Empty response body")
                         lastException = Exception("Empty response")
                         if (attempt < retries) {
+                            val delayMs = baseDelayMs * (1 shl attempt)
+                            Log.d(TAG, "Waiting ${delayMs}ms before retry...")
+                            Thread.sleep(delayMs)
                             cycleServer()
                         }
                         return@repeat
@@ -265,6 +337,11 @@ class RadioBrowserClient(private val context: Context) {
                     Log.e(TAG, "API request failed (attempt ${attempt + 1}): ${e.message}")
                     lastException = e
                     if (attempt < retries) {
+                        // Exponential backoff: 500ms, 1s, 2s...
+                        // This gives network/DNS time to recover from hiccups
+                        val delayMs = baseDelayMs * (1 shl attempt)
+                        Log.d(TAG, "Waiting ${delayMs}ms before retry...")
+                        Thread.sleep(delayMs)
                         cycleServer()
                     }
                 }
