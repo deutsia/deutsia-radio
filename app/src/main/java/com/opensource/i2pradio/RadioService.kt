@@ -5,8 +5,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.drawable.BitmapDrawable
 import android.media.AudioManager
 import android.media.audiofx.AudioEffect
@@ -118,6 +120,25 @@ class RadioService : Service() {
         }
     }
 
+    // Broadcast receiver to pause playback when audio output device disconnects (e.g., Bluetooth)
+    private val becomingNoisyReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
+                android.util.Log.d("RadioService", "Audio becoming noisy - pausing playback")
+                player?.let { exoPlayer ->
+                    if (exoPlayer.isPlaying) {
+                        exoPlayer.pause()
+                        updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                        scheduleSessionDeactivation()
+                        startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
+                        broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                    }
+                }
+            }
+        }
+    }
+    private var becomingNoisyReceiverRegistered = false
+
     private var mediaSession: MediaSessionCompat? = null
     private var currentCoverArtUri: String? = null
     private val sessionDeactivateHandler = Handler(Looper.getMainLooper())
@@ -200,6 +221,11 @@ class RadioService : Service() {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         equalizerManager = EqualizerManager(this)
         initializeMediaSession()
+
+        // Register receiver to pause playback when audio output device disconnects
+        val becomingNoisyFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        registerReceiver(becomingNoisyReceiver, becomingNoisyFilter)
+        becomingNoisyReceiverRegistered = true
     }
 
     private fun initializeMediaSession() {
@@ -2063,6 +2089,11 @@ class RadioService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // Unregister audio becoming noisy receiver
+        if (becomingNoisyReceiverRegistered) {
+            unregisterReceiver(becomingNoisyReceiver)
+            becomingNoisyReceiverRegistered = false
+        }
         stopRecording()
         cancelSleepTimer()
         equalizerManager?.release()
