@@ -2,6 +2,16 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.4.5]
+
+### Added
+- **Auto-pause on Bluetooth disconnect**: Radio now automatically pauses when Bluetooth audio devices disconnect
+
+### Fixed
+- **API server resolution**: Fixed intermittent "Unable to resolve host" errors when browsing stations. The app now dynamically discovers available Radio Browser API servers instead of relying on a static list that could become stale.
+
+### Other
+- Updated I2P station list with additional station
 ## [1.4.4]
 - **Fix Tor/I2P Loading in forceCustomProxyExceptTorI2P mode**
 - **Updated Tor station**: Updated Tor address in bundled Tor radio station list
