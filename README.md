@@ -21,7 +21,7 @@ Privacy-focused, anti-censorship multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.4.4** Fix Tor/I2P Loading in forceCustomProxyExceptTorI2P mode, UI/UX improvements
+- **New Release: v1.4.5** Migrate from hardcoded api server list to dyanmic server discovery to prevent api resolution errors, add auto pause on Bluetooth disconnect
 ---
 
 ## Features
