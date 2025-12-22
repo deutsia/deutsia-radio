@@ -18,6 +18,11 @@ import java.util.concurrent.TimeUnit
  *
  * Supports proxy routing through Tor when Force Tor settings are enabled,
  * ensuring metadata fetches don't leak user's real IP.
+ *
+ * IMPORTANT: In non-force Tor mode (Tor enabled but Force Tor disabled),
+ * API calls go directly via clearnet for best performance. Only when
+ * Force Tor All or Force Tor Except I2P is enabled will API calls route
+ * through the Tor SOCKS proxy.
  */
 class RadioBrowserClient(private val context: Context) {
 
@@ -40,100 +45,156 @@ class RadioBrowserClient(private val context: Context) {
 
         // User agent to identify our app to RadioBrowser
         private const val USER_AGENT = "DeutsiaRadio/1.0 (Android; +https://github.com/deutsia/i2pradio)"
+
+        // Cached HTTP client for connection reuse
+        @Volatile
+        private var cachedClient: OkHttpClient? = null
+        @Volatile
+        private var cachedClientConfig: ClientConfig? = null
+
+        /**
+         * Invalidate the cached HTTP client.
+         * Call this when proxy settings change.
+         */
+        fun invalidateClient() {
+            cachedClient = null
+            cachedClientConfig = null
+            Log.d(TAG, "HTTP client cache invalidated")
+        }
     }
 
+    /**
+     * Configuration snapshot for caching decisions
+     */
+    private data class ClientConfig(
+        val useTorProxy: Boolean,
+        val torHost: String,
+        val torPort: Int,
+        val useCustomProxy: Boolean,
+        val customHost: String,
+        val customPort: Int,
+        val customProtocol: String,
+        val customUsername: String,
+        val customPassword: String
+    )
+
     private var currentServerIndex = 0
+
+    /**
+     * Get the current client configuration based on settings.
+     */
+    private fun getCurrentClientConfig(): ClientConfig {
+        val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
+        val forceTorAll = PreferencesHelper.isForceTorAll(context)
+        val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(context)
+        val forceCustomProxy = PreferencesHelper.isForceCustomProxy(context)
+        val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(context)
+        val torConnected = TorManager.isConnected()
+
+        // Determine if we should use Tor proxy
+        val useTorProxy = torEnabled && (forceTorAll || forceTorExceptI2P) && torConnected
+        val torHost = if (useTorProxy) TorManager.getProxyHost() else ""
+        val torPort = if (useTorProxy) TorManager.getProxyPort() else 0
+
+        // Determine if we should use custom proxy (when Tor is not being used)
+        val useCustomProxy = !useTorProxy && (forceCustomProxy || forceCustomProxyExceptTorI2P)
+
+        return ClientConfig(
+            useTorProxy = useTorProxy && torPort > 0,
+            torHost = torHost,
+            torPort = torPort,
+            useCustomProxy = useCustomProxy,
+            customHost = if (useCustomProxy) PreferencesHelper.getCustomProxyHost(context) else "",
+            customPort = if (useCustomProxy) PreferencesHelper.getCustomProxyPort(context) else 0,
+            customProtocol = if (useCustomProxy) PreferencesHelper.getCustomProxyProtocol(context) else "",
+            customUsername = if (useCustomProxy) PreferencesHelper.getCustomProxyUsername(context) else "",
+            customPassword = if (useCustomProxy) PreferencesHelper.getCustomProxyPassword(context) else ""
+        )
+    }
 
     /**
      * Build an OkHttpClient respecting both Force Tor and Force Custom Proxy settings.
      *
      * IMPORTANT: This ensures RadioBrowser API calls respect the same proxy settings
      * as media streams to prevent privacy leaks.
+     *
+     * NOTE: In non-force Tor mode (Tor integration enabled but Force Tor disabled),
+     * API calls use DIRECT clearnet connection for best performance. The Tor integration
+     * setting alone does not route API calls through Tor - only Force Tor settings do.
+     *
+     * The client is cached and reused for better connection pooling and performance.
+     * Cache is invalidated when proxy settings change.
      */
     private fun buildHttpClient(): OkHttpClient {
-        val builder = OkHttpClient.Builder()
+        val currentConfig = getCurrentClientConfig()
 
-        val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
-        val forceTorAll = PreferencesHelper.isForceTorAll(context)
-        val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(context)
-        val forceCustomProxy = PreferencesHelper.isForceCustomProxy(context)
-        val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(context)
-        val customProxyAppliedToClearnet = PreferencesHelper.isCustomProxyAppliedToClearnet(context)
-        val torConnected = TorManager.isConnected()
-
-        Log.d(TAG, "Building HTTP client - ForceTorAll: $forceTorAll, ForceTorExceptI2P: $forceTorExceptI2P, " +
-                "ForceCustomProxy: $forceCustomProxy, ForceCustomProxyExceptTorI2P: $forceCustomProxyExceptTorI2P, " +
-                "TorEnabled: $torEnabled, TorConnected: $torConnected")
-
-        // Priority 1: Force Tor (if Tor integration is enabled)
-        if (torEnabled && (forceTorAll || forceTorExceptI2P) && torConnected) {
-            val socksHost = TorManager.getProxyHost()
-            val socksPort = TorManager.getProxyPort()
-
-            if (socksPort > 0) {
-                Log.d(TAG, "Routing RadioBrowser API through Tor SOCKS5 proxy at $socksHost:$socksPort")
-                builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(socksHost, socksPort)))
-                builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-                builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-            } else {
-                Log.w(TAG, "Force Tor enabled but Tor proxy port invalid, using direct connection")
-                builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        // Return cached client if configuration hasn't changed
+        cachedClient?.let { client ->
+            if (cachedClientConfig == currentConfig) {
+                Log.d(TAG, "Reusing cached HTTP client")
+                return client
             }
         }
+
+        Log.d(TAG, "Building new HTTP client - useTorProxy: ${currentConfig.useTorProxy}, " +
+                "useCustomProxy: ${currentConfig.useCustomProxy}")
+
+        val builder = OkHttpClient.Builder()
+
+        // Priority 1: Force Tor (if Tor integration is enabled and Force Tor is active)
+        if (currentConfig.useTorProxy) {
+            Log.d(TAG, "Routing RadioBrowser API through Tor SOCKS5 proxy at ${currentConfig.torHost}:${currentConfig.torPort}")
+            builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(currentConfig.torHost, currentConfig.torPort)))
+            builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
+            builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
+        }
         // Priority 2: Force Custom Proxy for clearnet (RadioBrowser API is clearnet)
-        else if (forceCustomProxy || forceCustomProxyExceptTorI2P) {
-            val proxyHost = PreferencesHelper.getCustomProxyHost(context)
-            val proxyPort = PreferencesHelper.getCustomProxyPort(context)
-            val proxyProtocol = PreferencesHelper.getCustomProxyProtocol(context)
-            val proxyUsername = PreferencesHelper.getCustomProxyUsername(context)
-            val proxyPassword = PreferencesHelper.getCustomProxyPassword(context)
-            val proxyAuthType = PreferencesHelper.getCustomProxyAuthType(context)
-
-            if (proxyHost.isNotEmpty() && proxyPort > 0) {
-                val proxyType = when (proxyProtocol.uppercase()) {
-                    "SOCKS4", "SOCKS5", "SOCKS" -> Proxy.Type.SOCKS
-                    "HTTP", "HTTPS" -> Proxy.Type.HTTP
-                    else -> Proxy.Type.HTTP
-                }
-
-                Log.d(TAG, "Routing RadioBrowser API through CUSTOM proxy ($proxyProtocol) at $proxyHost:$proxyPort")
-                builder.proxy(Proxy(proxyType, InetSocketAddress(proxyHost, proxyPort)))
-
-                // Add proxy authentication if credentials are configured
-                if (proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()) {
-                    Log.d(TAG, "Adding proxy authentication for RadioBrowser API (user: $proxyUsername, auth type: $proxyAuthType)")
-                    builder.proxyAuthenticator { _, response ->
-                        // Check if we've already tried authentication to avoid infinite loops
-                        val previousAuth = response.request.header("Proxy-Authorization")
-                        if (previousAuth != null) {
-                            Log.w(TAG, "Proxy authentication already attempted - credentials may be incorrect")
-                            return@proxyAuthenticator null
-                        }
-
-                        val credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword)
-                        response.request.newBuilder()
-                            .header("Proxy-Authorization", credential)
-                            .build()
-                    }
-                }
-
-                // Use longer timeouts for proxy connections
-                builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-                builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-            } else {
-                Log.w(TAG, "Force Custom Proxy enabled but proxy configuration invalid, using direct connection")
-                builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        else if (currentConfig.useCustomProxy && currentConfig.customHost.isNotEmpty() && currentConfig.customPort > 0) {
+            val proxyType = when (currentConfig.customProtocol.uppercase()) {
+                "SOCKS4", "SOCKS5", "SOCKS" -> Proxy.Type.SOCKS
+                "HTTP", "HTTPS" -> Proxy.Type.HTTP
+                else -> Proxy.Type.HTTP
             }
+
+            Log.d(TAG, "Routing RadioBrowser API through CUSTOM proxy (${currentConfig.customProtocol}) at ${currentConfig.customHost}:${currentConfig.customPort}")
+            builder.proxy(Proxy(proxyType, InetSocketAddress(currentConfig.customHost, currentConfig.customPort)))
+
+            // Add proxy authentication if credentials are configured
+            if (currentConfig.customUsername.isNotEmpty() && currentConfig.customPassword.isNotEmpty()) {
+                Log.d(TAG, "Adding proxy authentication for RadioBrowser API")
+                builder.proxyAuthenticator { _, response ->
+                    // Check if we've already tried authentication to avoid infinite loops
+                    val previousAuth = response.request.header("Proxy-Authorization")
+                    if (previousAuth != null) {
+                        Log.w(TAG, "Proxy authentication already attempted - credentials may be incorrect")
+                        return@proxyAuthenticator null
+                    }
+
+                    val credential = okhttp3.Credentials.basic(currentConfig.customUsername, currentConfig.customPassword)
+                    response.request.newBuilder()
+                        .header("Proxy-Authorization", credential)
+                        .build()
+                }
+            }
+
+            // Use longer timeouts for proxy connections
+            builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
+            builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
         } else {
-            // No forced proxy - use direct connection
-            Log.d(TAG, "No forced proxy configured - using direct connection for RadioBrowser API")
+            // No forced proxy - use DIRECT clearnet connection for best performance
+            // This is the expected path for "Tor mode (non-force)" - API goes via clearnet
+            Log.d(TAG, "Using DIRECT clearnet connection for RadioBrowser API (no Force proxy enabled)")
             builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         }
 
-        return builder.build()
+        val client = builder.build()
+
+        // Cache the client and configuration
+        cachedClient = client
+        cachedClientConfig = currentConfig
+
+        return client
     }
 
     /**

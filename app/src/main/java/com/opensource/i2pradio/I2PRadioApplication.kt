@@ -1,6 +1,7 @@
 package com.opensource.i2pradio
 
 import android.app.Application
+import com.opensource.i2pradio.data.radiobrowser.RadioBrowserClient
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 import com.opensource.i2pradio.ui.PreferencesHelper
@@ -10,9 +11,10 @@ import com.opensource.i2pradio.utils.DatabaseEncryptionManager
 class I2PRadioApplication : Application() {
 
     private val torStateListener: (TorManager.TorState) -> Unit = { _ ->
-        // Invalidate image loader cache when Tor state changes
-        // This ensures images use the correct proxy settings
+        // Invalidate caches when Tor state changes
+        // This ensures images and API calls use the correct proxy settings
         SecureImageLoader.invalidateCache()
+        RadioBrowserClient.invalidateClient()
     }
 
     override fun onCreate() {
