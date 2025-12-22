@@ -24,13 +24,6 @@ class RadioBrowserClient(private val context: Context) {
     companion object {
         private const val TAG = "RadioBrowserClient"
 
-        // RadioBrowser API servers (use multiple for redundancy)
-        private val API_SERVERS = listOf(
-            "de1.api.radio-browser.info",
-            "nl1.api.radio-browser.info",
-            "at1.api.radio-browser.info"
-        )
-
         private const val DEFAULT_LIMIT = 50
         private const val MAX_LIMIT = 100
         private const val CONNECT_TIMEOUT_SECONDS = 30L
@@ -41,8 +34,6 @@ class RadioBrowserClient(private val context: Context) {
         // User agent to identify our app to RadioBrowser
         private const val USER_AGENT = "DeutsiaRadio/1.0 (Android; +https://github.com/deutsia/i2pradio)"
     }
-
-    private var currentServerIndex = 0
 
     /**
      * Build an OkHttpClient respecting both Force Tor and Force Custom Proxy settings.
@@ -137,18 +128,17 @@ class RadioBrowserClient(private val context: Context) {
     }
 
     /**
-     * Get the current API base URL, cycling through servers on failure
+     * Get the current API base URL using dynamic server discovery
      */
-    private fun getApiBaseUrl(): String {
-        return "https://${API_SERVERS[currentServerIndex]}/json"
+    private suspend fun getApiBaseUrl(): String {
+        return RadioBrowserServerManager.getApiBaseUrl()
     }
 
     /**
      * Cycle to the next API server
      */
-    private fun cycleServer() {
-        currentServerIndex = (currentServerIndex + 1) % API_SERVERS.size
-        Log.d(TAG, "Cycled to API server: ${API_SERVERS[currentServerIndex]}")
+    private suspend fun cycleServer() {
+        RadioBrowserServerManager.cycleToNextServer()
     }
 
     /**
@@ -388,7 +378,8 @@ class RadioBrowserClient(private val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
-                val url = "${getApiBaseUrl()}/countries?order=stationcount&reverse=true&hidebroken=true"
+                val baseUrl = getApiBaseUrl()
+                val url = "$baseUrl/countries?order=stationcount&reverse=true&hidebroken=true"
 
                 val request = Request.Builder()
                     .url(url)
@@ -439,7 +430,8 @@ class RadioBrowserClient(private val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
-                val url = "${getApiBaseUrl()}/tags?order=stationcount&reverse=true&limit=$limit&hidebroken=true"
+                val baseUrl = getApiBaseUrl()
+                val url = "$baseUrl/tags?order=stationcount&reverse=true&limit=$limit&hidebroken=true"
 
                 val request = Request.Builder()
                     .url(url)
@@ -492,7 +484,8 @@ class RadioBrowserClient(private val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
-                val url = "${getApiBaseUrl()}/languages?order=stationcount&reverse=true&limit=$limit&hidebroken=true"
+                val baseUrl = getApiBaseUrl()
+                val url = "$baseUrl/languages?order=stationcount&reverse=true&limit=$limit&hidebroken=true"
 
                 val request = Request.Builder()
                     .url(url)
