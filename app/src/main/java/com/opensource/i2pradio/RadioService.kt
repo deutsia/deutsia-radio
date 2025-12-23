@@ -1596,8 +1596,15 @@ class RadioService : Service() {
             val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("DeutsiaRadio/1.0")
 
+            // Use larger buffers for high-latency networks (I2P/Tor)
+            val isHighLatencyNetwork = effectiveProxyType == ProxyType.I2P || effectiveProxyType == ProxyType.TOR
             val loadControl = DefaultLoadControl.Builder()
-                .setBufferDurationsMs(5_000, 15_000, 1_000, 2_000)
+                .setBufferDurationsMs(
+                    if (isHighLatencyNetwork) 20_000 else 5_000,   // minBuffer: 20s for I2P/Tor
+                    if (isHighLatencyNetwork) 60_000 else 15_000,  // maxBuffer: 60s for I2P/Tor
+                    if (isHighLatencyNetwork) 5_000 else 1_000,    // playbackStart: wait longer before playing
+                    if (isHighLatencyNetwork) 8_000 else 2_000     // rebufferStart: more tolerance after rebuffer
+                )
                 .build()
 
             val audioAttributes = androidx.media3.common.AudioAttributes.Builder()
@@ -1652,10 +1659,26 @@ class RadioService : Service() {
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
                             Player.STATE_ENDED -> {
-                                android.util.Log.d("RadioService", "Stream ended, reconnecting...")
-                                updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
-                                broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
-                                scheduleReconnect()
+                                // For high-latency networks (Tor/I2P), add grace period before reconnecting
+                                // This prevents unnecessary reconnects during song switches on streams without padding
+                                val isHighLatency = currentProxyType == ProxyType.TOR || currentProxyType == ProxyType.I2P
+                                if (isHighLatency) {
+                                    android.util.Log.d("RadioService", "Stream ended on high-latency network, waiting before reconnect...")
+                                    updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
+                                    broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
+                                    // Wait 3 seconds - if stream was just between songs, it may resume
+                                    handler.postDelayed({
+                                        if (player?.playbackState == Player.STATE_ENDED) {
+                                            android.util.Log.d("RadioService", "Stream still ended after grace period, reconnecting...")
+                                            scheduleReconnect()
+                                        }
+                                    }, 3000)
+                                } else {
+                                    android.util.Log.d("RadioService", "Stream ended, reconnecting...")
+                                    updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
+                                    broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
+                                    scheduleReconnect()
+                                }
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
