@@ -19,6 +19,9 @@ import java.net.Proxy
  *
  * Local content (file://, content://) is loaded directly without proxy.
  * Remote URLs (http://, https://) are routed through Tor proxy when configured.
+ *
+ * SECURITY: When Force Tor is enabled but Tor is not connected, remote image
+ * loading is BLOCKED to prevent IP leaks.
  */
 object SecureImageLoader {
 
@@ -28,7 +31,8 @@ object SecureImageLoader {
     private data class ProxyConfig(
         val useTor: Boolean,
         val host: String,
-        val port: Int
+        val port: Int,
+        val blocked: Boolean  // True if Force Tor is enabled but Tor not connected
     )
 
     /**
@@ -85,22 +89,54 @@ object SecureImageLoader {
         val forceTorExceptI2p = PreferencesHelper.isForceTorExceptI2P(context)
         val torConnected = TorManager.isConnected()
 
+        val forceTorMode = torEnabled && (forceTorAll || forceTorExceptI2p)
+
+        // SECURITY: Block remote image loading if Force Tor is enabled but Tor is not connected
+        // This prevents IP leaks when the user expects all traffic to go through Tor
+        val blocked = forceTorMode && !torConnected
+
         // Use Tor proxy if:
         // 1. Tor is enabled AND connected
         // 2. AND either Force Tor All or Force Tor Except I2P is enabled
-        val useTor = torEnabled && torConnected && (forceTorAll || forceTorExceptI2p)
+        val useTor = forceTorMode && torConnected
 
         return ProxyConfig(
             useTor = useTor,
             host = if (useTor) TorManager.socksHost else "",
-            port = if (useTor) TorManager.socksPort else 0
+            port = if (useTor) TorManager.socksPort else 0,
+            blocked = blocked
         )
+    }
+
+    /**
+     * Check if remote image loading is currently blocked due to Force Tor mode
+     * being enabled without an active Tor connection.
+     */
+    fun isBlocked(context: Context): Boolean {
+        return getCurrentProxyConfig(context).blocked
     }
 
     private fun buildImageLoader(context: Context, config: ProxyConfig): ImageLoader {
         val builder = ImageLoader.Builder(context)
 
-        if (config.useTor && config.host.isNotEmpty() && config.port > 0) {
+        if (config.blocked) {
+            // SECURITY: Force Tor is enabled but Tor is not connected
+            // Create a loader that will fail all network requests
+            // Local content (file://, content://) will still work via Coil's built-in fetchers
+            android.util.Log.e("SecureImageLoader",
+                "BLOCKING remote image loading: Force Tor enabled but Tor not connected")
+
+            // Create an OkHttpClient that rejects all connections
+            val blockingClient = OkHttpClient.Builder()
+                .addInterceptor { chain ->
+                    android.util.Log.e("SecureImageLoader",
+                        "BLOCKED image request: ${chain.request().url} - Tor not connected")
+                    throw java.io.IOException("Image loading blocked: Tor not connected. Enable Tor or disable Force Tor mode.")
+                }
+                .build()
+
+            builder.okHttpClient(blockingClient)
+        } else if (config.useTor && config.host.isNotEmpty() && config.port > 0) {
             // Build OkHttpClient with SOCKS proxy for Tor
             val proxy = Proxy(
                 Proxy.Type.SOCKS,

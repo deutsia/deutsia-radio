@@ -40,8 +40,11 @@ class RadioBrowserClient(private val context: Context) {
      *
      * IMPORTANT: This ensures RadioBrowser API calls respect the same proxy settings
      * as media streams to prevent privacy leaks.
+     *
+     * @return OkHttpClient configured with appropriate proxy, or null if Force Tor is enabled
+     *         but Tor is not available (to prevent IP leaks)
      */
-    private fun buildHttpClient(): OkHttpClient {
+    private fun buildHttpClient(): OkHttpClient? {
         val builder = OkHttpClient.Builder()
 
         val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
@@ -56,8 +59,14 @@ class RadioBrowserClient(private val context: Context) {
                 "ForceCustomProxy: $forceCustomProxy, ForceCustomProxyExceptTorI2P: $forceCustomProxyExceptTorI2P, " +
                 "TorEnabled: $torEnabled, TorConnected: $torConnected")
 
-        // Priority 1: Force Tor (if Tor integration is enabled)
-        if (torEnabled && (forceTorAll || forceTorExceptI2P) && torConnected) {
+        // CRITICAL: Block all requests if Force Tor is enabled but Tor is not available
+        // This prevents IP leaks when the user expects traffic to go through Tor
+        if (torEnabled && (forceTorAll || forceTorExceptI2P)) {
+            if (!torConnected) {
+                Log.e(TAG, "BLOCKING RadioBrowser API request: Force Tor enabled but Tor is NOT connected")
+                return null
+            }
+
             val socksHost = TorManager.getProxyHost()
             val socksPort = TorManager.getProxyPort()
 
@@ -66,10 +75,10 @@ class RadioBrowserClient(private val context: Context) {
                 builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(socksHost, socksPort)))
                 builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
                 builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
+                return builder.build()
             } else {
-                Log.w(TAG, "Force Tor enabled but Tor proxy port invalid, using direct connection")
-                builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                Log.e(TAG, "BLOCKING RadioBrowser API request: Force Tor enabled but Tor proxy port invalid ($socksPort)")
+                return null
             }
         }
         // Priority 2: Force Custom Proxy for clearnet (RadioBrowser API is clearnet)
@@ -112,10 +121,10 @@ class RadioBrowserClient(private val context: Context) {
                 // Use longer timeouts for proxy connections
                 builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
                 builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
+                return builder.build()
             } else {
-                Log.w(TAG, "Force Custom Proxy enabled but proxy configuration invalid, using direct connection")
-                builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                Log.e(TAG, "BLOCKING RadioBrowser API request: Force Custom Proxy enabled but proxy configuration invalid")
+                return null
             }
         } else {
             // No forced proxy - use direct connection
@@ -151,6 +160,15 @@ class RadioBrowserClient(private val context: Context) {
             repeat(retries + 1) { attempt ->
                 try {
                     val client = buildHttpClient()
+                    if (client == null) {
+                        // Request blocked due to Force Tor/Proxy mode without available proxy
+                        Log.e(TAG, "API request blocked: proxy required but not available")
+                        return@withContext RadioBrowserResult.Error(
+                            "Request blocked: Tor/proxy not connected. Enable Tor or disable Force Tor mode.",
+                            null
+                        )
+                    }
+
                     val url = "${getApiBaseUrl()}$endpoint"
 
                     Log.d(TAG, "API Request (attempt ${attempt + 1}): $url")
@@ -378,6 +396,14 @@ class RadioBrowserClient(private val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
+                if (client == null) {
+                    Log.e(TAG, "getCountries blocked: proxy required but not available")
+                    return@withContext RadioBrowserResult.Error(
+                        "Request blocked: Tor/proxy not connected. Enable Tor or disable Force Tor mode.",
+                        null
+                    )
+                }
+
                 val baseUrl = getApiBaseUrl()
                 val url = "$baseUrl/countries?order=stationcount&reverse=true&hidebroken=true"
 
@@ -430,6 +456,14 @@ class RadioBrowserClient(private val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
+                if (client == null) {
+                    Log.e(TAG, "getTags blocked: proxy required but not available")
+                    return@withContext RadioBrowserResult.Error(
+                        "Request blocked: Tor/proxy not connected. Enable Tor or disable Force Tor mode.",
+                        null
+                    )
+                }
+
                 val baseUrl = getApiBaseUrl()
                 val url = "$baseUrl/tags?order=stationcount&reverse=true&limit=$limit&hidebroken=true"
 
@@ -484,6 +518,14 @@ class RadioBrowserClient(private val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
+                if (client == null) {
+                    Log.e(TAG, "getLanguages blocked: proxy required but not available")
+                    return@withContext RadioBrowserResult.Error(
+                        "Request blocked: Tor/proxy not connected. Enable Tor or disable Force Tor mode.",
+                        null
+                    )
+                }
+
                 val baseUrl = getApiBaseUrl()
                 val url = "$baseUrl/languages?order=stationcount&reverse=true&limit=$limit&hidebroken=true"
 
