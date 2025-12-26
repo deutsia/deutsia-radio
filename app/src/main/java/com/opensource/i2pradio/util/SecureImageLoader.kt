@@ -14,11 +14,17 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 
 /**
- * Secure image loading utility that routes HTTP/HTTPS requests through Tor
- * when Force Tor settings are enabled.
+ * Secure image loading utility that routes HTTP/HTTPS requests through Tor or
+ * custom proxy when Force Tor or Force Custom Proxy settings are enabled.
  *
  * Local content (file://, content://) is loaded directly without proxy.
- * Remote URLs (http://, https://) are routed through Tor proxy when configured.
+ * Remote URLs (http://, https://) are routed through proxy when configured.
+ *
+ * Priority order:
+ * 1. Tor proxy (when Force Tor All or Force Tor Except I2P is enabled and Tor is connected)
+ * 2. Custom proxy (when Force Custom Proxy or Force Custom Proxy Except Tor/I2P is enabled)
+ * 3. Block all requests (when any force mode is enabled but no valid proxy is configured)
+ * 4. Direct clearnet (when no force mode is enabled)
  */
 object SecureImageLoader {
 
@@ -27,6 +33,8 @@ object SecureImageLoader {
 
     private data class ProxyConfig(
         val useTor: Boolean,
+        val useCustomProxy: Boolean,
+        val proxyType: java.net.Proxy.Type,
         val host: String,
         val port: Int
     )
@@ -85,49 +93,139 @@ object SecureImageLoader {
         val forceTorExceptI2p = PreferencesHelper.isForceTorExceptI2P(context)
         val torConnected = TorManager.isConnected()
 
-        // Use Tor proxy if:
+        // Check custom proxy settings
+        val forceCustomProxy = PreferencesHelper.isForceCustomProxy(context)
+        val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(context)
+
+        // Priority 1: Use Tor proxy if:
         // 1. Tor is enabled AND connected
         // 2. AND either Force Tor All or Force Tor Except I2P is enabled
         val useTor = torEnabled && torConnected && (forceTorAll || forceTorExceptI2p)
 
+        if (useTor) {
+            return ProxyConfig(
+                useTor = true,
+                useCustomProxy = false,
+                proxyType = Proxy.Type.SOCKS,
+                host = TorManager.socksHost,
+                port = TorManager.socksPort
+            )
+        }
+
+        // Priority 2: Use custom proxy if Force Custom Proxy is enabled
+        // This applies to ALL image loading (cover art from RadioBrowser, etc.)
+        val useCustomProxy = forceCustomProxy || forceCustomProxyExceptTorI2P
+
+        if (useCustomProxy) {
+            val customProxyHost = PreferencesHelper.getCustomProxyHost(context)
+            val customProxyPort = PreferencesHelper.getCustomProxyPort(context)
+            val customProxyProtocol = PreferencesHelper.getCustomProxyProtocol(context)
+
+            // Only use custom proxy if it's properly configured
+            if (customProxyHost.isNotEmpty() && customProxyPort > 0) {
+                val proxyType = when (customProxyProtocol.uppercase()) {
+                    "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
+                    else -> Proxy.Type.HTTP  // HTTP, HTTPS use HTTP proxy type
+                }
+
+                return ProxyConfig(
+                    useTor = false,
+                    useCustomProxy = true,
+                    proxyType = proxyType,
+                    host = customProxyHost,
+                    port = customProxyPort
+                )
+            }
+        }
+
+        // No proxy configured - but if force modes are enabled, we should NOT fall back to clearnet
+        // Return an empty config that will be handled by buildImageLoader
         return ProxyConfig(
-            useTor = useTor,
-            host = if (useTor) TorManager.socksHost else "",
-            port = if (useTor) TorManager.socksPort else 0
+            useTor = false,
+            useCustomProxy = false,
+            proxyType = Proxy.Type.DIRECT,
+            host = "",
+            port = 0
         )
     }
 
     private fun buildImageLoader(context: Context, config: ProxyConfig): ImageLoader {
         val builder = ImageLoader.Builder(context)
 
-        if (config.useTor && config.host.isNotEmpty() && config.port > 0) {
-            // Build OkHttpClient with SOCKS proxy for Tor
-            val proxy = Proxy(
-                Proxy.Type.SOCKS,
-                InetSocketAddress(config.host, config.port)
-            )
+        // Check if any force mode is enabled - used to determine if we should block clearnet
+        val forceTorAll = PreferencesHelper.isForceTorAll(context)
+        val forceTorExceptI2p = PreferencesHelper.isForceTorExceptI2P(context)
+        val forceCustomProxy = PreferencesHelper.isForceCustomProxy(context)
+        val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(context)
+        val anyForceModeEnabled = forceTorAll || forceTorExceptI2p || forceCustomProxy || forceCustomProxyExceptTorI2P
 
-            val okHttpClient = OkHttpClient.Builder()
-                .proxy(proxy)
-                .build()
+        when {
+            // Priority 1: Tor proxy
+            config.useTor && config.host.isNotEmpty() && config.port > 0 -> {
+                val proxy = Proxy(
+                    Proxy.Type.SOCKS,
+                    InetSocketAddress(config.host, config.port)
+                )
 
-            builder.okHttpClient(okHttpClient)
+                val okHttpClient = OkHttpClient.Builder()
+                    .proxy(proxy)
+                    .build()
 
-            android.util.Log.d("SecureImageLoader",
-                "Created image loader with Tor proxy: ${config.host}:${config.port}")
-        } else {
-            // Even without Tor, provide a custom OkHttpClient that explicitly allows
-            // HTTP (cleartext) connections. Coil's default loader may block HTTP requests
-            // on Android 9+ due to network security configuration defaults.
-            // The manifest has usesCleartextTraffic="true" but Coil needs a configured client.
-            val okHttpClient = OkHttpClient.Builder()
-                .retryOnConnectionFailure(true)
-                .build()
+                builder.okHttpClient(okHttpClient)
 
-            builder.okHttpClient(okHttpClient)
+                android.util.Log.d("SecureImageLoader",
+                    "Created image loader with Tor proxy: ${config.host}:${config.port}")
+            }
 
-            android.util.Log.d("SecureImageLoader",
-                "Created image loader without proxy (Tor not active or not required)")
+            // Priority 2: Custom proxy
+            config.useCustomProxy && config.host.isNotEmpty() && config.port > 0 -> {
+                val proxy = Proxy(
+                    config.proxyType,
+                    InetSocketAddress(config.host, config.port)
+                )
+
+                val okHttpClient = OkHttpClient.Builder()
+                    .proxy(proxy)
+                    .build()
+
+                builder.okHttpClient(okHttpClient)
+
+                android.util.Log.d("SecureImageLoader",
+                    "Created image loader with custom proxy (${config.proxyType}): ${config.host}:${config.port}")
+            }
+
+            // Force mode enabled but no valid proxy configured - BLOCK all image loading
+            // This prevents clearnet leaks when user expects privacy protection
+            anyForceModeEnabled -> {
+                // Create an OkHttpClient that will fail all requests
+                // by pointing to an invalid proxy that doesn't exist
+                val blockingProxy = Proxy(
+                    Proxy.Type.SOCKS,
+                    InetSocketAddress("127.0.0.1", 1)  // Invalid port, will fail
+                )
+
+                val okHttpClient = OkHttpClient.Builder()
+                    .proxy(blockingProxy)
+                    .connectTimeout(1, java.util.concurrent.TimeUnit.MILLISECONDS)
+                    .build()
+
+                builder.okHttpClient(okHttpClient)
+
+                android.util.Log.w("SecureImageLoader",
+                    "Force proxy mode enabled but no valid proxy configured - blocking image loading to prevent clearnet leak")
+            }
+
+            // No force mode and no proxy - allow direct clearnet access
+            else -> {
+                val okHttpClient = OkHttpClient.Builder()
+                    .retryOnConnectionFailure(true)
+                    .build()
+
+                builder.okHttpClient(okHttpClient)
+
+                android.util.Log.d("SecureImageLoader",
+                    "Created image loader without proxy (no force mode active)")
+            }
         }
 
         return builder.build()
@@ -135,9 +233,12 @@ object SecureImageLoader {
 }
 
 /**
- * Extension function to load images securely through Tor when enabled.
+ * Extension function to load images securely through Tor or custom proxy when enabled.
  * Uses SecureImageLoader for remote URLs (http/https).
  * Local content URIs (file://, content://) and drawable resources bypass proxy.
+ *
+ * When any force proxy mode is enabled, images will ONLY load through the configured
+ * proxy. If no valid proxy is configured, image loading will fail (no clearnet fallback).
  *
  * @param data The image source (URL string, Uri, DrawableRes, etc.)
  * @param builder Optional builder to customize the image request
