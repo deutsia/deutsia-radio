@@ -30,9 +30,12 @@ import androidx.media3.common.Metadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.okhttp.OkHttpDataSource
+import androidx.media3.common.C
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
+import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.extractor.metadata.icy.IcyInfo
 import coil.request.ImageRequest
 import coil.request.SuccessResult
@@ -164,6 +167,8 @@ class RadioService : Service() {
     private var sleepTimerEndTime: Long = 0L
 
     private var reconnectRunnable: Runnable? = null
+    private var streamEndedGracePeriodRunnable: Runnable? = null
+    private val streamEndedGracePeriodMs = 8_000L  // 8 seconds grace period before reconnecting
 
     private var currentMetadata: String? = null
     private var currentBitrate: Int = 0
@@ -1596,9 +1601,37 @@ class RadioService : Service() {
             val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("DeutsiaRadio/1.0")
 
+            // Increased buffer sizes for Tor/I2P resilience:
+            // - Larger buffers absorb brief connection gaps (circuit rotation, no-padding songs)
+            // - Browser-like behavior: keep playing from buffer during brief interruptions
             val loadControl = DefaultLoadControl.Builder()
-                .setBufferDurationsMs(5_000, 15_000, 1_000, 2_000)
+                .setBufferDurationsMs(
+                    30_000,  // minBufferMs: 30s minimum buffer before playback
+                    120_000, // maxBufferMs: 2 minutes max buffer for gap tolerance
+                    2_500,   // bufferForPlaybackMs: 2.5s to start playback
+                    5_000    // bufferForPlaybackAfterRebufferMs: 5s after rebuffer
+                )
                 .build()
+
+            // Tolerant error handling for live streams over Tor/I2P:
+            // - More retries before giving up (browsers don't fail fast)
+            // - Longer delays between retries to let Tor circuits stabilize
+            val tolerantErrorPolicy = object : DefaultLoadErrorHandlingPolicy() {
+                override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorHandlingPolicy.LoadErrorInfo): Long {
+                    // Retry up to 15 times with increasing delay (max 8 seconds between retries)
+                    return if (loadErrorInfo.errorCount <= 15) {
+                        minOf(loadErrorInfo.errorCount * 1000L, 8000L)
+                    } else {
+                        C.TIME_UNSET // Give up after 15 retries (~60+ seconds of trying)
+                    }
+                }
+
+                override fun getMinimumLoadableRetryCount(dataType: Int): Int {
+                    // Retry loading chunks up to 15 times before failing
+                    // This is much more tolerant than the default (3)
+                    return 15
+                }
+            }
 
             val audioAttributes = androidx.media3.common.AudioAttributes.Builder()
                 .setUsage(androidx.media3.common.C.USAGE_MEDIA)
@@ -1610,8 +1643,26 @@ class RadioService : Service() {
                 .setAudioAttributes(audioAttributes, true)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
+                // Configure MediaItem as a LIVE stream:
+                // - targetOffsetMs: target live offset (10s behind live edge)
+                // - minOffsetMs/maxOffsetMs: acceptable range for live offset
+                // - minPlaybackSpeed/maxPlaybackSpeed: speed adjustment to catch up
+                val liveConfiguration = MediaItem.LiveConfiguration.Builder()
+                    .setTargetOffsetMs(10_000)  // 10 seconds behind live edge
+                    .setMinOffsetMs(5_000)      // Min 5 seconds
+                    .setMaxOffsetMs(30_000)     // Max 30 seconds (for buffering tolerance)
+                    .setMinPlaybackSpeed(0.97f) // Slow down slightly if too far ahead
+                    .setMaxPlaybackSpeed(1.03f) // Speed up slightly if falling behind
+                    .build()
+
+                val liveMediaItem = MediaItem.Builder()
+                    .setUri(streamUrl)
+                    .setLiveConfiguration(liveConfiguration)
+                    .build()
+
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(streamUrl))
+                    .setLoadErrorHandlingPolicy(tolerantErrorPolicy)
+                    .createMediaSource(liveMediaItem)
 
                 setMediaSource(mediaSource)
                 prepare()
@@ -1630,6 +1681,9 @@ class RadioService : Service() {
                         when (playbackState) {
                             Player.STATE_READY -> {
                                 reconnectAttempts = 0
+                                // Cancel any pending grace period (stream recovered)
+                                streamEndedGracePeriodRunnable?.let { handler.removeCallbacks(it) }
+                                streamEndedGracePeriodRunnable = null
                                 val status = if (isRecording) getString(R.string.notification_playing_recording) else getString(R.string.notification_playing)
                                 startForeground(NOTIFICATION_ID, createNotification(status))
                                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
@@ -1652,10 +1706,30 @@ class RadioService : Service() {
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
                             Player.STATE_ENDED -> {
-                                android.util.Log.d("RadioService", "Stream ended, reconnecting...")
+                                // Browser-like behavior: don't panic on stream end.
+                                // Radio streams shouldn't "end" - this usually means:
+                                // 1. Brief connection gap (Tor circuit rotation)
+                                // 2. Server closed connection between songs (no-padding stations)
+                                // 3. Actual server issue
+                                // Wait a grace period before reconnecting to avoid jarring UX
+                                android.util.Log.d("RadioService", "Stream ended, waiting ${streamEndedGracePeriodMs}ms grace period...")
                                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
                                 broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
-                                scheduleReconnect()
+                                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_buffering)))
+
+                                // Cancel any previous grace period runnable
+                                streamEndedGracePeriodRunnable?.let { handler.removeCallbacks(it) }
+
+                                streamEndedGracePeriodRunnable = Runnable {
+                                    // Still in ENDED state after grace period - now reconnect
+                                    if (player?.playbackState == Player.STATE_ENDED || player == null) {
+                                        android.util.Log.d("RadioService", "Grace period expired, reconnecting...")
+                                        scheduleReconnect()
+                                    } else {
+                                        android.util.Log.d("RadioService", "Stream recovered during grace period")
+                                    }
+                                }
+                                handler.postDelayed(streamEndedGracePeriodRunnable!!, streamEndedGracePeriodMs)
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
@@ -1740,8 +1814,9 @@ class RadioService : Service() {
         broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
         startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_reconnecting)))
 
-        // Cancel any pending reconnect before scheduling a new one
+        // Cancel any pending reconnect or grace period before scheduling a new one
         reconnectRunnable?.let { handler.removeCallbacks(it) }
+        streamEndedGracePeriodRunnable?.let { handler.removeCallbacks(it) }
 
         reconnectRunnable = Runnable {
             currentStreamUrl?.let { url ->
@@ -1757,11 +1832,13 @@ class RadioService : Service() {
         // Stop playback time updates first
         stopPlaybackTimeUpdates()
 
-        // Cancel only the reconnect runnable, not ALL callbacks
+        // Cancel only the reconnect/grace period runnables, not ALL callbacks
         // Using removeCallbacksAndMessages(null) is too aggressive and can
         // interfere with other pending operations
         reconnectRunnable?.let { handler.removeCallbacks(it) }
         reconnectRunnable = null
+        streamEndedGracePeriodRunnable?.let { handler.removeCallbacks(it) }
+        streamEndedGracePeriodRunnable = null
 
         // Clear metadata, bitrate, and codec when stopping stream
         // This prevents stale metadata from appearing when switching stations
