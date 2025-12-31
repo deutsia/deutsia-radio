@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">Sobre</string>
-    <string name="settings_version">Versão 1.4</string>
+    <string name="settings_version">Versão 1.5</string>
     <string name="settings_view_github">Ver no GitHub</string>
     <string name="settings_donate">Doar</string>
     <string name="settings_donate_description">Se este aplicativo ajudou você, considere fazer uma doação</string>
@@ -576,4 +576,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Senha alterada mas falha ao re-codificar banco de dados: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">Nenhuma estação encontrada</string>
+    <string name="empty_state_message">Comece adicionando sua primeira estação.\nClique no botão abaixo.</string>
+    <string name="empty_state_add_button">Adicionar nova estação</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">Adicionar estação de rádio</string>
+    <string name="cd_embedded_tor">Tor integrado</string>
+    <string name="cd_cover_art_preview">Pré-visualização da capa</string>
+    <string name="cd_custom_proxy_status">Estado do proxy personalizado</string>
+    <string name="cd_like">Curtir</string>
+    <string name="cd_album_art">Capa do álbum</string>
+    <string name="cd_record">Gravar</string>
+    <string name="cd_play_pause">Reproduzir/Pausar</string>
+    <string name="cd_volume">Volume</string>
+    <string name="cd_tor_status_icon">Ícone de estado do Tor</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">Abrir</string>
+    <string name="cd_more_options">Mais opções</string>
+    <string name="cd_tor_status">Estado do Tor</string>
+    <string name="cd_bandwidth_icon">Ícone de largura de banda</string>
+    <string name="cd_like_station">Adicionar estação aos favoritos</string>
+    <string name="cd_add_to_library">Adicionar à biblioteca</string>
+    <string name="cd_stop">Parar</string>
 </resources>

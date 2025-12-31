@@ -98,7 +98,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_tor_on"
-                android:contentDescription="Embedded Tor" />
+                android:contentDescription="@string/cd_embedded_tor" />
 
             <TextView
                 android:layout_width="0dp"
@@ -305,7 +305,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:contentDescription="Cover art preview" />
+                android:contentDescription="@string/cd_cover_art_preview" />
 
         </com.google.android.material.card.MaterialCardView>
 

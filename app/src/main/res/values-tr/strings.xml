@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">Hakkında</string>
-    <string name="settings_version">Sürüm 1.4</string>
+    <string name="settings_version">Sürüm 1.5</string>
     <string name="settings_view_github">GitHub\'da Görüntüle</string>
     <string name="settings_donate">Bağış Yap</string>
     <string name="settings_donate_description">Bu uygulama işinize yaradıysa bağış yapmayı düşünün</string>
@@ -576,4 +576,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Şifre değiştirildi ancak veritabanı yeniden şifrelenemedi: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">İstasyon Bulunamadı</string>
+    <string name="empty_state_message">İlk istasyonunuzu ekleyerek başlayın.\nAşağıdaki düğmeye tıklayın.</string>
+    <string name="empty_state_add_button">Yeni İstasyon Ekle</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">Radyo İstasyonu Ekle</string>
+    <string name="cd_embedded_tor">Gömülü Tor</string>
+    <string name="cd_cover_art_preview">Kapak resmi önizlemesi</string>
+    <string name="cd_custom_proxy_status">Özel proxy durumu</string>
+    <string name="cd_like">Beğen</string>
+    <string name="cd_album_art">Albüm kapağı</string>
+    <string name="cd_record">Kaydet</string>
+    <string name="cd_play_pause">Oynat/Duraklat</string>
+    <string name="cd_volume">Ses</string>
+    <string name="cd_tor_status_icon">Tor durum simgesi</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">Aç</string>
+    <string name="cd_more_options">Diğer seçenekler</string>
+    <string name="cd_tor_status">Tor durumu</string>
+    <string name="cd_bandwidth_icon">Bant genişliği simgesi</string>
+    <string name="cd_like_station">İstasyonu favorilere ekle</string>
+    <string name="cd_add_to_library">Kütüphaneye ekle</string>
+    <string name="cd_stop">Durdur</string>
 </resources>

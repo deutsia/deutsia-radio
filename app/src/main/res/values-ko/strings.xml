@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">정보</string>
-    <string name="settings_version">버전 1.4</string>
+    <string name="settings_version">버전 1.5</string>
     <string name="settings_view_github">GitHub에서 보기</string>
     <string name="settings_donate">기부</string>
     <string name="settings_donate_description">이 앱이 도움이 되었다면 기부를 고려해주세요</string>
@@ -575,4 +575,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">비밀번호는 변경되었지만 데이터베이스 재암호화에 실패했습니다: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">방송국을 찾을 수 없음</string>
+    <string name="empty_state_message">첫 번째 방송국을 추가하여 시작하세요.\n아래 버튼을 클릭하세요.</string>
+    <string name="empty_state_add_button">새 방송국 추가</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">라디오 방송국 추가</string>
+    <string name="cd_embedded_tor">내장 Tor</string>
+    <string name="cd_cover_art_preview">앨범 아트 미리보기</string>
+    <string name="cd_custom_proxy_status">사용자 정의 프록시 상태</string>
+    <string name="cd_like">좋아요</string>
+    <string name="cd_album_art">앨범 아트</string>
+    <string name="cd_record">녹음</string>
+    <string name="cd_play_pause">재생/일시정지</string>
+    <string name="cd_volume">볼륨</string>
+    <string name="cd_tor_status_icon">Tor 상태 아이콘</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">열기</string>
+    <string name="cd_more_options">추가 옵션</string>
+    <string name="cd_tor_status">Tor 상태</string>
+    <string name="cd_bandwidth_icon">대역폭 아이콘</string>
+    <string name="cd_like_station">즐겨찾기에 방송국 추가</string>
+    <string name="cd_add_to_library">라이브러리에 추가</string>
+    <string name="cd_stop">중지</string>
 </resources>

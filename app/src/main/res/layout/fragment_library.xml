@@ -110,7 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="No Stations Found"
+            android:text="@string/empty_state_title"
             android:textColor="?attr/colorOnSurface"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -120,7 +120,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Tune in by adding your first station.\nClick the button below."
+            android:text="@string/empty_state_message"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="16sp" />
 
@@ -131,7 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Add New Station"
+            android:text="@string/empty_state_add_button"
             app:icon="@drawable/ic_add" />
 
     </LinearLayout>
@@ -143,7 +143,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
-        android:contentDescription="Add Radio Station"
+        android:contentDescription="@string/cd_add_radio_station"
         app:backgroundTint="?attr/colorPrimaryContainer"
         app:elevation="6dp"
         app:srcCompat="@drawable/ic_add"

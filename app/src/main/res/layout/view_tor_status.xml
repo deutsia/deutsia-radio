@@ -20,7 +20,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_tor_off"
-            android:contentDescription="Tor status"
+            android:contentDescription="@string/cd_tor_status"
             tools:src="@drawable/ic_tor_on" />
 
         <TextView

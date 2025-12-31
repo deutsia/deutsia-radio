@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">О программе</string>
-    <string name="settings_version">Версия 1.4</string>
+    <string name="settings_version">Версия 1.5</string>
     <string name="settings_view_github">Посмотреть на GitHub</string>
     <string name="settings_donate">Поддержать</string>
     <string name="settings_donate_description">Если это приложение вам помогло, рассмотрите возможность поддержки</string>
@@ -575,4 +575,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Пароль изменён, но не удалось перешифровать базу данных: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">Станции не найдены</string>
+    <string name="empty_state_message">Начните с добавления первой станции.\nНажмите кнопку ниже.</string>
+    <string name="empty_state_add_button">Добавить новую станцию</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">Добавить радиостанцию</string>
+    <string name="cd_embedded_tor">Встроенный Tor</string>
+    <string name="cd_cover_art_preview">Предпросмотр обложки</string>
+    <string name="cd_custom_proxy_status">Статус пользовательского прокси</string>
+    <string name="cd_like">Нравится</string>
+    <string name="cd_album_art">Обложка альбома</string>
+    <string name="cd_record">Запись</string>
+    <string name="cd_play_pause">Воспроизведение/Пауза</string>
+    <string name="cd_volume">Громкость</string>
+    <string name="cd_tor_status_icon">Иконка статуса Tor</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">Открыть</string>
+    <string name="cd_more_options">Дополнительные параметры</string>
+    <string name="cd_tor_status">Статус Tor</string>
+    <string name="cd_bandwidth_icon">Иконка трафика</string>
+    <string name="cd_like_station">Добавить станцию в избранное</string>
+    <string name="cd_add_to_library">Добавить в библиотеку</string>
+    <string name="cd_stop">Остановить</string>
 </resources>

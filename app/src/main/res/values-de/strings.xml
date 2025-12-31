@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">Über</string>
-    <string name="settings_version">Version 1.4</string>
+    <string name="settings_version">Version 1.5</string>
     <string name="settings_view_github">Auf GitHub ansehen</string>
     <string name="settings_donate">Spenden</string>
     <string name="settings_donate_description">Wenn Ihnen diese App geholfen hat, ziehen Sie eine Spende in Betracht</string>
@@ -576,4 +576,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Passwort geändert, aber Datenbank-Neucodierung fehlgeschlagen: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">Keine Sender gefunden</string>
+    <string name="empty_state_message">Beginne mit dem Hinzufügen deines ersten Senders.\nKlicke auf die Schaltfläche unten.</string>
+    <string name="empty_state_add_button">Neuen Sender hinzufügen</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">Radiosender hinzufügen</string>
+    <string name="cd_embedded_tor">Eingebettetes Tor</string>
+    <string name="cd_cover_art_preview">Cover-Vorschau</string>
+    <string name="cd_custom_proxy_status">Benutzerdefinierter Proxy-Status</string>
+    <string name="cd_like">Gefällt mir</string>
+    <string name="cd_album_art">Albumcover</string>
+    <string name="cd_record">Aufnehmen</string>
+    <string name="cd_play_pause">Wiedergabe/Pause</string>
+    <string name="cd_volume">Lautstärke</string>
+    <string name="cd_tor_status_icon">Tor-Status-Symbol</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">Öffnen</string>
+    <string name="cd_more_options">Weitere Optionen</string>
+    <string name="cd_tor_status">Tor-Status</string>
+    <string name="cd_bandwidth_icon">Bandbreiten-Symbol</string>
+    <string name="cd_like_station">Sender favorisieren</string>
+    <string name="cd_add_to_library">Zur Bibliothek hinzufügen</string>
+    <string name="cd_stop">Stopp</string>
 </resources>

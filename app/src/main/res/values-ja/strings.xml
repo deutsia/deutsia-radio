@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">このアプリについて</string>
-    <string name="settings_version">バージョン 1.4</string>
+    <string name="settings_version">バージョン 1.5</string>
     <string name="settings_view_github">GitHubで見る</string>
     <string name="settings_donate">寄付</string>
     <string name="settings_donate_description">このアプリが役に立った場合は、寄付をご検討ください</string>
@@ -575,4 +575,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">パスワードは変更されましたが、データベースの再暗号化に失敗しました: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">ステーションが見つかりません</string>
+    <string name="empty_state_message">最初のステーションを追加してください。\n下のボタンをクリックしてください。</string>
+    <string name="empty_state_add_button">新しいステーションを追加</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">ラジオ局を追加</string>
+    <string name="cd_embedded_tor">組み込み Tor</string>
+    <string name="cd_cover_art_preview">カバーアートプレビュー</string>
+    <string name="cd_custom_proxy_status">カスタムプロキシの状態</string>
+    <string name="cd_like">いいね</string>
+    <string name="cd_album_art">アルバムアート</string>
+    <string name="cd_record">録音</string>
+    <string name="cd_play_pause">再生/一時停止</string>
+    <string name="cd_volume">音量</string>
+    <string name="cd_tor_status_icon">Tor ステータスアイコン</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">開く</string>
+    <string name="cd_more_options">その他のオプション</string>
+    <string name="cd_tor_status">Tor ステータス</string>
+    <string name="cd_bandwidth_icon">帯域幅アイコン</string>
+    <string name="cd_like_station">お気に入りに追加</string>
+    <string name="cd_add_to_library">ライブラリに追加</string>
+    <string name="cd_stop">停止</string>
 </resources>

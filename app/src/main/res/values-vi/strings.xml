@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">Giới thiệu</string>
-    <string name="settings_version">Phiên bản 1.4</string>
+    <string name="settings_version">Phiên bản 1.5</string>
     <string name="settings_view_github">Xem trên GitHub</string>
     <string name="settings_donate">Quyên góp</string>
     <string name="settings_donate_description">Nếu ứng dụng này hữu ích cho bạn, hãy xem xét quyên góp</string>
@@ -576,4 +576,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Đã đổi mật khẩu nhưng không thể mã hóa lại cơ sở dữ liệu: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">Không tìm thấy đài nào</string>
+    <string name="empty_state_message">Bắt đầu bằng cách thêm đài đầu tiên.\nNhấp vào nút bên dưới.</string>
+    <string name="empty_state_add_button">Thêm đài mới</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">Thêm đài radio</string>
+    <string name="cd_embedded_tor">Tor tích hợp</string>
+    <string name="cd_cover_art_preview">Xem trước ảnh bìa</string>
+    <string name="cd_custom_proxy_status">Trạng thái proxy tùy chỉnh</string>
+    <string name="cd_like">Thích</string>
+    <string name="cd_album_art">Ảnh bìa album</string>
+    <string name="cd_record">Ghi âm</string>
+    <string name="cd_play_pause">Phát/Tạm dừng</string>
+    <string name="cd_volume">Âm lượng</string>
+    <string name="cd_tor_status_icon">Biểu tượng trạng thái Tor</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">Mở</string>
+    <string name="cd_more_options">Tùy chọn khác</string>
+    <string name="cd_tor_status">Trạng thái Tor</string>
+    <string name="cd_bandwidth_icon">Biểu tượng băng thông</string>
+    <string name="cd_like_station">Thêm đài vào yêu thích</string>
+    <string name="cd_add_to_library">Thêm vào thư viện</string>
+    <string name="cd_stop">Dừng</string>
 </resources>

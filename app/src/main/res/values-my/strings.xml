@@ -257,7 +257,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">အကြောင်း</string>
-    <string name="settings_version">ဗားရှင်း 1.4</string>
+    <string name="settings_version">ဗားရှင်း 1.5</string>
     <string name="settings_view_github">GitHub တွင် ကြည့်ရန်</string>
     <string name="settings_donate">လှူဒါန်းရန်</string>
     <string name="settings_donate_description">ဒီအက်ပ်က သင့်ကို ကူညီခဲ့ရင် လှူဒါန်းရန် စဉ်းစားပါ</string>
@@ -573,4 +573,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">စကားဝှက် ပြောင်းလဲပြီးပါပြီ သို့သော် ဒေတာဘေ့စ် ပြန်လည်ကုဒ်ဝှက်မှု မအောင်မြင်ပါ: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">ဘူတာရုံ မတွေ့ရှိပါ</string>
+    <string name="empty_state_message">သင်၏ ပထမဆုံး ဘူတာရုံကို ထည့်ပါ။\nအောက်ပါ ခလုတ်ကို နှိပ်ပါ။</string>
+    <string name="empty_state_add_button">ဘူတာရုံ အသစ် ထည့်ပါ</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">ရေဒီယို ဘူတာရုံ ထည့်ပါ</string>
+    <string name="cd_embedded_tor">ပါဝင်သော Tor</string>
+    <string name="cd_cover_art_preview">အဖုံးပုံ အကြိုကြည့်ရှုခြင်း</string>
+    <string name="cd_custom_proxy_status">စိတ်ကြိုက် ပရောက်စီ အခြေအနေ</string>
+    <string name="cd_like">နှစ်သက်</string>
+    <string name="cd_album_art">အယ်လ်ဘမ် ပုံ</string>
+    <string name="cd_record">အသံဖမ်း</string>
+    <string name="cd_play_pause">ဖွင့်/ခေတ္တရပ်</string>
+    <string name="cd_volume">အသံ</string>
+    <string name="cd_tor_status_icon">Tor အခြေအနေ အိုင်ကွန်</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">ဖွင့်</string>
+    <string name="cd_more_options">နောက်ထပ် ရွေးချယ်စရာများ</string>
+    <string name="cd_tor_status">Tor အခြေအနေ</string>
+    <string name="cd_bandwidth_icon">bandwidth အိုင်ကွန်</string>
+    <string name="cd_like_station">ဘူတာရုံကို အကြိုက်ဆုံးထဲ ထည့်ပါ</string>
+    <string name="cd_add_to_library">စာကြည့်တိုက်သို့ ထည့်ပါ</string>
+    <string name="cd_stop">ရပ်</string>
 </resources>
