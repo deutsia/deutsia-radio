@@ -188,6 +188,14 @@ object SecureImageLoader {
                 val okHttpClient = OkHttpClient.Builder()
                     .proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(config.host, config.port)))
                     .dns(SOCKS5_DNS)  // Force DNS through SOCKS5
+                    // SAFETY CHECK: Block if Tor disconnects mid-session
+                    .addInterceptor { chain ->
+                        if (!TorManager.isConnected()) {
+                            android.util.Log.e(TAG, "BLOCKED: Tor disconnected mid-request: ${chain.request().url}")
+                            throw java.io.IOException("Image blocked: Tor disconnected")
+                        }
+                        chain.proceed(chain.request())
+                    }
                     .build()
 
                 builder.okHttpClient(okHttpClient)
@@ -196,9 +204,20 @@ object SecureImageLoader {
             ProxyMode.CUSTOM_SOCKS -> {
                 android.util.Log.d(TAG, "Creating image loader with custom SOCKS proxy: ${config.host}:${config.port}")
 
+                val ctx = context  // Capture for lambda
                 val okHttpClient = OkHttpClient.Builder()
                     .proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(config.host, config.port)))
                     .dns(SOCKS5_DNS)  // Force DNS through SOCKS5
+                    // SAFETY CHECK: Block if proxy config changes mid-session
+                    .addInterceptor { chain ->
+                        val currentHost = PreferencesHelper.getCustomProxyHost(ctx)
+                        val currentPort = PreferencesHelper.getCustomProxyPort(ctx)
+                        if (currentHost.isEmpty() || currentPort <= 0) {
+                            android.util.Log.e(TAG, "BLOCKED: Custom proxy unconfigured mid-request: ${chain.request().url}")
+                            throw java.io.IOException("Image blocked: Proxy not configured")
+                        }
+                        chain.proceed(chain.request())
+                    }
                     .build()
 
                 builder.okHttpClient(okHttpClient)
@@ -207,8 +226,19 @@ object SecureImageLoader {
             ProxyMode.CUSTOM_HTTP -> {
                 android.util.Log.d(TAG, "Creating image loader with custom HTTP proxy: ${config.host}:${config.port}")
 
+                val ctx = context  // Capture for lambda
                 val okHttpClient = OkHttpClient.Builder()
                     .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(config.host, config.port)))
+                    // SAFETY CHECK: Block if proxy config changes mid-session
+                    .addInterceptor { chain ->
+                        val currentHost = PreferencesHelper.getCustomProxyHost(ctx)
+                        val currentPort = PreferencesHelper.getCustomProxyPort(ctx)
+                        if (currentHost.isEmpty() || currentPort <= 0) {
+                            android.util.Log.e(TAG, "BLOCKED: Custom proxy unconfigured mid-request: ${chain.request().url}")
+                            throw java.io.IOException("Image blocked: Proxy not configured")
+                        }
+                        chain.proceed(chain.request())
+                    }
                     .build()
 
                 builder.okHttpClient(okHttpClient)
