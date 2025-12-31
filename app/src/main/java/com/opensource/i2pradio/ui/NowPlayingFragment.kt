@@ -206,6 +206,17 @@ class NowPlayingFragment : Fragment() {
                     val currentPositionMs = intent.getLongExtra(RadioService.EXTRA_CURRENT_POSITION_MS, 0L)
                     updatePlaybackTime(elapsedMs, bufferedPositionMs, currentPositionMs)
                 }
+                RadioService.BROADCAST_STREAM_ERROR -> {
+                    val errorType = intent.getStringExtra(RadioService.EXTRA_STREAM_ERROR_TYPE)
+                    val errorMessage = when (errorType) {
+                        RadioService.ERROR_TYPE_TOR_NOT_CONNECTED -> getString(R.string.error_tor_not_connected)
+                        RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED -> getString(R.string.error_custom_proxy_not_configured)
+                        RadioService.ERROR_TYPE_MAX_RETRIES -> getString(R.string.error_stream_max_retries)
+                        RadioService.ERROR_TYPE_STREAM_FAILED -> getString(R.string.error_stream_failed)
+                        else -> getString(R.string.error_stream_failed)
+                    }
+                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -278,7 +289,7 @@ class NowPlayingFragment : Fragment() {
         val serviceIntent = Intent(requireContext(), RadioService::class.java)
         requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-        // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, and time
+        // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, time, and errors
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_METADATA_CHANGED)
             addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
@@ -287,6 +298,7 @@ class NowPlayingFragment : Fragment() {
             addAction(RadioService.BROADCAST_RECORDING_COMPLETE)
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
             addAction(RadioService.BROADCAST_PLAYBACK_TIME_UPDATE)
+            addAction(RadioService.BROADCAST_STREAM_ERROR)
         }
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
 

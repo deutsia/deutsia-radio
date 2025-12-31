@@ -576,6 +576,16 @@
     <!-- Browse Filter Messages -->
     <string name="all_filters_applied">All filters are already applied</string>
 
+    <!-- Search Status -->
+    <string name="searching">Searching…</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">Stream failed to connect</string>
+    <string name="error_stream_max_retries">Connection failed after multiple attempts</string>
+    <string name="error_tor_not_connected">Tor is not connected. Enable Tor to play this stream.</string>
+    <string name="error_tor_required_for_clearnet">Tor is not connected. Force Tor mode requires Tor for clearnet streams.</string>
+    <string name="error_custom_proxy_not_configured">Custom proxy is not configured. Configure it in Settings to play.</string>
+
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Password changed but failed to re-key database: %s</string>
 </resources>
