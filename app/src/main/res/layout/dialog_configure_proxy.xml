@@ -63,6 +63,21 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- SOCKS4 DNS Warning -->
+        <TextView
+            android:id="@+id/socks4DnsWarning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:padding="12dp"
+            android:background="@drawable/warning_background"
+            android:text="@string/warning_socks4_dns_limitation"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnErrorContainer"
+            android:visibility="gone"
+            android:drawableStart="@drawable/ic_warning"
+            android:drawablePadding="8dp" />
+
         <!-- Username (Optional) -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"

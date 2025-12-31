@@ -1730,6 +1730,12 @@ class SettingsFragment : Fragment() {
         val timeoutInput = dialogView.findViewById<TextInputEditText>(R.id.proxyTimeoutInput)
         val testButton = dialogView.findViewById<MaterialButton>(R.id.testConnectionButton)
         val testResultText = dialogView.findViewById<TextView>(R.id.testResultText)
+        val socks4DnsWarning = dialogView.findViewById<TextView>(R.id.socks4DnsWarning)
+
+        // Helper function to update SOCKS4 warning visibility
+        fun updateSocks4Warning(protocol: String) {
+            socks4DnsWarning.visibility = if (protocol.uppercase() == "SOCKS4") View.VISIBLE else View.GONE
+        }
 
         // Set up dropdowns
         val protocols = arrayOf(
@@ -1757,6 +1763,15 @@ class SettingsFragment : Fragment() {
         passwordInput.setText(PreferencesHelper.getCustomProxyPassword(requireContext()))
         authTypeInput.setText(PreferencesHelper.getCustomProxyAuthType(requireContext()), false)
         timeoutInput.setText(PreferencesHelper.getCustomProxyConnectionTimeout(requireContext()).toString())
+
+        // Show SOCKS4 warning if currently selected
+        updateSocks4Warning(PreferencesHelper.getCustomProxyProtocol(requireContext()))
+
+        // Update SOCKS4 warning when protocol changes
+        protocolInput.setOnItemClickListener { _, _, position, _ ->
+            val selectedProtocol = protocols[position]
+            updateSocks4Warning(selectedProtocol)
+        }
 
         // Test Connection button
         testButton.setOnClickListener {

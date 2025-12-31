@@ -411,6 +411,7 @@
     <string name="default_protocol_https">HTTPS</string>
     <string name="default_protocol_socks4">SOCKS4</string>
     <string name="default_protocol_socks5">SOCKS5</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 does not support remote DNS resolution. DNS queries may be resolved locally, which could reveal the domains you access to your ISP. Consider using SOCKS5 for better privacy.</string>
     <string name="default_auth_basic">Basic</string>
     <string name="default_auth_digest">Digest</string>
     <string name="default_port_8080">8080</string>
