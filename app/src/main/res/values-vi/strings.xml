@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">Giới thiệu</string>
-    <string name="settings_version">Phiên bản 1.4</string>
+    <string name="settings_version">Phiên bản 1.5</string>
     <string name="settings_view_github">Xem trên GitHub</string>
     <string name="settings_donate">Quyên góp</string>
     <string name="settings_donate_description">Nếu ứng dụng này hữu ích cho bạn, hãy xem xét quyên góp</string>

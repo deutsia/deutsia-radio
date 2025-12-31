@@ -257,7 +257,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">के बारे में</string>
-    <string name="settings_version">संस्करण 1.4</string>
+    <string name="settings_version">संस्करण 1.5</string>
     <string name="settings_view_github">GitHub पर देखें</string>
     <string name="settings_donate">दान करें</string>
     <string name="settings_donate_description">यदि इस ऐप ने आपकी मदद की, तो दान करने पर विचार करें</string>

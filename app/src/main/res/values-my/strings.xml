@@ -257,7 +257,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">အကြောင်း</string>
-    <string name="settings_version">ဗားရှင်း 1.4</string>
+    <string name="settings_version">ဗားရှင်း 1.5</string>
     <string name="settings_view_github">GitHub တွင် ကြည့်ရန်</string>
     <string name="settings_donate">လှူဒါန်းရန်</string>
     <string name="settings_donate_description">ဒီအက်ပ်က သင့်ကို ကူညီခဲ့ရင် လှူဒါန်းရန် စဉ်းစားပါ</string>

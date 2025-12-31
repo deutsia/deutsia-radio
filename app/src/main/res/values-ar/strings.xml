@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">حول</string>
-    <string name="settings_version">الإصدار 1.4</string>
+    <string name="settings_version">الإصدار 1.5</string>
     <string name="settings_view_github">عرض على GitHub</string>
     <string name="settings_donate">تبرع</string>
     <string name="settings_donate_description">إذا ساعدك هذا التطبيق، فكر في التبرع</string>

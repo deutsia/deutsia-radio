@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">このアプリについて</string>
-    <string name="settings_version">バージョン 1.4</string>
+    <string name="settings_version">バージョン 1.5</string>
     <string name="settings_view_github">GitHubで見る</string>
     <string name="settings_donate">寄付</string>
     <string name="settings_donate_description">このアプリが役に立った場合は、寄付をご検討ください</string>

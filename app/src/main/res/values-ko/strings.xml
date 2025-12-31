@@ -260,7 +260,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">정보</string>
-    <string name="settings_version">버전 1.4</string>
+    <string name="settings_version">버전 1.5</string>
     <string name="settings_view_github">GitHub에서 보기</string>
     <string name="settings_donate">기부</string>
     <string name="settings_donate_description">이 앱이 도움이 되었다면 기부를 고려해주세요</string>

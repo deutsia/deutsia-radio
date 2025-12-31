@@ -264,7 +264,7 @@
 
     <!-- Settings - About -->
     <string name="settings_about">Acerca de</string>
-    <string name="settings_version">Versión 1.4</string>
+    <string name="settings_version">Versión 1.5</string>
     <string name="settings_view_github">Ver en GitHub</string>
     <string name="settings_donate">Donar</string>
     <string name="settings_donate_description">Si esta aplicación te ayudó, considera hacer una donación</string>
