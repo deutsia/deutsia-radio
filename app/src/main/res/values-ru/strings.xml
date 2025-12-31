@@ -466,11 +466,11 @@
     <string name="auth_biometric_negative">Использовать пароль</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">Вы уверены, что хотите удалить %d станци%s?</string>
+    <string name="delete_stations_message">Вы уверены, что хотите удалить %1$d станци%2$s?</string>
     <string name="delete_stations_message_single">Вы уверены, что хотите удалить %d станцию?</string>
     <string name="delete_stations_message_plural">Вы уверены, что хотите удалить %d станций?</string>
     <string name="button_delete">Удалить</string>
-    <string name="deleted_stations_message">Удалено %d станци%s</string>
+    <string name="deleted_stations_message">Удалено %1$d станци%2$s</string>
     <string name="deleted_stations_message_single">Удалена %d станция</string>
     <string name="deleted_stations_message_plural">Удалено %d станций</string>
 
@@ -524,7 +524,7 @@
     <string name="import_curated_title">Импорт станций %s</string>
     <string name="import_curated_message">Импортировать %1$d отобранных радиостанций %2$s?\n\nЭти станции предварительно настроены с параметрами прокси и готовы к использованию.</string>
     <string name="no_stations_found_in_list">Станции не найдены в списке %s</string>
-    <string name="failed_to_import_stations">Не удалось импортировать станции %s: %s</string>
+    <string name="failed_to_import_stations">Не удалось импортировать станции %1$s: %2$s</string>
     <string name="dialog_export_stations_title">Экспорт станций</string>
     <string name="no_stations_in_file">Станции не найдены в файле</string>
     <string name="dialog_import_failed">Импорт не удался</string>

@@ -464,11 +464,11 @@
     <string name="auth_biometric_negative">စကားဝှက် သုံးပါ</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">%d ဘူတာ%s ကို ဖျက်ရန် သေချာပါသလား?</string>
+    <string name="delete_stations_message">%1$d ဘူတာ%2$s ကို ဖျက်ရန် သေချာပါသလား?</string>
     <string name="delete_stations_message_single">%d ဘူတာကို ဖျက်ရန် သေချာပါသလား?</string>
     <string name="delete_stations_message_plural">%d ဘူတာကို ဖျက်ရန် သေချာပါသလား?</string>
     <string name="button_delete">ဖျက်ပါ</string>
-    <string name="deleted_stations_message">%d ဘူတာ%s ဖျက်လိုက်ပါပြီ</string>
+    <string name="deleted_stations_message">%1$d ဘူတာ%2$s ဖျက်လိုက်ပါပြီ</string>
     <string name="deleted_stations_message_single">%d ဘူတာ ဖျက်လိုက်ပါပြီ</string>
     <string name="deleted_stations_message_plural">%d ဘူတာ ဖျက်လိုက်ပါပြီ</string>
 
@@ -522,7 +522,7 @@
     <string name="import_curated_title">%s ဘူတာများ တင်သွင်းပါ</string>
     <string name="import_curated_message">%1$d ရွေးချယ်ထားသော %2$s ရေဒီယိုဘူတာများ တင်သွင်းမလား?\n\nဤဘူတာများသည် ပရောက်ဆီ ဆက်တင်များဖြင့် ကြိုတင်ပြင်ဆင်ထားပြီး အသုံးပြုရန် အဆင်သင့်ဖြစ်ပါသည်။</string>
     <string name="no_stations_found_in_list">%s စာရင်းတွင် ဘူတာများ မတွေ့ပါ</string>
-    <string name="failed_to_import_stations">%s ဘူတာများ တင်သွင်းမှု မအောင်မြင်ပါ: %s</string>
+    <string name="failed_to_import_stations">%1$s ဘူတာများ တင်သွင်းမှု မအောင်မြင်ပါ: %2$s</string>
     <string name="dialog_export_stations_title">ဘူတာများ တင်ပို့ပါ</string>
     <string name="no_stations_in_file">ဖိုင်တွင် ဘူတာများ မတွေ့ပါ</string>
     <string name="dialog_import_failed">တင်သွင်းမှု မအောင်မြင်ပါ</string>

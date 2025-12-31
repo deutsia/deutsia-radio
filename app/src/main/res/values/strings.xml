@@ -474,11 +474,11 @@
     <string name="auth_biometric_negative">Use Password</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">Are you sure you want to delete %d station%s?</string>
+    <string name="delete_stations_message">Are you sure you want to delete %1$d station%2$s?</string>
     <string name="delete_stations_message_single">Are you sure you want to delete %d station?</string>
     <string name="delete_stations_message_plural">Are you sure you want to delete %d stations?</string>
     <string name="button_delete">Delete</string>
-    <string name="deleted_stations_message">Deleted %d station%s</string>
+    <string name="deleted_stations_message">Deleted %1$d station%2$s</string>
     <string name="deleted_stations_message_single">Deleted %d station</string>
     <string name="deleted_stations_message_plural">Deleted %d stations</string>
 
@@ -532,7 +532,7 @@
     <string name="import_curated_title">Add %s Stations</string>
     <string name="import_curated_message">Add %1$d bundled %2$s radio stations?\n\nThese stations are pre-configured with proxy settings and ready to use. This is an offline operation.</string>
     <string name="no_stations_found_in_list">No stations found in %s list</string>
-    <string name="failed_to_import_stations">Failed to add %s stations: %s</string>
+    <string name="failed_to_import_stations">Failed to add %1$s stations: %2$s</string>
     <string name="dialog_export_stations_title">Export Stations</string>
     <string name="no_stations_in_file">No stations found in the file</string>
     <string name="dialog_import_failed">Import Failed</string>

@@ -466,11 +466,11 @@
     <string name="auth_biometric_negative">استخدام كلمة المرور</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">هل أنت متأكد من حذف %d محطة%s؟</string>
+    <string name="delete_stations_message">هل أنت متأكد من حذف %1$d محطة%2$s؟</string>
     <string name="delete_stations_message_single">هل أنت متأكد من حذف %d محطة؟</string>
     <string name="delete_stations_message_plural">هل أنت متأكد من حذف %d محطة؟</string>
     <string name="button_delete">حذف</string>
-    <string name="deleted_stations_message">تم حذف %d محطة%s</string>
+    <string name="deleted_stations_message">تم حذف %1$d محطة%2$s</string>
     <string name="deleted_stations_message_single">تم حذف %d محطة</string>
     <string name="deleted_stations_message_plural">تم حذف %d محطة</string>
 
@@ -524,7 +524,7 @@
     <string name="import_curated_title">استيراد محطات %s</string>
     <string name="import_curated_message">استيراد %1$d محطة راديو %2$s منتقاة؟\n\nهذه المحطات مهيأة مسبقًا بإعدادات البروكسي وجاهزة للاستخدام.</string>
     <string name="no_stations_found_in_list">لم يتم العثور على محطات في قائمة %s</string>
-    <string name="failed_to_import_stations">فشل استيراد محطات %s: %s</string>
+    <string name="failed_to_import_stations">فشل استيراد محطات %1$s: %2$s</string>
     <string name="dialog_export_stations_title">تصدير المحطات</string>
     <string name="no_stations_in_file">لم يتم العثور على محطات في الملف</string>
     <string name="dialog_import_failed">فشل الاستيراد</string>

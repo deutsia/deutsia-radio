@@ -303,9 +303,9 @@
     <string name="tor_status_leak_warning_description">Le mode Tor forcé est activé mais non connecté. La confidentialité peut être compromise.</string>
 
     <string name="tor_status_tor_required">Tor requis</string>
-    <string name="tor_status_tor_required_description">Les flux sont bloqués jusqu'à ce que Tor se reconnecte. Appuyez pour reconnecter.</string>
+    <string name="tor_status_tor_required_description">Les flux sont bloqués jusqu\'à ce que Tor se reconnecte. Appuyez pour reconnecter.</string>
     <string name="tor_control_title_blocked">Flux bloqués</string>
-    <string name="tor_control_subtitle_blocked">Le mode Tor forcé protège votre vie privée. Tous les flux sont bloqués jusqu'à ce que Tor se reconnecte — aucune donnée n'a été divulguée.</string>
+    <string name="tor_control_subtitle_blocked">Le mode Tor forcé protège votre vie privée. Tous les flux sont bloqués jusqu\'à ce que Tor se reconnecte — aucune donnée n\'a été divulguée.</string>
 
     <string name="tor_status_connecting_message">Connexion à Tor...</string>
     <string name="tor_status_connected_message">Connecté via Tor</string>
@@ -473,11 +473,11 @@
     <string name="auth_biometric_negative">Utiliser le mot de passe</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">Voulez-vous vraiment supprimer %d station%s ?</string>
+    <string name="delete_stations_message">Voulez-vous vraiment supprimer %1$d station%2$s ?</string>
     <string name="delete_stations_message_single">Voulez-vous vraiment supprimer %d station ?</string>
     <string name="delete_stations_message_plural">Voulez-vous vraiment supprimer %d stations ?</string>
     <string name="button_delete">Supprimer</string>
-    <string name="deleted_stations_message">%d station%s supprimée</string>
+    <string name="deleted_stations_message">%1$d station%2$s supprimée</string>
     <string name="deleted_stations_message_single">%d station supprimée</string>
     <string name="deleted_stations_message_plural">%d stations supprimées</string>
 
@@ -531,7 +531,7 @@
     <string name="import_curated_title">Importer des stations %s</string>
     <string name="import_curated_message">Importer %1$d stations de radio %2$s sélectionnées ?\n\nCes stations sont préconfigurées avec les paramètres proxy et prêtes à l\'emploi.</string>
     <string name="no_stations_found_in_list">Aucune station trouvée dans la liste %s</string>
-    <string name="failed_to_import_stations">Échec de l\'importation des stations %s : %s</string>
+    <string name="failed_to_import_stations">Échec de l\'importation des stations %1$s : %2$s</string>
     <string name="dialog_export_stations_title">Exporter des stations</string>
     <string name="no_stations_in_file">Aucune station trouvée dans le fichier</string>
     <string name="dialog_import_failed">Échec de l\'importation</string>

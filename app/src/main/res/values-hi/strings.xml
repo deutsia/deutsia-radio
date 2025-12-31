@@ -463,11 +463,11 @@
     <string name="auth_biometric_negative">पासवर्ड उपयोग करें</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">क्या आप वाकई %d स्टेशन%s को हटाना चाहते हैं?</string>
+    <string name="delete_stations_message">क्या आप वाकई %1$d स्टेशन%2$s को हटाना चाहते हैं?</string>
     <string name="delete_stations_message_single">क्या आप वाकई %d स्टेशन को हटाना चाहते हैं?</string>
     <string name="delete_stations_message_plural">क्या आप वाकई %d स्टेशन को हटाना चाहते हैं?</string>
     <string name="button_delete">हटाएं</string>
-    <string name="deleted_stations_message">%d स्टेशन%s हटा दिया गया</string>
+    <string name="deleted_stations_message">%1$d स्टेशन%2$s हटा दिया गया</string>
     <string name="deleted_stations_message_single">%d स्टेशन हटा दिया गया</string>
     <string name="deleted_stations_message_plural">%d स्टेशन हटा दिए गए</string>
 
@@ -521,7 +521,7 @@
     <string name="import_curated_title">%s स्टेशन आयात करें</string>
     <string name="import_curated_message">%1$d चयनित %2$s रेडियो स्टेशन आयात करें?\n\nये स्टेशन प्रॉक्सी सेटिंग्स के साथ पूर्व-कॉन्फ़िगर हैं और उपयोग के लिए तैयार हैं।</string>
     <string name="no_stations_found_in_list">%s सूची में कोई स्टेशन नहीं मिला</string>
-    <string name="failed_to_import_stations">%s स्टेशन आयात करने में विफल: %s</string>
+    <string name="failed_to_import_stations">%1$s स्टेशन आयात करने में विफल: %2$s</string>
     <string name="dialog_export_stations_title">स्टेशन निर्यात करें</string>
     <string name="no_stations_in_file">फ़ाइल में कोई स्टेशन नहीं मिला</string>
     <string name="dialog_import_failed">आयात विफल</string>

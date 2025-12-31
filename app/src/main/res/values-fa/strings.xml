@@ -467,11 +467,11 @@
     <string name="auth_biometric_negative">استفاده از رمز عبور</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">آیا مطمئن هستید که می‌خواهید %d ایستگاه%s را حذف کنید؟</string>
+    <string name="delete_stations_message">آیا مطمئن هستید که می‌خواهید %1$d ایستگاه%2$s را حذف کنید؟</string>
     <string name="delete_stations_message_single">آیا مطمئن هستید که می‌خواهید %d ایستگاه را حذف کنید؟</string>
     <string name="delete_stations_message_plural">آیا مطمئن هستید که می‌خواهید %d ایستگاه را حذف کنید؟</string>
     <string name="button_delete">حذف</string>
-    <string name="deleted_stations_message">%d ایستگاه%s حذف شد</string>
+    <string name="deleted_stations_message">%1$d ایستگاه%2$s حذف شد</string>
     <string name="deleted_stations_message_single">%d ایستگاه حذف شد</string>
     <string name="deleted_stations_message_plural">%d ایستگاه حذف شد</string>
 
@@ -525,7 +525,7 @@
     <string name="import_curated_title">وارد کردن ایستگاه‌های %s</string>
     <string name="import_curated_message">وارد کردن %1$d ایستگاه رادیویی %2$s منتخب؟\n\nاین ایستگاه‌ها از قبل با تنظیمات پروکسی پیکربندی شده و آماده استفاده هستند.</string>
     <string name="no_stations_found_in_list">هیچ ایستگاهی در فهرست %s یافت نشد</string>
-    <string name="failed_to_import_stations">وارد کردن ایستگاه‌های %s ناموفق بود: %s</string>
+    <string name="failed_to_import_stations">وارد کردن ایستگاه‌های %1$s ناموفق بود: %2$s</string>
     <string name="dialog_export_stations_title">صادر کردن ایستگاه‌ها</string>
     <string name="no_stations_in_file">هیچ ایستگاهی در فایل یافت نشد</string>
     <string name="dialog_import_failed">وارد کردن ناموفق</string>

@@ -467,11 +467,11 @@
     <string name="auth_biometric_negative">使用密码</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">确定要删除 %d 个电台%s吗？</string>
+    <string name="delete_stations_message">确定要删除 %1$d 个电台%2$s吗？</string>
     <string name="delete_stations_message_single">确定要删除 %d 个电台吗？</string>
     <string name="delete_stations_message_plural">确定要删除 %d 个电台吗？</string>
     <string name="button_delete">删除</string>
-    <string name="deleted_stations_message">已删除 %d 个电台%s</string>
+    <string name="deleted_stations_message">已删除 %1$d 个电台%2$s</string>
     <string name="deleted_stations_message_single">已删除 %d 个电台</string>
     <string name="deleted_stations_message_plural">已删除 %d 个电台</string>
 
@@ -525,7 +525,7 @@
     <string name="import_curated_title">导入 %s 电台</string>
     <string name="import_curated_message">导入 %1$d 个精选的 %2$s 广播电台？\n\n这些电台已预先配置代理设置，可立即使用。</string>
     <string name="no_stations_found_in_list">在 %s 列表中未找到电台</string>
-    <string name="failed_to_import_stations">导入 %s 电台失败：%s</string>
+    <string name="failed_to_import_stations">导入 %1$s 电台失败：%2$s</string>
     <string name="dialog_export_stations_title">导出电台</string>
     <string name="no_stations_in_file">文件中未找到电台</string>
     <string name="dialog_import_failed">导入失败</string>
