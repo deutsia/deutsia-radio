@@ -119,6 +119,17 @@ class MainActivity : AppCompatActivity() {
                     // Update proxy status view visibility
                     updateProxyStatusViewVisibility()
                 }
+                RadioService.BROADCAST_STREAM_ERROR -> {
+                    val errorType = intent.getStringExtra(RadioService.EXTRA_STREAM_ERROR_TYPE)
+                    val errorMessage = when (errorType) {
+                        RadioService.ERROR_TYPE_TOR_NOT_CONNECTED -> getString(R.string.error_tor_not_connected)
+                        RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED -> getString(R.string.error_custom_proxy_not_configured)
+                        RadioService.ERROR_TYPE_MAX_RETRIES -> getString(R.string.error_stream_max_retries)
+                        RadioService.ERROR_TYPE_STREAM_FAILED -> getString(R.string.error_stream_failed)
+                        else -> getString(R.string.error_stream_failed)
+                    }
+                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -272,10 +283,11 @@ class MainActivity : AppCompatActivity() {
             TorManager.initialize(this)
         }
 
-        // Register broadcast receiver for playback state and cover art changes
+        // Register broadcast receiver for playback state, cover art changes, and stream errors
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
+            addAction(RadioService.BROADCAST_STREAM_ERROR)
             addAction(BROADCAST_LIKE_STATE_CHANGED)
             addAction(BROADCAST_PROXY_MODE_CHANGED)
         }
@@ -297,6 +309,20 @@ class MainActivity : AppCompatActivity() {
 
         // Handle click on custom proxy status to show settings
         customProxyStatusView.setOnStatusClickListener {
+            // Check if Force Custom Proxy is enabled but proxy not configured
+            val isForceCustomProxy = PreferencesHelper.isForceCustomProxy(this) ||
+                                     PreferencesHelper.isForceCustomProxyExceptTorI2P(this)
+            val proxyHost = PreferencesHelper.getCustomProxyHost(this)
+
+            if (isForceCustomProxy && proxyHost.isEmpty()) {
+                // Show snackbar explaining no leak occurred before navigating to settings
+                com.google.android.material.snackbar.Snackbar.make(
+                    findViewById(android.R.id.content),
+                    R.string.custom_proxy_blocked_snackbar,
+                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                ).show()
+            }
+
             // Navigate to settings tab (index 3)
             viewPager.currentItem = 3
         }

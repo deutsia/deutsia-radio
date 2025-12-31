@@ -286,6 +286,7 @@
     <string name="tor_status_off">Tor Off</string>
     <string name="tor_status_error">Tor Error</string>
     <string name="tor_status_leak_warning">Leak Warning</string>
+    <string name="tor_status_tor_required">Tor Required</string>
     <string name="tor_status_install_invizible">Install InviZible Pro</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
@@ -296,6 +297,7 @@
     <string name="tor_status_error_description">Tor connection failed. Tap to retry.</string>
     <string name="tor_status_install_invizible_description">InviZible Pro is not installed. Tap to install.</string>
     <string name="tor_status_leak_warning_description">Force Tor is enabled but not connected. Privacy may be compromised.</string>
+    <string name="tor_status_tor_required_description">Streams are blocked until Tor reconnects. Tap to reconnect.</string>
 
     <string name="tor_status_connecting_message">Connecting to Tor...</string>
     <string name="tor_status_connected_message">Connected via Tor</string>
@@ -311,6 +313,8 @@
     <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
     <string name="tor_control_title_invizible_required">InviZible Pro Required</string>
     <string name="tor_control_subtitle_invizible_required">Install InviZible Pro to connect to the Tor network</string>
+    <string name="tor_control_title_blocked">Streams Blocked</string>
+    <string name="tor_control_subtitle_blocked">Force Tor mode is protecting your privacy. All streams are blocked until Tor reconnects — no data has leaked.</string>
     <string name="tor_control_button_connecting">Connecting...</string>
     <string name="tor_control_button_disconnect">Disconnect</string>
     <string name="tor_control_button_cancel">Cancel</string>
@@ -373,6 +377,10 @@
     <string name="custom_proxy_status_no_proxy">No proxy set</string>
     <string name="custom_proxy_status_leak_warning">Leak Warning</string>
     <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+    <string name="custom_proxy_status_proxy_required">Proxy Required</string>
+    <string name="custom_proxy_status_proxy_required_detail">Streams blocked until configured</string>
+    <string name="custom_proxy_status_proxy_required_description">Streams are blocked until proxy is configured. Tap to configure.</string>
+    <string name="custom_proxy_blocked_snackbar">No data leaked — streams are blocked. Configure your proxy below.</string>
 
     <!-- Tor Service Notification Messages -->
     <string name="tor_channel_name">Tor Connection</string>
@@ -575,6 +583,16 @@
 
     <!-- Browse Filter Messages -->
     <string name="all_filters_applied">All filters are already applied</string>
+
+    <!-- Search Status -->
+    <string name="searching">Searching…</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">Stream failed to connect</string>
+    <string name="error_stream_max_retries">Connection failed after multiple attempts</string>
+    <string name="error_tor_not_connected">Tor is not connected. Enable Tor to play this stream.</string>
+    <string name="error_tor_required_for_clearnet">Tor is not connected. Force Tor mode requires Tor for clearnet streams.</string>
+    <string name="error_custom_proxy_not_configured">Custom proxy is not configured. Configure it in Settings to play.</string>
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Password changed but failed to re-key database: %s</string>

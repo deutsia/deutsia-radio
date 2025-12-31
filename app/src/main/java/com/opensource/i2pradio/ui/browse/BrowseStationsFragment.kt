@@ -115,7 +115,8 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var repository: RadioBrowserRepository
 
     private var searchDebounceRunnable: Runnable? = null
-    private val searchDebounceDelay = 500L
+    private val searchDebounceDelay = 800L
+    private var isSearchPending = false
     private var isManualSearchClear = false
     private var isInResultsMode = false
 
@@ -589,8 +590,16 @@ class BrowseStationsFragment : Fragment() {
                 btnClearSearch.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
 
                 searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+
+                val query = s?.toString()?.trim() ?: ""
+                // Show "Searching..." indicator when typing (2+ chars)
+                if (query.length >= 2) {
+                    isSearchPending = true
+                    resultsCount.text = getString(R.string.searching)
+                }
+
                 searchDebounceRunnable = Runnable {
-                    val query = s?.toString()?.trim() ?: ""
+                    isSearchPending = false
                     if (query.length >= 2) {
                         currentResultsTitle = "\"$query\""
                         viewModel.search(query)
@@ -609,6 +618,10 @@ class BrowseStationsFragment : Fragment() {
 
         resultsSearchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                // Cancel pending debounce when user presses Enter
+                searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+                isSearchPending = false
+
                 val query = resultsSearchInput.text?.toString()?.trim() ?: ""
                 if (query.isNotEmpty()) {
                     currentResultsTitle = "\"$query\""

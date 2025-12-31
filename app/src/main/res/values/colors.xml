@@ -10,6 +10,8 @@
     <color name="tor_connecting">#FF9800</color>
     <color name="tor_disconnected">#9E9E9E</color>
     <color name="tor_error">#F44336</color>
+    <color name="tor_blocked">#FF9800</color>  <!-- Orange - caution, not danger -->
+    <color name="proxy_blocked">#FF9800</color>  <!-- Orange - caution, not danger -->
 
     <!-- InviZible Pro brand color -->
     <color name="invizible_blue">#1976D2</color>

@@ -212,6 +212,13 @@ class RadioService : Service() {
         const val EXTRA_BUFFERED_POSITION_MS = "buffered_position_ms"
         const val EXTRA_CURRENT_POSITION_MS = "current_position_ms"
 
+        const val BROADCAST_STREAM_ERROR = "com.opensource.i2pradio.STREAM_ERROR"
+        const val EXTRA_STREAM_ERROR_TYPE = "stream_error_type"
+        const val ERROR_TYPE_TOR_NOT_CONNECTED = "tor_not_connected"
+        const val ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED = "custom_proxy_not_configured"
+        const val ERROR_TYPE_MAX_RETRIES = "max_retries"
+        const val ERROR_TYPE_STREAM_FAILED = "stream_failed"
+
         /**
          * Custom DNS resolver that forces DNS resolution through SOCKS5 proxy.
          *
@@ -411,6 +418,7 @@ class RadioService : Service() {
             ACTION_PAUSE -> {
                 player?.pause()
                 updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 scheduleSessionDeactivation()
                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
             }
@@ -418,6 +426,7 @@ class RadioService : Service() {
                 stopRecording()
                 currentStreamUrl = null
                 updatePlaybackState(PlaybackStateCompat.STATE_STOPPED)
+                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                 deactivateMediaSession()
                 stopStream()
                 stopForeground(true)
@@ -1323,6 +1332,7 @@ class RadioService : Service() {
                 android.util.Log.e("RadioService", "FORCE TOR ALL: Tor not connected - BLOCKING stream to prevent leak")
                 isStartingNewStream.set(false)
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                broadcastStreamError(ERROR_TYPE_TOR_NOT_CONNECTED)
                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_tor_blocked)))
                 return
             }
@@ -1331,6 +1341,7 @@ class RadioService : Service() {
                 android.util.Log.e("RadioService", "FORCE TOR (except I2P): Tor not connected - BLOCKING non-I2P stream")
                 isStartingNewStream.set(false)
                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                broadcastStreamError(ERROR_TYPE_TOR_NOT_CONNECTED)
                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_tor_blocked)))
                 return
             }
@@ -1341,7 +1352,8 @@ class RadioService : Service() {
                     android.util.Log.e("RadioService", "FORCE CUSTOM PROXY: Custom proxy not configured - BLOCKING stream")
                     isStartingNewStream.set(false)
                     broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                    startForeground(NOTIFICATION_ID, createNotification("Custom proxy not configured"))
+                    broadcastStreamError(ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED)
+                    startForeground(NOTIFICATION_ID, createNotification(getString(R.string.custom_proxy_not_configured_notification)))
                     return
                 }
             }
@@ -1352,7 +1364,8 @@ class RadioService : Service() {
                     android.util.Log.e("RadioService", "FORCE CUSTOM PROXY (except Tor/I2P): Custom proxy not configured - BLOCKING clearnet stream")
                     isStartingNewStream.set(false)
                     broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                    startForeground(NOTIFICATION_ID, createNotification("Custom proxy not configured"))
+                    broadcastStreamError(ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED)
+                    startForeground(NOTIFICATION_ID, createNotification(getString(R.string.custom_proxy_not_configured_notification)))
                     return
                 }
             }
@@ -1700,6 +1713,7 @@ class RadioService : Service() {
                         if (isPlaying) {
                             updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
                             cancelSessionDeactivation()
+                            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = true)
                             if (playbackStartTimeMillis > 0 && playbackTimeUpdateRunnable == null) {
                                 playbackTimeUpdateRunnable = object : Runnable {
                                     override fun run() {
@@ -1712,7 +1726,9 @@ class RadioService : Service() {
                                 handler.post(playbackTimeUpdateRunnable!!)
                             }
                         } else if (player?.playbackState == Player.STATE_READY) {
+                            // Player paused (e.g., via notification, headphone disconnect, audio focus loss)
                             updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+                            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
                             playbackTimeUpdateRunnable?.let { handler.removeCallbacks(it) }
                             playbackTimeUpdateRunnable = null
                         }
@@ -1758,6 +1774,7 @@ class RadioService : Service() {
             android.util.Log.e("RadioService", "Max reconnection attempts reached")
             // Broadcast final failure to UI
             broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+            broadcastStreamError(ERROR_TYPE_MAX_RETRIES)
             startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connection_failed)))
             return
         }
@@ -1988,6 +2005,16 @@ class RadioService : Service() {
             putExtra(EXTRA_PLAYBACK_ELAPSED_MS, elapsedMs)
             putExtra(EXTRA_BUFFERED_POSITION_MS, bufferedPositionMs)
             putExtra(EXTRA_CURRENT_POSITION_MS, currentPositionMs)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    /**
+     * Broadcast stream error to UI for toast notification
+     */
+    private fun broadcastStreamError(errorType: String) {
+        val intent = Intent(BROADCAST_STREAM_ERROR).apply {
+            putExtra(EXTRA_STREAM_ERROR_TYPE, errorType)
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
