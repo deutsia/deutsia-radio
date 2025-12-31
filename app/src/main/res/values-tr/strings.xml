@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro yüklü değil. Yüklemek için dokunun.</string>
     <string name="tor_status_leak_warning_description">Zorunlu Tor modu etkin ancak bağlı değil. Gizlilik tehlikeye girebilir.</string>
 
+    <string name="tor_status_tor_required">Tor gerekli</string>
+    <string name="tor_status_tor_required_description">Tor yeniden bağlanana kadar akışlar engellendi. Yeniden bağlanmak için dokunun.</string>
+    <string name="tor_control_title_blocked">Akışlar engellendi</string>
+    <string name="tor_control_subtitle_blocked">Zorunlu Tor modu gizliliğinizi koruyor. Tor yeniden bağlanana kadar tüm akışlar engellendi — hiçbir veri sızmadı.</string>
+
     <string name="tor_status_connecting_message">Tor\'a bağlanıyor...</string>
     <string name="tor_status_connected_message">Tor üzerinden bağlandı</string>
     <string name="tor_control_title_stopped">Tor Bağlantısı Kesildi</string>

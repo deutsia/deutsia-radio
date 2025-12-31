@@ -292,6 +292,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro တပ်ဆင်မထားပါ။ တပ်ဆင်ရန် တို့ပါ။</string>
     <string name="tor_status_leak_warning_description">အတင်းအဓမ္မ Tor မုဒ် ဖွင့်ထားသည် သို့သော် ချိတ်ဆက်မထားပါ။ ကိုယ်ရေးကိုယ်တာ အန္တရာယ်ရှိနိုင်သည်။</string>
 
+    <string name="tor_status_tor_required">Tor လိုအပ်သည်</string>
+    <string name="tor_status_tor_required_description">Tor ပြန်လည်ချိတ်ဆက်သည်အထိ streams များကို ပိတ်ဆို့ထားသည်။ ပြန်လည်ချိတ်ဆက်ရန် တို့ပါ။</string>
+    <string name="tor_control_title_blocked">Streams များ ပိတ်ဆို့ထားသည်</string>
+    <string name="tor_control_subtitle_blocked">Force Tor mode သည် သင်၏ ကိုယ်ရေးကိုယ်တာကို ကာကွယ်ပေးနေသည်။ Tor ပြန်လည်ချိတ်ဆက်သည်အထိ streams အားလုံးကို ပိတ်ဆို့ထားသည် — ဒေတာများ ယိုစိမ့်ခြင်း မရှိပါ။</string>
+
     <string name="tor_status_connecting_message">Tor သို့ ချိတ်ဆက်နေသည်...</string>
     <string name="tor_status_connected_message">Tor မှတစ်ဆင့် ချိတ်ဆက်ပြီးပါပြီ</string>
     <string name="tor_control_title_stopped">Tor ချိတ်ဆက်မထားပါ</string>

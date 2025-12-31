@@ -301,6 +301,12 @@
     <string name="tor_status_error_description">Connessione Tor non riuscita. Tocca per riprovare.</string>
     <string name="tor_status_install_invizible_description">InviZible Pro non è installato. Tocca per installare.</string>
     <string name="tor_status_leak_warning_description">La modalità Tor forzata è abilitata ma non connessa. La privacy potrebbe essere compromessa.</string>
+
+    <string name="tor_status_tor_required">Tor richiesto</string>
+    <string name="tor_status_tor_required_description">Gli stream sono bloccati fino a quando Tor non si riconnette. Tocca per riconnetterti.</string>
+    <string name="tor_control_title_blocked">Stream bloccati</string>
+    <string name="tor_control_subtitle_blocked">La modalità Tor forzata sta proteggendo la tua privacy. Tutti gli stream sono bloccati fino a quando Tor non si riconnette — nessun dato è trapelato.</string>
+
     <string name="tor_status_connecting_message">Connessione a Tor...</string>
     <string name="tor_status_connected_message">Connesso tramite Tor</string>
     <string name="tor_control_title_stopped">Tor disconnesso</string>

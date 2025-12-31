@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro chưa được cài đặt. Nhấn để cài đặt.</string>
     <string name="tor_status_leak_warning_description">Chế độ Tor bắt buộc đã bật nhưng chưa kết nối. Quyền riêng tư có thể bị ảnh hưởng.</string>
 
+    <string name="tor_status_tor_required">Yêu cầu Tor</string>
+    <string name="tor_status_tor_required_description">Các luồng bị chặn cho đến khi Tor kết nối lại. Nhấn để kết nối lại.</string>
+    <string name="tor_control_title_blocked">Các luồng bị chặn</string>
+    <string name="tor_control_subtitle_blocked">Chế độ bắt buộc Tor đang bảo vệ quyền riêng tư của bạn. Tất cả các luồng bị chặn cho đến khi Tor kết nối lại — không có dữ liệu nào bị rò rỉ.</string>
+
     <string name="tor_status_connecting_message">Đang kết nối với Tor...</string>
     <string name="tor_status_connected_message">Đã kết nối qua Tor</string>
     <string name="tor_control_title_stopped">Tor đã ngắt kết nối</string>

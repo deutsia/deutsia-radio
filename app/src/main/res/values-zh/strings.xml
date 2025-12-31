@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">未安装InviZible Pro。点击安装。</string>
     <string name="tor_status_leak_warning_description">强制Tor模式已启用但未连接。隐私可能受到威胁。</string>
 
+    <string name="tor_status_tor_required">需要Tor</string>
+    <string name="tor_status_tor_required_description">在Tor重新连接之前，流被阻止。点击以重新连接。</string>
+    <string name="tor_control_title_blocked">流已被阻止</string>
+    <string name="tor_control_subtitle_blocked">强制Tor模式正在保护您的隐私。在Tor重新连接之前，所有流都被阻止——没有数据泄漏。</string>
+
     <string name="tor_status_connecting_message">正在连接到Tor...</string>
     <string name="tor_status_connected_message">已通过Tor连接</string>
     <string name="tor_control_title_stopped">Tor已断开</string>

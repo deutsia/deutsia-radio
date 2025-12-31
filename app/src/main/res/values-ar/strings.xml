@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro غير مثبت. انقر للتثبيت.</string>
     <string name="tor_status_leak_warning_description">تم تمكين وضع Tor الإجباري ولكن غير متصل. قد تكون الخصوصية معرضة للخطر.</string>
 
+    <string name="tor_status_tor_required">Tor مطلوب</string>
+    <string name="tor_status_tor_required_description">البث محظور حتى إعادة اتصال Tor. اضغط لإعادة الاتصال.</string>
+    <string name="tor_control_title_blocked">البث محظور</string>
+    <string name="tor_control_subtitle_blocked">وضع إجبار Tor يحمي خصوصيتك. جميع البث محظور حتى إعادة اتصال Tor — لم تتسرب أي بيانات.</string>
+
     <string name="tor_status_connecting_message">جارٍ الاتصال بـ Tor...</string>
     <string name="tor_status_connected_message">متصل عبر Tor</string>
     <string name="tor_control_title_stopped">تم قطع اتصال Tor</string>

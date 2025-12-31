@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro ist nicht installiert. Tippen zum Installieren.</string>
     <string name="tor_status_leak_warning_description">Tor-Zwangsmodus ist aktiviert, aber nicht verbunden. Privatsphäre könnte gefährdet sein.</string>
 
+    <string name="tor_status_tor_required">Tor erforderlich</string>
+    <string name="tor_status_tor_required_description">Streams sind blockiert, bis Tor sich wieder verbindet. Tippen zum Erneut verbinden.</string>
+    <string name="tor_control_title_blocked">Streams blockiert</string>
+    <string name="tor_control_subtitle_blocked">Tor-Zwangsmodus schützt Ihre Privatsphäre. Alle Streams sind blockiert, bis Tor sich wieder verbindet — keine Daten sind durchgesickert.</string>
+
     <string name="tor_status_connecting_message">Verbinde mit Tor...</string>
     <string name="tor_status_connected_message">Über Tor verbunden</string>
     <string name="tor_control_title_stopped">Tor getrennt</string>

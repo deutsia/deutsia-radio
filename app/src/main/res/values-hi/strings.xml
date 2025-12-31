@@ -292,6 +292,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro इंस्टॉल नहीं है। इंस्टॉल करने के लिए टैप करें।</string>
     <string name="tor_status_leak_warning_description">फ़ोर्स Tor मोड सक्षम है लेकिन कनेक्ट नहीं है। गोपनीयता खतरे में हो सकती है।</string>
 
+    <string name="tor_status_tor_required">Tor आवश्यक</string>
+    <string name="tor_status_tor_required_description">Tor फिर से कनेक्ट होने तक स्ट्रीम ब्लॉक हैं। फिर से कनेक्ट करने के लिए टैप करें।</string>
+    <string name="tor_control_title_blocked">स्ट्रीम ब्लॉक</string>
+    <string name="tor_control_subtitle_blocked">फोर्स Tor मोड आपकी गोपनीयता की रक्षा कर रहा है। Tor फिर से कनेक्ट होने तक सभी स्ट्रीम ब्लॉक हैं — कोई डेटा लीक नहीं हुआ है।</string>
+
     <string name="tor_status_connecting_message">Tor से कनेक्ट हो रहा है...</string>
     <string name="tor_status_connected_message">Tor के माध्यम से कनेक्ट किया गया</string>
     <string name="tor_control_title_stopped">Tor डिसकनेक्ट किया गया</string>
