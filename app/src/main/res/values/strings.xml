@@ -377,6 +377,10 @@
     <string name="custom_proxy_status_no_proxy">No proxy set</string>
     <string name="custom_proxy_status_leak_warning">Leak Warning</string>
     <string name="custom_proxy_status_leak_detail">Force enabled but not configured</string>
+    <string name="custom_proxy_status_proxy_required">Proxy Required</string>
+    <string name="custom_proxy_status_proxy_required_detail">Streams blocked until configured</string>
+    <string name="custom_proxy_status_proxy_required_description">Streams are blocked until proxy is configured. Tap to configure.</string>
+    <string name="custom_proxy_blocked_snackbar">No data leaked — streams are blocked. Configure your proxy below.</string>
 
     <!-- Tor Service Notification Messages -->
     <string name="tor_channel_name">Tor Connection</string>

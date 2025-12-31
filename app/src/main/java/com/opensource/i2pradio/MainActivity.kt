@@ -309,6 +309,20 @@ class MainActivity : AppCompatActivity() {
 
         // Handle click on custom proxy status to show settings
         customProxyStatusView.setOnStatusClickListener {
+            // Check if Force Custom Proxy is enabled but proxy not configured
+            val isForceCustomProxy = PreferencesHelper.isForceCustomProxy(this) ||
+                                     PreferencesHelper.isForceCustomProxyExceptTorI2P(this)
+            val proxyHost = PreferencesHelper.getCustomProxyHost(this)
+
+            if (isForceCustomProxy && proxyHost.isEmpty()) {
+                // Show snackbar explaining no leak occurred before navigating to settings
+                com.google.android.material.snackbar.Snackbar.make(
+                    findViewById(android.R.id.content),
+                    R.string.custom_proxy_blocked_snackbar,
+                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                ).show()
+            }
+
             // Navigate to settings tab (index 3)
             viewPager.currentItem = 3
         }

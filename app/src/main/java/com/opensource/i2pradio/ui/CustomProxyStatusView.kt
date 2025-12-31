@@ -37,9 +37,10 @@ class CustomProxyStatusView @JvmOverloads constructor(
      * Custom proxy connection states
      */
     enum class ProxyState {
-        CONNECTED,      // Proxy is configured (settings saved)
-        NOT_CONFIGURED, // No proxy configured
-        LEAK_WARNING    // Force custom proxy enabled but proxy not configured (privacy leak)
+        CONNECTED,       // Proxy is configured (settings saved)
+        NOT_CONFIGURED,  // No proxy configured
+        LEAK_WARNING,    // Force custom proxy enabled but proxy not configured (legacy name)
+        PROXY_REQUIRED   // Force custom proxy enabled but proxy not configured (streams blocked)
     }
 
     init {
@@ -115,15 +116,17 @@ class CustomProxyStatusView @JvmOverloads constructor(
                 statusDetail.setTextColor(context.getColor(R.color.tor_disconnected))
                 contentDescription = context.getString(R.string.custom_proxy_not_configured_description)
             }
-            ProxyState.LEAK_WARNING -> {
-                statusIcon.setImageResource(R.drawable.ic_proxy_custom_error)
+            ProxyState.LEAK_WARNING, ProxyState.PROXY_REQUIRED -> {
+                // Use orange (caution) instead of red (error) because streams are blocked,
+                // not leaking - the user is protected, just unable to stream without config
+                statusIcon.setImageResource(R.drawable.ic_proxy_custom_off)
                 statusIcon.alpha = 1f
-                statusText.text = context.getString(R.string.custom_proxy_status_leak_warning)
-                statusText.setTextColor(context.getColor(R.color.tor_error))
-                statusDetail.text = context.getString(R.string.custom_proxy_status_leak_detail)
-                statusDetail.setTextColor(context.getColor(R.color.tor_error))
-                contentDescription = context.getString(R.string.custom_proxy_privacy_warning_description)
-                showLeakWarningAnimation()
+                statusText.text = context.getString(R.string.custom_proxy_status_proxy_required)
+                statusText.setTextColor(context.getColor(R.color.proxy_blocked))
+                statusDetail.text = context.getString(R.string.custom_proxy_status_proxy_required_detail)
+                statusDetail.setTextColor(context.getColor(R.color.proxy_blocked))
+                contentDescription = context.getString(R.string.custom_proxy_status_proxy_required_description)
+                showProxyRequiredAnimation()
             }
         }
     }
@@ -133,8 +136,8 @@ class CustomProxyStatusView @JvmOverloads constructor(
      */
     fun updateStateFromConfig(forceEnabled: Boolean, proxyHost: String, protocol: String = "", port: Int = 0) {
         val state = when {
-            // Force enabled but no proxy configured = privacy leak warning
-            forceEnabled && proxyHost.isEmpty() -> ProxyState.LEAK_WARNING
+            // Force enabled but no proxy configured = streams blocked (not leaking)
+            forceEnabled && proxyHost.isEmpty() -> ProxyState.PROXY_REQUIRED
             // Proxy configured (whether force is enabled or not) = show as connected
             proxyHost.isNotEmpty() -> ProxyState.CONNECTED
             // No force, no proxy configured = not configured
@@ -159,10 +162,13 @@ class CustomProxyStatusView @JvmOverloads constructor(
             .start()
     }
 
-    private fun showLeakWarningAnimation() {
-        // Pulse animation for leak warning
-        pulseAnimator = ObjectAnimator.ofFloat(statusIcon, "alpha", 0.4f, 1f).apply {
-            duration = 800
+    /**
+     * Gentle pulse animation for "Proxy Required" state.
+     * Uses slower, subtler animation since this is a caution (not error) state.
+     */
+    private fun showProxyRequiredAnimation() {
+        pulseAnimator = ObjectAnimator.ofFloat(statusIcon, "alpha", 0.6f, 1f).apply {
+            duration = 1000
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.REVERSE
             interpolator = AccelerateDecelerateInterpolator()
