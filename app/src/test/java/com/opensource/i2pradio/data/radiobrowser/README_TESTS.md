@@ -1,6 +1,6 @@
 # DNS Fallback and Leak Prevention Tests
 
-This directory contains comprehensive tests for the RadioBrowserServerManager DNS fallback system and leak prevention mechanisms.
+This directory contains comprehensive tests for the RadioBrowserServerManager DNS fallback system and leak prevention mechanisms. There are 47 tests and all are passing as of the v1.5.0 release
 
 ## Test Files
 
@@ -10,54 +10,54 @@ Primary test suite covering DNS leak prevention and fallback mechanisms.
 **Test Coverage:**
 
 #### 1. DNS Fallback Mechanisms (3-Tier System)
-- ✅ Normal mode DNS discovery flow
-- ✅ Hardcoded fallback when all discovery methods fail
-- ✅ Server cycling and rotation
-- ✅ Server list retrieval
+- Normal mode DNS discovery flow
+- Hardcoded fallback when all discovery methods fail
+- Server cycling and rotation
+- Server list retrieval
 
 #### 2. DNS Leak Prevention - Force Tor Mode
-- ✅ Blocks clearnet DNS when Tor is not connected
-- ✅ Uses Tor proxy when connected
-- ✅ Blocks when Tor port is invalid
-- ✅ Force Tor All mode prevents clearnet DNS
-- ✅ Force Tor Except I2P mode prevents clearnet DNS
+- Blocks clearnet DNS when Tor is not connected
+- Uses Tor proxy when connected
+- Blocks when Tor port is invalid
+- Force Tor All mode prevents clearnet DNS
+- Force Tor Except I2P mode prevents clearnet DNS
 
 #### 3. DNS Leak Prevention - Force Custom Proxy Mode
-- ✅ Blocks when proxy not configured (empty host)
-- ✅ Blocks when proxy not configured (invalid port)
-- ✅ Blocks when host empty but port valid
-- ✅ Blocks when port invalid but host valid
-- ✅ Uses SOCKS proxy when properly configured
-- ✅ Uses HTTP proxy when properly configured
-- ✅ Force Custom Proxy Except Tor/I2P mode prevents clearnet DNS
+- Blocks when proxy not configured (empty host)
+- Blocks when proxy not configured (invalid port)
+- Blocks when host empty but port valid
+- Blocks when port invalid but host valid
+- Uses SOCKS proxy when properly configured
+- Uses HTTP proxy when properly configured
+- Force Custom Proxy Except Tor/I2P mode prevents clearnet DNS
 
 #### 4. Proxy Authentication
-- ✅ Custom proxy with authentication credentials
+- Custom proxy with authentication credentials
 
 #### 5. SOCKS5_DNS Resolver
-- ✅ Returns placeholder IP address (0.0.0.0)
-- ✅ Preserves hostname for proxy-side resolution
-- ✅ Prevents local DNS resolution before SOCKS connection
+- Returns placeholder IP address (0.0.0.0)
+- Preserves hostname for proxy-side resolution
+- Prevents local DNS resolution before SOCKS connection
 
 #### 6. Server Caching
-- ✅ Server list caching and reuse
-- ✅ Force refresh updates server list
-- ✅ Reset clears cached servers
-- ✅ Cache expiration
+- Server list caching and reuse
+- Force refresh updates server list
+- Reset clears cached servers
+- Cache expiration
 
 #### 7. Proxy Protocol Handling
-- ✅ SOCKS4 protocol recognition
-- ✅ SOCKS5 protocol recognition
-- ✅ Generic SOCKS protocol recognition
-- ✅ HTTP proxy protocol
+- SOCKS4 protocol recognition
+- SOCKS5 protocol recognition
+- Generic SOCKS protocol recognition
+- HTTP proxy protocol
 
 #### 8. Combined Proxy Modes
-- ✅ Force Tor takes priority over Force Custom Proxy
-- ✅ Normal mode allows DNS discovery
+- Force Tor takes priority over Force Custom Proxy
+- Normal mode allows DNS discovery
 
 #### 9. API Base URL
-- ✅ Correct URL format generation
-- ✅ Respects proxy settings
+- Correct URL format generation
+- Respects proxy settings
 
 ### RadioBrowserServerManagerApiTest.kt
 Integration-style tests for API behavior and edge cases.
@@ -65,38 +65,38 @@ Integration-style tests for API behavior and edge cases.
 **Test Coverage:**
 
 #### 1. API Response Handling
-- ✅ Valid server list parsing
-- ✅ Empty server list fallback
+- Valid server list parsing
+- Empty server list fallback
 
 #### 2. Leak Prevention Verification
-- ✅ Force Tor mode never makes clearnet API request
-- ✅ Force Custom Proxy mode never makes clearnet API request
+- Force Tor mode never makes clearnet API request
+- Force Custom Proxy mode never makes clearnet API request
 
 #### 3. Server Discovery Flow
-- ✅ Consistent results from cache
-- ✅ Force refresh triggers new discovery
+- Consistent results from cache
+- Force refresh triggers new discovery
 
 #### 4. Proxy Configuration Validation
-- ✅ Tor proxy settings validated before use
-- ✅ Custom SOCKS proxy settings validated
-- ✅ Proxy authentication only used when credentials provided
+- Tor proxy settings validated before use
+- Custom SOCKS proxy settings validated
+- Proxy authentication only used when credentials provided
 
 #### 5. Edge Cases
-- ✅ Null context handling in normal mode
-- ✅ Null context in getApiBaseUrl
-- ✅ Null context in getAllServers
-- ✅ Server cycling wrap-around
-- ✅ Reset clears all state
+- Null context handling in normal mode
+- Null context in getApiBaseUrl
+- Null context in getAllServers
+- Server cycling wrap-around
+- Reset clears all state
 
 #### 6. Multi-Mode Proxy Tests
-- ✅ Force Tor All mode blocks clearnet
-- ✅ Force Tor Except I2P mode blocks clearnet
-- ✅ Force Custom Proxy mode blocks clearnet
-- ✅ Force Custom Proxy Except Tor/I2P mode blocks clearnet
+- Force Tor All mode blocks clearnet
+- Force Tor Except I2P mode blocks clearnet
+- Force Custom Proxy mode blocks clearnet
+- Force Custom Proxy Except Tor/I2P mode blocks clearnet
 
 #### 7. Proxy Protocol Case Sensitivity
-- ✅ Case-insensitive SOCKS protocol detection
-- ✅ Unknown protocol defaults to HTTP
+- Case-insensitive SOCKS protocol detection
+- Unknown protocol defaults to HTTP
 
 ## Running the Tests
 
@@ -188,13 +188,3 @@ These tests verify critical privacy and security features:
 - **SOCKS5 DNS delegation** to prevent local DNS resolution
 
 Any test failures in this suite should be treated as **critical security issues** and investigated immediately.
-
-## Future Enhancements
-
-Potential areas for additional test coverage:
-- Network timeout handling
-- Concurrent server requests
-- Cache expiration timing
-- DNS resolution performance
-- Proxy authentication failures
-- IPv6 address handling
