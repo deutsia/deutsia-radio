@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro نصب نشده است. برای نصب لمس کنید.</string>
     <string name="tor_status_leak_warning_description">حالت اجباری Tor فعال است اما متصل نیست. حریم خصوصی ممکن است به خطر افتاده باشد.</string>
 
+    <string name="tor_status_tor_required">Tor مورد نیاز است</string>
+    <string name="tor_status_tor_required_description">جریان‌ها مسدود هستند تا Tor دوباره متصل شود. برای اتصال مجدد ضربه بزنید.</string>
+    <string name="tor_control_title_blocked">جریان‌ها مسدود شده</string>
+    <string name="tor_control_subtitle_blocked">حالت اجباری Tor از حریم خصوصی شما محافظت می‌کند. تمام جریان‌ها مسدود هستند تا Tor دوباره متصل شود — هیچ داده‌ای درز نکرده است.</string>
+
     <string name="tor_status_connecting_message">در حال اتصال به Tor...</string>
     <string name="tor_status_connected_message">از طریق Tor متصل شد</string>
     <string name="tor_control_title_stopped">Tor قطع شد</string>

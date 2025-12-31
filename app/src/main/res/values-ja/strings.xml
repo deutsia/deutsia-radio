@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">InviZible Proがインストールされていません。タップしてインストールします。</string>
     <string name="tor_status_leak_warning_description">強制Torモードが有効ですが接続されていません。プライバシーが危険にさらされている可能性があります。</string>
 
+    <string name="tor_status_tor_required">Torが必要です</string>
+    <string name="tor_status_tor_required_description">Torが再接続するまでストリームはブロックされています。タップして再接続します。</string>
+    <string name="tor_control_title_blocked">ストリームがブロックされています</string>
+    <string name="tor_control_subtitle_blocked">強制Torモードがプライバシーを保護しています。Torが再接続するまですべてのストリームがブロックされています — データは漏洩していません。</string>
+
     <string name="tor_status_connecting_message">Torに接続中...</string>
     <string name="tor_status_connected_message">Tor経由で接続済み</string>
     <string name="tor_control_title_stopped">Tor切断済み</string>

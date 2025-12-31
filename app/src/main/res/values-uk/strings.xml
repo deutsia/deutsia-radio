@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro не встановлено. Натисніть для встановлення.</string>
     <string name="tor_status_leak_warning_description">Примусовий режим Tor увімкнено, але не підключено. Конфіденційність може бути під загрозою.</string>
 
+    <string name="tor_status_tor_required">Потрібен Tor</string>
+    <string name="tor_status_tor_required_description">Потоки заблоковані до повторного підключення Tor. Натисніть для повторного підключення.</string>
+    <string name="tor_control_title_blocked">Потоки заблоковані</string>
+    <string name="tor_control_subtitle_blocked">Примусовий режим Tor захищає вашу конфіденційність. Усі потоки заблоковані до повторного підключення Tor — витоку даних не сталося.</string>
+
     <string name="tor_status_connecting_message">Підключення до Tor...</string>
     <string name="tor_status_connected_message">Підключено через Tor</string>
     <string name="tor_control_title_stopped">Tor відключено</string>

@@ -295,6 +295,11 @@
     <string name="tor_status_install_invizible_description">InviZible Pro não está instalado. Toque para instalar.</string>
     <string name="tor_status_leak_warning_description">Modo Tor forçado está ativado mas não conectado. A privacidade pode estar comprometida.</string>
 
+    <string name="tor_status_tor_required">Tor necessário</string>
+    <string name="tor_status_tor_required_description">As transmissões estão bloqueadas até que o Tor se reconecte. Toque para reconectar.</string>
+    <string name="tor_control_title_blocked">Transmissões bloqueadas</string>
+    <string name="tor_control_subtitle_blocked">O modo Tor forçado está protegendo sua privacidade. Todas as transmissões estão bloqueadas até que o Tor se reconecte — nenhum dado vazou.</string>
+
     <string name="tor_status_connecting_message">Conectando ao Tor...</string>
     <string name="tor_status_connected_message">Conectado via Tor</string>
     <string name="tor_control_title_stopped">Tor desconectado</string>

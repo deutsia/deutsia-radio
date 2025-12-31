@@ -301,6 +301,12 @@
     <string name="tor_status_error_description">Connexion Tor échouée. Appuyez pour réessayer.</string>
     <string name="tor_status_install_invizible_description">InviZible Pro n\'est pas installé. Appuyez pour installer.</string>
     <string name="tor_status_leak_warning_description">Le mode Tor forcé est activé mais non connecté. La confidentialité peut être compromise.</string>
+
+    <string name="tor_status_tor_required">Tor requis</string>
+    <string name="tor_status_tor_required_description">Les flux sont bloqués jusqu'à ce que Tor se reconnecte. Appuyez pour reconnecter.</string>
+    <string name="tor_control_title_blocked">Flux bloqués</string>
+    <string name="tor_control_subtitle_blocked">Le mode Tor forcé protège votre vie privée. Tous les flux sont bloqués jusqu'à ce que Tor se reconnecte — aucune donnée n'a été divulguée.</string>
+
     <string name="tor_status_connecting_message">Connexion à Tor...</string>
     <string name="tor_status_connected_message">Connecté via Tor</string>
     <string name="tor_control_title_stopped">Tor déconnecté</string>
