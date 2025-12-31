@@ -146,13 +146,30 @@ class TorStatusView @JvmOverloads constructor(
         showConnectedAnimation()
     }
 
+    /**
+     * Shows "Tor Required" state when Force Tor is enabled but Tor is disconnected.
+     * Uses orange (caution) color instead of red (error) because streams are blocked,
+     * not leaking - the user is protected, just unable to stream.
+     */
     private fun showForceTorWarning() {
-        statusIcon.setImageResource(R.drawable.ic_tor_error)
+        statusIcon.setImageResource(R.drawable.ic_tor_off)
         statusIcon.alpha = 1f
-        statusText.text = context.getString(R.string.tor_status_leak_warning)
-        statusText.setTextColor(context.getColor(R.color.tor_error))
-        contentDescription = context.getString(R.string.tor_status_leak_warning_description)
-        showErrorAnimation()
+        statusText.text = context.getString(R.string.tor_status_tor_required)
+        statusText.setTextColor(context.getColor(R.color.tor_blocked))
+        contentDescription = context.getString(R.string.tor_status_tor_required_description)
+        // Gentle pulse animation instead of error shake - it's caution, not danger
+        showBlockedAnimation()
+    }
+
+    private fun showBlockedAnimation() {
+        // Gentle pulse animation to draw attention without alarm
+        pulseAnimator = ObjectAnimator.ofFloat(statusIcon, "alpha", 0.6f, 1f).apply {
+            duration = 1000
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            interpolator = AccelerateDecelerateInterpolator()
+            start()
+        }
     }
 
     private fun startConnectingAnimation() {

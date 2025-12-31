@@ -96,16 +96,39 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun updateUI(state: TorManager.TorState) {
+        // Check if Force Tor mode is enabled
+        val isForceTorEnabled = PreferencesHelper.isForceTorAll(requireContext()) ||
+                                PreferencesHelper.isForceTorExceptI2P(requireContext())
+
         when (state) {
-            TorManager.TorState.STOPPED -> showStoppedState()
+            TorManager.TorState.STOPPED -> {
+                if (isForceTorEnabled && !TorManager.isConnected()) {
+                    showBlockedState()
+                } else {
+                    showStoppedState()
+                }
+            }
             TorManager.TorState.STARTING -> showConnectingState()
             TorManager.TorState.CONNECTED -> showConnectedState()
-            TorManager.TorState.ERROR -> showErrorState()
-            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> showInviZibleNotInstalledState()
+            TorManager.TorState.ERROR -> {
+                if (isForceTorEnabled) {
+                    showBlockedState()
+                } else {
+                    showErrorState()
+                }
+            }
+            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
+                if (isForceTorEnabled && !TorManager.isConnected()) {
+                    showBlockedState()
+                } else {
+                    showInviZibleNotInstalledState()
+                }
+            }
         }
     }
 
     private fun showStoppedState() {
+        statusIcon.clearColorFilter()
         statusIcon.setImageResource(R.drawable.ic_tor_off)
         statusIcon.alpha = 0.6f
         statusTitle.text = getString(R.string.tor_control_title_stopped)
@@ -125,6 +148,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showConnectingState() {
+        statusIcon.clearColorFilter()
         statusIcon.setImageResource(R.drawable.ic_tor_connecting)
         statusIcon.alpha = 1f
         statusTitle.text = getString(R.string.tor_control_title_connecting)
@@ -159,6 +183,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showConnectedState() {
+        statusIcon.clearColorFilter()
         statusIcon.setImageResource(R.drawable.ic_tor_on)
         statusIcon.alpha = 1f
 
@@ -210,6 +235,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showErrorState() {
+        statusIcon.clearColorFilter()
         statusIcon.setImageResource(R.drawable.ic_tor_error)
         statusIcon.alpha = 1f
         statusTitle.text = getString(R.string.tor_control_title_error)
@@ -247,6 +273,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun showInviZibleNotInstalledState() {
+        statusIcon.clearColorFilter()
         statusIcon.setImageResource(R.drawable.ic_invizible)
         statusIcon.alpha = 1f
         statusTitle.text = getString(R.string.tor_control_title_invizible_required)
@@ -261,6 +288,42 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.visibility = View.VISIBLE
 
         secondaryActionButton.visibility = View.GONE
+    }
+
+    /**
+     * Shows the "Streams Blocked" state when Force Tor mode is enabled but Tor is disconnected.
+     * Reassures the user that no data has leaked - streams are simply blocked.
+     */
+    private fun showBlockedState() {
+        statusIcon.setImageResource(R.drawable.ic_tor_off)
+        statusIcon.alpha = 1f
+        statusIcon.setColorFilter(requireContext().getColor(R.color.tor_blocked))
+        statusTitle.text = getString(R.string.tor_control_title_blocked)
+        statusSubtitle.text = getString(R.string.tor_control_subtitle_blocked)
+        connectionProgress.visibility = View.GONE
+        connectionDetailsContainer.visibility = View.GONE
+        invizibleInfoCard.visibility = View.GONE
+
+        // Gentle pulse animation
+        statusIcon.animate()
+            .alpha(0.6f)
+            .setDuration(800)
+            .withEndAction {
+                statusIcon.animate()
+                    .alpha(1f)
+                    .setDuration(800)
+                    .start()
+            }
+            .start()
+
+        primaryActionButton.text = getString(R.string.tor_connect)
+        primaryActionButton.setIconResource(R.drawable.ic_tor_on)
+        primaryActionButton.isEnabled = true
+        primaryActionButton.visibility = View.VISIBLE
+
+        secondaryActionButton.text = getString(R.string.tor_control_button_open_invizible)
+        secondaryActionButton.visibility = View.VISIBLE
+        secondaryActionButton.isEnabled = TorManager.isInviZibleInstalled(requireContext())
     }
 
     private fun handlePrimaryAction() {

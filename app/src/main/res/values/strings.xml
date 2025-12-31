@@ -286,6 +286,7 @@
     <string name="tor_status_off">Tor Off</string>
     <string name="tor_status_error">Tor Error</string>
     <string name="tor_status_leak_warning">Leak Warning</string>
+    <string name="tor_status_tor_required">Tor Required</string>
     <string name="tor_status_install_invizible">Install InviZible Pro</string>
 
     <!-- Tor Status ContentDescriptions (for accessibility) -->
@@ -296,6 +297,7 @@
     <string name="tor_status_error_description">Tor connection failed. Tap to retry.</string>
     <string name="tor_status_install_invizible_description">InviZible Pro is not installed. Tap to install.</string>
     <string name="tor_status_leak_warning_description">Force Tor is enabled but not connected. Privacy may be compromised.</string>
+    <string name="tor_status_tor_required_description">Streams are blocked until Tor reconnects. Tap to reconnect.</string>
 
     <string name="tor_status_connecting_message">Connecting to Tor...</string>
     <string name="tor_status_connected_message">Connected via Tor</string>
@@ -311,6 +313,8 @@
     <string name="tor_control_subtitle_error">Could not connect to Tor network</string>
     <string name="tor_control_title_invizible_required">InviZible Pro Required</string>
     <string name="tor_control_subtitle_invizible_required">Install InviZible Pro to connect to the Tor network</string>
+    <string name="tor_control_title_blocked">Streams Blocked</string>
+    <string name="tor_control_subtitle_blocked">Force Tor mode is protecting your privacy. All streams are blocked until Tor reconnects — no data has leaked.</string>
     <string name="tor_control_button_connecting">Connecting...</string>
     <string name="tor_control_button_disconnect">Disconnect</string>
     <string name="tor_control_button_cancel">Cancel</string>
