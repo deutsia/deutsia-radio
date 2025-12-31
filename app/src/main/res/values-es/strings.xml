@@ -471,11 +471,11 @@
     <string name="auth_biometric_negative">Usar contraseña</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">¿Estás seguro de que quieres eliminar %d estación%s?</string>
+    <string name="delete_stations_message">¿Estás seguro de que quieres eliminar %1$d estación%2$s?</string>
     <string name="delete_stations_message_single">¿Estás seguro de que quieres eliminar %d estación?</string>
     <string name="delete_stations_message_plural">¿Estás seguro de que quieres eliminar %d estaciones?</string>
     <string name="button_delete">Eliminar</string>
-    <string name="deleted_stations_message">%d estación%s eliminada</string>
+    <string name="deleted_stations_message">%1$d estación%2$s eliminada</string>
     <string name="deleted_stations_message_single">%d estación eliminada</string>
     <string name="deleted_stations_message_plural">%d estaciones eliminadas</string>
 
@@ -529,7 +529,7 @@
     <string name="import_curated_title">Importar estaciones %s</string>
     <string name="import_curated_message">¿Importar %1$d estaciones de radio %2$s seleccionadas?\n\nEstas estaciones están preconfiguradas con ajustes de proxy y listas para usar.</string>
     <string name="no_stations_found_in_list">No se encontraron estaciones en la lista %s</string>
-    <string name="failed_to_import_stations">Error al importar estaciones %s: %s</string>
+    <string name="failed_to_import_stations">Error al importar estaciones %1$s: %2$s</string>
     <string name="dialog_export_stations_title">Exportar estaciones</string>
     <string name="no_stations_in_file">No se encontraron estaciones en el archivo</string>
     <string name="dialog_import_failed">Importación fallida</string>

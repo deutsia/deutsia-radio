@@ -466,11 +466,11 @@
     <string name="auth_biometric_negative">パスワードを使用</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">%d個のステーション%sを削除してもよろしいですか？</string>
+    <string name="delete_stations_message">%1$d個のステーション%2$sを削除してもよろしいですか？</string>
     <string name="delete_stations_message_single">%d個のステーションを削除してもよろしいですか？</string>
     <string name="delete_stations_message_plural">%d個のステーションを削除してもよろしいですか？</string>
     <string name="button_delete">削除</string>
-    <string name="deleted_stations_message">%d個のステーション%sを削除しました</string>
+    <string name="deleted_stations_message">%1$d個のステーション%2$sを削除しました</string>
     <string name="deleted_stations_message_single">%d個のステーションを削除しました</string>
     <string name="deleted_stations_message_plural">%d個のステーションを削除しました</string>
 
@@ -524,7 +524,7 @@
     <string name="import_curated_title">%sステーションをインポート</string>
     <string name="import_curated_message">%1$d個の厳選された%2$sラジオステーションをインポートしますか？\n\nこれらのステーションはプロキシ設定で事前設定されており、すぐに使用できます。</string>
     <string name="no_stations_found_in_list">%sリストにステーションが見つかりません</string>
-    <string name="failed_to_import_stations">%sステーションのインポートに失敗しました: %s</string>
+    <string name="failed_to_import_stations">%1$sステーションのインポートに失敗しました: %2$s</string>
     <string name="dialog_export_stations_title">ステーションをエクスポート</string>
     <string name="no_stations_in_file">ファイルにステーションが見つかりません</string>
     <string name="dialog_import_failed">インポートに失敗しました</string>

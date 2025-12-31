@@ -467,11 +467,11 @@
     <string name="auth_biometric_negative">Sử dụng mật khẩu</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">Bạn có chắc chắn muốn xóa %d đài%s không?</string>
+    <string name="delete_stations_message">Bạn có chắc chắn muốn xóa %1$d đài%2$s không?</string>
     <string name="delete_stations_message_single">Bạn có chắc chắn muốn xóa %d đài không?</string>
     <string name="delete_stations_message_plural">Bạn có chắc chắn muốn xóa %d đài không?</string>
     <string name="button_delete">Xóa</string>
-    <string name="deleted_stations_message">Đã xóa %d đài%s</string>
+    <string name="deleted_stations_message">Đã xóa %1$d đài%2$s</string>
     <string name="deleted_stations_message_single">Đã xóa %d đài</string>
     <string name="deleted_stations_message_plural">Đã xóa %d đài</string>
 
@@ -525,7 +525,7 @@
     <string name="import_curated_title">Nhập đài %s</string>
     <string name="import_curated_message">Nhập %1$d đài phát thanh %2$s được tuyển chọn?\n\nCác đài này được cấu hình sẵn với cài đặt proxy và sẵn sàng sử dụng.</string>
     <string name="no_stations_found_in_list">Không tìm thấy đài nào trong danh sách %s</string>
-    <string name="failed_to_import_stations">Không nhập được đài %s: %s</string>
+    <string name="failed_to_import_stations">Không nhập được đài %1$s: %2$s</string>
     <string name="dialog_export_stations_title">Xuất đài</string>
     <string name="no_stations_in_file">Không tìm thấy đài nào trong tệp</string>
     <string name="dialog_import_failed">Nhập thất bại</string>

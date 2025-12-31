@@ -473,11 +473,11 @@
     <string name="auth_biometric_negative">Usa password</string>
 
     <!-- Delete Confirmation Dialog -->
-    <string name="delete_stations_message">Sei sicuro di voler eliminare %d stazione%s?</string>
+    <string name="delete_stations_message">Sei sicuro di voler eliminare %1$d stazione%2$s?</string>
     <string name="delete_stations_message_single">Sei sicuro di voler eliminare %d stazione?</string>
     <string name="delete_stations_message_plural">Sei sicuro di voler eliminare %d stazioni?</string>
     <string name="button_delete">Elimina</string>
-    <string name="deleted_stations_message">%d stazione%s eliminata</string>
+    <string name="deleted_stations_message">%1$d stazione%2$s eliminata</string>
     <string name="deleted_stations_message_single">%d stazione eliminata</string>
     <string name="deleted_stations_message_plural">%d stazioni eliminate</string>
 
@@ -531,7 +531,7 @@
     <string name="import_curated_title">Importa stazioni %s</string>
     <string name="import_curated_message">Importare %1$d stazioni radio %2$s selezionate?\n\nQueste stazioni sono preconfigurate e pronte all\'uso.</string>
     <string name="no_stations_found_in_list">Nessuna stazione trovata nell\'elenco %s</string>
-    <string name="failed_to_import_stations">Importazione stazioni %s fallita: %s</string>
+    <string name="failed_to_import_stations">Importazione stazioni %1$s fallita: %2$s</string>
     <string name="dialog_export_stations_title">Esporta stazioni</string>
     <string name="no_stations_in_file">Nessuna stazione trovata nel file</string>
     <string name="dialog_import_failed">Importazione fallita</string>
