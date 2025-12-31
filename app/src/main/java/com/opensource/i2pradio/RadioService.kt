@@ -44,6 +44,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
+import com.opensource.i2pradio.i2p.I2PManager
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import com.opensource.i2pradio.util.BandwidthTrackingInterceptor
@@ -245,6 +246,9 @@ class RadioService : Service() {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         equalizerManager = EqualizerManager(this)
         initializeMediaSession()
+
+        // Initialize I2P proxy availability monitoring (background health checks)
+        I2PManager.initialize()
 
         // Register receiver to pause playback when audio output device disconnects
         val becomingNoisyFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
@@ -1372,18 +1376,14 @@ class RadioService : Service() {
             }
 
             // Check if I2P proxy is available before attempting to play an I2P stream
-            if (isI2PStream) {
-                val i2pHost = if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyHost else "127.0.0.1"
-                val i2pPort = if (proxyType == ProxyType.I2P && proxyPort > 0) proxyPort else 4444
-                android.util.Log.d("RadioService", "I2P stream detected - checking proxy at $i2pHost:$i2pPort")
-                if (!isI2PProxyAvailable(i2pHost, i2pPort)) {
-                    android.util.Log.e("RadioService", "I2P proxy not available at $i2pHost:$i2pPort - BLOCKING stream")
-                    isStartingNewStream.set(false)
-                    broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                    broadcastStreamError(ERROR_TYPE_I2P_NOT_CONNECTED)
-                    startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_i2p_not_connected)))
-                    return
-                }
+            // Uses cached state from I2PManager (instant, non-blocking)
+            if (isI2PStream && !I2PManager.isAvailable()) {
+                android.util.Log.e("RadioService", "I2P proxy not available (cached state) - BLOCKING stream")
+                isStartingNewStream.set(false)
+                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                broadcastStreamError(ERROR_TYPE_I2P_NOT_CONNECTED)
+                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_i2p_not_connected)))
+                return
             }
 
             val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -2023,27 +2023,6 @@ class RadioService : Service() {
             putExtra(EXTRA_CURRENT_POSITION_MS, currentPositionMs)
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-    }
-
-    /**
-     * Check if I2P HTTP proxy is available at the specified host and port.
-     * Uses a quick socket connection test with a short timeout.
-     *
-     * @param host The I2P proxy host (typically 127.0.0.1)
-     * @param port The I2P proxy port (typically 4444)
-     * @return true if the proxy is reachable, false otherwise
-     */
-    private fun isI2PProxyAvailable(host: String, port: Int): Boolean {
-        return try {
-            val socket = java.net.Socket()
-            socket.connect(java.net.InetSocketAddress(host, port), 2000)
-            socket.close()
-            android.util.Log.d("RadioService", "I2P proxy check PASSED - $host:$port is reachable")
-            true
-        } catch (e: Exception) {
-            android.util.Log.w("RadioService", "I2P proxy check FAILED - $host:$port not reachable: ${e.message}")
-            false
-        }
     }
 
     /**
