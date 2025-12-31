@@ -167,10 +167,13 @@ class RadioBrowserClient(private val context: Context) {
     }
 
     /**
-     * Get the current API base URL using dynamic server discovery
+     * Get the current API base URL using dynamic server discovery.
+     *
+     * SECURITY: Passes context to RadioBrowserServerManager so that server
+     * discovery respects force proxy settings and prevents DNS/HTTP leaks.
      */
     private suspend fun getApiBaseUrl(): String {
-        return RadioBrowserServerManager.getApiBaseUrl()
+        return RadioBrowserServerManager.getApiBaseUrl(context)
     }
 
     /**
