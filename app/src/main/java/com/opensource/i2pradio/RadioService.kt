@@ -1386,14 +1386,11 @@ class RadioService : Service() {
                 return
             }
 
-            // Check if Tor is connected before attempting to play a Tor (.onion) stream
+            // Warn user if Tor is not detected but still attempt to play
+            // (detection may fail for external proxies or unusual configurations)
             if (isTorStream && !TorManager.isConnected()) {
-                android.util.Log.e("RadioService", "Tor not connected - BLOCKING .onion stream")
-                isStartingNewStream.set(false)
-                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                android.util.Log.w("RadioService", "Tor not detected - warning user but attempting stream anyway")
                 broadcastStreamError(ERROR_TYPE_TOR_NOT_CONNECTED)
-                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_tor_blocked)))
-                return
             }
 
             val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
