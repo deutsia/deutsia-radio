@@ -61,8 +61,10 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
+import okhttp3.Dns
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -209,6 +211,20 @@ class RadioService : Service() {
         const val EXTRA_PLAYBACK_ELAPSED_MS = "playback_elapsed_ms"
         const val EXTRA_BUFFERED_POSITION_MS = "buffered_position_ms"
         const val EXTRA_CURRENT_POSITION_MS = "current_position_ms"
+
+        /**
+         * Custom DNS resolver that forces DNS resolution through SOCKS5 proxy.
+         *
+         * By default, OkHttp resolves DNS locally BEFORE connecting through SOCKS,
+         * which leaks DNS queries to clearnet. This resolver returns a placeholder
+         * address, forcing the SOCKS5 proxy (Tor) to handle DNS resolution.
+         */
+        private val SOCKS5_DNS = object : Dns {
+            override fun lookup(hostname: String): List<InetAddress> {
+                android.util.Log.d("RadioService", "DNS lookup for '$hostname' - delegating to SOCKS5 proxy")
+                return listOf(InetAddress.getByAddress(hostname, byteArrayOf(0, 0, 0, 0)))
+            }
+        }
     }
 
     inner class RadioBinder : Binder() {
@@ -1086,6 +1102,12 @@ class RadioService : Service() {
             }
             builder.proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
 
+            // CRITICAL: Force DNS through SOCKS5 to prevent DNS leaks
+            if (javaProxyType == Proxy.Type.SOCKS) {
+                builder.dns(SOCKS5_DNS)
+                android.util.Log.d("RadioService", "Recording DNS resolution will be handled by SOCKS proxy")
+            }
+
             if (effectiveProxyType == ProxyType.CUSTOM && effectiveProxyUsername.isNotEmpty() && effectiveProxyPassword.isNotEmpty()) {
                 android.util.Log.d("RadioService", "Adding proxy authentication for recording client (auth type: $effectiveProxyAuthType)")
                 builder.proxyAuthenticator { route, response ->
@@ -1508,7 +1530,15 @@ class RadioService : Service() {
 
                     val builder = OkHttpClient.Builder()
                         .proxy(Proxy(javaProxyType, InetSocketAddress(effectiveProxyHost, effectiveProxyPort)))
-                        .addInterceptor(BandwidthTrackingInterceptor(this))
+
+                    // CRITICAL: Force DNS through SOCKS5 to prevent DNS leaks
+                    // Only applies to SOCKS proxies (Tor, SOCKS4, SOCKS5) - HTTP proxies handle DNS differently
+                    if (javaProxyType == Proxy.Type.SOCKS) {
+                        builder.dns(SOCKS5_DNS)
+                        android.util.Log.d("RadioService", "DNS resolution will be handled by SOCKS proxy")
+                    }
+
+                    builder.addInterceptor(BandwidthTrackingInterceptor(this))
                         .addInterceptor { chain ->
                             val request = chain.request()
                             android.util.Log.d("RadioService", "PROXY REQUEST: ${request.method} ${request.url}")

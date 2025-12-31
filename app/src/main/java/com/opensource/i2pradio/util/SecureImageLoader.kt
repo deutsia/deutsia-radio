@@ -9,7 +9,9 @@ import coil.request.ImageRequest
 import coil.request.ImageResult
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
+import okhttp3.Dns
 import okhttp3.OkHttpClient
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
 
@@ -25,6 +27,8 @@ import java.net.Proxy
  */
 object SecureImageLoader {
 
+    private const val TAG = "SecureImageLoader"
+
     private var cachedImageLoader: ImageLoader? = null
     private var cachedProxyConfig: ProxyConfig? = null
 
@@ -34,6 +38,20 @@ object SecureImageLoader {
         val port: Int,
         val blocked: Boolean  // True if Force Tor is enabled but Tor not connected
     )
+
+    /**
+     * Custom DNS resolver that forces DNS resolution through SOCKS5 proxy.
+     *
+     * By default, OkHttp resolves DNS locally BEFORE connecting through SOCKS,
+     * which leaks DNS queries to clearnet. This resolver returns a placeholder
+     * address, forcing the SOCKS5 proxy (Tor) to handle DNS resolution.
+     */
+    private val SOCKS5_DNS = object : Dns {
+        override fun lookup(hostname: String): List<InetAddress> {
+            android.util.Log.d(TAG, "DNS lookup for '$hostname' - delegating to SOCKS5 proxy")
+            return listOf(InetAddress.getByAddress(hostname, byteArrayOf(0, 0, 0, 0)))
+        }
+    }
 
     /**
      * Get an ImageLoader configured based on current Tor settings.
@@ -145,6 +163,8 @@ object SecureImageLoader {
 
             val okHttpClient = OkHttpClient.Builder()
                 .proxy(proxy)
+                // CRITICAL: Force DNS through SOCKS5 to prevent DNS leaks
+                .dns(SOCKS5_DNS)
                 .build()
 
             builder.okHttpClient(okHttpClient)
