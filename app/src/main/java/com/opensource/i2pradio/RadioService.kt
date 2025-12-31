@@ -44,6 +44,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
+import com.opensource.i2pradio.i2p.I2PManager
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import com.opensource.i2pradio.util.BandwidthTrackingInterceptor
@@ -215,6 +216,7 @@ class RadioService : Service() {
         const val BROADCAST_STREAM_ERROR = "com.opensource.i2pradio.STREAM_ERROR"
         const val EXTRA_STREAM_ERROR_TYPE = "stream_error_type"
         const val ERROR_TYPE_TOR_NOT_CONNECTED = "tor_not_connected"
+        const val ERROR_TYPE_I2P_NOT_CONNECTED = "i2p_not_connected"
         const val ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED = "custom_proxy_not_configured"
         const val ERROR_TYPE_MAX_RETRIES = "max_retries"
         const val ERROR_TYPE_STREAM_FAILED = "stream_failed"
@@ -244,6 +246,9 @@ class RadioService : Service() {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         equalizerManager = EqualizerManager(this)
         initializeMediaSession()
+
+        // Initialize I2P proxy availability monitoring (background health checks)
+        I2PManager.initialize()
 
         // Register receiver to pause playback when audio output device disconnects
         val becomingNoisyFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
@@ -1368,6 +1373,17 @@ class RadioService : Service() {
                     startForeground(NOTIFICATION_ID, createNotification(getString(R.string.custom_proxy_not_configured_notification)))
                     return
                 }
+            }
+
+            // Check if I2P proxy is available before attempting to play an I2P stream
+            // Uses cached state from I2PManager (instant, non-blocking)
+            if (isI2PStream && !I2PManager.isAvailable()) {
+                android.util.Log.e("RadioService", "I2P proxy not available (cached state) - BLOCKING stream")
+                isStartingNewStream.set(false)
+                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                broadcastStreamError(ERROR_TYPE_I2P_NOT_CONNECTED)
+                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_i2p_not_connected)))
+                return
             }
 
             val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -120,6 +120,7 @@
     <string name="notification_reconnecting">Reconnecting...</string>
     <string name="notification_connection_failed">Connection failed</string>
     <string name="notification_tor_blocked">Tor not connected - stream blocked</string>
+    <string name="notification_i2p_not_connected">I2P not running - stream blocked</string>
     <string name="notification_audio_focus_denied">Audio focus denied</string>
     <string name="notification_channel_name">deutsia radio Playback</string>
     <string name="notification_channel_description">Shows radio playback status</string>
@@ -591,6 +592,7 @@
     <string name="error_stream_failed">Stream failed to connect</string>
     <string name="error_stream_max_retries">Connection failed after multiple attempts</string>
     <string name="error_tor_not_connected">Tor is not connected. Enable Tor to play this stream.</string>
+    <string name="error_i2p_not_connected">I2P is not running. Start I2P (e.g., InviZible Pro) to play this stream.</string>
     <string name="error_tor_required_for_clearnet">Tor is not connected. Force Tor mode requires Tor for clearnet streams.</string>
     <string name="error_custom_proxy_not_configured">Custom proxy is not configured. Configure it in Settings to play.</string>
 
