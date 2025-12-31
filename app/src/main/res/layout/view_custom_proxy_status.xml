@@ -16,7 +16,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@drawable/ic_proxy_custom"
-        android:contentDescription="Custom proxy status"
+        android:contentDescription="@string/cd_custom_proxy_status"
         tools:src="@drawable/ic_proxy_custom" />
 
     <LinearLayout

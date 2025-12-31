@@ -599,4 +599,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Password changed but failed to re-key database: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">No Stations Found</string>
+    <string name="empty_state_message">Tune in by adding your first station.\nClick the button below.</string>
+    <string name="empty_state_add_button">Add New Station</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">Add Radio Station</string>
+    <string name="cd_embedded_tor">Embedded Tor</string>
+    <string name="cd_cover_art_preview">Cover art preview</string>
+    <string name="cd_custom_proxy_status">Custom proxy status</string>
+    <string name="cd_like">Like</string>
+    <string name="cd_album_art">Album art</string>
+    <string name="cd_record">Record</string>
+    <string name="cd_play_pause">Play/Pause</string>
+    <string name="cd_volume">Volume</string>
+    <string name="cd_tor_status_icon">Tor status icon</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">Open</string>
+    <string name="cd_more_options">More options</string>
+    <string name="cd_tor_status">Tor status</string>
+    <string name="cd_bandwidth_icon">Bandwidth icon</string>
+    <string name="cd_like_station">Like station</string>
+    <string name="cd_add_to_library">Add to library</string>
+    <string name="cd_stop">Stop</string>
 </resources>

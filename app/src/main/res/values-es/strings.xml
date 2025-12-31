@@ -580,4 +580,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Contraseña cambiada pero fallo al renovar clave de base de datos: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">No se encontraron estaciones</string>
+    <string name="empty_state_message">Sintoniza añadiendo tu primera estación.\nHaz clic en el botón de abajo.</string>
+    <string name="empty_state_add_button">Añadir nueva estación</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">Añadir estación de radio</string>
+    <string name="cd_embedded_tor">Tor integrado</string>
+    <string name="cd_cover_art_preview">Vista previa de portada</string>
+    <string name="cd_custom_proxy_status">Estado del proxy personalizado</string>
+    <string name="cd_like">Me gusta</string>
+    <string name="cd_album_art">Portada del álbum</string>
+    <string name="cd_record">Grabar</string>
+    <string name="cd_play_pause">Reproducir/Pausar</string>
+    <string name="cd_volume">Volumen</string>
+    <string name="cd_tor_status_icon">Icono de estado de Tor</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">Abrir</string>
+    <string name="cd_more_options">Más opciones</string>
+    <string name="cd_tor_status">Estado de Tor</string>
+    <string name="cd_bandwidth_icon">Icono de ancho de banda</string>
+    <string name="cd_like_station">Marcar estación como favorita</string>
+    <string name="cd_add_to_library">Añadir a la biblioteca</string>
+    <string name="cd_stop">Detener</string>
 </resources>

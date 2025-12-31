@@ -576,4 +576,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">رمز عبور تغییر کرد اما رمزگذاری مجدد پایگاه داده ناموفق بود: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">ایستگاهی یافت نشد</string>
+    <string name="empty_state_message">با افزودن اولین ایستگاه خود شروع کنید.\nروی دکمه زیر کلیک کنید.</string>
+    <string name="empty_state_add_button">افزودن ایستگاه جدید</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">افزودن ایستگاه رادیویی</string>
+    <string name="cd_embedded_tor">Tor تعبیه شده</string>
+    <string name="cd_cover_art_preview">پیش‌نمایش تصویر جلد</string>
+    <string name="cd_custom_proxy_status">وضعیت پروکسی سفارشی</string>
+    <string name="cd_like">پسندیدن</string>
+    <string name="cd_album_art">تصویر آلبوم</string>
+    <string name="cd_record">ضبط</string>
+    <string name="cd_play_pause">پخش/مکث</string>
+    <string name="cd_volume">صدا</string>
+    <string name="cd_tor_status_icon">آیکون وضعیت Tor</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">باز کردن</string>
+    <string name="cd_more_options">گزینه‌های بیشتر</string>
+    <string name="cd_tor_status">وضعیت Tor</string>
+    <string name="cd_bandwidth_icon">آیکون پهنای باند</string>
+    <string name="cd_like_station">افزودن ایستگاه به علاقه‌مندی‌ها</string>
+    <string name="cd_add_to_library">افزودن به کتابخانه</string>
+    <string name="cd_stop">توقف</string>
 </resources>

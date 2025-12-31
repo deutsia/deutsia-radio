@@ -576,4 +576,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Пароль змінено, але не вдалося перешифрувати базу даних: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">Станцій не знайдено</string>
+    <string name="empty_state_message">Почніть з додавання першої станції.\nНатисніть кнопку нижче.</string>
+    <string name="empty_state_add_button">Додати нову станцію</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">Додати радіостанцію</string>
+    <string name="cd_embedded_tor">Вбудований Tor</string>
+    <string name="cd_cover_art_preview">Попередній перегляд обкладинки</string>
+    <string name="cd_custom_proxy_status">Статус користувацького проксі</string>
+    <string name="cd_like">Подобається</string>
+    <string name="cd_album_art">Обкладинка альбому</string>
+    <string name="cd_record">Запис</string>
+    <string name="cd_play_pause">Відтворення/Пауза</string>
+    <string name="cd_volume">Гучність</string>
+    <string name="cd_tor_status_icon">Іконка статусу Tor</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">Відкрити</string>
+    <string name="cd_more_options">Додаткові параметри</string>
+    <string name="cd_tor_status">Статус Tor</string>
+    <string name="cd_bandwidth_icon">Іконка трафіку</string>
+    <string name="cd_like_station">Додати станцію до обраних</string>
+    <string name="cd_add_to_library">Додати до бібліотеки</string>
+    <string name="cd_stop">Зупинити</string>
 </resources>

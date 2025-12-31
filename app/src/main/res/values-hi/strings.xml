@@ -572,4 +572,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">पासवर्ड बदल गया लेकिन डेटाबेस पुन: एन्क्रिप्ट करने में विफल: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">कोई स्टेशन नहीं मिला</string>
+    <string name="empty_state_message">अपना पहला स्टेशन जोड़कर शुरू करें।\nनीचे दिए गए बटन पर क्लिक करें।</string>
+    <string name="empty_state_add_button">नया स्टेशन जोड़ें</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">रेडियो स्टेशन जोड़ें</string>
+    <string name="cd_embedded_tor">एम्बेडेड Tor</string>
+    <string name="cd_cover_art_preview">कवर आर्ट पूर्वावलोकन</string>
+    <string name="cd_custom_proxy_status">कस्टम प्रॉक्सी स्थिति</string>
+    <string name="cd_like">पसंद करें</string>
+    <string name="cd_album_art">एल्बम आर्ट</string>
+    <string name="cd_record">रिकॉर्ड</string>
+    <string name="cd_play_pause">प्ले/रोकें</string>
+    <string name="cd_volume">वॉल्यूम</string>
+    <string name="cd_tor_status_icon">Tor स्थिति आइकन</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">खोलें</string>
+    <string name="cd_more_options">अधिक विकल्प</string>
+    <string name="cd_tor_status">Tor स्थिति</string>
+    <string name="cd_bandwidth_icon">बैंडविड्थ आइकन</string>
+    <string name="cd_like_station">स्टेशन को पसंदीदा में जोड़ें</string>
+    <string name="cd_add_to_library">लाइब्रेरी में जोड़ें</string>
+    <string name="cd_stop">रोकें</string>
 </resources>

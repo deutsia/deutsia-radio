@@ -575,4 +575,29 @@
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">تم تغيير كلمة المرور لكن فشل إعادة تشفير قاعدة البيانات: %s</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_title">لم يتم العثور على محطات</string>
+    <string name="empty_state_message">ابدأ بإضافة محطتك الأولى.\nانقر على الزر أدناه.</string>
+    <string name="empty_state_add_button">إضافة محطة جديدة</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_add_radio_station">إضافة محطة راديو</string>
+    <string name="cd_embedded_tor">Tor مدمج</string>
+    <string name="cd_cover_art_preview">معاينة صورة الغلاف</string>
+    <string name="cd_custom_proxy_status">حالة البروكسي المخصص</string>
+    <string name="cd_like">إعجاب</string>
+    <string name="cd_album_art">صورة الألبوم</string>
+    <string name="cd_record">تسجيل</string>
+    <string name="cd_play_pause">تشغيل/إيقاف مؤقت</string>
+    <string name="cd_volume">مستوى الصوت</string>
+    <string name="cd_tor_status_icon">أيقونة حالة Tor</string>
+    <string name="cd_invizible_pro">InviZible Pro</string>
+    <string name="cd_open">فتح</string>
+    <string name="cd_more_options">خيارات أخرى</string>
+    <string name="cd_tor_status">حالة Tor</string>
+    <string name="cd_bandwidth_icon">أيقونة عرض النطاق</string>
+    <string name="cd_like_station">إضافة المحطة للمفضلة</string>
+    <string name="cd_add_to_library">إضافة للمكتبة</string>
+    <string name="cd_stop">إيقاف</string>
 </resources>

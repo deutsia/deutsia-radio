@@ -29,7 +29,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_tor_off"
-            android:contentDescription="Tor status icon"
+            android:contentDescription="@string/cd_tor_status_icon"
             tools:src="@drawable/ic_tor_on" />
 
         <LinearLayout
@@ -187,7 +187,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@drawable/ic_invizible"
-                android:contentDescription="InviZible Pro" />
+                android:contentDescription="@string/cd_invizible_pro" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -219,7 +219,7 @@
                 android:layout_height="24dp"
                 android:src="@drawable/ic_chevron_right"
                 android:alpha="0.5"
-                android:contentDescription="Open" />
+                android:contentDescription="@string/cd_open" />
 
         </LinearLayout>
 

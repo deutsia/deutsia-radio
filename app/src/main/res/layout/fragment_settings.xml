@@ -505,7 +505,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_tor_off"
-                        android:contentDescription="Tor status" />
+                        android:contentDescription="@string/cd_tor_status" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -932,7 +932,7 @@
                             android:layout_gravity="center"
                             android:layout_marginEnd="16.75dp"
                             android:src="@drawable/ic_bandwidth"
-                            android:contentDescription="Bandwidth icon"
+                            android:contentDescription="@string/cd_bandwidth_icon"
                             app:tint="?attr/colorPrimary" />
 
                     </FrameLayout>
