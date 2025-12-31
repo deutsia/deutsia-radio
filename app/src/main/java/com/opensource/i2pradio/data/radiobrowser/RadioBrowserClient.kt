@@ -123,6 +123,13 @@ class RadioBrowserClient(private val context: Context) {
                 Log.d(TAG, "Routing RadioBrowser API through CUSTOM proxy ($proxyProtocol) at $proxyHost:$proxyPort")
                 builder.proxy(Proxy(proxyType, InetSocketAddress(proxyHost, proxyPort)))
 
+                // CRITICAL: Force DNS through SOCKS5 to prevent DNS leaks
+                // Only applies to SOCKS proxies - HTTP proxies handle DNS differently
+                if (proxyType == Proxy.Type.SOCKS) {
+                    builder.dns(SOCKS5_DNS)
+                    Log.d(TAG, "RadioBrowser API DNS resolution will be handled by SOCKS proxy")
+                }
+
                 // Add proxy authentication if credentials are configured
                 if (proxyUsername.isNotEmpty() && proxyPassword.isNotEmpty()) {
                     Log.d(TAG, "Adding proxy authentication for RadioBrowser API (user: $proxyUsername, auth type: $proxyAuthType)")
