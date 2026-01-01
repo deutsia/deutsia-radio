@@ -2,6 +2,16 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.5.2]
+
+### Fixed
+- **Tor/I2P streams loading as clearnet streams:** Fixed a bug where loading I2P/Tor streams in an alternative way (via the browse tab's genre chip list) would load them as clearnet streams. This is not a leak - if you were in Force Tor mode you would actually be able to load the Tor streams, as in Force Tor mode, it routes all streams, including clearnet (which the tor streams were incorrectly labeled as). 
+
+### UI/UX Improvements
+- **Improved Toast messages and disable option:** Added debounce for some messages, improved the Toast Diable option
+- **Metadata fix:** For the list of Tor/I2P streams via the Browse tab's genre chip list: The stations now have the (genre) · Tor or (genre) · I2P like they do via the import option of Tor/i2p streams when you add them to library
+
+
 ## [1.5.1]
 
 ### Fixed
