@@ -169,6 +169,8 @@ class RadioService : Service() {
     private var reconnectRunnable: Runnable? = null
 
     private var currentMetadata: String? = null
+    private var currentArtist: String? = null
+    private var currentTitle: String? = null
     private var currentBitrate: Int = 0
     private var currentCodec: String? = null
 
@@ -196,6 +198,11 @@ class RadioService : Service() {
         const val BROADCAST_RECORDING_ERROR = "com.opensource.i2pradio.RECORDING_ERROR"
         const val BROADCAST_RECORDING_COMPLETE = "com.opensource.i2pradio.RECORDING_COMPLETE"
         const val EXTRA_METADATA = "metadata"
+        const val EXTRA_ARTIST = "artist"
+        const val EXTRA_TITLE = "title"
+
+        // Common delimiters used in ICY metadata to separate artist and title
+        private val METADATA_DELIMITERS = listOf(" - ", " – ", " — ", " | ", " / ", " • ", " : ")
         const val EXTRA_BITRATE = "bitrate"
         const val EXTRA_CODEC = "codec"
         const val EXTRA_IS_BUFFERING = "is_buffering"
@@ -1657,6 +1664,7 @@ class RadioService : Service() {
 
             val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("DeutsiaRadio/1.0")
+                .setDefaultRequestProperties(mapOf("Icy-MetaData" to "1"))
 
             val loadControl = DefaultLoadControl.Builder()
                 .setBufferDurationsMs(5_000, 15_000, 1_000, 2_000)
@@ -1758,11 +1766,19 @@ class RadioService : Service() {
                         for (i in 0 until metadata.length()) {
                             val entry = metadata.get(i)
                             if (entry is IcyInfo) {
-                                entry.title?.let { title ->
-                                    if (title.isNotBlank() && title != currentMetadata) {
-                                        currentMetadata = title
-                                        broadcastMetadataChanged(title)
-                                        android.util.Log.d("RadioService", "ICY metadata: $title")
+                                entry.title?.let { rawTitle ->
+                                    // Trim whitespace from the metadata
+                                    val trimmedTitle = rawTitle.trim()
+                                    if (trimmedTitle.isNotBlank() && trimmedTitle != currentMetadata) {
+                                        currentMetadata = trimmedTitle
+
+                                        // Parse artist and title from metadata
+                                        val (artist, title) = parseMetadata(trimmedTitle)
+                                        currentArtist = artist
+                                        currentTitle = title
+
+                                        broadcastMetadataChanged(trimmedTitle, artist, title)
+                                        android.util.Log.d("RadioService", "ICY metadata: $trimmedTitle (Artist: $artist, Title: $title)")
                                     }
                                 }
                             }
@@ -1833,6 +1849,8 @@ class RadioService : Service() {
         // This prevents stale metadata from appearing when switching stations
         // or when the UI is recreated (e.g., Material You toggle)
         currentMetadata = null
+        currentArtist = null
+        currentTitle = null
         currentBitrate = 0
         currentCodec = null
 
@@ -1962,11 +1980,35 @@ class RadioService : Service() {
     }
 
     /**
-     * Broadcast metadata change to UI
+     * Parse metadata string to extract artist and title.
+     * Tries common delimiters like " - ", " | ", etc.
+     * Returns Pair(artist, title) or Pair(null, originalMetadata) if no delimiter found.
      */
-    private fun broadcastMetadataChanged(metadata: String) {
+    private fun parseMetadata(metadata: String): Pair<String?, String?> {
+        // Try each delimiter in order of preference
+        for (delimiter in METADATA_DELIMITERS) {
+            val index = metadata.indexOf(delimiter)
+            if (index > 0 && index < metadata.length - delimiter.length) {
+                val artist = metadata.substring(0, index).trim()
+                val title = metadata.substring(index + delimiter.length).trim()
+                // Only accept if both parts are non-empty
+                if (artist.isNotBlank() && title.isNotBlank()) {
+                    return Pair(artist, title)
+                }
+            }
+        }
+        // No delimiter found - return the whole thing as the title
+        return Pair(null, metadata)
+    }
+
+    /**
+     * Broadcast metadata change to UI with parsed artist and title
+     */
+    private fun broadcastMetadataChanged(metadata: String, artist: String?, title: String?) {
         val intent = Intent(BROADCAST_METADATA_CHANGED).apply {
             putExtra(EXTRA_METADATA, metadata)
+            putExtra(EXTRA_ARTIST, artist)
+            putExtra(EXTRA_TITLE, title)
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
@@ -2073,6 +2115,16 @@ class RadioService : Service() {
      * Get current metadata (for UI binding)
      */
     fun getCurrentMetadata(): String? = currentMetadata
+
+    /**
+     * Get current parsed artist (for UI binding)
+     */
+    fun getCurrentArtist(): String? = currentArtist
+
+    /**
+     * Get current parsed title (for UI binding)
+     */
+    fun getCurrentTitle(): String? = currentTitle
 
     /**
      * Get current bitrate in bps (for UI binding)

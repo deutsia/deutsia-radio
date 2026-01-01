@@ -115,9 +115,19 @@ class NowPlayingFragment : Fragment() {
                 // This prevents stale metadata from previous stations appearing
                 // when the activity is recreated (e.g., Material You toggle)
                 if (isPlaying) {
-                    val metadata = svc.getCurrentMetadata()
-                    if (!metadata.isNullOrBlank()) {
-                        metadataText.text = metadata
+                    val artist = svc.getCurrentArtist()
+                    val title = svc.getCurrentTitle()
+                    val rawMetadata = svc.getCurrentMetadata()
+
+                    // Display formatted artist - title if both are present, otherwise raw metadata
+                    val displayText = when {
+                        !artist.isNullOrBlank() && !title.isNullOrBlank() -> "$artist — $title"
+                        !rawMetadata.isNullOrBlank() -> rawMetadata
+                        else -> null
+                    }
+
+                    if (!displayText.isNullOrBlank()) {
+                        metadataText.text = displayText
                         metadataText.visibility = View.VISIBLE
                     }
 
@@ -157,9 +167,19 @@ class NowPlayingFragment : Fragment() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 RadioService.BROADCAST_METADATA_CHANGED -> {
-                    val metadata = intent.getStringExtra(RadioService.EXTRA_METADATA)
-                    if (!metadata.isNullOrBlank()) {
-                        metadataText.text = metadata
+                    val artist = intent.getStringExtra(RadioService.EXTRA_ARTIST)
+                    val title = intent.getStringExtra(RadioService.EXTRA_TITLE)
+                    val rawMetadata = intent.getStringExtra(RadioService.EXTRA_METADATA)
+
+                    // Display formatted artist - title if both are present, otherwise raw metadata
+                    val displayText = when {
+                        !artist.isNullOrBlank() && !title.isNullOrBlank() -> "$artist — $title"
+                        !rawMetadata.isNullOrBlank() -> rawMetadata
+                        else -> null
+                    }
+
+                    if (!displayText.isNullOrBlank()) {
+                        metadataText.text = displayText
                         metadataText.visibility = View.VISIBLE
                     }
                 }
