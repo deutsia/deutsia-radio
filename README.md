@@ -21,7 +21,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.5.0** DNS leak protection for Force Tor/Proxy modes, fixed cover art privacy leak, improved search UX with debounce, general UI/UX, and 47 new tests for leak prevention
+- **New Release: v1.5.1** Fixed browse tab station buttons not updating correctly after adding and removing a station
 
 ---
 

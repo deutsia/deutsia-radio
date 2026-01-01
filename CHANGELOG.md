@@ -2,6 +2,12 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.5.1]
+
+### Fixed
+- **Browse tab add/remove buttons not updating after add/delete cycle:** Fixed a bug where the + button and heart icon in the browse tab would stop working correctly after adding and then removing a station. 
+- **Browse tab not syncing with library changes:** Fixed another bug where deleting a station from the library tab wouldn't update the browse tab's button states. Now when returning to the browse tab, the saved/liked state is refreshed to reflect any changes made elsewhere.
+
 
 ## [1.5.0]
 
