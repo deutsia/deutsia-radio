@@ -21,7 +21,8 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.4.5** Migrate from hardcoded api server list to dyanmic server discovery to prevent api resolution errors, add auto pause on Bluetooth disconnect
+- **New Release: v1.5.0** DNS leak protection for Force Tor/Proxy modes, fixed cover art privacy leak, improved search UX with debounce, general UI/UX, and 47 new tests for leak prevention
+
 ---
 
 ## Features
@@ -35,6 +36,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 - **Light/Dark/System** - Adaptive theme modes
 - **Bundled Darknet Stations** Add pre-curated i2p/tor station lists to local library
 - **Add any station** Support for Tor, Clearnet, I2P and per-station level custom proxy stations
+- **Full DNS Protection** - No DNS leaks to ISP in Force Tor/Proxy modes, backed by 47 unit and integration tests
 
 ---
 

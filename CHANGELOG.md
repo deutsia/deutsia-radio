@@ -2,6 +2,30 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+
+## [1.5.0]
+
+### Added
+- **DNS protection system**: Force Tor and Force Custom Proxy modes now route all DNS queries through the proxy instead of leaking to system/ISP DNS
+- **Comprehensive DNS leak tests**: Added 47 unit and integration tests to verify DNS protection and leak prevention across all proxy modes
+- **Enhanced toast notifications**: Added informative messages for Force Tor/Proxy blocks, I2P proxy availability, and connection failures
+- **SOCKS4 DNS warning**: Added UI warning in proxy configuration explaining SOCKS4 DNS limitations and recommending SOCKS5
+
+### Fixed
+- **Cover art privacy leak**: SecureImageLoader now properly blocks image loading from mid-session disconnection clearnet fallback and checks proxy availability before each request to catch mid-session disconnections
+- **Playback UI sync**: Play/pause button now syncs when playback stops via headphone disconnect, audio focus loss, or notification actions
+
+### UI/UX Improvements
+- Replaced misleading "Leak Warning" with "Tor Required" (orange) when Force Tor mode/Force custom proxy mode blocks streams
+- Improved search experience with 800ms debounce, "Searching..." indicator, and instant search on Enter
+- Added more user-friendly toast messages
+- Added Toast Disable option in Settings (important toast messages still display)
+
+### Localization
+- Updated all translation strings
+    
+    
+
 ## [1.4.5]
 
 ### Added
