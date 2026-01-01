@@ -21,7 +21,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.5.1** Fixed browse tab station buttons not updating correctly after adding and removing a station
+- **New Release: v1.5.2** Improved toast messages, minor bug fix, UI/UX improvements
 
 ---
 
