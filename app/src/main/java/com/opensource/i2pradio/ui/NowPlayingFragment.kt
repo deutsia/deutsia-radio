@@ -115,9 +115,19 @@ class NowPlayingFragment : Fragment() {
                 // This prevents stale metadata from previous stations appearing
                 // when the activity is recreated (e.g., Material You toggle)
                 if (isPlaying) {
-                    val metadata = svc.getCurrentMetadata()
-                    if (!metadata.isNullOrBlank()) {
-                        metadataText.text = metadata
+                    val artist = svc.getCurrentArtist()
+                    val title = svc.getCurrentTitle()
+                    val rawMetadata = svc.getCurrentMetadata()
+
+                    // Display formatted artist - title if both are present, otherwise raw metadata
+                    val displayText = when {
+                        !artist.isNullOrBlank() && !title.isNullOrBlank() -> "$artist — $title"
+                        !rawMetadata.isNullOrBlank() -> rawMetadata
+                        else -> null
+                    }
+
+                    if (!displayText.isNullOrBlank()) {
+                        metadataText.text = displayText
                         metadataText.visibility = View.VISIBLE
                     }
 
@@ -157,11 +167,25 @@ class NowPlayingFragment : Fragment() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 RadioService.BROADCAST_METADATA_CHANGED -> {
-                    val metadata = intent.getStringExtra(RadioService.EXTRA_METADATA)
-                    if (!metadata.isNullOrBlank()) {
-                        metadataText.text = metadata
+                    val artist = intent.getStringExtra(RadioService.EXTRA_ARTIST)
+                    val title = intent.getStringExtra(RadioService.EXTRA_TITLE)
+                    val rawMetadata = intent.getStringExtra(RadioService.EXTRA_METADATA)
+
+                    // Display formatted artist - title if both are present, otherwise raw metadata
+                    val displayText = when {
+                        !artist.isNullOrBlank() && !title.isNullOrBlank() -> "$artist — $title"
+                        !rawMetadata.isNullOrBlank() -> rawMetadata
+                        else -> null
+                    }
+
+                    if (!displayText.isNullOrBlank()) {
+                        metadataText.text = displayText
                         metadataText.visibility = View.VISIBLE
                     }
+                }
+                RadioService.BROADCAST_METADATA_CLEARED -> {
+                    // Hide metadata when cleared due to timeout or station change
+                    metadataText.visibility = View.GONE
                 }
                 RadioService.BROADCAST_STREAM_INFO_CHANGED -> {
                     val bitrate = intent.getIntExtra(RadioService.EXTRA_BITRATE, 0)
@@ -295,6 +319,7 @@ class NowPlayingFragment : Fragment() {
         // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, time, and errors
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_METADATA_CHANGED)
+            addAction(RadioService.BROADCAST_METADATA_CLEARED)
             addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
             addAction(RadioService.BROADCAST_RECORDING_ERROR)
