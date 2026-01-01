@@ -1375,15 +1375,11 @@ class RadioService : Service() {
                 }
             }
 
-            // Check if I2P proxy is available before attempting to play an I2P stream
-            // Uses cached state from I2PManager (instant, non-blocking)
+            // Warn user if I2P is not detected but still attempt to play
+            // (detection may fail for external proxies or unusual configurations)
             if (isI2PStream && !I2PManager.isAvailable()) {
-                android.util.Log.e("RadioService", "I2P proxy not available (cached state) - BLOCKING stream")
-                isStartingNewStream.set(false)
-                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                android.util.Log.w("RadioService", "I2P not detected - warning user but attempting stream anyway")
                 broadcastStreamError(ERROR_TYPE_I2P_NOT_CONNECTED)
-                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_i2p_not_connected)))
-                return
             }
 
             // Warn user if Tor is not detected but still attempt to play

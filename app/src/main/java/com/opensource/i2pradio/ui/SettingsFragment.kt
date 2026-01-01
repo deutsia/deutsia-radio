@@ -327,6 +327,27 @@ class SettingsFragment : Fragment() {
             materialYouContainer?.visibility = View.GONE
         }
 
+        // Disable Toast Messages switch
+        val disableToastsSwitch = view.findViewById<MaterialSwitch>(R.id.disableToastsSwitch)
+        disableToastsSwitch?.isChecked = PreferencesHelper.isToastMessagesDisabled(requireContext())
+        disableToastsSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+            PreferencesHelper.setToastMessagesDisabled(requireContext(), isChecked)
+        }
+
         // Update theme button text
         updateThemeButtonText(themeButton)
 
