@@ -36,7 +36,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 - **Light/Dark/System** - Adaptive theme modes
 - **Bundled Darknet Stations** Add pre-curated i2p/tor station lists to local library
 - **Add any station** Support for Tor, Clearnet, I2P and per-station level custom proxy stations
-- **Full DNS Protection** - No DNS leaks to ISP in Force Tor/Proxy modes, backed by 47 unit and integration tests
+- **Full DNS Protection** - No DNS leaks to ISP/System DNS in Force Tor/Proxy modes, backed by 47 unit and integration tests
 
 ---
 
