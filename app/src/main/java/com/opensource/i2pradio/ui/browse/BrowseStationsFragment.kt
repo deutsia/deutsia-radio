@@ -1182,9 +1182,9 @@ class BrowseStationsFragment : Fragment() {
             action = RadioService.ACTION_PLAY
             putExtra("stream_url", radioStation.streamUrl)
             putExtra("station_name", radioStation.name)
-            putExtra("proxy_host", "")
-            putExtra("proxy_port", 0)
-            putExtra("proxy_type", "NONE")
+            putExtra("proxy_host", radioStation.proxyHost)
+            putExtra("proxy_port", radioStation.proxyPort)
+            putExtra("proxy_type", radioStation.proxyType)
             putExtra("cover_art_uri", radioStation.coverArtUri)
             putExtra("custom_proxy_protocol", "HTTP")
             putExtra("proxy_username", "")
