@@ -174,10 +174,6 @@ class RadioService : Service() {
     private var currentBitrate: Int = 0
     private var currentCodec: String? = null
 
-    // Metadata timeout - clear stale metadata after 30 seconds of no updates
-    private var metadataTimeoutRunnable: Runnable? = null
-    private val metadataTimeoutMs = 30_000L
-
     private var playbackStartTimeMillis: Long = 0L
     private var playbackTimeUpdateRunnable: Runnable? = null
     private val playbackTimeUpdateInterval = 1000L // Update every second
@@ -201,7 +197,6 @@ class RadioService : Service() {
         const val BROADCAST_PLAYBACK_STATE_CHANGED = "com.opensource.i2pradio.PLAYBACK_STATE_CHANGED"
         const val BROADCAST_RECORDING_ERROR = "com.opensource.i2pradio.RECORDING_ERROR"
         const val BROADCAST_RECORDING_COMPLETE = "com.opensource.i2pradio.RECORDING_COMPLETE"
-        const val BROADCAST_METADATA_CLEARED = "com.opensource.i2pradio.METADATA_CLEARED"
         const val EXTRA_METADATA = "metadata"
         const val EXTRA_ARTIST = "artist"
         const val EXTRA_TITLE = "title"
@@ -1784,9 +1779,6 @@ class RadioService : Service() {
 
                                         broadcastMetadataChanged(trimmedTitle, artist, title)
                                         android.util.Log.d("RadioService", "ICY metadata: $trimmedTitle (Artist: $artist, Title: $title)")
-
-                                        // Reset metadata timeout - will clear after 30s of no updates
-                                        resetMetadataTimeout()
                                     }
                                 }
                             }
@@ -1852,10 +1844,6 @@ class RadioService : Service() {
         // interfere with other pending operations
         reconnectRunnable?.let { handler.removeCallbacks(it) }
         reconnectRunnable = null
-
-        // Cancel metadata timeout
-        metadataTimeoutRunnable?.let { handler.removeCallbacks(it) }
-        metadataTimeoutRunnable = null
 
         // Clear metadata, bitrate, and codec when stopping stream
         // This prevents stale metadata from appearing when switching stations
@@ -2011,42 +1999,6 @@ class RadioService : Service() {
         }
         // No delimiter found - return the whole thing as the title
         return Pair(null, metadata)
-    }
-
-    /**
-     * Reset the metadata timeout timer.
-     * Called whenever new metadata is received.
-     */
-    private fun resetMetadataTimeout() {
-        // Cancel any existing timeout
-        metadataTimeoutRunnable?.let { handler.removeCallbacks(it) }
-
-        // Schedule new timeout to clear metadata
-        metadataTimeoutRunnable = Runnable {
-            clearStaleMetadata()
-        }
-        handler.postDelayed(metadataTimeoutRunnable!!, metadataTimeoutMs)
-    }
-
-    /**
-     * Clear stale metadata when no updates have been received for a while.
-     */
-    private fun clearStaleMetadata() {
-        if (currentMetadata != null) {
-            android.util.Log.d("RadioService", "Clearing stale metadata after ${metadataTimeoutMs / 1000}s timeout")
-            currentMetadata = null
-            currentArtist = null
-            currentTitle = null
-            broadcastMetadataCleared()
-        }
-    }
-
-    /**
-     * Broadcast that metadata has been cleared (timeout or station change)
-     */
-    private fun broadcastMetadataCleared() {
-        val intent = Intent(BROADCAST_METADATA_CLEARED)
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     /**

@@ -183,10 +183,6 @@ class NowPlayingFragment : Fragment() {
                         metadataText.visibility = View.VISIBLE
                     }
                 }
-                RadioService.BROADCAST_METADATA_CLEARED -> {
-                    // Hide metadata when cleared due to timeout or station change
-                    metadataText.visibility = View.GONE
-                }
                 RadioService.BROADCAST_STREAM_INFO_CHANGED -> {
                     val bitrate = intent.getIntExtra(RadioService.EXTRA_BITRATE, 0)
                     val codec = intent.getStringExtra(RadioService.EXTRA_CODEC) ?: "Unknown"
@@ -319,7 +315,6 @@ class NowPlayingFragment : Fragment() {
         // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, time, and errors
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_METADATA_CHANGED)
-            addAction(RadioService.BROADCAST_METADATA_CLEARED)
             addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
             addAction(RadioService.BROADCAST_RECORDING_ERROR)
