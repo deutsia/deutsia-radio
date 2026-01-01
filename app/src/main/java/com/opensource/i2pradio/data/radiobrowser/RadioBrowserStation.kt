@@ -122,10 +122,14 @@ data class RadioBrowserStation(
     }
 
     /**
-     * Get the primary genre/tag from the tags list
+     * Get the primary genre/tag from the tags list.
+     * Skips network type tags (I2P, Tor) to return the actual content genre.
      */
     fun getPrimaryGenre(): String {
-        val tagList = tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        val networkTags = setOf("i2p", "tor")
+        val tagList = tags.split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() && it.lowercase() !in networkTags }
         return mapToAppGenre(tagList.firstOrNull() ?: "Other")
     }
 
