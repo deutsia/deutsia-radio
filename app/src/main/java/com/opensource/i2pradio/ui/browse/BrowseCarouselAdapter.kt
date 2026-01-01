@@ -26,8 +26,17 @@ class BrowseCarouselAdapter(
     private var likedUuids: Set<String> = emptySet()
 
     fun updateLikedUuids(uuids: Set<String>) {
+        val oldLikedUuids = likedUuids
         likedUuids = uuids
-        notifyDataSetChanged()
+
+        // Find items that changed liked status and notify with payload for efficient update
+        currentList.forEachIndexed { index, station ->
+            val wasLiked = oldLikedUuids.contains(station.stationuuid)
+            val isLiked = uuids.contains(station.stationuuid)
+            if (wasLiked != isLiked) {
+                notifyItemChanged(index, PAYLOAD_LIKED_STATUS)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,6 +47,18 @@ class BrowseCarouselAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position), position + 1)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+            return
+        }
+        // Handle payload-based partial update for liked status
+        val station = getItem(position)
+        if (payloads.contains(PAYLOAD_LIKED_STATUS)) {
+            holder.updateLikedStatus(likedUuids.contains(station.stationuuid))
+        }
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -78,14 +99,17 @@ class BrowseCarouselAdapter(
             }
 
             // Like state
-            val isLiked = likedUuids.contains(station.stationuuid)
-            btnLike.setImageResource(
-                if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
-            )
+            updateLikedStatus(likedUuids.contains(station.stationuuid))
 
             // Click listeners
             itemView.setOnClickListener { onStationClick(station) }
             btnLike.setOnClickListener { onLikeClick(station) }
+        }
+
+        fun updateLikedStatus(isLiked: Boolean) {
+            btnLike.setImageResource(
+                if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+            )
         }
     }
 
@@ -97,5 +121,9 @@ class BrowseCarouselAdapter(
         override fun areContentsTheSame(oldItem: RadioBrowserStation, newItem: RadioBrowserStation): Boolean {
             return oldItem == newItem
         }
+    }
+
+    companion object {
+        private const val PAYLOAD_LIKED_STATUS = "liked_status"
     }
 }

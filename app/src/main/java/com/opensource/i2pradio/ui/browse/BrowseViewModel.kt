@@ -843,25 +843,40 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     /**
      * Check saved and liked status for a list of stations
      * Uses batch query to avoid N+1 query problem
+     *
+     * This method properly syncs the UI state with the database:
+     * - For stations IN the database: adds them to saved/liked sets
+     * - For stations NOT in the database: removes them from saved/liked sets
+     *
+     * This fixes the bug where after add+delete, the UI would still show
+     * the station as added because the old code only added, never removed.
      */
     private suspend fun checkSavedStatus(stations: List<RadioBrowserStation>) {
-        val savedUuids = mutableSetOf<String>()
-        savedUuids.addAll(_savedStationUuids.value.orEmpty())
-
-        val likedUuids = mutableSetOf<String>()
-        likedUuids.addAll(_likedStationUuids.value.orEmpty())
+        val savedUuids = _savedStationUuids.value.orEmpty().toMutableSet()
+        val likedUuids = _likedStationUuids.value.orEmpty().toMutableSet()
 
         // Batch query: get all station info at once instead of one-by-one
         val uuids = stations.map { it.stationuuid }
         val stationInfoMap = repository.getStationInfoByUuids(uuids)
 
+        // For each station in the displayed list, sync its status with the database
         for (station in stations) {
-            val stationInfo = stationInfoMap[station.stationuuid]
+            val uuid = station.stationuuid
+            val stationInfo = stationInfoMap[uuid]
             if (stationInfo != null) {
-                savedUuids.add(station.stationuuid)
+                // Station is in database - mark as saved
+                savedUuids.add(uuid)
+                // Update liked status based on database state
                 if (stationInfo.isLiked) {
-                    likedUuids.add(station.stationuuid)
+                    likedUuids.add(uuid)
+                } else {
+                    likedUuids.remove(uuid)
                 }
+            } else {
+                // Station is NOT in database - remove from both sets
+                // This is critical for the add->delete->add cycle to work correctly
+                savedUuids.remove(uuid)
+                likedUuids.remove(uuid)
             }
         }
 
