@@ -843,25 +843,40 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     /**
      * Check saved and liked status for a list of stations
      * Uses batch query to avoid N+1 query problem
+     *
+     * This method properly syncs the UI state with the database:
+     * - For stations IN the database: adds them to saved/liked sets
+     * - For stations NOT in the database: removes them from saved/liked sets
+     *
+     * This fixes the bug where after add+delete, the UI would still show
+     * the station as added because the old code only added, never removed.
      */
     private suspend fun checkSavedStatus(stations: List<RadioBrowserStation>) {
-        val savedUuids = mutableSetOf<String>()
-        savedUuids.addAll(_savedStationUuids.value.orEmpty())
-
-        val likedUuids = mutableSetOf<String>()
-        likedUuids.addAll(_likedStationUuids.value.orEmpty())
+        val savedUuids = _savedStationUuids.value.orEmpty().toMutableSet()
+        val likedUuids = _likedStationUuids.value.orEmpty().toMutableSet()
 
         // Batch query: get all station info at once instead of one-by-one
         val uuids = stations.map { it.stationuuid }
         val stationInfoMap = repository.getStationInfoByUuids(uuids)
 
+        // For each station in the displayed list, sync its status with the database
         for (station in stations) {
-            val stationInfo = stationInfoMap[station.stationuuid]
+            val uuid = station.stationuuid
+            val stationInfo = stationInfoMap[uuid]
             if (stationInfo != null) {
-                savedUuids.add(station.stationuuid)
+                // Station is in database - mark as saved
+                savedUuids.add(uuid)
+                // Update liked status based on database state
                 if (stationInfo.isLiked) {
-                    likedUuids.add(station.stationuuid)
+                    likedUuids.add(uuid)
+                } else {
+                    likedUuids.remove(uuid)
                 }
+            } else {
+                // Station is NOT in database - remove from both sets
+                // This is critical for the add->delete->add cycle to work correctly
+                savedUuids.remove(uuid)
+                likedUuids.remove(uuid)
             }
         }
 
@@ -871,13 +886,35 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
     /**
      * Refresh liked and saved station UUIDs from the database.
-     * Called when like state changes from other views to keep UI in sync.
+     * Called when like state changes from other views to keep UI in sync,
+     * or when the fragment resumes to catch changes made in other screens (e.g., library).
+     *
+     * This checks ALL displayed stations including:
+     * - Results list stations
+     * - All carousel stations (USA, Germany, Spanish, French, Trending, Top Voted, Popular, New)
      */
     fun refreshLikedAndSavedUuids() {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentStations = _stations.value ?: emptyList()
-            if (currentStations.isNotEmpty()) {
-                checkSavedStatus(currentStations)
+            // Collect all displayed stations from results and all carousels
+            val allDisplayedStations = mutableListOf<RadioBrowserStation>()
+
+            // Results list
+            _stations.value?.let { allDisplayedStations.addAll(it) }
+
+            // All carousel stations
+            _usaStations.value?.let { allDisplayedStations.addAll(it) }
+            _germanyStations.value?.let { allDisplayedStations.addAll(it) }
+            _spanishStations.value?.let { allDisplayedStations.addAll(it) }
+            _frenchStations.value?.let { allDisplayedStations.addAll(it) }
+            _trendingStations.value?.let { allDisplayedStations.addAll(it) }
+            _topVotedPreviewStations.value?.let { allDisplayedStations.addAll(it) }
+            _popularStations.value?.let { allDisplayedStations.addAll(it) }
+            _newStations.value?.let { allDisplayedStations.addAll(it) }
+
+            if (allDisplayedStations.isNotEmpty()) {
+                // Deduplicate by UUID before checking (same station may appear in multiple carousels)
+                val uniqueStations = allDisplayedStations.distinctBy { it.stationuuid }
+                checkSavedStatus(uniqueStations)
             }
         }
     }

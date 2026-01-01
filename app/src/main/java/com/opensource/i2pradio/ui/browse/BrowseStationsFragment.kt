@@ -1793,6 +1793,11 @@ class BrowseStationsFragment : Fragment() {
         super.onResume()
         val filter = IntentFilter(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(likeStateReceiver, filter)
+
+        // Refresh saved/liked state when returning to this fragment
+        // This catches changes made in other screens (e.g., deleting a station in library)
+        viewModel.refreshLikedAndSavedUuids()
+        refreshCarouselLikeStates()
     }
 
     override fun onPause() {
