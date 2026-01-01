@@ -654,18 +654,20 @@ class LibraryFragment : Fragment() {
                     LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
 
                     // Show toast message for both like and unlike
-                    if (it.isLiked) {
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.station_saved, station.name),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.station_removed, station.name),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        if (it.isLiked) {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.station_saved, station.name),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.station_removed, station.name),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
@@ -800,11 +802,13 @@ class LibraryFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             repository.deleteStationsByIds(selectedIds)
             withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(if (selectedIds.size > 1) R.string.deleted_stations_message_plural else R.string.deleted_stations_message_single, selectedIds.size),
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(if (selectedIds.size > 1) R.string.deleted_stations_message_plural else R.string.deleted_stations_message_single, selectedIds.size),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
                 actionMode?.finish()
             }
         }

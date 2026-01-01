@@ -731,7 +731,9 @@ class BrowseStationsFragment : Fragment() {
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                }
                 viewModel.clearError()
             }
         }
@@ -971,7 +973,9 @@ class BrowseStationsFragment : Fragment() {
     private fun showFullGenreDialog() {
         val tags = viewModel.tags.value ?: return
         if (tags.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.loading_genres, Toast.LENGTH_SHORT).show()
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), R.string.loading_genres, Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
@@ -1114,7 +1118,9 @@ class BrowseStationsFragment : Fragment() {
         }
 
         if (filters.isEmpty()) {
-            Toast.makeText(requireContext(), getString(R.string.all_filters_applied), Toast.LENGTH_SHORT).show()
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), getString(R.string.all_filters_applied), Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
@@ -1197,20 +1203,24 @@ class BrowseStationsFragment : Fragment() {
 
     private fun saveStation(station: RadioBrowserStation) {
         viewModel.saveStation(station)
-        Toast.makeText(
-            requireContext(),
-            getString(R.string.station_saved, station.name),
-            Toast.LENGTH_SHORT
-        ).show()
+        if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.station_saved, station.name),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun removeStation(station: RadioBrowserStation) {
         viewModel.removeStation(station)
-        Toast.makeText(
-            requireContext(),
-            getString(R.string.station_removed, station.name),
-            Toast.LENGTH_SHORT
-        ).show()
+        if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.station_removed, station.name),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun likeStation(station: RadioBrowserStation) {
@@ -1222,40 +1232,42 @@ class BrowseStationsFragment : Fragment() {
         lifecycleScope.launch {
             val updatedStation = repository.getStationInfoByUuid(station.stationuuid)
 
-            if (!wasLiked) {
-                if (!wasSaved) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.station_saved, station.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                if (!wasLiked) {
+                    if (!wasSaved) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_saved, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_added_to_favorites, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 } else {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.station_added_to_favorites, station.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            } else {
-                val stationAge = if (updatedStation != null) {
-                    System.currentTimeMillis() - updatedStation.addedTimestamp
-                } else {
-                    0L
-                }
+                    val stationAge = if (updatedStation != null) {
+                        System.currentTimeMillis() - updatedStation.addedTimestamp
+                    } else {
+                        0L
+                    }
 
-                val fiveMinutesInMillis = 5 * 60 * 1000
-                if (stationAge > fiveMinutesInMillis) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.station_removed_from_favorites, station.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.station_removed, station.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val fiveMinutesInMillis = 5 * 60 * 1000
+                    if (stationAge > fiveMinutesInMillis) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_removed_from_favorites, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_removed, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
 
@@ -1277,7 +1289,9 @@ class BrowseStationsFragment : Fragment() {
     private fun showCountryFilterDialog() {
         val countries = viewModel.countries.value ?: return
         if (countries.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.loading_countries, Toast.LENGTH_SHORT).show()
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), R.string.loading_countries, Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
@@ -1310,7 +1324,9 @@ class BrowseStationsFragment : Fragment() {
     private fun showGenreFilterDialog() {
         val tags = viewModel.tags.value ?: return
         if (tags.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.loading_genres, Toast.LENGTH_SHORT).show()
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), R.string.loading_genres, Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
@@ -1343,7 +1359,9 @@ class BrowseStationsFragment : Fragment() {
     private fun showLanguageFilterDialog() {
         val languages = viewModel.languages.value ?: return
         if (languages.isEmpty()) {
-            Toast.makeText(requireContext(), R.string.loading_languages, Toast.LENGTH_SHORT).show()
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), R.string.loading_languages, Toast.LENGTH_SHORT).show()
+            }
             return
         }
 

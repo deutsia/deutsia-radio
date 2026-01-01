@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                     updateProxyStatusViewVisibility()
                 }
                 RadioService.BROADCAST_STREAM_ERROR -> {
-                    if (context != null && !PreferencesHelper.isToastMessagesDisabled(context)) {
+                    if (context != null) {
                         val errorType = intent.getStringExtra(RadioService.EXTRA_STREAM_ERROR_TYPE)
                         val errorMessage = when (errorType) {
                             RadioService.ERROR_TYPE_TOR_NOT_CONNECTED -> getString(R.string.error_tor_not_connected)
@@ -130,7 +130,17 @@ class MainActivity : AppCompatActivity() {
                             RadioService.ERROR_TYPE_STREAM_FAILED -> getString(R.string.error_stream_failed)
                             else -> getString(R.string.error_stream_failed)
                         }
-                        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                        // Privacy/security errors always show, others respect toast setting
+                        // Use debounce to prevent spam (same error won't show again for 30 seconds)
+                        val isPrivacyError = errorType in listOf(
+                            RadioService.ERROR_TYPE_TOR_NOT_CONNECTED,
+                            RadioService.ERROR_TYPE_I2P_NOT_CONNECTED,
+                            RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED
+                        )
+                        val shouldShow = isPrivacyError || !PreferencesHelper.isToastMessagesDisabled(context)
+                        if (shouldShow && shouldShowErrorToast(errorType)) {
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
             }
@@ -515,18 +525,20 @@ class MainActivity : AppCompatActivity() {
                             LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(broadcastIntent)
 
                             // Show toast message for both like and unlike
-                            if (it.isLiked) {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.station_saved, station.name),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.station_removed, station.name),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            if (!PreferencesHelper.isToastMessagesDisabled(this@MainActivity)) {
+                                if (it.isLiked) {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        getString(R.string.station_saved, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        getString(R.string.station_removed, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     }
@@ -548,18 +560,20 @@ class MainActivity : AppCompatActivity() {
                             LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(broadcastIntent)
 
                             // Show toast message for both like and unlike
-                            if (it.isLiked) {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.station_saved, station.name),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.station_removed, station.name),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            if (!PreferencesHelper.isToastMessagesDisabled(this@MainActivity)) {
+                                if (it.isLiked) {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        getString(R.string.station_saved, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        getString(R.string.station_removed, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     }
@@ -714,6 +728,27 @@ class MainActivity : AppCompatActivity() {
 
         // Broadcast action for proxy mode changes
         const val BROADCAST_PROXY_MODE_CHANGED = "com.opensource.i2pradio.PROXY_MODE_CHANGED"
+
+        // Stream error toast debounce to prevent spam
+        private const val ERROR_TOAST_COOLDOWN_MS = 30_000L // 30 seconds
+        private val lastErrorToastTimes = mutableMapOf<String, Long>()
+
+        /**
+         * Check if enough time has passed since the last toast for this error type.
+         * Returns true if we should show the toast, false if it should be suppressed.
+         */
+        @Synchronized
+        fun shouldShowErrorToast(errorType: String?): Boolean {
+            if (errorType == null) return true
+            val now = System.currentTimeMillis()
+            val lastTime = lastErrorToastTimes[errorType] ?: 0L
+            return if (now - lastTime >= ERROR_TOAST_COOLDOWN_MS) {
+                lastErrorToastTimes[errorType] = now
+                true
+            } else {
+                false
+            }
+        }
 
         // Flag to preserve authentication state across activity recreation (for UI changes like themes)
         @Volatile
