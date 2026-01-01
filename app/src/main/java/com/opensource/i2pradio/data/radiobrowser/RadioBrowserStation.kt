@@ -134,6 +134,34 @@ data class RadioBrowserStation(
     }
 
     /**
+     * Get the network type indicator (I2P, Tor) if this station uses a privacy network.
+     * Returns null if no privacy network is used.
+     */
+    fun getNetworkIndicator(): String? {
+        return when (proxyType.uppercase()) {
+            "I2P" -> "I2P"
+            "TOR" -> "Tor"
+            else -> null
+        }
+    }
+
+    /**
+     * Get the genre string with network indicator suffix if applicable.
+     * Returns format like "Pop · Tor" or "Rock · I2P", or just "Pop" for regular stations.
+     */
+    fun getGenreWithNetwork(): String {
+        val genre = getPrimaryGenre()
+        val network = getNetworkIndicator()
+        return if (network != null && genre.isNotEmpty() && genre != "Other") {
+            "$genre · $network"
+        } else if (network != null) {
+            network
+        } else {
+            genre
+        }
+    }
+
+    /**
      * Map RadioBrowser tags to app's genre categories
      */
     private fun mapToAppGenre(tag: String): String {
