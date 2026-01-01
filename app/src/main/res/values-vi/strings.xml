@@ -174,6 +174,8 @@
     <string name="settings_color_orange">Cam</string>
     <string name="settings_language">Ngôn ngữ</string>
     <string name="settings_language_description">Chọn ngôn ngữ ưa thích của bạn</string>
+    <string name="settings_disable_toasts">Tắt thông báo toast</string>
+    <string name="settings_disable_toasts_description">Ẩn thông báo bật lên cho cảnh báo và lỗi</string>
 
     <!-- Language Names -->
     <string name="language_choose">Chọn ngôn ngữ</string>
@@ -586,6 +588,14 @@
     <string name="empty_state_title">Không tìm thấy đài nào</string>
     <string name="empty_state_message">Bắt đầu bằng cách thêm đài đầu tiên.\nNhấp vào nút bên dưới.</string>
     <string name="empty_state_add_button">Thêm đài mới</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">Không thể kết nối đến luồng</string>
+    <string name="error_stream_max_retries">Kết nối thất bại sau nhiều lần thử</string>
+    <string name="error_tor_not_connected">Tor chưa được kết nối. Bật Tor để phát luồng này.</string>
+    <string name="error_i2p_not_connected">I2P chưa chạy. Khởi động I2P (ví dụ: InviZible Pro) để phát luồng này.</string>
+    <string name="error_tor_required_for_clearnet">Tor chưa được kết nối. Chế độ bắt buộc Tor yêu cầu Tor cho các luồng clearnet.</string>
+    <string name="error_custom_proxy_not_configured">Proxy tùy chỉnh chưa được cấu hình. Cấu hình trong Cài đặt.</string>
 
     <!-- Content Descriptions (Accessibility) -->
     <string name="cd_add_radio_station">Thêm đài radio</string>

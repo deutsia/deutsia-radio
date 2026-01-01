@@ -174,6 +174,8 @@
     <string name="settings_color_orange">Laranja</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_description">Escolha seu idioma preferido</string>
+    <string name="settings_disable_toasts">Desativar mensagens toast</string>
+    <string name="settings_disable_toasts_description">Ocultar notificações popup de avisos e erros</string>
 
     <!-- Language Names -->
     <string name="language_choose">Escolher idioma</string>
@@ -586,6 +588,14 @@
     <string name="empty_state_title">Nenhuma estação encontrada</string>
     <string name="empty_state_message">Comece adicionando sua primeira estação.\nClique no botão abaixo.</string>
     <string name="empty_state_add_button">Adicionar nova estação</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">Falha ao conectar ao stream</string>
+    <string name="error_stream_max_retries">Conexão falhou após várias tentativas</string>
+    <string name="error_tor_not_connected">Tor não está conectado. Ative o Tor para reproduzir este stream.</string>
+    <string name="error_i2p_not_connected">I2P não está em execução. Inicie o I2P (ex. InviZible Pro) para reproduzir este stream.</string>
+    <string name="error_tor_required_for_clearnet">Tor não está conectado. O modo Tor forçado requer Tor para streams clearnet.</string>
+    <string name="error_custom_proxy_not_configured">Proxy personalizado não configurado. Configure-o nas Configurações.</string>
 
     <!-- Content Descriptions (Accessibility) -->
     <string name="cd_add_radio_station">Adicionar estação de rádio</string>

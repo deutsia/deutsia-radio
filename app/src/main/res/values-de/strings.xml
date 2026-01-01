@@ -174,6 +174,8 @@
     <string name="settings_color_orange">Orange</string>
     <string name="settings_language">Sprache</string>
     <string name="settings_language_description">Wählen Sie Ihre bevorzugte Sprache</string>
+    <string name="settings_disable_toasts">Toast-Benachrichtigungen deaktivieren</string>
+    <string name="settings_disable_toasts_description">Popup-Benachrichtigungen für Warnungen und Fehler ausblenden</string>
 
     <!-- Language Names -->
     <string name="language_choose">Sprache wählen</string>
@@ -578,6 +580,14 @@
 
     <!-- Browse Filter Messages -->
     <string name="all_filters_applied">Alle Filter sind bereits angewendet</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">Stream-Verbindung fehlgeschlagen</string>
+    <string name="error_stream_max_retries">Verbindung nach mehreren Versuchen fehlgeschlagen</string>
+    <string name="error_tor_not_connected">Tor ist nicht verbunden. Aktivieren Sie Tor, um diesen Stream abzuspielen.</string>
+    <string name="error_i2p_not_connected">I2P läuft nicht. Starten Sie I2P (z.B. InviZible Pro), um diesen Stream abzuspielen.</string>
+    <string name="error_tor_required_for_clearnet">Tor ist nicht verbunden. Der Tor-Zwangsmodus erfordert Tor für Clearnet-Streams.</string>
+    <string name="error_custom_proxy_not_configured">Benutzerdefinierter Proxy nicht konfiguriert. Konfigurieren Sie ihn in den Einstellungen.</string>
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Passwort geändert, aber Datenbank-Neucodierung fehlgeschlagen: %s</string>

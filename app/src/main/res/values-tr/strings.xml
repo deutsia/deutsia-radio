@@ -174,6 +174,8 @@
     <string name="settings_color_orange">Turuncu</string>
     <string name="settings_language">Dil</string>
     <string name="settings_language_description">Tercih ettiğiniz dili seçin</string>
+    <string name="settings_disable_toasts">Toast mesajlarını devre dışı bırak</string>
+    <string name="settings_disable_toasts_description">Uyarı ve hata bildirimlerini gizle</string>
 
     <!-- Language Names -->
     <string name="language_choose">Dil Seç</string>
@@ -586,6 +588,14 @@
     <string name="empty_state_title">İstasyon Bulunamadı</string>
     <string name="empty_state_message">İlk istasyonunuzu ekleyerek başlayın.\nAşağıdaki düğmeye tıklayın.</string>
     <string name="empty_state_add_button">Yeni İstasyon Ekle</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">Yayına bağlanılamadı</string>
+    <string name="error_stream_max_retries">Birden fazla denemeden sonra bağlantı başarısız oldu</string>
+    <string name="error_tor_not_connected">Tor bağlı değil. Bu yayını oynatmak için Tor\'u etkinleştirin.</string>
+    <string name="error_i2p_not_connected">I2P çalışmıyor. Bu yayını oynatmak için I2P\'yi başlatın (örn. InviZible Pro).</string>
+    <string name="error_tor_required_for_clearnet">Tor bağlı değil. Zorla Tor modu clearnet yayınları için Tor gerektirir.</string>
+    <string name="error_custom_proxy_not_configured">Özel proxy yapılandırılmamış. Ayarlar\'da yapılandırın.</string>
 
     <!-- Content Descriptions (Accessibility) -->
     <string name="cd_add_radio_station">Radyo İstasyonu Ekle</string>
