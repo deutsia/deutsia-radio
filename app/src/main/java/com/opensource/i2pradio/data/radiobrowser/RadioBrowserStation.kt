@@ -31,7 +31,12 @@ data class RadioBrowserStation(
     val clicktrend: Int,
     val sslError: Boolean,
     val geoLat: Double?,
-    val geoLong: Double?
+    val geoLong: Double?,
+    // Proxy settings for Tor/I2P stations
+    val useProxy: Boolean = false,
+    val proxyType: String = "NONE",
+    val proxyHost: String = "",
+    val proxyPort: Int = 0
 ) {
     companion object {
         /**
@@ -99,7 +104,12 @@ data class RadioBrowserStation(
                 clicktrend = 0,
                 sslError = false,
                 geoLat = null,
-                geoLong = null
+                geoLong = null,
+                // Preserve proxy settings from source station
+                useProxy = station.useProxy,
+                proxyType = station.proxyType,
+                proxyHost = station.proxyHost,
+                proxyPort = station.proxyPort
             )
         }
     }

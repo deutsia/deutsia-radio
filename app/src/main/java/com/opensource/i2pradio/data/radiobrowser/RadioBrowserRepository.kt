@@ -260,10 +260,11 @@ class RadioBrowserRepository(context: Context) {
             countryCode = station.countrycode,
             homepage = station.homepage,
             addedTimestamp = now,
-            // Default proxy settings - stations from RadioBrowser are clearnet
-            useProxy = false,
-            proxyHost = "",
-            proxyPort = 0
+            // Use proxy settings from the station (for Tor/I2P curated stations)
+            useProxy = station.useProxy,
+            proxyType = station.proxyType,
+            proxyHost = station.proxyHost,
+            proxyPort = station.proxyPort
         )
     }
 
