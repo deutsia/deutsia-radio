@@ -155,7 +155,9 @@ class SettingsFragment : Fragment() {
             // Save the URI
             PreferencesHelper.setRecordingDirectoryUri(requireContext(), selectedUri.toString())
             updateRecordingDirectoryDisplay()
-            Toast.makeText(requireContext(), getString(R.string.recording_directory_updated), Toast.LENGTH_SHORT).show()
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), getString(R.string.recording_directory_updated), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -386,7 +388,9 @@ class SettingsFragment : Fragment() {
             clipboard.setPrimaryClip(clip)
 
             // Show a toast to confirm
-            Toast.makeText(requireContext(), getString(R.string.toast_address_copied), Toast.LENGTH_SHORT).show()
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), getString(R.string.toast_address_copied), Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Sleep timer button
@@ -545,13 +549,17 @@ class SettingsFragment : Fragment() {
     private fun openBuiltInEqualizer() {
         val equalizerManager = radioService?.getEqualizerManager()
         if (equalizerManager == null) {
-            Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
         val audioSessionId = radioService?.getAudioSessionId() ?: 0
         if (audioSessionId == 0) {
-            Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
@@ -559,7 +567,9 @@ class SettingsFragment : Fragment() {
         if (!equalizerManager.isInitialized()) {
             val initialized = equalizerManager.initialize(audioSessionId)
             if (!initialized) {
-                Toast.makeText(requireContext(), getString(R.string.equalizer_init_failed), Toast.LENGTH_SHORT).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(requireContext(), getString(R.string.equalizer_init_failed), Toast.LENGTH_SHORT).show()
+                }
                 return
             }
         }
@@ -839,11 +849,13 @@ class SettingsFragment : Fragment() {
             // Show warning if enabling and Tor is not connected
             // Skip warning during initialization to prevent flickering when Material You is toggled
             if (isChecked && !TorManager.isConnected() && !isInitializing) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.warning_tor_not_connected),
-                    Toast.LENGTH_LONG
-                ).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.warning_tor_not_connected),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
 
@@ -888,11 +900,13 @@ class SettingsFragment : Fragment() {
             // Show warning if enabling and Tor is not connected
             // Skip warning during initialization to prevent flickering when Material You is toggled
             if (isChecked && !TorManager.isConnected() && !isInitializing) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.warning_tor_not_connected_except_i2p),
-                    Toast.LENGTH_LONG
-                ).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.warning_tor_not_connected_except_i2p),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
 
@@ -1070,13 +1084,17 @@ class SettingsFragment : Fragment() {
                         // Default
                         PreferencesHelper.setRecordingDirectoryUri(requireContext(), null)
                         updateRecordingDirectoryDisplay()
-                        Toast.makeText(requireContext(), getString(R.string.toast_using_default_directory), Toast.LENGTH_SHORT).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(requireContext(), getString(R.string.toast_using_default_directory), Toast.LENGTH_SHORT).show()
+                        }
                     }
                     savedUri != null && which == 1 -> {
                         // Clear custom folder
                         PreferencesHelper.setRecordingDirectoryUri(requireContext(), null)
                         updateRecordingDirectoryDisplay()
-                        Toast.makeText(requireContext(), getString(R.string.toast_using_default_directory), Toast.LENGTH_SHORT).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(requireContext(), getString(R.string.toast_using_default_directory), Toast.LENGTH_SHORT).show()
+                        }
                     }
                     else -> {
                         // Choose custom folder
@@ -1335,11 +1353,13 @@ class SettingsFragment : Fragment() {
                     if (!isAdded) return@withContext
 
                     if (result.stations.isEmpty()) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.no_stations_found_in_list, networkName),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                            Toast.makeText(
+                                context,
+                                getString(R.string.no_stations_found_in_list, networkName),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                         return@withContext
                     }
 
@@ -1350,11 +1370,13 @@ class SettingsFragment : Fragment() {
                 withContext(Dispatchers.Main) {
                     if (!isAdded) return@withContext
 
-                    Toast.makeText(
-                        context,
-                        getString(R.string.failed_to_import_stations, networkName, e.message),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.failed_to_import_stations, networkName, e.message),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -1430,11 +1452,13 @@ class SettingsFragment : Fragment() {
                     // Check if Fragment is still attached before showing UI
                     if (!isAdded) return@withContext
 
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.import_error_message, e.message),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.import_error_message, e.message),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -1458,11 +1482,13 @@ class SettingsFragment : Fragment() {
                 // Check if Fragment is still attached before showing UI
                 if (!isAdded) return@withContext
 
-                Toast.makeText(
-                    context,
-                    getString(R.string.imported_stations_success, imported),
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                    Toast.makeText(
+                        context,
+                        getString(R.string.imported_stations_success, imported),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
@@ -1479,11 +1505,13 @@ class SettingsFragment : Fragment() {
                         // Check if Fragment is still attached before showing UI
                         if (!isAdded) return@withContext
 
-                        Toast.makeText(
-                            context,
-                            getString(R.string.no_stations_to_export),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                            Toast.makeText(
+                                context,
+                                getString(R.string.no_stations_to_export),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                     return@launch
                 }
@@ -1505,22 +1533,26 @@ class SettingsFragment : Fragment() {
                     // Check if Fragment is still attached before showing UI
                     if (!isAdded) return@withContext
 
-                    Toast.makeText(
-                        context,
-                        getString(R.string.exported_stations_success, stations.size, format.displayName),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.exported_stations_success, stations.size, format.displayName),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     // Check if Fragment is still attached before showing UI
                     if (!isAdded) return@withContext
 
-                    Toast.makeText(
-                        context,
-                        getString(R.string.export_error_message, e.message),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.export_error_message, e.message),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -1641,11 +1673,13 @@ class SettingsFragment : Fragment() {
             if (isChecked) {
                 val host = PreferencesHelper.getCustomProxyHost(requireContext())
                 if (host.isEmpty()) {
-                    Toast.makeText(
-                        requireContext(),
-                        "⚠️ Custom proxy not configured! Configure proxy first.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(
+                            requireContext(),
+                            "⚠️ Custom proxy not configured! Configure proxy first.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -1695,11 +1729,13 @@ class SettingsFragment : Fragment() {
             if (isChecked) {
                 val host = PreferencesHelper.getCustomProxyHost(requireContext())
                 if (host.isEmpty()) {
-                    Toast.makeText(
-                        requireContext(),
-                        "⚠️ Custom proxy not configured! Configure proxy first.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(
+                            requireContext(),
+                            "⚠️ Custom proxy not configured! Configure proxy first.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -1724,7 +1760,9 @@ class SettingsFragment : Fragment() {
                 .setPositiveButton(getString(R.string.button_reset)) { _, _ ->
                     PreferencesHelper.resetSessionBandwidthUsage(requireContext())
                     updateBandwidthDisplay()
-                    Toast.makeText(requireContext(), getString(R.string.toast_session_bandwidth_reset), Toast.LENGTH_SHORT).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(requireContext(), getString(R.string.toast_session_bandwidth_reset), Toast.LENGTH_SHORT).show()
+                    }
                 }
                 .setNegativeButton(getString(R.string.button_cancel), null)
                 .show()
@@ -1886,7 +1924,9 @@ class SettingsFragment : Fragment() {
                 // Update status view in settings
                 updateCustomProxyStatusView()
 
-                Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_saved), Toast.LENGTH_SHORT).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_saved), Toast.LENGTH_SHORT).show()
+                }
             }
             .setNeutralButton(getString(R.string.button_clear)) { _, _ ->
                 // Disable custom proxy
@@ -1917,7 +1957,9 @@ class SettingsFragment : Fragment() {
                 // Update status view in settings
                 updateCustomProxyStatusView()
 
-                Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_cleared), Toast.LENGTH_SHORT).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(requireContext(), getString(R.string.toast_custom_proxy_cleared), Toast.LENGTH_SHORT).show()
+                }
             }
             .setNegativeButton(getString(R.string.button_cancel), null)
             .show()
@@ -2257,11 +2299,15 @@ class SettingsFragment : Fragment() {
 
                 when {
                     password.length < 4 -> {
-                        Toast.makeText(requireContext(), R.string.auth_error_password_too_short, Toast.LENGTH_SHORT).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(requireContext(), R.string.auth_error_password_too_short, Toast.LENGTH_SHORT).show()
+                        }
                         appLockSwitch?.isChecked = false
                     }
                     password != confirm -> {
-                        Toast.makeText(requireContext(), R.string.auth_error_passwords_dont_match, Toast.LENGTH_SHORT).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(requireContext(), R.string.auth_error_passwords_dont_match, Toast.LENGTH_SHORT).show()
+                        }
                         appLockSwitch?.isChecked = false
                     }
                     else -> {
@@ -2269,7 +2315,9 @@ class SettingsFragment : Fragment() {
                         PreferencesHelper.setAppLockEnabled(requireContext(), true)
                         updateAuthenticationUIVisibility()
                         updateDatabaseEncryptionSwitchState()
-                        Toast.makeText(requireContext(), R.string.auth_password_set, Toast.LENGTH_SHORT).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(requireContext(), R.string.auth_password_set, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
@@ -2335,13 +2383,19 @@ class SettingsFragment : Fragment() {
 
                 when {
                     newPassword.length < 4 -> {
-                        Toast.makeText(requireContext(), R.string.auth_error_password_too_short, Toast.LENGTH_SHORT).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(requireContext(), R.string.auth_error_password_too_short, Toast.LENGTH_SHORT).show()
+                        }
                     }
                     newPassword != confirm -> {
-                        Toast.makeText(requireContext(), R.string.auth_error_passwords_dont_match, Toast.LENGTH_SHORT).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(requireContext(), R.string.auth_error_passwords_dont_match, Toast.LENGTH_SHORT).show()
+                        }
                     }
                     !BiometricAuthManager.changePassword(requireContext(), currentPassword, newPassword) -> {
-                        Toast.makeText(requireContext(), R.string.auth_error_current_password_wrong, Toast.LENGTH_SHORT).show()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(requireContext(), R.string.auth_error_current_password_wrong, Toast.LENGTH_SHORT).show()
+                        }
                     }
                     else -> {
                         // Password changed successfully
@@ -2374,7 +2428,9 @@ class SettingsFragment : Fragment() {
 
                                     withContext(Dispatchers.Main) {
                                         progressDialog.dismiss()
-                                        Toast.makeText(requireContext(), R.string.auth_password_changed, Toast.LENGTH_SHORT).show()
+                                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                            Toast.makeText(requireContext(), R.string.auth_password_changed, Toast.LENGTH_SHORT).show()
+                                        }
 
                                         // Restart app to apply changes
                                         restartApp()
@@ -2383,13 +2439,17 @@ class SettingsFragment : Fragment() {
                                     withContext(Dispatchers.Main) {
                                         progressDialog.dismiss()
                                         android.util.Log.e("SettingsFragment", "Failed to re-key database", e)
-                                        Toast.makeText(requireContext(), getString(R.string.password_change_rekey_failed, e.message), Toast.LENGTH_LONG).show()
+                                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                            Toast.makeText(requireContext(), getString(R.string.password_change_rekey_failed, e.message), Toast.LENGTH_LONG).show()
+                                        }
                                     }
                                 }
                             }
                         } else {
                             // No database encryption, just show success message
-                            Toast.makeText(requireContext(), R.string.auth_password_changed, Toast.LENGTH_SHORT).show()
+                            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                Toast.makeText(requireContext(), R.string.auth_password_changed, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
@@ -2501,7 +2561,9 @@ class SettingsFragment : Fragment() {
 
                 // Verify password matches stored password
                 if (!com.opensource.i2pradio.utils.BiometricAuthManager.verifyPassword(requireContext(), password)) {
-                    Toast.makeText(requireContext(), R.string.auth_error_wrong_password, Toast.LENGTH_SHORT).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(requireContext(), R.string.auth_error_wrong_password, Toast.LENGTH_SHORT).show()
+                    }
                     switch.isChecked = false
                     switch.isEnabled = true
                     return@setPositiveButton
@@ -2534,7 +2596,9 @@ class SettingsFragment : Fragment() {
 
                         withContext(Dispatchers.Main) {
                             progressDialog.dismiss()
-                            Toast.makeText(requireContext(), R.string.settings_database_encryption_enabled, Toast.LENGTH_SHORT).show()
+                            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                Toast.makeText(requireContext(), R.string.settings_database_encryption_enabled, Toast.LENGTH_SHORT).show()
+                            }
 
                             // Restart the app
                             restartApp()
@@ -2543,7 +2607,9 @@ class SettingsFragment : Fragment() {
                         withContext(Dispatchers.Main) {
                             progressDialog.dismiss()
                             android.util.Log.e("SettingsFragment", "Failed to enable database encryption", e)
-                            Toast.makeText(requireContext(), "${getString(R.string.settings_database_encryption_error)}: ${e.message}", Toast.LENGTH_LONG).show()
+                            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                Toast.makeText(requireContext(), "${getString(R.string.settings_database_encryption_error)}: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
 
                             // Disable encryption setting
                             com.opensource.i2pradio.utils.DatabaseEncryptionManager.disableDatabaseEncryption(requireContext())
@@ -2598,7 +2664,9 @@ class SettingsFragment : Fragment() {
 
                 // Verify password matches stored password
                 if (!com.opensource.i2pradio.utils.BiometricAuthManager.verifyPassword(requireContext(), password)) {
-                    Toast.makeText(requireContext(), R.string.auth_error_wrong_password, Toast.LENGTH_SHORT).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(requireContext(), R.string.auth_error_wrong_password, Toast.LENGTH_SHORT).show()
+                    }
                     switch.isChecked = true
                     switch.isEnabled = true
                     return@setPositiveButton
@@ -2642,7 +2710,9 @@ class SettingsFragment : Fragment() {
                         withContext(Dispatchers.Main) {
                             progressDialog.dismiss()
                             android.util.Log.e("SettingsFragment", "Failed to disable database encryption", e)
-                            Toast.makeText(requireContext(), "${getString(R.string.settings_database_encryption_error)}: ${e.message}", Toast.LENGTH_LONG).show()
+                            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                Toast.makeText(requireContext(), "${getString(R.string.settings_database_encryption_error)}: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
                             switch.isChecked = true
                             switch.isEnabled = true
                         }

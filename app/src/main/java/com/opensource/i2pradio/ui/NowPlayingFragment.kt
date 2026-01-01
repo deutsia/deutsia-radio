@@ -203,14 +203,18 @@ class NowPlayingFragment : Fragment() {
                     val errorMessage = intent.getStringExtra(RadioService.EXTRA_ERROR_MESSAGE) ?: getString(R.string.error_unknown)
                     // Reset recording state in ViewModel
                     viewModel.onRecordingError()
-                    Toast.makeText(context, getString(R.string.recording_failed, errorMessage), Toast.LENGTH_LONG).show()
+                    if (context != null && !PreferencesHelper.isToastMessagesDisabled(context!!)) {
+                        Toast.makeText(context, getString(R.string.recording_failed, errorMessage), Toast.LENGTH_LONG).show()
+                    }
                 }
                 RadioService.BROADCAST_RECORDING_COMPLETE -> {
                     val filePath = intent.getStringExtra(RadioService.EXTRA_FILE_PATH) ?: ""
                     val fileSize = intent.getLongExtra(RadioService.EXTRA_FILE_SIZE, 0L)
                     val sizeKB = fileSize / 1024
                     val fileName = filePath.substringAfterLast("/")
-                    Toast.makeText(context, getString(R.string.recording_saved, fileName, sizeKB), Toast.LENGTH_LONG).show()
+                    if (context != null && !PreferencesHelper.isToastMessagesDisabled(context!!)) {
+                        Toast.makeText(context, getString(R.string.recording_saved, fileName, sizeKB), Toast.LENGTH_LONG).show()
+                    }
                 }
                 RadioService.BROADCAST_COVER_ART_CHANGED -> {
                     val coverArtUri = intent.getStringExtra(RadioService.EXTRA_COVER_ART_URI)
@@ -382,18 +386,20 @@ class NowPlayingFragment : Fragment() {
                                 LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
 
                                 // Show toast message
-                                if (it.isLiked) {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        getString(R.string.station_saved, station.name),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        getString(R.string.station_removed, station.name),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                    if (it.isLiked) {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            getString(R.string.station_saved, station.name),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            getString(R.string.station_removed, station.name),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
                         }
@@ -415,18 +421,20 @@ class NowPlayingFragment : Fragment() {
                                 LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
 
                                 // Show toast message
-                                if (it.isLiked) {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        getString(R.string.station_saved, station.name),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        getString(R.string.station_removed, station.name),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                    if (it.isLiked) {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            getString(R.string.station_saved, station.name),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            getString(R.string.station_removed, station.name),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
                         }
@@ -655,12 +663,18 @@ class NowPlayingFragment : Fragment() {
             val recordingState = viewModel.recordingState.value
             if (recordingState?.isRecording == true) {
                 viewModel.stopRecording()
-                Toast.makeText(requireContext(), getString(R.string.recording_stopping), Toast.LENGTH_SHORT).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(requireContext(), getString(R.string.recording_stopping), Toast.LENGTH_SHORT).show()
+                }
             } else {
                 if (viewModel.startRecording()) {
-                    Toast.makeText(requireContext(), getString(R.string.recording_starting), Toast.LENGTH_SHORT).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(requireContext(), getString(R.string.recording_starting), Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    Toast.makeText(requireContext(), getString(R.string.recording_no_station), Toast.LENGTH_SHORT).show()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(requireContext(), getString(R.string.recording_no_station), Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -965,13 +979,17 @@ class NowPlayingFragment : Fragment() {
     private fun openBuiltInEqualizer() {
         val equalizerManager = radioService?.getEqualizerManager()
         if (equalizerManager == null) {
-            Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
         val audioSessionId = radioService?.getAudioSessionId() ?: 0
         if (audioSessionId == 0) {
-            Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
@@ -979,7 +997,9 @@ class NowPlayingFragment : Fragment() {
         if (!equalizerManager.isInitialized()) {
             val initialized = equalizerManager.initialize(audioSessionId)
             if (!initialized) {
-                Toast.makeText(requireContext(), getString(R.string.equalizer_init_failed), Toast.LENGTH_SHORT).show()
+                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                    Toast.makeText(requireContext(), getString(R.string.equalizer_init_failed), Toast.LENGTH_SHORT).show()
+                }
                 return
             }
         }

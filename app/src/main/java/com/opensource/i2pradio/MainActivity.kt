@@ -515,18 +515,20 @@ class MainActivity : AppCompatActivity() {
                             LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(broadcastIntent)
 
                             // Show toast message for both like and unlike
-                            if (it.isLiked) {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.station_saved, station.name),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.station_removed, station.name),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            if (!PreferencesHelper.isToastMessagesDisabled(this@MainActivity)) {
+                                if (it.isLiked) {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        getString(R.string.station_saved, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        getString(R.string.station_removed, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     }
@@ -548,18 +550,20 @@ class MainActivity : AppCompatActivity() {
                             LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(broadcastIntent)
 
                             // Show toast message for both like and unlike
-                            if (it.isLiked) {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.station_saved, station.name),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.station_removed, station.name),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            if (!PreferencesHelper.isToastMessagesDisabled(this@MainActivity)) {
+                                if (it.isLiked) {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        getString(R.string.station_saved, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        getString(R.string.station_removed, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     }
