@@ -242,12 +242,14 @@ class NowPlayingFragment : Fragment() {
                             else -> getString(R.string.error_stream_failed)
                         }
                         // Privacy/security errors always show, others respect toast setting
+                        // Use debounce to prevent spam (same error won't show again for 30 seconds)
                         val isPrivacyError = errorType in listOf(
                             RadioService.ERROR_TYPE_TOR_NOT_CONNECTED,
                             RadioService.ERROR_TYPE_I2P_NOT_CONNECTED,
                             RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED
                         )
-                        if (isPrivacyError || !PreferencesHelper.isToastMessagesDisabled(context!!)) {
+                        val shouldShow = isPrivacyError || !PreferencesHelper.isToastMessagesDisabled(context!!)
+                        if (shouldShow && com.opensource.i2pradio.MainActivity.shouldShowErrorToast(errorType)) {
                             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                         }
                     }
