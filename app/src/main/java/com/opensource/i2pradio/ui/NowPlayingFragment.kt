@@ -231,7 +231,7 @@ class NowPlayingFragment : Fragment() {
                     updatePlaybackTime(elapsedMs, bufferedPositionMs, currentPositionMs)
                 }
                 RadioService.BROADCAST_STREAM_ERROR -> {
-                    if (context != null && !PreferencesHelper.isToastMessagesDisabled(context!!)) {
+                    if (context != null) {
                         val errorType = intent.getStringExtra(RadioService.EXTRA_STREAM_ERROR_TYPE)
                         val errorMessage = when (errorType) {
                             RadioService.ERROR_TYPE_TOR_NOT_CONNECTED -> getString(R.string.error_tor_not_connected)
@@ -241,7 +241,15 @@ class NowPlayingFragment : Fragment() {
                             RadioService.ERROR_TYPE_STREAM_FAILED -> getString(R.string.error_stream_failed)
                             else -> getString(R.string.error_stream_failed)
                         }
-                        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                        // Privacy/security errors always show, others respect toast setting
+                        val isPrivacyError = errorType in listOf(
+                            RadioService.ERROR_TYPE_TOR_NOT_CONNECTED,
+                            RadioService.ERROR_TYPE_I2P_NOT_CONNECTED,
+                            RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED
+                        )
+                        if (isPrivacyError || !PreferencesHelper.isToastMessagesDisabled(context!!)) {
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
             }

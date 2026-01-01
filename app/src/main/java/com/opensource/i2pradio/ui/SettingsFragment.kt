@@ -848,14 +848,13 @@ class SettingsFragment : Fragment() {
 
             // Show warning if enabling and Tor is not connected
             // Skip warning during initialization to prevent flickering when Material You is toggled
+            // Note: This is a privacy/security warning - always show regardless of toast setting
             if (isChecked && !TorManager.isConnected() && !isInitializing) {
-                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.warning_tor_not_connected),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.warning_tor_not_connected),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
 
@@ -899,14 +898,13 @@ class SettingsFragment : Fragment() {
 
             // Show warning if enabling and Tor is not connected
             // Skip warning during initialization to prevent flickering when Material You is toggled
+            // Note: This is a privacy/security warning - always show regardless of toast setting
             if (isChecked && !TorManager.isConnected() && !isInitializing) {
-                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.warning_tor_not_connected_except_i2p),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.warning_tor_not_connected_except_i2p),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
 
@@ -1670,16 +1668,15 @@ class SettingsFragment : Fragment() {
             stopCurrentStream()
 
             // Show warning if enabling and custom proxy is not configured
+            // Note: This is a privacy/security warning - always show regardless of toast setting
             if (isChecked) {
                 val host = PreferencesHelper.getCustomProxyHost(requireContext())
                 if (host.isEmpty()) {
-                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                        Toast.makeText(
-                            requireContext(),
-                            "⚠️ Custom proxy not configured! Configure proxy first.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    Toast.makeText(
+                        requireContext(),
+                        "⚠️ Custom proxy not configured! Configure proxy first.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -1726,16 +1723,15 @@ class SettingsFragment : Fragment() {
             stopCurrentStream()
 
             // Show warning if enabling and custom proxy is not configured
+            // Note: This is a privacy/security warning - always show regardless of toast setting
             if (isChecked) {
                 val host = PreferencesHelper.getCustomProxyHost(requireContext())
                 if (host.isEmpty()) {
-                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                        Toast.makeText(
-                            requireContext(),
-                            "⚠️ Custom proxy not configured! Configure proxy first.",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    Toast.makeText(
+                        requireContext(),
+                        "⚠️ Custom proxy not configured! Configure proxy first.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
