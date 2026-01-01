@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                     updateProxyStatusViewVisibility()
                 }
                 RadioService.BROADCAST_STREAM_ERROR -> {
-                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                    if (context != null && !PreferencesHelper.isToastMessagesDisabled(context)) {
                         val errorType = intent.getStringExtra(RadioService.EXTRA_STREAM_ERROR_TYPE)
                         val errorMessage = when (errorType) {
                             RadioService.ERROR_TYPE_TOR_NOT_CONNECTED -> getString(R.string.error_tor_not_connected)
