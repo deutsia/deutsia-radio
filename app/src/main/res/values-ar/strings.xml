@@ -174,6 +174,8 @@
     <string name="settings_color_orange">برتقالي</string>
     <string name="settings_language">اللغة</string>
     <string name="settings_language_description">اختر لغتك المفضلة</string>
+    <string name="settings_disable_toasts">تعطيل رسائل التنبيه</string>
+    <string name="settings_disable_toasts_description">إخفاء الإشعارات المنبثقة للتحذيرات والأخطاء</string>
 
     <!-- Language Names -->
     <string name="language_choose">اختيار اللغة</string>
@@ -585,6 +587,14 @@
     <string name="empty_state_title">لم يتم العثور على محطات</string>
     <string name="empty_state_message">ابدأ بإضافة محطتك الأولى.\nانقر على الزر أدناه.</string>
     <string name="empty_state_add_button">إضافة محطة جديدة</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">فشل الاتصال بالبث</string>
+    <string name="error_stream_max_retries">فشل الاتصال بعد عدة محاولات</string>
+    <string name="error_tor_not_connected">Tor غير متصل. قم بتفعيل Tor لتشغيل هذا البث.</string>
+    <string name="error_i2p_not_connected">I2P لا يعمل. قم بتشغيل I2P (مثل InviZible Pro) لتشغيل هذا البث.</string>
+    <string name="error_tor_required_for_clearnet">Tor غير متصل. وضع إجبار Tor يتطلب Tor للبث العادي.</string>
+    <string name="error_custom_proxy_not_configured">البروكسي المخصص غير مهيأ. قم بتهيئته في الإعدادات.</string>
 
     <!-- Content Descriptions (Accessibility) -->
     <string name="cd_add_radio_station">إضافة محطة راديو</string>

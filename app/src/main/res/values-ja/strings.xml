@@ -174,6 +174,8 @@
     <string name="settings_color_orange">オレンジ</string>
     <string name="settings_language">言語</string>
     <string name="settings_language_description">お好みの言語を選択してください</string>
+    <string name="settings_disable_toasts">トースト通知を無効にする</string>
+    <string name="settings_disable_toasts_description">警告とエラーのポップアップ通知を非表示にする</string>
 
     <!-- Language Names -->
     <string name="language_choose">言語を選択</string>
@@ -585,6 +587,14 @@
     <string name="empty_state_title">ステーションが見つかりません</string>
     <string name="empty_state_message">最初のステーションを追加してください。\n下のボタンをクリックしてください。</string>
     <string name="empty_state_add_button">新しいステーションを追加</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">ストリームへの接続に失敗しました</string>
+    <string name="error_stream_max_retries">複数回の試行後に接続に失敗しました</string>
+    <string name="error_tor_not_connected">Torが接続されていません。このストリームを再生するにはTorを有効にしてください。</string>
+    <string name="error_i2p_not_connected">I2Pが実行されていません。このストリームを再生するにはI2P（例：InviZible Pro）を起動してください。</string>
+    <string name="error_tor_required_for_clearnet">Torが接続されていません。Tor強制モードではクリアネットストリームにTorが必要です。</string>
+    <string name="error_custom_proxy_not_configured">カスタムプロキシが設定されていません。設定で構成してください。</string>
 
     <!-- Content Descriptions (Accessibility) -->
     <string name="cd_add_radio_station">ラジオ局を追加</string>

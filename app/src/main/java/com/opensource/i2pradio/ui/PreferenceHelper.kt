@@ -56,6 +56,9 @@ object PreferencesHelper {
     private const val KEY_BIOMETRIC_ENABLED = "biometric_enabled"
     private const val KEY_REQUIRE_AUTH_ON_LAUNCH = "require_auth_on_launch"
 
+    // UI settings
+    private const val KEY_TOAST_MESSAGES_DISABLED = "toast_messages_disabled"
+
     // Currently playing station persistence
     private const val KEY_CURRENT_STATION_JSON = "current_station_json"
 
@@ -768,6 +771,26 @@ object PreferencesHelper {
     fun isRequireAuthOnLaunch(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_REQUIRE_AUTH_ON_LAUNCH, true)
+    }
+
+    // ===== UI Settings =====
+
+    /**
+     * Set whether toast messages are disabled
+     */
+    fun setToastMessagesDisabled(context: Context, disabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_TOAST_MESSAGES_DISABLED, disabled)
+            .apply()
+    }
+
+    /**
+     * Check if toast messages are disabled
+     */
+    fun isToastMessagesDisabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_TOAST_MESSAGES_DISABLED, false)
     }
 
     // ===== Currently Playing Station Persistence =====

@@ -207,15 +207,18 @@ class NowPlayingFragment : Fragment() {
                     updatePlaybackTime(elapsedMs, bufferedPositionMs, currentPositionMs)
                 }
                 RadioService.BROADCAST_STREAM_ERROR -> {
-                    val errorType = intent.getStringExtra(RadioService.EXTRA_STREAM_ERROR_TYPE)
-                    val errorMessage = when (errorType) {
-                        RadioService.ERROR_TYPE_TOR_NOT_CONNECTED -> getString(R.string.error_tor_not_connected)
-                        RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED -> getString(R.string.error_custom_proxy_not_configured)
-                        RadioService.ERROR_TYPE_MAX_RETRIES -> getString(R.string.error_stream_max_retries)
-                        RadioService.ERROR_TYPE_STREAM_FAILED -> getString(R.string.error_stream_failed)
-                        else -> getString(R.string.error_stream_failed)
+                    if (context != null && !PreferencesHelper.isToastMessagesDisabled(context!!)) {
+                        val errorType = intent.getStringExtra(RadioService.EXTRA_STREAM_ERROR_TYPE)
+                        val errorMessage = when (errorType) {
+                            RadioService.ERROR_TYPE_TOR_NOT_CONNECTED -> getString(R.string.error_tor_not_connected)
+                            RadioService.ERROR_TYPE_I2P_NOT_CONNECTED -> getString(R.string.error_i2p_not_connected)
+                            RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED -> getString(R.string.error_custom_proxy_not_configured)
+                            RadioService.ERROR_TYPE_MAX_RETRIES -> getString(R.string.error_stream_max_retries)
+                            RadioService.ERROR_TYPE_STREAM_FAILED -> getString(R.string.error_stream_failed)
+                            else -> getString(R.string.error_stream_failed)
+                        }
+                        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                     }
-                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                 }
             }
         }

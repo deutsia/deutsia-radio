@@ -177,6 +177,8 @@
     <string name="settings_color_orange">Orange</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_description">Choose your preferred language</string>
+    <string name="settings_disable_toasts">Disable Toast Messages</string>
+    <string name="settings_disable_toasts_description">Hide popup notifications for warnings and errors</string>
 
     <!-- Language Names -->
     <string name="language_choose">Choose Language</string>

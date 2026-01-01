@@ -174,6 +174,8 @@
     <string name="settings_color_orange">Помаранчевий</string>
     <string name="settings_language">Мова</string>
     <string name="settings_language_description">Виберіть бажану мову</string>
+    <string name="settings_disable_toasts">Вимкнути спливаючі повідомлення</string>
+    <string name="settings_disable_toasts_description">Приховати спливаючі сповіщення про попередження та помилки</string>
 
     <!-- Language Names -->
     <string name="language_choose">Вибрати мову</string>
@@ -586,6 +588,14 @@
     <string name="empty_state_title">Станцій не знайдено</string>
     <string name="empty_state_message">Почніть з додавання першої станції.\nНатисніть кнопку нижче.</string>
     <string name="empty_state_add_button">Додати нову станцію</string>
+
+    <!-- Stream Error Messages (Toasts) -->
+    <string name="error_stream_failed">Не вдалося підключитися до потоку</string>
+    <string name="error_stream_max_retries">Підключення не вдалося після кількох спроб</string>
+    <string name="error_tor_not_connected">Tor не підключено. Увімкніть Tor для відтворення цього потоку.</string>
+    <string name="error_i2p_not_connected">I2P не запущено. Запустіть I2P (напр. InviZible Pro) для відтворення цього потоку.</string>
+    <string name="error_tor_required_for_clearnet">Tor не підключено. Примусовий режим Tor вимагає Tor для звичайних потоків.</string>
+    <string name="error_custom_proxy_not_configured">Користувацький проксі не налаштовано. Налаштуйте його в Налаштуваннях.</string>
 
     <!-- Content Descriptions (Accessibility) -->
     <string name="cd_add_radio_station">Додати радіостанцію</string>
