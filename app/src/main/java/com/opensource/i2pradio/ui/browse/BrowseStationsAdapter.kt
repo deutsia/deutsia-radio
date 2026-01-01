@@ -114,11 +114,11 @@ class BrowseStationsAdapter(
         fun bind(station: RadioBrowserStation, isSaved: Boolean, isLiked: Boolean) {
             stationName.text = station.name
 
-            // Build info string: genre + country
+            // Build info string: genre (with network indicator) + country
             val infoParts = mutableListOf<String>()
-            val genre = station.getPrimaryGenre()
-            if (genre.isNotEmpty() && genre != "Other") {
-                infoParts.add(genre)
+            val genreWithNetwork = station.getGenreWithNetwork()
+            if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {
+                infoParts.add(genreWithNetwork)
             }
             if (station.country.isNotEmpty()) {
                 infoParts.add(station.country)

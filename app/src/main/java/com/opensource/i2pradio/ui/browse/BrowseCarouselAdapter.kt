@@ -72,7 +72,10 @@ class BrowseCarouselAdapter(
         fun bind(station: RadioBrowserStation, rank: Int) {
             stationName.text = station.name
             stationInfo.text = buildString {
-                station.getPrimaryGenre()?.let { append(it) }
+                val genreWithNetwork = station.getGenreWithNetwork()
+                if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {
+                    append(genreWithNetwork)
+                }
                 if (station.country.isNotBlank()) {
                     if (isNotEmpty()) append(" • ")
                     append(station.country)
