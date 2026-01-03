@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.request.Disposable
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
-import com.opensource.i2pradio.util.loadSecure
+import com.opensource.i2pradio.util.loadSecurePrivacy
 
 /**
  * Adapter for horizontal carousel of Privacy Radio stations (Tor/I2P from Radio Registry API).
@@ -99,7 +99,7 @@ class PrivacyRadioCarouselAdapter(
             imageLoadDisposable?.dispose()
             stationImage.setImageResource(R.drawable.ic_radio)
             if (!station.faviconUrl.isNullOrEmpty()) {
-                imageLoadDisposable = stationImage.loadSecure(station.faviconUrl) {
+                imageLoadDisposable = stationImage.loadSecurePrivacy(station.faviconUrl) {
                     crossfade(true)
                     placeholder(R.drawable.ic_radio)
                     error(R.drawable.ic_radio)

@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import coil.load
 import coil.request.CachePolicy
 import com.opensource.i2pradio.util.loadSecure
+import com.opensource.i2pradio.util.loadSecurePrivacy
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -111,11 +112,16 @@ class MiniPlayerView @JvmOverloads constructor(
     /**
      * Update cover art with cache invalidation for real-time updates.
      * Uses loadSecure to route remote URLs through Tor when Force Tor is enabled.
+     * For privacy stations (Tor/I2P), uses loadSecurePrivacy to route through Tor when available.
      */
     fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
             coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
-            coverImage.loadSecure(coverArtUri) {
+            // Use privacy loader for Tor/I2P stations to route cover art through Tor
+            val isPrivacyStation = currentStation?.getProxyTypeEnum().let {
+                it == ProxyType.TOR || it == ProxyType.I2P
+            }
+            val imageLoadBuilder: coil.request.ImageRequest.Builder.() -> Unit = {
                 crossfade(true)
                 // Force refresh by disabling cache for this request
                 memoryCachePolicy(CachePolicy.WRITE_ONLY)
@@ -132,6 +138,11 @@ class MiniPlayerView @JvmOverloads constructor(
                         coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     }
                 )
+            }
+            if (isPrivacyStation) {
+                coverImage.loadSecurePrivacy(coverArtUri, imageLoadBuilder)
+            } else {
+                coverImage.loadSecure(coverArtUri, imageLoadBuilder)
             }
         } else {
             // No cover art - use centerInside for vector placeholder
@@ -197,9 +208,13 @@ class MiniPlayerView @JvmOverloads constructor(
 
         // Handle cover art update properly - clear old image when switching stations
         // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
+        // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
         if (station.coverArtUri != null) {
             coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
-            coverImage.loadSecure(station.coverArtUri) {
+            val isPrivacyStation = station.getProxyTypeEnum().let {
+                it == ProxyType.TOR || it == ProxyType.I2P
+            }
+            val imageLoadBuilder: coil.request.ImageRequest.Builder.() -> Unit = {
                 crossfade(true)
                 placeholder(R.drawable.ic_radio)
                 error(R.drawable.ic_radio)
@@ -213,6 +228,11 @@ class MiniPlayerView @JvmOverloads constructor(
                         coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     }
                 )
+            }
+            if (isPrivacyStation) {
+                coverImage.loadSecurePrivacy(station.coverArtUri, imageLoadBuilder)
+            } else {
+                coverImage.loadSecure(station.coverArtUri, imageLoadBuilder)
             }
         } else {
             // No cover art - use centerInside for vector placeholder
