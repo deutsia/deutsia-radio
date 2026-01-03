@@ -57,7 +57,8 @@ class RadioRegistryRepository(private val context: Context) {
             Log.d(TAG, "Fetching Tor stations from API")
             when (val result = client.getTorStations(limit = limit)) {
                 is RadioRegistryResult.Success -> {
-                    val stations = result.data.stations
+                    // Filter to ensure only Tor stations are included (client-side validation)
+                    val stations = result.data.stations.filter { it.isTorStation }
                     Log.d(TAG, "Fetched ${stations.size} Tor stations from API")
 
                     // Cache the stations
@@ -113,7 +114,8 @@ class RadioRegistryRepository(private val context: Context) {
             Log.d(TAG, "Fetching I2P stations from API")
             when (val result = client.getI2pStations(limit = limit)) {
                 is RadioRegistryResult.Success -> {
-                    val stations = result.data.stations
+                    // Filter to ensure only I2P stations are included (client-side validation)
+                    val stations = result.data.stations.filter { it.isI2pStation }
                     Log.d(TAG, "Fetched ${stations.size} I2P stations from API")
 
                     // Cache the stations
