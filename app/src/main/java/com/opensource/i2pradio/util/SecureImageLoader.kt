@@ -32,9 +32,13 @@ object SecureImageLoader {
     private var cachedImageLoader: ImageLoader? = null
     private var cachedProxyConfig: ProxyConfig? = null
 
+    // Separate cache for privacy station image loading
+    private var cachedPrivacyImageLoader: ImageLoader? = null
+    private var cachedPrivacyProxyConfig: ProxyConfig? = null
+
     private enum class ProxyMode {
         NONE,           // No forced proxy
-        TOR,            // Force Tor
+        TOR,            // Force Tor or privacy station with Tor available
         CUSTOM_SOCKS,   // Force Custom Proxy (SOCKS)
         CUSTOM_HTTP,    // Force Custom Proxy (HTTP)
         BLOCKED         // Proxy required but not available
@@ -81,6 +85,32 @@ object SecureImageLoader {
     }
 
     /**
+     * Get an ImageLoader configured for privacy stations (Tor/I2P).
+     * Routes through Tor when available, even if Force Tor mode is not enabled.
+     * This allows privacy station cover art to load over Tor without forcing all traffic.
+     *
+     * Behavior:
+     * - If Force Tor is enabled: Uses force mode settings (same as getImageLoader)
+     * - If Tor is connected but not forced: Routes through Tor for privacy
+     * - If Tor is not connected: Blocks loading (privacy stations require Tor)
+     */
+    fun getPrivacyImageLoader(context: Context): ImageLoader {
+        val currentConfig = getPrivacyProxyConfig(context)
+
+        // Return cached loader if config hasn't changed
+        if (cachedPrivacyImageLoader != null && cachedPrivacyProxyConfig == currentConfig) {
+            return cachedPrivacyImageLoader!!
+        }
+
+        // Build new loader with privacy config
+        val loader = buildImageLoader(context, currentConfig)
+        cachedPrivacyImageLoader = loader
+        cachedPrivacyProxyConfig = currentConfig
+
+        return loader
+    }
+
+    /**
      * Execute an image request with proxy-aware loading.
      * Automatically determines if proxy should be used based on URI scheme.
      */
@@ -106,6 +136,8 @@ object SecureImageLoader {
     fun invalidateCache() {
         cachedImageLoader = null
         cachedProxyConfig = null
+        cachedPrivacyImageLoader = null
+        cachedPrivacyProxyConfig = null
     }
 
     private fun getCurrentProxyConfig(context: Context): ProxyConfig {
@@ -155,6 +187,74 @@ object SecureImageLoader {
 
         // No forced proxy - use direct connection
         return ProxyConfig(ProxyMode.NONE, "", 0)
+    }
+
+    /**
+     * Get proxy config for privacy stations (Tor/I2P).
+     * Routes through Tor when available, even if Force Tor mode is not enabled.
+     *
+     * Priority:
+     * 1. Force Tor modes: Same as getCurrentProxyConfig (blocks if Tor unavailable)
+     * 2. Force Custom Proxy modes: Same as getCurrentProxyConfig
+     * 3. Tor connected (not forced): Use Tor for privacy station images
+     * 4. Tor not connected (not forced): Block loading (privacy stations require Tor)
+     */
+    private fun getPrivacyProxyConfig(context: Context): ProxyConfig {
+        val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
+        val forceTorAll = PreferencesHelper.isForceTorAll(context)
+        val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(context)
+        val forceCustomProxy = PreferencesHelper.isForceCustomProxy(context)
+        val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(context)
+        val torConnected = TorManager.isConnected()
+
+        android.util.Log.d(TAG, "getPrivacyProxyConfig: forceTorAll=$forceTorAll, forceTorExceptI2P=$forceTorExceptI2P, " +
+                "forceCustomProxy=$forceCustomProxy, forceCustomProxyExceptTorI2P=$forceCustomProxyExceptTorI2P, " +
+                "torEnabled=$torEnabled, torConnected=$torConnected")
+
+        // Priority 1: Force Tor modes (same as regular config)
+        if (torEnabled && (forceTorAll || forceTorExceptI2P)) {
+            if (!torConnected) {
+                android.util.Log.e(TAG, "BLOCKED: Force Tor enabled but Tor not connected (privacy)")
+                return ProxyConfig(ProxyMode.BLOCKED, "", 0)
+            }
+            val port = TorManager.getProxyPort()
+            if (port <= 0) {
+                android.util.Log.e(TAG, "BLOCKED: Force Tor enabled but Tor port invalid (privacy)")
+                return ProxyConfig(ProxyMode.BLOCKED, "", 0)
+            }
+            return ProxyConfig(ProxyMode.TOR, TorManager.getProxyHost(), port)
+        }
+
+        // Priority 2: Force Custom Proxy modes (same as regular config)
+        if (forceCustomProxy || forceCustomProxyExceptTorI2P) {
+            val proxyHost = PreferencesHelper.getCustomProxyHost(context)
+            val proxyPort = PreferencesHelper.getCustomProxyPort(context)
+            val proxyProtocol = PreferencesHelper.getCustomProxyProtocol(context)
+
+            if (proxyHost.isEmpty() || proxyPort <= 0) {
+                android.util.Log.e(TAG, "BLOCKED: Force Custom Proxy enabled but proxy not configured (privacy)")
+                return ProxyConfig(ProxyMode.BLOCKED, "", 0)
+            }
+
+            val mode = when (proxyProtocol.uppercase()) {
+                "SOCKS4", "SOCKS5", "SOCKS" -> ProxyMode.CUSTOM_SOCKS
+                else -> ProxyMode.CUSTOM_HTTP
+            }
+            return ProxyConfig(mode, proxyHost, proxyPort)
+        }
+
+        // Priority 3: Tor is connected but not forced - use it for privacy stations
+        if (torConnected) {
+            val port = TorManager.getProxyPort()
+            if (port > 0) {
+                android.util.Log.d(TAG, "Privacy station: Using available Tor proxy at ${TorManager.getProxyHost()}:$port")
+                return ProxyConfig(ProxyMode.TOR, TorManager.getProxyHost(), port)
+            }
+        }
+
+        // Priority 4: Tor not available - block privacy station images to prevent IP leak
+        android.util.Log.w(TAG, "Privacy station image blocked: Tor not available")
+        return ProxyConfig(ProxyMode.BLOCKED, "", 0)
     }
 
     /**
@@ -273,5 +373,32 @@ fun ImageView.loadSecure(
     builder: ImageRequest.Builder.() -> Unit = {}
 ): Disposable {
     val imageLoader = SecureImageLoader.getImageLoader(context)
+    return this.load(data, imageLoader, builder)
+}
+
+/**
+ * Extension function to load images for privacy stations (Tor/I2P).
+ * Routes through Tor when available, even if Force Tor mode is not enabled.
+ * This ensures privacy station cover art is always loaded through Tor for privacy.
+ *
+ * Use this for:
+ * - Privacy station carousel images
+ * - Cover art for currently playing Tor/I2P stations
+ * - Any image from a privacy station source
+ *
+ * Behavior:
+ * - If Force Tor is enabled: Uses force mode settings
+ * - If Tor is connected (not forced): Routes through Tor
+ * - If Tor is not connected: Image loading is blocked (fails gracefully with placeholder)
+ *
+ * @param data The image source (URL string, Uri, DrawableRes, etc.)
+ * @param builder Optional builder to customize the image request
+ * @return Disposable to cancel the request if needed
+ */
+fun ImageView.loadSecurePrivacy(
+    data: Any?,
+    builder: ImageRequest.Builder.() -> Unit = {}
+): Disposable {
+    val imageLoader = SecureImageLoader.getPrivacyImageLoader(context)
     return this.load(data, imageLoader, builder)
 }

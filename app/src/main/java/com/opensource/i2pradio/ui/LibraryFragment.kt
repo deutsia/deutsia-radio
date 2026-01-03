@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.request.Disposable
 import com.opensource.i2pradio.util.loadSecure
+import com.opensource.i2pradio.util.loadSecurePrivacy
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
@@ -932,11 +933,20 @@ class RadioStationAdapter(
             coverArt.setImageResource(R.drawable.ic_radio)
 
             // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
+            // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
             if (station.coverArtUri != null) {
-                imageLoadDisposable = coverArt.loadSecure(station.coverArtUri) {
+                val isPrivacyStation = station.getProxyTypeEnum().let {
+                    it == ProxyType.TOR || it == ProxyType.I2P
+                }
+                val imageLoadBuilder: coil.request.ImageRequest.Builder.() -> Unit = {
                     crossfade(true)
                     placeholder(R.drawable.ic_radio)
                     error(R.drawable.ic_radio)
+                }
+                imageLoadDisposable = if (isPrivacyStation) {
+                    coverArt.loadSecurePrivacy(station.coverArtUri, imageLoadBuilder)
+                } else {
+                    coverArt.loadSecure(station.coverArtUri, imageLoadBuilder)
                 }
             }
 

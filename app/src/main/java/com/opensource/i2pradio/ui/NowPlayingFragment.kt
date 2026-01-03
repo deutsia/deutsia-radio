@@ -35,6 +35,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import coil.load
 import coil.request.CachePolicy
 import com.opensource.i2pradio.util.loadSecure
+import com.opensource.i2pradio.util.loadSecurePrivacy
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -583,10 +584,14 @@ class NowPlayingFragment : Fragment() {
 
                 // Handle cover art update properly - switch scaleType based on content
                 // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
+                // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
                 if (station.coverArtUri != null) {
                     // Set scaleType early to prevent sizing issues during Material You theme changes
                     coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
-                    coverArt.loadSecure(station.coverArtUri) {
+                    val isPrivacyStation = station.getProxyTypeEnum().let {
+                        it == ProxyType.TOR || it == ProxyType.I2P
+                    }
+                    val imageLoadBuilder: coil.request.ImageRequest.Builder.() -> Unit = {
                         crossfade(true)
                         memoryCachePolicy(CachePolicy.ENABLED)
                         placeholder(R.drawable.ic_radio)
@@ -601,6 +606,11 @@ class NowPlayingFragment : Fragment() {
                                 coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
                             }
                         )
+                    }
+                    if (isPrivacyStation) {
+                        coverArt.loadSecurePrivacy(station.coverArtUri, imageLoadBuilder)
+                    } else {
+                        coverArt.loadSecure(station.coverArtUri, imageLoadBuilder)
                     }
                 } else {
                     // No cover art - use centerInside for vector placeholder and force reload
@@ -1047,10 +1057,15 @@ class NowPlayingFragment : Fragment() {
     /**
      * Update the cover art image with cache invalidation for real-time updates.
      * Uses loadSecure to route remote URLs through Tor when Force Tor is enabled.
+     * For privacy stations (Tor/I2P), uses loadSecurePrivacy to route through Tor when available.
      */
     private fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
-            coverArt.loadSecure(coverArtUri) {
+            // Check if current station is a privacy station (Tor/I2P)
+            val isPrivacyStation = viewModel.currentStation.value?.getProxyTypeEnum().let {
+                it == ProxyType.TOR || it == ProxyType.I2P
+            }
+            val imageLoadBuilder: coil.request.ImageRequest.Builder.() -> Unit = {
                 crossfade(true)
                 // Force refresh by disabling cache for this request
                 memoryCachePolicy(coil.request.CachePolicy.WRITE_ONLY)
@@ -1065,6 +1080,11 @@ class NowPlayingFragment : Fragment() {
                         coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     }
                 )
+            }
+            if (isPrivacyStation) {
+                coverArt.loadSecurePrivacy(coverArtUri, imageLoadBuilder)
+            } else {
+                coverArt.loadSecure(coverArtUri, imageLoadBuilder)
             }
         } else {
             coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
