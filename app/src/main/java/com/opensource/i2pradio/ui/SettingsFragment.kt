@@ -37,7 +37,6 @@ import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
-import com.opensource.i2pradio.data.DefaultStations
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
@@ -114,6 +113,9 @@ class SettingsFragment : Fragment() {
     private val registryRepository: RadioRegistryRepository by lazy {
         RadioRegistryRepository(requireContext())
     }
+
+    // Temporary cache for pending station imports (cleared after use)
+    private var pendingImportStations: List<RadioStation>? = null
 
     // Miniplayer spacing for dynamic bottom padding
     private var settingsContentContainer: LinearLayout? = null
@@ -491,6 +493,11 @@ class SettingsFragment : Fragment() {
         exportStationsButton = view.findViewById(R.id.exportStationsButton)
         i2pStationsDescription = view.findViewById(R.id.i2pStationsDescription)
         torStationsDescription = view.findViewById(R.id.torStationsDescription)
+
+        // Clear any leftover cached stations from the old caching system
+        lifecycleScope.launch(Dispatchers.IO) {
+            repository.clearUnlikedCachedStations()
+        }
 
         // Update station counts dynamically
         updateStationCounts()
@@ -1272,30 +1279,38 @@ class SettingsFragment : Fragment() {
     private fun updateStationCounts() {
         val context = context ?: return
         lifecycleScope.launch(Dispatchers.IO) {
-            // Try to get I2P count from API first, fallback to bundled JSON
+            // Fetch counts directly from API
             val i2pCount = try {
-                when (val result = registryRepository.getI2pStations(forceRefresh = false, onlineOnly = false, limit = 200)) {
+                when (val result = registryRepository.getI2pStations(onlineOnly = false, limit = 200)) {
                     is RadioRegistryResult.Success -> result.data.size
-                    else -> DefaultStations.getI2pStations(context).size
+                    else -> 0
                 }
             } catch (e: Exception) {
-                DefaultStations.getI2pStations(context).size
+                0
             }
 
-            // Try to get Tor count from API first, fallback to bundled JSON
             val torCount = try {
-                when (val result = registryRepository.getTorStations(forceRefresh = false, onlineOnly = false, limit = 200)) {
+                when (val result = registryRepository.getTorStations(onlineOnly = false, limit = 200)) {
                     is RadioRegistryResult.Success -> result.data.size
-                    else -> DefaultStations.getTorStations(context).size
+                    else -> 0
                 }
             } catch (e: Exception) {
-                DefaultStations.getTorStations(context).size
+                0
             }
 
             withContext(Dispatchers.Main) {
                 if (!isAdded) return@withContext
-                i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_description, i2pCount)
-                torStationsDescription?.text = getString(R.string.settings_add_tor_stations_description, torCount)
+                // Show count if available, otherwise show generic description
+                if (i2pCount > 0) {
+                    i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_description, i2pCount)
+                } else {
+                    i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_description_generic)
+                }
+                if (torCount > 0) {
+                    torStationsDescription?.text = getString(R.string.settings_add_tor_stations_description, torCount)
+                } else {
+                    torStationsDescription?.text = getString(R.string.settings_add_tor_stations_description_generic)
+                }
             }
         }
     }
@@ -1319,6 +1334,10 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
+    /**
+     * Show import dialog for curated I2P/Tor station lists.
+     * Fetches stations from the API and caches them for the import step.
+     */
     private fun showImportCuratedListDialog(type: String) {
         val networkName = when (type) {
             "i2p" -> "I2P"
@@ -1327,124 +1346,88 @@ class SettingsFragment : Fragment() {
         }
 
         val context = requireContext()
+
+        // Clear any previous pending import
+        pendingImportStations = null
+
         lifecycleScope.launch(Dispatchers.IO) {
-            // Get count from API only (no fallback to bundled JSON)
-            val count = try {
-                val apiResult = when (type) {
-                    "tor" -> registryRepository.getTorStations(forceRefresh = true, onlineOnly = true, limit = 200)
-                    "i2p" -> registryRepository.getI2pStations(forceRefresh = true, onlineOnly = true, limit = 200)
+            // Fetch stations from API
+            val apiResult = try {
+                when (type) {
+                    "tor" -> registryRepository.getTorStations(onlineOnly = true, limit = 200)
+                    "i2p" -> registryRepository.getI2pStations(onlineOnly = true, limit = 200)
                     else -> null
                 }
-
-                when (apiResult) {
-                    is RadioRegistryResult.Success -> apiResult.data.size
-                    else -> -1  // API failed
-                }
             } catch (e: Exception) {
-                -1  // API failed
+                RadioRegistryResult.Error(e.message ?: "Unknown error", e)
             }
 
             withContext(Dispatchers.Main) {
                 if (!isAdded) return@withContext
 
-                if (count < 0) {
-                    // API failed - show error
-                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.failed_to_fetch_stations, networkName),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    return@withContext
-                }
+                when (apiResult) {
+                    is RadioRegistryResult.Success -> {
+                        val stations = apiResult.data.map { it.toRadioStation() }
 
-                if (count == 0) {
-                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.no_stations_found_in_list, networkName),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    return@withContext
-                }
+                        if (stations.isEmpty()) {
+                            if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.no_stations_found_in_list, networkName),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            return@withContext
+                        }
 
-                AlertDialog.Builder(context)
-                    .setTitle(getString(R.string.import_curated_title, networkName))
-                    .setMessage(getString(R.string.import_curated_message, count, networkName))
-                    .setPositiveButton(getString(R.string.button_import)) { _, _ ->
-                        importCuratedList(type, networkName)
+                        // Cache stations for the import step
+                        pendingImportStations = stations
+
+                        AlertDialog.Builder(context)
+                            .setTitle(getString(R.string.import_curated_title, networkName))
+                            .setMessage(getString(R.string.import_curated_message, stations.size, networkName))
+                            .setPositiveButton(getString(R.string.button_import)) { _, _ ->
+                                performPendingImport(networkName)
+                            }
+                            .setNegativeButton(getString(R.string.button_cancel)) { _, _ ->
+                                pendingImportStations = null
+                            }
+                            .setOnCancelListener {
+                                pendingImportStations = null
+                            }
+                            .show()
                     }
-                    .setNegativeButton(getString(R.string.button_cancel), null)
-                    .show()
+                    is RadioRegistryResult.Error -> {
+                        if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                            Toast.makeText(
+                                context,
+                                getString(R.string.failed_to_fetch_stations, networkName),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                    else -> {
+                        // Loading state - shouldn't happen in this flow
+                    }
+                }
             }
         }
     }
 
-    private fun importCuratedList(type: String, networkName: String) {
-        val context = requireContext()
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                // Fetch from API only - no fallback to bundled JSON
-                val apiResult = when (type) {
-                    "tor" -> registryRepository.getTorStations(forceRefresh = true, onlineOnly = true, limit = 200)
-                    "i2p" -> registryRepository.getI2pStations(forceRefresh = true, onlineOnly = true, limit = 200)
-                    else -> null
-                }
-
-                val stations: List<RadioStation> = when (apiResult) {
-                    is RadioRegistryResult.Success -> {
-                        // Convert RadioRegistryStation to RadioStation
-                        apiResult.data.map { it.toRadioStation() }
-                    }
-                    else -> {
-                        // API failed - show error and return
-                        withContext(Dispatchers.Main) {
-                            if (!isAdded) return@withContext
-                            if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                                Toast.makeText(
-                                    context,
-                                    getString(R.string.failed_to_fetch_stations, networkName),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                        return@launch
-                    }
-                }
-
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
-
-                    if (stations.isEmpty()) {
-                        if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                            Toast.makeText(
-                                context,
-                                getString(R.string.no_stations_found_in_list, networkName),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        return@withContext
-                    }
-
-                    // Import stations directly (no second confirmation needed)
-                    performImport(stations)
-                }
-            } catch (e: Exception) {
-                // Show error - do NOT fall back to bundled JSON
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
-                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.failed_to_import_stations, networkName, e.message),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            }
+    /**
+     * Import the cached pending stations to the user's library.
+     * Uses stations fetched in showImportCuratedListDialog to avoid refetching.
+     */
+    private fun performPendingImport(networkName: String) {
+        val stations = pendingImportStations
+        if (stations.isNullOrEmpty()) {
+            return
         }
+
+        // Clear the cache immediately
+        pendingImportStations = null
+
+        performImport(stations)
     }
 
     private fun showExportDialog() {

@@ -2,210 +2,116 @@ package com.opensource.i2pradio.data.radioregistry
 
 import android.content.Context
 import android.util.Log
-import com.opensource.i2pradio.data.RadioDao
-import com.opensource.i2pradio.data.RadioDatabase
-import com.opensource.i2pradio.data.RadioStation
-import com.opensource.i2pradio.data.StationSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
- * Repository for Radio Registry API data with local caching.
+ * Repository for Radio Registry API.
  *
- * Manages privacy-focused Tor and I2P stations from the Radio Registry API,
- * with local caching to reduce network requests.
+ * This is a simple wrapper around RadioRegistryClient that fetches
+ * privacy-focused Tor and I2P stations directly from the API.
+ *
+ * No caching is performed - all requests go directly to the API.
+ * Stations are only saved to the database when the user explicitly
+ * imports them to their library.
  */
 class RadioRegistryRepository(private val context: Context) {
 
     companion object {
         private const val TAG = "RadioRegistryRepository"
-
-        // Cache validity: 4 hours (matches API health check interval)
-        private const val CACHE_VALIDITY_MS = 4 * 60 * 60 * 1000L
     }
 
     private val client = RadioRegistryClient(context)
-    private val dao: RadioDao by lazy {
-        RadioDatabase.getDatabase(context).radioDao()
-    }
 
     /**
-     * Get Tor stations from API or cache
+     * Get Tor stations from API
      *
-     * @param forceRefresh If true, always fetch from API
      * @param onlineOnly If true, filter to only online stations
+     * @param limit Maximum number of stations to fetch
      */
     suspend fun getTorStations(
-        forceRefresh: Boolean = false,
         onlineOnly: Boolean = true,
         limit: Int = 50
-    ): RadioRegistryResult<List<RadioRegistryStation>> = withContext(Dispatchers.IO) {
-        try {
-            // Try cache first if not forcing refresh
-            if (!forceRefresh) {
-                val cached = getCachedStations("tor")
-                if (cached.isNotEmpty()) {
-                    Log.d(TAG, "Returning ${cached.size} cached Tor stations")
-                    val result = cached.map { it.toRegistryStation() }
-                    return@withContext RadioRegistryResult.Success(
-                        if (onlineOnly) result.filter { it.isOnline } else result
-                    )
-                }
+    ): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Fetching Tor stations from API (onlineOnly=$onlineOnly, limit=$limit)")
+
+        return when (val result = client.getTorStations(onlineOnly = onlineOnly, limit = limit)) {
+            is RadioRegistryResult.Success -> {
+                // Filter to ensure only Tor stations are included (client-side validation)
+                val stations = result.data.stations.filter { it.isTorStation }
+                Log.d(TAG, "Received ${result.data.stations.size} stations, ${stations.size} are Tor")
+                RadioRegistryResult.Success(stations)
             }
-
-            // Fetch from API
-            Log.d(TAG, "Fetching Tor stations from API")
-            when (val result = client.getTorStations(onlineOnly = onlineOnly, limit = limit)) {
-                is RadioRegistryResult.Success -> {
-                    // Log raw API response count
-                    Log.d(TAG, "API returned ${result.data.stations.size} stations for Tor request")
-
-                    // Filter to ensure only Tor stations are included (client-side validation)
-                    val stations = result.data.stations.filter { it.isTorStation }
-                    Log.d(TAG, "After filtering: ${stations.size} Tor stations (filtered out ${result.data.stations.size - stations.size} non-Tor)")
-
-                    // Cache the stations
-                    cacheStations(stations)
-
-                    RadioRegistryResult.Success(
-                        if (onlineOnly) stations.filter { it.isOnline } else stations
-                    )
-                }
-                is RadioRegistryResult.Error -> {
-                    // Try to return cached data on error
-                    val cached = getCachedStations("tor")
-                    if (cached.isNotEmpty()) {
-                        Log.d(TAG, "API error, returning ${cached.size} cached Tor stations")
-                        val cachedResult = cached.map { it.toRegistryStation() }
-                        RadioRegistryResult.Success(
-                            if (onlineOnly) cachedResult.filter { it.isOnline } else cachedResult
-                        )
-                    } else {
-                        result
-                    }
-                }
-                is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
+            is RadioRegistryResult.Error -> {
+                Log.e(TAG, "Failed to fetch Tor stations: ${result.message}")
+                result
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting Tor stations: ${e.message}")
-            RadioRegistryResult.Error(e.message ?: "Unknown error", e)
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
         }
     }
 
     /**
-     * Get I2P stations from API or cache
+     * Get I2P stations from API
+     *
+     * @param onlineOnly If true, filter to only online stations
+     * @param limit Maximum number of stations to fetch
      */
     suspend fun getI2pStations(
-        forceRefresh: Boolean = false,
         onlineOnly: Boolean = true,
         limit: Int = 50
-    ): RadioRegistryResult<List<RadioRegistryStation>> = withContext(Dispatchers.IO) {
-        try {
-            // Try cache first if not forcing refresh
-            if (!forceRefresh) {
-                val cached = getCachedStations("i2p")
-                if (cached.isNotEmpty()) {
-                    Log.d(TAG, "Returning ${cached.size} cached I2P stations")
-                    val result = cached.map { it.toRegistryStation() }
-                    return@withContext RadioRegistryResult.Success(
-                        if (onlineOnly) result.filter { it.isOnline } else result
-                    )
-                }
+    ): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Fetching I2P stations from API (onlineOnly=$onlineOnly, limit=$limit)")
+
+        return when (val result = client.getI2pStations(onlineOnly = onlineOnly, limit = limit)) {
+            is RadioRegistryResult.Success -> {
+                // Filter to ensure only I2P stations are included (client-side validation)
+                val stations = result.data.stations.filter { it.isI2pStation }
+                Log.d(TAG, "Received ${result.data.stations.size} stations, ${stations.size} are I2P")
+                RadioRegistryResult.Success(stations)
             }
-
-            // Fetch from API
-            Log.d(TAG, "Fetching I2P stations from API")
-            when (val result = client.getI2pStations(onlineOnly = onlineOnly, limit = limit)) {
-                is RadioRegistryResult.Success -> {
-                    // Log raw API response count
-                    Log.d(TAG, "API returned ${result.data.stations.size} stations for I2P request")
-
-                    // Filter to ensure only I2P stations are included (client-side validation)
-                    val stations = result.data.stations.filter { it.isI2pStation }
-                    Log.d(TAG, "After filtering: ${stations.size} I2P stations (filtered out ${result.data.stations.size - stations.size} non-I2P)")
-
-                    // Cache the stations
-                    cacheStations(stations)
-
-                    RadioRegistryResult.Success(
-                        if (onlineOnly) stations.filter { it.isOnline } else stations
-                    )
-                }
-                is RadioRegistryResult.Error -> {
-                    val cached = getCachedStations("i2p")
-                    if (cached.isNotEmpty()) {
-                        Log.d(TAG, "API error, returning ${cached.size} cached I2P stations")
-                        val cachedResult = cached.map { it.toRegistryStation() }
-                        RadioRegistryResult.Success(
-                            if (onlineOnly) cachedResult.filter { it.isOnline } else cachedResult
-                        )
-                    } else {
-                        result
-                    }
-                }
-                is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
+            is RadioRegistryResult.Error -> {
+                Log.e(TAG, "Failed to fetch I2P stations: ${result.message}")
+                result
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting I2P stations: ${e.message}")
-            RadioRegistryResult.Error(e.message ?: "Unknown error", e)
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
         }
     }
 
     /**
      * Get all privacy radio stations (both Tor and I2P)
+     *
+     * @param onlineOnly If true, filter to only online stations
+     * @param limit Maximum number of stations to fetch
      */
     suspend fun getAllPrivacyStations(
-        forceRefresh: Boolean = false,
-        onlineOnly: Boolean = true
-    ): RadioRegistryResult<List<RadioRegistryStation>> = withContext(Dispatchers.IO) {
-        try {
-            // Try cache first
-            if (!forceRefresh) {
-                val cachedTor = getCachedStations("tor")
-                val cachedI2p = getCachedStations("i2p")
-                if (cachedTor.isNotEmpty() || cachedI2p.isNotEmpty()) {
-                    val all = (cachedTor + cachedI2p).map { it.toRegistryStation() }
-                    return@withContext RadioRegistryResult.Success(
-                        if (onlineOnly) all.filter { it.isOnline } else all
-                    )
-                }
-            }
+        onlineOnly: Boolean = true,
+        limit: Int = 200
+    ): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Fetching all privacy stations from API")
 
-            // Fetch from API
-            when (val result = client.getStations(limit = 200)) {
-                is RadioRegistryResult.Success -> {
-                    val stations = result.data.stations
-                    cacheStations(stations)
-                    RadioRegistryResult.Success(
-                        if (onlineOnly) stations.filter { it.isOnline } else stations
-                    )
-                }
-                is RadioRegistryResult.Error -> {
-                    val cached = (getCachedStations("tor") + getCachedStations("i2p"))
-                        .map { it.toRegistryStation() }
-                    if (cached.isNotEmpty()) {
-                        RadioRegistryResult.Success(
-                            if (onlineOnly) cached.filter { it.isOnline } else cached
-                        )
-                    } else {
-                        result
-                    }
-                }
-                is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
+        return when (val result = client.getStations(onlineOnly = onlineOnly, limit = limit)) {
+            is RadioRegistryResult.Success -> {
+                val stations = result.data.stations
+                Log.d(TAG, "Received ${stations.size} total privacy stations")
+                RadioRegistryResult.Success(stations)
             }
-        } catch (e: Exception) {
-            RadioRegistryResult.Error(e.message ?: "Unknown error", e)
+            is RadioRegistryResult.Error -> {
+                Log.e(TAG, "Failed to fetch privacy stations: ${result.message}")
+                result
+            }
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
         }
     }
 
     /**
      * Get stations by genre
+     *
+     * @param genre Genre to filter by
+     * @param network Optional network filter ("tor" or "i2p")
      */
     suspend fun getStationsByGenre(
         genre: String,
         network: String? = null
-    ): RadioRegistryResult<List<RadioRegistryStation>> = withContext(Dispatchers.IO) {
-        when (val result = client.getStations(network = network, genre = genre, limit = 100)) {
+    ): RadioRegistryResult<List<RadioRegistryStation>> {
+        return when (val result = client.getStations(network = network, genre = genre, limit = 100)) {
             is RadioRegistryResult.Success -> {
                 RadioRegistryResult.Success(result.data.stations.filter { it.isOnline })
             }
@@ -233,140 +139,5 @@ class RadioRegistryRepository(private val context: Context) {
      */
     fun isTorRequiredButNotConnected(): Boolean {
         return client.isTorRequiredButNotConnected()
-    }
-
-    /**
-     * Convert a RadioRegistryStation to a playable RadioStation
-     */
-    fun toPlayableStation(station: RadioRegistryStation): RadioStation {
-        return station.toRadioStation()
-    }
-
-    /**
-     * Save a station to the library (as liked)
-     */
-    suspend fun saveStationToLibrary(station: RadioRegistryStation): Long = withContext(Dispatchers.IO) {
-        val radioStation = station.toRadioStation().copy(
-            isLiked = true,
-            source = StationSource.RADIOBROWSER.name,
-            cachedAt = System.currentTimeMillis()
-        )
-        dao.insertStation(radioStation)
-    }
-
-    /**
-     * Check if a station is saved in the library
-     */
-    suspend fun isStationSaved(stationId: String): Boolean = withContext(Dispatchers.IO) {
-        val uuid = "registry_$stationId"
-        dao.countByRadioBrowserUuid(uuid) > 0
-    }
-
-    /**
-     * Get station info from library by registry ID
-     */
-    suspend fun getStationFromLibrary(stationId: String): RadioStation? = withContext(Dispatchers.IO) {
-        val uuid = "registry_$stationId"
-        dao.getStationByRadioBrowserUuid(uuid)
-    }
-
-    // ==================== Private Helpers ====================
-
-    /**
-     * Cache stations in the local database
-     */
-    private suspend fun cacheStations(stations: List<RadioRegistryStation>) {
-        try {
-            val now = System.currentTimeMillis()
-            val radioStations = stations.map { station ->
-                station.toRadioStation().copy(
-                    cachedAt = now,
-                    isLiked = false,  // Cached stations are not liked by default
-                    source = StationSource.RADIOBROWSER.name
-                )
-            }
-
-            // Insert or update cached stations
-            for (station in radioStations) {
-                // Check if already exists
-                val existing = dao.getStationByRadioBrowserUuid(station.radioBrowserUuid!!)
-                if (existing != null) {
-                    // Update cache timestamp but preserve liked status
-                    dao.updateStation(existing.copy(
-                        cachedAt = now,
-                        // Update metadata from API
-                        name = station.name,
-                        streamUrl = station.streamUrl,
-                        genre = station.genre,
-                        bitrate = station.bitrate,
-                        codec = station.codec,
-                        coverArtUri = station.coverArtUri
-                    ))
-                } else {
-                    dao.insertStation(station)
-                }
-            }
-
-            Log.d(TAG, "Cached ${stations.size} stations")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error caching stations: ${e.message}")
-        }
-    }
-
-    /**
-     * Get cached stations by network type
-     */
-    private suspend fun getCachedStations(network: String): List<RadioStation> {
-        return try {
-            val threshold = System.currentTimeMillis() - CACHE_VALIDITY_MS
-            val allCached = dao.getStationsBySource(StationSource.RADIOBROWSER.name)
-
-            // Filter by network type and cache validity
-            allCached.filter { station ->
-                station.cachedAt > threshold &&
-                station.radioBrowserUuid?.startsWith("registry_") == true &&
-                when (network.lowercase()) {
-                    "tor" -> station.proxyType == "TOR"
-                    "i2p" -> station.proxyType == "I2P"
-                    else -> true
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting cached stations: ${e.message}")
-            emptyList()
-        }
-    }
-
-    /**
-     * Extension to convert RadioStation back to RadioRegistryStation for display
-     */
-    private fun RadioStation.toRegistryStation(): RadioRegistryStation {
-        val registryId = radioBrowserUuid?.removePrefix("registry_") ?: ""
-        return RadioRegistryStation(
-            id = registryId,
-            name = name,
-            streamUrl = streamUrl,
-            homepage = homepage.takeIf { it.isNotEmpty() },
-            faviconUrl = coverArtUri,
-            genre = genre,
-            codec = codec.takeIf { it.isNotEmpty() },
-            bitrate = bitrate.takeIf { it > 0 },
-            language = null,
-            network = when (proxyType) {
-                "TOR" -> "tor"
-                "I2P" -> "i2p"
-                else -> ""
-            },
-            country = country.takeIf { it.isNotEmpty() },
-            countryCode = countryCode.takeIf { it.isNotEmpty() },
-            isOnline = true,  // Note: Online status not stored in cache, use fresh API data for accurate status
-            lastCheckTime = null,
-            status = "approved",
-            checkCount = 0,
-            checkOkCount = 0,
-            submittedAt = null,
-            createdAt = null,
-            updatedAt = null
-        )
     }
 }
