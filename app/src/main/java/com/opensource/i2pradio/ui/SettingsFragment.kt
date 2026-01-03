@@ -37,9 +37,12 @@ import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.data.DefaultStations
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.data.radioregistry.RadioRegistryRepository
+import com.opensource.i2pradio.data.radioregistry.RadioRegistryResult
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 import com.opensource.i2pradio.util.StationImportExport
@@ -106,6 +109,11 @@ class SettingsFragment : Fragment() {
 
     // ViewModel for observing current station (for miniplayer padding)
     private val radioViewModel: RadioViewModel by activityViewModels()
+
+    // Radio Registry API repository for fetching I2P/Tor stations
+    private val registryRepository: RadioRegistryRepository by lazy {
+        RadioRegistryRepository(requireContext())
+    }
 
     // Miniplayer spacing for dynamic bottom padding
     private var settingsContentContainer: LinearLayout? = null
@@ -1306,20 +1314,42 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showImportCuratedListDialog(type: String) {
-        val (fileName, networkName) = when (type) {
-            "i2p" -> Pair("i2p_stations.json", "I2P")
-            "tor" -> Pair("tor_stations.json", "Tor")
+        val networkName = when (type) {
+            "i2p" -> "I2P"
+            "tor" -> "Tor"
             else -> return
         }
 
         val context = requireContext()
         lifecycleScope.launch(Dispatchers.IO) {
+            // Try to get count from API first, fallback to bundled JSON
             val count = try {
-                val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
-                val result = StationImportExport.importFromJson(jsonString)
-                result.stations.size
+                val apiResult = when (type) {
+                    "tor" -> registryRepository.getTorStations(forceRefresh = true, onlineOnly = false, limit = 200)
+                    "i2p" -> registryRepository.getI2pStations(forceRefresh = true, onlineOnly = false, limit = 200)
+                    else -> null
+                }
+
+                when (apiResult) {
+                    is RadioRegistryResult.Success -> apiResult.data.size
+                    else -> {
+                        // Fallback to bundled JSON
+                        val fallbackStations = when (type) {
+                            "tor" -> DefaultStations.getTorStations(context)
+                            "i2p" -> DefaultStations.getI2pStations(context)
+                            else -> emptyList()
+                        }
+                        fallbackStations.size
+                    }
+                }
             } catch (e: Exception) {
-                0
+                // Fallback to bundled JSON on any error
+                val fallbackStations = when (type) {
+                    "tor" -> DefaultStations.getTorStations(context)
+                    "i2p" -> DefaultStations.getI2pStations(context)
+                    else -> emptyList()
+                }
+                fallbackStations.size
             }
 
             withContext(Dispatchers.Main) {
@@ -1329,7 +1359,7 @@ class SettingsFragment : Fragment() {
                     .setTitle(getString(R.string.import_curated_title, networkName))
                     .setMessage(getString(R.string.import_curated_message, count, networkName))
                     .setPositiveButton(getString(R.string.button_import)) { _, _ ->
-                        importCuratedList(fileName, networkName)
+                        importCuratedList(type, networkName)
                     }
                     .setNegativeButton(getString(R.string.button_cancel), null)
                     .show()
@@ -1337,20 +1367,36 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun importCuratedList(fileName: String, networkName: String) {
+    private fun importCuratedList(type: String, networkName: String) {
         val context = requireContext()
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // Load JSON from assets
-                val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
+                // Try to fetch from API first
+                val apiResult = when (type) {
+                    "tor" -> registryRepository.getTorStations(forceRefresh = true, onlineOnly = false, limit = 200)
+                    "i2p" -> registryRepository.getI2pStations(forceRefresh = true, onlineOnly = false, limit = 200)
+                    else -> null
+                }
 
-                // Parse using existing import utility
-                val result = StationImportExport.importFromJson(jsonString)
+                val stations: List<RadioStation> = when (apiResult) {
+                    is RadioRegistryResult.Success -> {
+                        // Convert RadioRegistryStation to RadioStation
+                        apiResult.data.map { it.toRadioStation() }
+                    }
+                    else -> {
+                        // Fallback to bundled JSON on API error
+                        when (type) {
+                            "tor" -> DefaultStations.getTorStations(context)
+                            "i2p" -> DefaultStations.getI2pStations(context)
+                            else -> emptyList()
+                        }
+                    }
+                }
 
                 withContext(Dispatchers.Main) {
                     if (!isAdded) return@withContext
 
-                    if (result.stations.isEmpty()) {
+                    if (stations.isEmpty()) {
                         if (!PreferencesHelper.isToastMessagesDisabled(context)) {
                             Toast.makeText(
                                 context,
@@ -1362,18 +1408,45 @@ class SettingsFragment : Fragment() {
                     }
 
                     // Import stations directly (no second confirmation needed)
-                    performImport(result.stations)
+                    performImport(stations)
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    if (!isAdded) return@withContext
+                // Fallback to bundled JSON on any exception
+                try {
+                    val fallbackStations = when (type) {
+                        "tor" -> DefaultStations.getTorStations(context)
+                        "i2p" -> DefaultStations.getI2pStations(context)
+                        else -> emptyList()
+                    }
 
-                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.failed_to_import_stations, networkName, e.message),
-                            Toast.LENGTH_LONG
-                        ).show()
+                    withContext(Dispatchers.Main) {
+                        if (!isAdded) return@withContext
+
+                        if (fallbackStations.isEmpty()) {
+                            if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.no_stations_found_in_list, networkName),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            return@withContext
+                        }
+
+                        // Import fallback stations
+                        performImport(fallbackStations)
+                    }
+                } catch (fallbackError: Exception) {
+                    withContext(Dispatchers.Main) {
+                        if (!isAdded) return@withContext
+
+                        if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                            Toast.makeText(
+                                context,
+                                getString(R.string.failed_to_import_stations, networkName, fallbackError.message),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }
