@@ -430,9 +430,9 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      * Load curated I2P stations from bundled JSON
      */
     fun loadCuratedI2pStations() {
-        _currentCategory.value = BrowseCategory.ALL_STATIONS
+        _currentCategory.postValue(BrowseCategory.ALL_STATIONS)
         currentOffset = 0
-        _isLoading.value = true
+        _isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val i2pStations = com.opensource.i2pradio.data.DefaultStations.getI2pStations(getApplication())
@@ -451,9 +451,9 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      * Load curated Tor stations from bundled JSON
      */
     fun loadCuratedTorStations() {
-        _currentCategory.value = BrowseCategory.ALL_STATIONS
+        _currentCategory.postValue(BrowseCategory.ALL_STATIONS)
         currentOffset = 0
-        _isLoading.value = true
+        _isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val torStations = com.opensource.i2pradio.data.DefaultStations.getTorStations(getApplication())
