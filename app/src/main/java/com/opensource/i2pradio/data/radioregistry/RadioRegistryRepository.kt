@@ -351,7 +351,7 @@ class RadioRegistryRepository(private val context: Context) {
             },
             country = country.takeIf { it.isNotEmpty() },
             countryCode = countryCode.takeIf { it.isNotEmpty() },
-            isOnline = true,  // Assume cached stations are online
+            isOnline = true,  // Note: Online status not stored in cache, use fresh API data for accurate status
             lastCheckTime = null,
             status = "approved",
             checkCount = 0,
