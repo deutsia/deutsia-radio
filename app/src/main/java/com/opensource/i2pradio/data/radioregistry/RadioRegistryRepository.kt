@@ -55,10 +55,14 @@ class RadioRegistryRepository(private val context: Context) {
 
             // Fetch from API
             Log.d(TAG, "Fetching Tor stations from API")
-            when (val result = client.getTorStations(limit = limit)) {
+            when (val result = client.getTorStations(onlineOnly = onlineOnly, limit = limit)) {
                 is RadioRegistryResult.Success -> {
-                    val stations = result.data.stations
-                    Log.d(TAG, "Fetched ${stations.size} Tor stations from API")
+                    // Log raw API response count
+                    Log.d(TAG, "API returned ${result.data.stations.size} stations for Tor request")
+
+                    // Filter to ensure only Tor stations are included (client-side validation)
+                    val stations = result.data.stations.filter { it.isTorStation }
+                    Log.d(TAG, "After filtering: ${stations.size} Tor stations (filtered out ${result.data.stations.size - stations.size} non-Tor)")
 
                     // Cache the stations
                     cacheStations(stations)
@@ -111,10 +115,14 @@ class RadioRegistryRepository(private val context: Context) {
 
             // Fetch from API
             Log.d(TAG, "Fetching I2P stations from API")
-            when (val result = client.getI2pStations(limit = limit)) {
+            when (val result = client.getI2pStations(onlineOnly = onlineOnly, limit = limit)) {
                 is RadioRegistryResult.Success -> {
-                    val stations = result.data.stations
-                    Log.d(TAG, "Fetched ${stations.size} I2P stations from API")
+                    // Log raw API response count
+                    Log.d(TAG, "API returned ${result.data.stations.size} stations for I2P request")
+
+                    // Filter to ensure only I2P stations are included (client-side validation)
+                    val stations = result.data.stations.filter { it.isI2pStation }
+                    Log.d(TAG, "After filtering: ${stations.size} I2P stations (filtered out ${result.data.stations.size - stations.size} non-I2P)")
 
                     // Cache the stations
                     cacheStations(stations)
