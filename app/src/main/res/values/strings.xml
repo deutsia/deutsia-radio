@@ -105,6 +105,10 @@
     <string name="browse_popular_germany">Popular in Germany</string>
     <string name="browse_spanish_radio">Spanish Radio</string>
     <string name="browse_french_radio">French Radio</string>
+    <string name="browse_privacy_radio">Privacy Radio</string>
+    <string name="browse_privacy_radio_subtitle">Anonymous radio stations via Tor and I2P</string>
+    <string name="browse_tor_stations">Tor Stations</string>
+    <string name="browse_i2p_stations">I2P Stations</string>
     <string name="see_all">See All</string>
     <string name="add_filter">Filter</string>
     <string name="browse_results_count">Loading…</string>
