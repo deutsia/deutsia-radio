@@ -251,9 +251,11 @@
     <string name="settings_import_from_file">ဖိုင်မှ တင်သွင်းရန်</string>
     <string name="settings_import_from_file_description">CSV၊ JSON၊ M3U သို့မဟုတ် PLS မှ တင်သွင်းပါ</string>
     <string name="settings_add_i2p_stations">I2P စတေးရှင်းများ ထည့်ရန်</string>
-    <string name="settings_add_i2p_stations_description">%d ပါဝင်သော I2P စတေးရှင်း (အော့ဖ်လိုင်း၊ ကွန်ရက်မလို)</string>
+    <string name="settings_add_i2p_stations_description">%d I2P စတေးရှင်း ရရှိနိုင်</string>
+    <string name="settings_add_i2p_stations_description_generic">ရွေးချယ်ထားသော I2P ရေဒီယိုစတေးရှင်းများ ထည့်ရန်</string>
     <string name="settings_add_tor_stations">Tor စတေးရှင်းများ ထည့်ရန်</string>
-    <string name="settings_add_tor_stations_description">%d ပါဝင်သော Tor စတေးရှင်း (အော့ဖ်လိုင်း၊ ကွန်ရက်မလို)</string>
+    <string name="settings_add_tor_stations_description">%d Tor စတေးရှင်း ရရှိနိုင်</string>
+    <string name="settings_add_tor_stations_description_generic">ရွေးချယ်ထားသော Tor ရေဒီယိုစတေးရှင်းများ ထည့်ရန်</string>
     <string name="settings_export_stations">စတေးရှင်းများကို ထုတ်ယူရန်</string>
     <string name="settings_export_stations_description">သင့်စတေးရှင်းများကို ဖိုင်သို့ ထုတ်ယူပါ</string>
 

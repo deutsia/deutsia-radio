@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">Импорт из файла</string>
     <string name="settings_import_from_file_description">Импорт из CSV, JSON, M3U или PLS</string>
     <string name="settings_add_i2p_stations">Добавить I2P станции</string>
-    <string name="settings_add_i2p_stations_description">%d встроенных I2P станций (офлайн, без сети)</string>
+    <string name="settings_add_i2p_stations_description">%d I2P станций доступно</string>
+    <string name="settings_add_i2p_stations_description_generic">Добавить отобранные I2P радиостанции</string>
     <string name="settings_add_tor_stations">Добавить Tor станции</string>
-    <string name="settings_add_tor_stations_description">%d встроенных Tor станций (офлайн, без сети)</string>
+    <string name="settings_add_tor_stations_description">%d Tor станций доступно</string>
+    <string name="settings_add_tor_stations_description_generic">Добавить отобранные Tor радиостанции</string>
     <string name="settings_export_stations">Экспорт станций</string>
     <string name="settings_export_stations_description">Экспортировать ваши станции в файл</string>
 

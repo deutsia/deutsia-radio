@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">Nhập từ tệp</string>
     <string name="settings_import_from_file_description">Nhập từ CSV, JSON, M3U hoặc PLS</string>
     <string name="settings_add_i2p_stations">Thêm trạm I2P</string>
-    <string name="settings_add_i2p_stations_description">%d trạm I2P đi kèm (ngoại tuyến, không cần mạng)</string>
+    <string name="settings_add_i2p_stations_description">%d trạm I2P khả dụng</string>
+    <string name="settings_add_i2p_stations_description_generic">Thêm các trạm phát thanh I2P được tuyển chọn</string>
     <string name="settings_add_tor_stations">Thêm trạm Tor</string>
-    <string name="settings_add_tor_stations_description">%d trạm Tor đi kèm (ngoại tuyến, không cần mạng)</string>
+    <string name="settings_add_tor_stations_description">%d trạm Tor khả dụng</string>
+    <string name="settings_add_tor_stations_description_generic">Thêm các trạm phát thanh Tor được tuyển chọn</string>
     <string name="settings_export_stations">Xuất trạm</string>
     <string name="settings_export_stations_description">Xuất các trạm của bạn ra tệp</string>
 

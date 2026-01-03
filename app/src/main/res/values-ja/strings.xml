@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">ファイルからインポート</string>
     <string name="settings_import_from_file_description">CSV、JSON、M3U、またはPLSからインポート</string>
     <string name="settings_add_i2p_stations">I2Pステーションを追加</string>
-    <string name="settings_add_i2p_stations_description">%d個の同梱I2Pステーション（オフライン、ネットワーク不要）</string>
+    <string name="settings_add_i2p_stations_description">%d個のI2Pステーションが利用可能</string>
+    <string name="settings_add_i2p_stations_description_generic">厳選されたI2Pラジオステーションを追加</string>
     <string name="settings_add_tor_stations">Torステーションを追加</string>
-    <string name="settings_add_tor_stations_description">%d個の同梱Torステーション（オフライン、ネットワーク不要）</string>
+    <string name="settings_add_tor_stations_description">%d個のTorステーションが利用可能</string>
+    <string name="settings_add_tor_stations_description_generic">厳選されたTorラジオステーションを追加</string>
     <string name="settings_export_stations">ステーションをエクスポート</string>
     <string name="settings_export_stations_description">ステーションをファイルにエクスポート</string>
 
