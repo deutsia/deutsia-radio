@@ -21,7 +21,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.5.2** Improved toast messages, minor bug fix, UI/UX improvements
+- **New Release: v1.6.0** Dynamic API migration for I2P/Tor stations - now fetches live station lists instead of hardcoded bundles
 
 ---
 
@@ -100,9 +100,9 @@ APK output: `app/build/outputs/apk/debug/`
 
 ## Submit Stations
 
-You can submit darknet stations (I2P/Tor) to be added to the bundled JSON list in the app by opening an issue, creating a pull request with the added stations, or by emailing me at **bb7x89uo at anonaddy dot me**.
+You can submit darknet stations (I2P/Tor) via the [Radio Registry API](https://www.api.deutsia.com).
 
-Please do **not** submit clearnet stations here, even if they are part of a darknet website. If the stream source is not `.i2p` or `.onion`, please submit it to the [RadioBrowser database](https://www.radio-browser.info/add) instead.
+Please note that you **cannot** submit clearnet stations here, even if they are part of a darknet website. If the stream source is not `.i2p` or `.onion`, please submit it to the [RadioBrowser database](https://www.radio-browser.info/add) instead.
 
 ---
 
@@ -121,6 +121,7 @@ Please do **not** submit clearnet stations here, even if they are part of a dark
 - [I2P Project](https://geti2p.net/) - Anonymous networking on Android
 - Built with [Claude Code](https://github.com/anthropics/claude-code)
 - [SQLCipher](https://www.zetetic.net/sqlcipher/) - Database encryption
+- [Tor/I2P Station API](http://www.api.deutsia.com) - Tor/I2P API, may be open-sourced in the future
 ---
 
 ## License
