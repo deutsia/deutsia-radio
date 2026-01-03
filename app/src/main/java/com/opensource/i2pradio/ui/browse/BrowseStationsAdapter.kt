@@ -1,5 +1,9 @@
 package com.opensource.i2pradio.ui.browse
 
+import android.graphics.Color
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -114,16 +118,45 @@ class BrowseStationsAdapter(
         fun bind(station: RadioBrowserStation, isSaved: Boolean, isLiked: Boolean) {
             stationName.text = station.name
 
-            // Build info string: genre (with network indicator) + country
-            val infoParts = mutableListOf<String>()
+            // Build info string: genre (with network indicator) + country/status
+            val isPrivacyStation = station.proxyType.uppercase() in listOf("TOR", "I2P")
             val genreWithNetwork = station.getGenreWithNetwork()
-            if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {
-                infoParts.add(genreWithNetwork)
+            val baseText = if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {
+                "$genreWithNetwork • "
+            } else {
+                ""
             }
-            if (station.country.isNotEmpty()) {
-                infoParts.add(station.country)
+
+            if (isPrivacyStation) {
+                // For privacy stations, show Online/Offline status with color
+                val statusText = if (station.lastcheckok) "Online" else "Offline"
+                val statusColor = if (station.lastcheckok) {
+                    Color.parseColor("#4CAF50")  // Material Green
+                } else {
+                    Color.parseColor("#F44336")  // Material Red
+                }
+                val spannable = SpannableStringBuilder(baseText).apply {
+                    val statusStart = length
+                    append(statusText)
+                    setSpan(
+                        ForegroundColorSpan(statusColor),
+                        statusStart,
+                        statusStart + statusText.length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+                stationInfo.text = spannable
+            } else {
+                // For regular stations, show country
+                val infoParts = mutableListOf<String>()
+                if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {
+                    infoParts.add(genreWithNetwork)
+                }
+                if (station.country.isNotEmpty()) {
+                    infoParts.add(station.country)
+                }
+                stationInfo.text = infoParts.joinToString(" • ")
             }
-            stationInfo.text = infoParts.joinToString(" • ")
 
             // Quality info
             val quality = station.getQualityInfo()

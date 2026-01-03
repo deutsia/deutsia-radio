@@ -388,13 +388,15 @@ class BrowseStationsFragment : Fragment() {
             currentResultsTitle = getString(R.string.browse_all_stations)
             switchToResultsMode()
 
-            // Special handling for I2P and Tor chips - load curated lists
+            // Special handling for I2P and Tor chips - load from API
             when (genreData.tag.lowercase()) {
                 "i2p" -> {
-                    viewModel.loadCuratedI2pStations()
+                    currentResultsTitle = getString(R.string.browse_i2p_stations)
+                    viewModel.loadApiI2pStations()
                 }
                 "tor" -> {
-                    viewModel.loadCuratedTorStations()
+                    currentResultsTitle = getString(R.string.browse_tor_stations)
+                    viewModel.loadApiTorStations()
                 }
                 else -> {
                     // Normal genre chip handling
