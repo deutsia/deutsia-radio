@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Curated I2P radio stations - privacy-focused streams accessible via I2P network",
+  "description": "fallback hardcoded JSON library of i2p stations",
   "stations": [
     {
       "name": "Arav's Dwelling",
