@@ -256,7 +256,15 @@ class RadioRegistryClient(private val context: Context) {
         limit: Int = DEFAULT_LIMIT,
         offset: Int = 0
     ): RadioRegistryResult<StationListResponse> {
-        return getStations(network = "tor", onlineOnly = onlineOnly, limit = limit, offset = offset)
+        val params = buildString {
+            append("/stations?network=tor")
+            if (onlineOnly) append("&online_only=true")
+            if (limit != DEFAULT_LIMIT) append("&limit=${limit.coerceAtMost(MAX_LIMIT)}")
+            if (offset > 0) append("&offset=$offset")
+        }
+        return executeRequest(params) { body ->
+            StationListResponse.fromJson(JSONObject(body))
+        }
     }
 
     /**
@@ -267,7 +275,15 @@ class RadioRegistryClient(private val context: Context) {
         limit: Int = DEFAULT_LIMIT,
         offset: Int = 0
     ): RadioRegistryResult<StationListResponse> {
-        return getStations(network = "i2p", onlineOnly = onlineOnly, limit = limit, offset = offset)
+        val params = buildString {
+            append("/stations?network=i2p")
+            if (onlineOnly) append("&online_only=true")
+            if (limit != DEFAULT_LIMIT) append("&limit=${limit.coerceAtMost(MAX_LIMIT)}")
+            if (offset > 0) append("&offset=$offset")
+        }
+        return executeRequest(params) { body ->
+            StationListResponse.fromJson(JSONObject(body))
+        }
     }
 
     /**
