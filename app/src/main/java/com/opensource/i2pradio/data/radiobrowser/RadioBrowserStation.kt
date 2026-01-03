@@ -1,6 +1,7 @@
 package com.opensource.i2pradio.data.radiobrowser
 
 import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
 import org.json.JSONObject
 import java.util.UUID
 
@@ -110,6 +111,52 @@ data class RadioBrowserStation(
                 proxyType = station.proxyType,
                 proxyHost = station.proxyHost,
                 proxyPort = station.proxyPort
+            )
+        }
+
+        /**
+         * Convert a RadioRegistryStation (from Radio Registry API) to RadioBrowserStation.
+         * Preserves the online status from the API.
+         */
+        fun fromRegistryStation(station: RadioRegistryStation): RadioBrowserStation {
+            // Add I2P or Tor tag based on network type
+            val tags = when {
+                station.isTorStation -> "Tor,${station.genre ?: "Other"}"
+                station.isI2pStation -> "I2P,${station.genre ?: "Other"}"
+                else -> station.genre ?: "Other"
+            }
+
+            val proxyType = station.getProxyType()
+
+            return RadioBrowserStation(
+                stationuuid = "registry_${station.id}",
+                name = station.name,
+                url = station.streamUrl,
+                urlResolved = station.streamUrl,
+                homepage = station.homepage ?: "",
+                favicon = station.faviconUrl ?: "",
+                tags = tags,
+                country = station.country ?: "",
+                countrycode = station.countryCode ?: "",
+                state = "",
+                language = station.language ?: "",
+                languagecodes = "",
+                votes = 0,
+                lastchangetime = "",
+                codec = station.codec ?: "",
+                bitrate = station.bitrate ?: 0,
+                hls = false,
+                lastcheckok = station.isOnline,  // Preserve actual online status!
+                clickcount = 0,
+                clicktrend = 0,
+                sslError = false,
+                geoLat = null,
+                geoLong = null,
+                // Set proxy settings based on network type
+                useProxy = proxyType != com.opensource.i2pradio.data.ProxyType.NONE,
+                proxyType = proxyType.name,
+                proxyHost = proxyType.getDefaultHost(),
+                proxyPort = proxyType.getDefaultPort()
             )
         }
     }

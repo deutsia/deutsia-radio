@@ -273,8 +273,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             try {
                 when (val result = registryRepository.getTorStations(forceRefresh = false, limit = 100)) {
                     is RadioRegistryResult.Success -> {
-                        val browserStations = result.data.map { it.toRadioStation() }
-                            .map { RadioBrowserStation.fromRadioStation(it) }
+                        val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
                         _stations.postValue(browserStations)
                         _hasMoreResults.postValue(false)
                         _isLoading.postValue(false)
@@ -303,8 +302,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             try {
                 when (val result = registryRepository.getI2pStations(forceRefresh = false, limit = 100)) {
                     is RadioRegistryResult.Success -> {
-                        val browserStations = result.data.map { it.toRadioStation() }
-                            .map { RadioBrowserStation.fromRadioStation(it) }
+                        val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
                         _stations.postValue(browserStations)
                         _hasMoreResults.postValue(false)
                         _isLoading.postValue(false)
