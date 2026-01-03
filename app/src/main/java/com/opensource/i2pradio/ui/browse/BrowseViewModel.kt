@@ -230,8 +230,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
         viewModelScope.launch {
             try {
-                // Load Tor stations from API - always force refresh to get accurate online status
-                when (val result = registryRepository.getTorStations(forceRefresh = true, limit = 20)) {
+                // Load Tor stations from API
+                when (val result = registryRepository.getTorStations(limit = 20)) {
                     is RadioRegistryResult.Success -> {
                         _privacyTorStations.value = result.data.take(10)
                     }
@@ -241,8 +241,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                     is RadioRegistryResult.Loading -> {}
                 }
 
-                // Load I2P stations from API - always force refresh to get accurate online status
-                when (val result = registryRepository.getI2pStations(forceRefresh = true, limit = 20)) {
+                // Load I2P stations from API
+                when (val result = registryRepository.getI2pStations(limit = 20)) {
                     is RadioRegistryResult.Success -> {
                         _privacyI2pStations.value = result.data.take(10)
                     }
@@ -271,7 +271,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                when (val result = registryRepository.getTorStations(forceRefresh = true, limit = 100)) {
+                when (val result = registryRepository.getTorStations(limit = 100)) {
                     is RadioRegistryResult.Success -> {
                         val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
                         _stations.postValue(browserStations)
@@ -300,7 +300,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                when (val result = registryRepository.getI2pStations(forceRefresh = true, limit = 100)) {
+                when (val result = registryRepository.getI2pStations(limit = 100)) {
                     is RadioRegistryResult.Success -> {
                         val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
                         _stations.postValue(browserStations)
@@ -323,7 +323,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     /**
      * Convert a RadioRegistryStation to a playable RadioStation
      */
-    fun getPlayableStation(station: RadioRegistryStation) = registryRepository.toPlayableStation(station)
+    fun getPlayableStation(station: RadioRegistryStation) = station.toRadioStation()
 
     /**
      * Load top voted stations

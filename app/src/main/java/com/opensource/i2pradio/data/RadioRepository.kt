@@ -113,4 +113,15 @@ class RadioRepository(context: Context) {
             PreferencesHelper.setPresetsInitialized(context, true)
         }
     }
+
+    /**
+     * Clear all cached API stations that are not liked by the user.
+     * This removes leftover cache entries from the old caching system.
+     */
+    suspend fun clearUnlikedCachedStations() {
+        withContext(Dispatchers.IO) {
+            // Delete all cached stations older than now (i.e., all of them)
+            radioDao.deleteStaleCachedStations(System.currentTimeMillis() + 1)
+        }
+    }
 }
