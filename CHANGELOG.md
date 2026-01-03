@@ -2,6 +2,28 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.6.0]
+
+### Added
+- **Dynamic API for I2P/Tor stations**: Privacy station lists now fetch live from Radio Registry API instead of using hardcoded bundled files
+- **Online-only station filtering**: Import now only shows currently online stations, eliminating dead/stale streams
+
+### Changed
+- **Removed bundled station fallbacks**: Station import no longer falls back to outdated bundled JSON files
+- **API-first architecture**: All privacy station imports now use Radio Registry API with proper error handling
+
+### Fixed
+- **PLS format detection**: Fixed bug where PLS playlist files were incorrectly identified as JSON format
+- **Threading crash**: Fixed crash when loading privacy stations due to incorrect thread context
+- **Cover art privacy**: Privacy station cover art now properly routes through Tor proxy when Tor is enabled
+- **Station count sync**: Fixed mismatch between settings display and import dialog station counts
+- **Import reliability**: Simplified API calls to match documented endpoint format for better stability
+
+### UI/UX Improvements
+- Updated playback translations to reflect dynamic API usage
+- More accurate station descriptions in import dialog
+- Better error messages when API fetch fails
+
 ## [1.5.2]
 
 ### Fixed
