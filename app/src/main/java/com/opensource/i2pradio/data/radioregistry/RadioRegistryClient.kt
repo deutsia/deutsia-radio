@@ -252,20 +252,22 @@ class RadioRegistryClient(private val context: Context) {
      * Get all Tor stations
      */
     suspend fun getTorStations(
+        onlineOnly: Boolean = true,
         limit: Int = DEFAULT_LIMIT,
         offset: Int = 0
     ): RadioRegistryResult<StationListResponse> {
-        return getStations(network = "tor", limit = limit, offset = offset)
+        return getStations(network = "tor", onlineOnly = onlineOnly, limit = limit, offset = offset)
     }
 
     /**
      * Get all I2P stations
      */
     suspend fun getI2pStations(
+        onlineOnly: Boolean = true,
         limit: Int = DEFAULT_LIMIT,
         offset: Int = 0
     ): RadioRegistryResult<StationListResponse> {
-        return getStations(network = "i2p", limit = limit, offset = offset)
+        return getStations(network = "i2p", onlineOnly = onlineOnly, limit = limit, offset = offset)
     }
 
     /**
