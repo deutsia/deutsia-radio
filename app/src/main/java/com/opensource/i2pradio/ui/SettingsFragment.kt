@@ -1328,38 +1328,47 @@ class SettingsFragment : Fragment() {
 
         val context = requireContext()
         lifecycleScope.launch(Dispatchers.IO) {
-            // Try to get count from API first, fallback to bundled JSON
+            // Get count from API only (no fallback to bundled JSON)
             val count = try {
                 val apiResult = when (type) {
-                    "tor" -> registryRepository.getTorStations(forceRefresh = true, onlineOnly = false, limit = 200)
-                    "i2p" -> registryRepository.getI2pStations(forceRefresh = true, onlineOnly = false, limit = 200)
+                    "tor" -> registryRepository.getTorStations(forceRefresh = true, onlineOnly = true, limit = 200)
+                    "i2p" -> registryRepository.getI2pStations(forceRefresh = true, onlineOnly = true, limit = 200)
                     else -> null
                 }
 
                 when (apiResult) {
                     is RadioRegistryResult.Success -> apiResult.data.size
-                    else -> {
-                        // Fallback to bundled JSON
-                        val fallbackStations = when (type) {
-                            "tor" -> DefaultStations.getTorStations(context)
-                            "i2p" -> DefaultStations.getI2pStations(context)
-                            else -> emptyList()
-                        }
-                        fallbackStations.size
-                    }
+                    else -> -1  // API failed
                 }
             } catch (e: Exception) {
-                // Fallback to bundled JSON on any error
-                val fallbackStations = when (type) {
-                    "tor" -> DefaultStations.getTorStations(context)
-                    "i2p" -> DefaultStations.getI2pStations(context)
-                    else -> emptyList()
-                }
-                fallbackStations.size
+                -1  // API failed
             }
 
             withContext(Dispatchers.Main) {
                 if (!isAdded) return@withContext
+
+                if (count < 0) {
+                    // API failed - show error
+                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.failed_to_fetch_stations, networkName),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    return@withContext
+                }
+
+                if (count == 0) {
+                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.no_stations_found_in_list, networkName),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    return@withContext
+                }
 
                 AlertDialog.Builder(context)
                     .setTitle(getString(R.string.import_curated_title, networkName))
@@ -1377,10 +1386,10 @@ class SettingsFragment : Fragment() {
         val context = requireContext()
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // Try to fetch from API first
+                // Fetch from API only - no fallback to bundled JSON
                 val apiResult = when (type) {
-                    "tor" -> registryRepository.getTorStations(forceRefresh = true, onlineOnly = false, limit = 200)
-                    "i2p" -> registryRepository.getI2pStations(forceRefresh = true, onlineOnly = false, limit = 200)
+                    "tor" -> registryRepository.getTorStations(forceRefresh = true, onlineOnly = true, limit = 200)
+                    "i2p" -> registryRepository.getI2pStations(forceRefresh = true, onlineOnly = true, limit = 200)
                     else -> null
                 }
 
@@ -1390,12 +1399,18 @@ class SettingsFragment : Fragment() {
                         apiResult.data.map { it.toRadioStation() }
                     }
                     else -> {
-                        // Fallback to bundled JSON on API error
-                        when (type) {
-                            "tor" -> DefaultStations.getTorStations(context)
-                            "i2p" -> DefaultStations.getI2pStations(context)
-                            else -> emptyList()
+                        // API failed - show error and return
+                        withContext(Dispatchers.Main) {
+                            if (!isAdded) return@withContext
+                            if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.failed_to_fetch_stations, networkName),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
+                        return@launch
                     }
                 }
 
@@ -1417,42 +1432,15 @@ class SettingsFragment : Fragment() {
                     performImport(stations)
                 }
             } catch (e: Exception) {
-                // Fallback to bundled JSON on any exception
-                try {
-                    val fallbackStations = when (type) {
-                        "tor" -> DefaultStations.getTorStations(context)
-                        "i2p" -> DefaultStations.getI2pStations(context)
-                        else -> emptyList()
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        if (!isAdded) return@withContext
-
-                        if (fallbackStations.isEmpty()) {
-                            if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                                Toast.makeText(
-                                    context,
-                                    getString(R.string.no_stations_found_in_list, networkName),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                            return@withContext
-                        }
-
-                        // Import fallback stations
-                        performImport(fallbackStations)
-                    }
-                } catch (fallbackError: Exception) {
-                    withContext(Dispatchers.Main) {
-                        if (!isAdded) return@withContext
-
-                        if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                            Toast.makeText(
-                                context,
-                                getString(R.string.failed_to_import_stations, networkName, fallbackError.message),
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                // Show error - do NOT fall back to bundled JSON
+                withContext(Dispatchers.Main) {
+                    if (!isAdded) return@withContext
+                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.failed_to_import_stations, networkName, e.message),
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
