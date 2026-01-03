@@ -224,18 +224,21 @@ class RadioRegistryClient(private val context: Context) {
      *
      * @param network Filter by network: "tor" or "i2p" (null for all)
      * @param genre Filter by genre
+     * @param onlineOnly If true, only return online stations (default: true)
      * @param limit Maximum number of stations (max 200)
      * @param offset Pagination offset
      */
     suspend fun getStations(
         network: String? = null,
         genre: String? = null,
+        onlineOnly: Boolean = true,
         limit: Int = DEFAULT_LIMIT,
         offset: Int = 0
     ): RadioRegistryResult<StationListResponse> {
         val params = buildString {
             append("/stations?limit=${limit.coerceAtMost(MAX_LIMIT)}")
             append("&offset=$offset")
+            if (onlineOnly) append("&online_only=true")
             network?.let { append("&network=${java.net.URLEncoder.encode(it, "UTF-8")}") }
             genre?.let { append("&genre=${java.net.URLEncoder.encode(it, "UTF-8")}") }
         }

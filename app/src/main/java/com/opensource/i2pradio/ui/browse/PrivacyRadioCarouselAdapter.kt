@@ -1,5 +1,9 @@
 package com.opensource.i2pradio.ui.browse
 
+import android.graphics.Color
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -71,17 +75,25 @@ class PrivacyRadioCarouselAdapter(
 
         fun bind(station: RadioRegistryStation, rank: Int) {
             stationName.text = station.name
-            stationInfo.text = buildString {
-                val genreWithNetwork = station.getGenreWithNetwork()
-                if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {
-                    append(genreWithNetwork)
-                }
-                val qualityInfo = station.getQualityInfo()
-                if (qualityInfo.isNotEmpty()) {
-                    if (isNotEmpty()) append(" • ")
-                    append(qualityInfo)
-                }
-            }.ifEmpty { station.getNetworkIndicator() ?: "Privacy Radio" }
+            // Build station info with "Online" in green
+            val genreWithNetwork = station.getGenreWithNetwork()
+            val baseText = if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {
+                "$genreWithNetwork • "
+            } else {
+                "${station.getNetworkIndicator() ?: "Privacy Radio"} • "
+            }
+            val onlineText = "Online"
+            val spannable = SpannableStringBuilder(baseText).apply {
+                val onlineStart = length
+                append(onlineText)
+                setSpan(
+                    ForegroundColorSpan(Color.parseColor("#4CAF50")),  // Material Green
+                    onlineStart,
+                    onlineStart + onlineText.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            stationInfo.text = spannable
 
             // Load station image using secure loader
             imageLoadDisposable?.dispose()
