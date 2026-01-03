@@ -539,6 +539,7 @@
     <string name="import_curated_message">Add %1$d %2$s radio stations from the Radio Registry?\n\nThese stations are pre-configured with proxy settings and ready to use.</string>
     <string name="no_stations_found_in_list">No stations found in %s list</string>
     <string name="failed_to_import_stations">Failed to add %1$s stations: %2$s</string>
+    <string name="failed_to_fetch_stations">Failed to fetch %s stations from server</string>
     <string name="dialog_export_stations_title">Export Stations</string>
     <string name="no_stations_in_file">No stations found in the file</string>
     <string name="dialog_import_failed">Import Failed</string>
