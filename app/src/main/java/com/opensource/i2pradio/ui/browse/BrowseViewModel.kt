@@ -271,7 +271,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                when (val result = registryRepository.getTorStations(forceRefresh = false, limit = 100)) {
+                when (val result = registryRepository.getTorStations(forceRefresh = true, limit = 100)) {
                     is RadioRegistryResult.Success -> {
                         val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
                         _stations.postValue(browserStations)
@@ -300,7 +300,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                when (val result = registryRepository.getI2pStations(forceRefresh = false, limit = 100)) {
+                when (val result = registryRepository.getI2pStations(forceRefresh = true, limit = 100)) {
                     is RadioRegistryResult.Success -> {
                         val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
                         _stations.postValue(browserStations)
