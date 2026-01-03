@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">Aus Datei importieren</string>
     <string name="settings_import_from_file_description">Aus CSV, JSON, M3U oder PLS importieren</string>
     <string name="settings_add_i2p_stations">I2P-Sender hinzufügen</string>
-    <string name="settings_add_i2p_stations_description">%d mitgelieferte I2P-Sender (offline, kein Netzwerk)</string>
+    <string name="settings_add_i2p_stations_description">%d I2P-Sender verfügbar</string>
+    <string name="settings_add_i2p_stations_description_generic">Ausgewählte I2P-Radiosender hinzufügen</string>
     <string name="settings_add_tor_stations">Tor-Sender hinzufügen</string>
-    <string name="settings_add_tor_stations_description">%d mitgelieferte Tor-Sender (offline, kein Netzwerk)</string>
+    <string name="settings_add_tor_stations_description">%d Tor-Sender verfügbar</string>
+    <string name="settings_add_tor_stations_description_generic">Ausgewählte Tor-Radiosender hinzufügen</string>
     <string name="settings_export_stations">Sender exportieren</string>
     <string name="settings_export_stations_description">Ihre Sender in eine Datei exportieren</string>
 

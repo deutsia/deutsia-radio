@@ -261,9 +261,11 @@
     <string name="settings_import_from_file">Importer depuis un fichier</string>
     <string name="settings_import_from_file_description">Importer depuis CSV, JSON, M3U ou PLS</string>
     <string name="settings_add_i2p_stations">Ajouter des stations I2P</string>
-    <string name="settings_add_i2p_stations_description">%d stations I2P incluses (hors ligne, pas de réseau)</string>
+    <string name="settings_add_i2p_stations_description">%d stations I2P disponibles</string>
+    <string name="settings_add_i2p_stations_description_generic">Ajouter des stations radio I2P sélectionnées</string>
     <string name="settings_add_tor_stations">Ajouter des stations Tor</string>
-    <string name="settings_add_tor_stations_description">%d stations Tor incluses (hors ligne, pas de réseau)</string>
+    <string name="settings_add_tor_stations_description">%d stations Tor disponibles</string>
+    <string name="settings_add_tor_stations_description_generic">Ajouter des stations radio Tor sélectionnées</string>
     <string name="settings_export_stations">Exporter les stations</string>
     <string name="settings_export_stations_description">Exporter vos stations vers un fichier</string>
 

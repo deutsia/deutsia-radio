@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">파일에서 가져오기</string>
     <string name="settings_import_from_file_description">CSV, JSON, M3U 또는 PLS에서 가져오기</string>
     <string name="settings_add_i2p_stations">I2P 방송국 추가</string>
-    <string name="settings_add_i2p_stations_description">%d개 포함된 I2P 방송국 (오프라인, 네트워크 불필요)</string>
+    <string name="settings_add_i2p_stations_description">%d개 I2P 방송국 이용 가능</string>
+    <string name="settings_add_i2p_stations_description_generic">선별된 I2P 라디오 방송국 추가</string>
     <string name="settings_add_tor_stations">Tor 방송국 추가</string>
-    <string name="settings_add_tor_stations_description">%d개 포함된 Tor 방송국 (오프라인, 네트워크 불필요)</string>
+    <string name="settings_add_tor_stations_description">%d개 Tor 방송국 이용 가능</string>
+    <string name="settings_add_tor_stations_description_generic">선별된 Tor 라디오 방송국 추가</string>
     <string name="settings_export_stations">방송국 내보내기</string>
     <string name="settings_export_stations_description">방송국을 파일로 내보내기</string>
 

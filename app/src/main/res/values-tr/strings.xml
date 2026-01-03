@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">Dosyadan İçe Aktar</string>
     <string name="settings_import_from_file_description">CSV, JSON, M3U veya PLS\'den içe aktar</string>
     <string name="settings_add_i2p_stations">I2P İstasyonlarını Ekle</string>
-    <string name="settings_add_i2p_stations_description">%d yerleşik I2P istasyonu (çevrimdışı, ağ gerektirmez)</string>
+    <string name="settings_add_i2p_stations_description">%d I2P istasyonu mevcut</string>
+    <string name="settings_add_i2p_stations_description_generic">Seçilmiş I2P radyo istasyonları ekle</string>
     <string name="settings_add_tor_stations">Tor İstasyonlarını Ekle</string>
-    <string name="settings_add_tor_stations_description">%d yerleşik Tor istasyonu (çevrimdışı, ağ gerektirmez)</string>
+    <string name="settings_add_tor_stations_description">%d Tor istasyonu mevcut</string>
+    <string name="settings_add_tor_stations_description_generic">Seçilmiş Tor radyo istasyonları ekle</string>
     <string name="settings_export_stations">İstasyonları Dışa Aktar</string>
     <string name="settings_export_stations_description">İstasyonlarınızı bir dosyaya aktar</string>
 

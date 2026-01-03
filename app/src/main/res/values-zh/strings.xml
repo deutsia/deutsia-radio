@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">从文件导入</string>
     <string name="settings_import_from_file_description">从 CSV、JSON、M3U 或 PLS 导入</string>
     <string name="settings_add_i2p_stations">添加 I2P 电台</string>
-    <string name="settings_add_i2p_stations_description">%d 个内置 I2P 电台（离线，无需网络）</string>
+    <string name="settings_add_i2p_stations_description">%d 个 I2P 电台可用</string>
+    <string name="settings_add_i2p_stations_description_generic">添加精选的 I2P 广播电台</string>
     <string name="settings_add_tor_stations">添加 Tor 电台</string>
-    <string name="settings_add_tor_stations_description">%d 个内置 Tor 电台（离线，无需网络）</string>
+    <string name="settings_add_tor_stations_description">%d 个 Tor 电台可用</string>
+    <string name="settings_add_tor_stations_description_generic">添加精选的 Tor 广播电台</string>
     <string name="settings_export_stations">导出电台</string>
     <string name="settings_export_stations_description">将您的电台导出到文件</string>
 

@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">استيراد من ملف</string>
     <string name="settings_import_from_file_description">الاستيراد من CSV أو JSON أو M3U أو PLS</string>
     <string name="settings_add_i2p_stations">إضافة محطات I2P</string>
-    <string name="settings_add_i2p_stations_description">%d محطة I2P مدمجة (بدون اتصال، بدون شبكة)</string>
+    <string name="settings_add_i2p_stations_description">%d محطة I2P متاحة</string>
+    <string name="settings_add_i2p_stations_description_generic">إضافة محطات راديو I2P منتقاة</string>
     <string name="settings_add_tor_stations">إضافة محطات Tor</string>
-    <string name="settings_add_tor_stations_description">%d محطة Tor مدمجة (بدون اتصال، بدون شبكة)</string>
+    <string name="settings_add_tor_stations_description">%d محطة Tor متاحة</string>
+    <string name="settings_add_tor_stations_description_generic">إضافة محطات راديو Tor منتقاة</string>
     <string name="settings_export_stations">تصدير المحطات</string>
     <string name="settings_export_stations_description">تصدير محطاتك إلى ملف</string>
 

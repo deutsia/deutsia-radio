@@ -254,9 +254,11 @@
     <string name="settings_import_from_file">وارد کردن از فایل</string>
     <string name="settings_import_from_file_description">وارد کردن از CSV، JSON، M3U یا PLS</string>
     <string name="settings_add_i2p_stations">افزودن ایستگاه‌های I2P</string>
-    <string name="settings_add_i2p_stations_description">%d ایستگاه I2P داخلی (آفلاین، بدون شبکه)</string>
+    <string name="settings_add_i2p_stations_description">%d ایستگاه I2P موجود</string>
+    <string name="settings_add_i2p_stations_description_generic">افزودن ایستگاه‌های رادیویی I2P منتخب</string>
     <string name="settings_add_tor_stations">افزودن ایستگاه‌های Tor</string>
-    <string name="settings_add_tor_stations_description">%d ایستگاه Tor داخلی (آفلاین، بدون شبکه)</string>
+    <string name="settings_add_tor_stations_description">%d ایستگاه Tor موجود</string>
+    <string name="settings_add_tor_stations_description_generic">افزودن ایستگاه‌های رادیویی Tor منتخب</string>
     <string name="settings_export_stations">خروجی ایستگاه‌ها</string>
     <string name="settings_export_stations_description">خروجی گرفتن ایستگاه‌های خود به فایل</string>
 
