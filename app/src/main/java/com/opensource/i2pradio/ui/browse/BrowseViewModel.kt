@@ -230,8 +230,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
 
         viewModelScope.launch {
             try {
-                // Load Tor stations from API
-                when (val result = registryRepository.getTorStations(forceRefresh = forceRefresh, limit = 20)) {
+                // Load Tor stations from API - always force refresh to get accurate online status
+                when (val result = registryRepository.getTorStations(forceRefresh = true, limit = 20)) {
                     is RadioRegistryResult.Success -> {
                         _privacyTorStations.value = result.data.take(10)
                     }
@@ -241,8 +241,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                     is RadioRegistryResult.Loading -> {}
                 }
 
-                // Load I2P stations from API
-                when (val result = registryRepository.getI2pStations(forceRefresh = forceRefresh, limit = 20)) {
+                // Load I2P stations from API - always force refresh to get accurate online status
+                when (val result = registryRepository.getI2pStations(forceRefresh = true, limit = 20)) {
                     is RadioRegistryResult.Success -> {
                         _privacyI2pStations.value = result.data.take(10)
                     }
