@@ -230,11 +230,13 @@ object StationImportExport {
         }
 
         // Detect by content
+        // Note: PLS check must come before JSON check because PLS starts with "[playlist]"
+        // which would otherwise match the generic "[" check for JSON arrays
         return when {
+            trimmedContent.startsWith("[playlist]", ignoreCase = true) -> FileFormat.PLS
             trimmedContent.startsWith("{") || trimmedContent.startsWith("[") -> FileFormat.JSON
             trimmedContent.startsWith("#EXTM3U") ||
                 (trimmedContent.contains("#EXTINF:") && trimmedContent.contains("http")) -> FileFormat.M3U
-            trimmedContent.startsWith("[playlist]", ignoreCase = true) -> FileFormat.PLS
             trimmedContent.contains(",") &&
                 (trimmedContent.lowercase().contains("name,url") ||
                  trimmedContent.lowercase().contains("name,stream")) -> FileFormat.CSV
