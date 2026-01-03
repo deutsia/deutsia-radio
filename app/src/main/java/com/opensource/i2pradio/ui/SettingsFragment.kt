@@ -1272,18 +1272,24 @@ class SettingsFragment : Fragment() {
     private fun updateStationCounts() {
         val context = context ?: return
         lifecycleScope.launch(Dispatchers.IO) {
+            // Try to get I2P count from API first, fallback to bundled JSON
             val i2pCount = try {
-                val jsonString = context.assets.open("i2p_stations.json").bufferedReader().use { it.readText() }
-                StationImportExport.importFromJson(jsonString).stations.size
+                when (val result = registryRepository.getI2pStations(forceRefresh = false, onlineOnly = false, limit = 200)) {
+                    is RadioRegistryResult.Success -> result.data.size
+                    else -> DefaultStations.getI2pStations(context).size
+                }
             } catch (e: Exception) {
-                0
+                DefaultStations.getI2pStations(context).size
             }
 
+            // Try to get Tor count from API first, fallback to bundled JSON
             val torCount = try {
-                val jsonString = context.assets.open("tor_stations.json").bufferedReader().use { it.readText() }
-                StationImportExport.importFromJson(jsonString).stations.size
+                when (val result = registryRepository.getTorStations(forceRefresh = false, onlineOnly = false, limit = 200)) {
+                    is RadioRegistryResult.Success -> result.data.size
+                    else -> DefaultStations.getTorStations(context).size
+                }
             } catch (e: Exception) {
-                0
+                DefaultStations.getTorStations(context).size
             }
 
             withContext(Dispatchers.Main) {
