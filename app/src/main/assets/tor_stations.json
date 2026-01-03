@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Curated Tor radio stations - privacy-focused streams accessible via Tor network",
+  "description": "fallback hardcoded JSON library of tor stations",
   "stations": [
     {
       "name": "Arav's Dwelling",
