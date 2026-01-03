@@ -40,6 +40,7 @@ import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserResult
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
+import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
 import com.opensource.i2pradio.ui.RadioViewModel
 import kotlinx.coroutines.launch
 
@@ -75,6 +76,13 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var newStationsRecyclerView: RecyclerView
     private lateinit var newStationsSeeAll: TextView
 
+    // Privacy Radio (API) views
+    private lateinit var privacyRadioSection: LinearLayout
+    private lateinit var torStationsRecyclerView: RecyclerView
+    private lateinit var torStationsSeeAll: TextView
+    private lateinit var i2pStationsRecyclerView: RecyclerView
+    private lateinit var i2pStationsSeeAll: TextView
+
     // Results mode views
     private lateinit var resultsContainer: LinearLayout
     private lateinit var btnBackToDiscovery: ImageButton
@@ -105,6 +113,10 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var topVotedPreviewAdapter: BrowseCarouselAdapter
     private lateinit var popularAdapter: BrowseCarouselAdapter
     private lateinit var newStationsAdapter: BrowseCarouselAdapter
+
+    // Privacy Radio adapters
+    private lateinit var torStationsAdapter: PrivacyRadioCarouselAdapter
+    private lateinit var i2pStationsAdapter: PrivacyRadioCarouselAdapter
 
     // Skeleton adapters for loading state
     private val skeletonCarouselAdapters = mutableListOf<SkeletonCarouselAdapter>()
@@ -224,6 +236,13 @@ class BrowseStationsFragment : Fragment() {
         newStationsRecyclerView = view.findViewById(R.id.newStationsRecyclerView)
         newStationsSeeAll = view.findViewById(R.id.newStationsSeeAll)
 
+        // Privacy Radio views
+        privacyRadioSection = view.findViewById(R.id.privacyRadioSection)
+        torStationsRecyclerView = view.findViewById(R.id.torStationsRecyclerView)
+        torStationsSeeAll = view.findViewById(R.id.torStationsSeeAll)
+        i2pStationsRecyclerView = view.findViewById(R.id.i2pStationsRecyclerView)
+        i2pStationsSeeAll = view.findViewById(R.id.i2pStationsSeeAll)
+
         // Results mode views
         resultsContainer = view.findViewById(R.id.resultsContainer)
         btnBackToDiscovery = view.findViewById(R.id.btnBackToDiscovery)
@@ -310,6 +329,19 @@ class BrowseStationsFragment : Fragment() {
             currentResultsTitle = getString(R.string.browse_new_stations)
             switchToResultsMode()
             viewModel.loadRandom() // Recently changed stations
+        }
+
+        // Privacy Radio See All buttons
+        torStationsSeeAll.setOnClickListener {
+            currentResultsTitle = getString(R.string.browse_tor_stations)
+            switchToResultsMode()
+            viewModel.loadApiTorStations()
+        }
+
+        i2pStationsSeeAll.setOnClickListener {
+            currentResultsTitle = getString(R.string.browse_i2p_stations)
+            switchToResultsMode()
+            viewModel.loadApiI2pStations()
         }
     }
 
@@ -503,6 +535,18 @@ class BrowseStationsFragment : Fragment() {
             showRankBadge = false
         )
 
+        // Privacy Radio adapters
+        torStationsAdapter = PrivacyRadioCarouselAdapter(
+            onStationClick = { station -> playPrivacyStation(station) },
+            onLikeClick = { station -> likePrivacyStation(station) },
+            showRankBadge = false
+        )
+        i2pStationsAdapter = PrivacyRadioCarouselAdapter(
+            onStationClick = { station -> playPrivacyStation(station) },
+            onLikeClick = { station -> likePrivacyStation(station) },
+            showRankBadge = false
+        )
+
         // Setup all carousels with skeleton adapters initially
         val carouselRecyclerViews = listOf(
             usaRecyclerView,
@@ -512,7 +556,9 @@ class BrowseStationsFragment : Fragment() {
             trendingRecyclerView,
             topVotedPreviewRecyclerView,
             popularRecyclerView,
-            newStationsRecyclerView
+            newStationsRecyclerView,
+            torStationsRecyclerView,
+            i2pStationsRecyclerView
         )
 
         skeletonCarouselAdapters.clear()
@@ -842,6 +888,21 @@ class BrowseStationsFragment : Fragment() {
                 swapToRealAdapter(newStationsRecyclerView, newStationsAdapter)
             }
             newStationsAdapter.submitList(stations)
+        }
+
+        // Privacy Radio observers
+        viewModel.privacyTorStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(torStationsRecyclerView, torStationsAdapter)
+            }
+            torStationsAdapter.submitList(stations)
+        }
+
+        viewModel.privacyI2pStations.observe(viewLifecycleOwner) { stations ->
+            if (stations.isNotEmpty()) {
+                swapToRealAdapter(i2pStationsRecyclerView, i2pStationsAdapter)
+            }
+            i2pStationsAdapter.submitList(stations)
         }
     }
 
@@ -1199,6 +1260,41 @@ class BrowseStationsFragment : Fragment() {
             putExtra("proxy_connection_timeout", 30)
         }
         ContextCompat.startForegroundService(requireContext(), intent)
+    }
+
+    /**
+     * Play a privacy radio station (from Radio Registry API)
+     */
+    private fun playPrivacyStation(station: RadioRegistryStation) {
+        val radioStation = viewModel.getPlayableStation(station)
+        radioViewModel.setCurrentStation(radioStation)
+        radioViewModel.setBuffering(true)
+
+        val intent = Intent(requireContext(), RadioService::class.java).apply {
+            action = RadioService.ACTION_PLAY
+            putExtra("stream_url", radioStation.streamUrl)
+            putExtra("station_name", radioStation.name)
+            putExtra("proxy_host", radioStation.proxyHost)
+            putExtra("proxy_port", radioStation.proxyPort)
+            putExtra("proxy_type", radioStation.proxyType)
+            putExtra("cover_art_uri", radioStation.coverArtUri)
+            putExtra("custom_proxy_protocol", "HTTP")
+            putExtra("proxy_username", "")
+            putExtra("proxy_password", "")
+            putExtra("proxy_auth_type", "NONE")
+            putExtra("proxy_connection_timeout", 30)
+        }
+        ContextCompat.startForegroundService(requireContext(), intent)
+    }
+
+    /**
+     * Like a privacy radio station (from Radio Registry API)
+     * Converts to RadioBrowserStation and uses existing like logic
+     */
+    private fun likePrivacyStation(station: RadioRegistryStation) {
+        val radioStation = viewModel.getPlayableStation(station)
+        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        likeStation(browserStation)
     }
 
     private fun saveStation(station: RadioBrowserStation) {

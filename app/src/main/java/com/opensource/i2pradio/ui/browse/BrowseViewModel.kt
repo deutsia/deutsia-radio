@@ -12,6 +12,9 @@ import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserResult
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
 import com.opensource.i2pradio.data.radiobrowser.TagInfo
+import com.opensource.i2pradio.data.radioregistry.RadioRegistryRepository
+import com.opensource.i2pradio.data.radioregistry.RadioRegistryResult
+import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -23,6 +26,7 @@ import kotlinx.coroutines.launch
 class BrowseViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = RadioBrowserRepository(application)
+    private val registryRepository = RadioRegistryRepository(application)
 
     // Current browse category
     private val _currentCategory = MutableLiveData(BrowseCategory.ALL_STATIONS)
@@ -100,6 +104,24 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     private val _newStations = MutableLiveData<List<RadioBrowserStation>>(emptyList())
     val newStations: LiveData<List<RadioBrowserStation>> = _newStations
 
+    // Privacy Radio (Radio Registry API) stations
+    private val _privacyTorStations = MutableLiveData<List<RadioRegistryStation>>(emptyList())
+    val privacyTorStations: LiveData<List<RadioRegistryStation>> = _privacyTorStations
+
+    private val _privacyI2pStations = MutableLiveData<List<RadioRegistryStation>>(emptyList())
+    val privacyI2pStations: LiveData<List<RadioRegistryStation>> = _privacyI2pStations
+
+    // Privacy Radio loading state (independent of main discovery loading)
+    private val _isPrivacyRadioLoading = MutableLiveData(true)
+    val isPrivacyRadioLoading: LiveData<Boolean> = _isPrivacyRadioLoading
+
+    // Privacy Radio error state
+    private val _privacyRadioError = MutableLiveData<String?>(null)
+    val privacyRadioError: LiveData<String?> = _privacyRadioError
+
+    // Track if privacy radio data has been loaded
+    private var privacyRadioDataLoaded = false
+
     // Track if discovery data has been loaded
     private var discoveryDataLoaded = false
 
@@ -131,6 +153,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         loadTags()
         loadLanguages()
         loadDiscoveryData()
+        loadPrivacyRadioData()
     }
 
     /**
@@ -194,6 +217,115 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             _isDiscoveryLoading.value = false
         }
     }
+
+    /**
+     * Load privacy radio stations from the Radio Registry API.
+     * Loads both Tor and I2P stations for the Privacy Radio section.
+     */
+    fun loadPrivacyRadioData(forceRefresh: Boolean = false) {
+        if (privacyRadioDataLoaded && !forceRefresh) return
+        privacyRadioDataLoaded = true
+        _isPrivacyRadioLoading.value = true
+        _privacyRadioError.value = null
+
+        viewModelScope.launch {
+            try {
+                // Load Tor stations from API
+                when (val result = registryRepository.getTorStations(forceRefresh = forceRefresh, limit = 20)) {
+                    is RadioRegistryResult.Success -> {
+                        _privacyTorStations.value = result.data.take(10)
+                    }
+                    is RadioRegistryResult.Error -> {
+                        _privacyRadioError.value = result.message
+                    }
+                    is RadioRegistryResult.Loading -> {}
+                }
+
+                // Load I2P stations from API
+                when (val result = registryRepository.getI2pStations(forceRefresh = forceRefresh, limit = 20)) {
+                    is RadioRegistryResult.Success -> {
+                        _privacyI2pStations.value = result.data.take(10)
+                    }
+                    is RadioRegistryResult.Error -> {
+                        if (_privacyRadioError.value == null) {
+                            _privacyRadioError.value = result.message
+                        }
+                    }
+                    is RadioRegistryResult.Loading -> {}
+                }
+
+                _isPrivacyRadioLoading.value = false
+            } catch (e: Exception) {
+                _privacyRadioError.value = e.message
+                _isPrivacyRadioLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Load all Tor stations from the API for results mode
+     */
+    fun loadApiTorStations() {
+        _currentCategory.value = BrowseCategory.ALL_STATIONS
+        currentOffset = 0
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                when (val result = registryRepository.getTorStations(forceRefresh = false, limit = 100)) {
+                    is RadioRegistryResult.Success -> {
+                        val browserStations = result.data.map { it.toRadioStation() }
+                            .map { RadioBrowserStation.fromRadioStation(it) }
+                        _stations.postValue(browserStations)
+                        _hasMoreResults.postValue(false)
+                        _isLoading.postValue(false)
+                    }
+                    is RadioRegistryResult.Error -> {
+                        // Fall back to curated stations on error
+                        loadCuratedTorStations()
+                    }
+                    is RadioRegistryResult.Loading -> {}
+                }
+            } catch (e: Exception) {
+                _errorMessage.postValue("Failed to load Tor stations: ${e.message}")
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    /**
+     * Load all I2P stations from the API for results mode
+     */
+    fun loadApiI2pStations() {
+        _currentCategory.value = BrowseCategory.ALL_STATIONS
+        currentOffset = 0
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                when (val result = registryRepository.getI2pStations(forceRefresh = false, limit = 100)) {
+                    is RadioRegistryResult.Success -> {
+                        val browserStations = result.data.map { it.toRadioStation() }
+                            .map { RadioBrowserStation.fromRadioStation(it) }
+                        _stations.postValue(browserStations)
+                        _hasMoreResults.postValue(false)
+                        _isLoading.postValue(false)
+                    }
+                    is RadioRegistryResult.Error -> {
+                        // Fall back to curated stations on error
+                        loadCuratedI2pStations()
+                    }
+                    is RadioRegistryResult.Loading -> {}
+                }
+            } catch (e: Exception) {
+                _errorMessage.postValue("Failed to load I2P stations: ${e.message}")
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    /**
+     * Convert a RadioRegistryStation to a playable RadioStation
+     */
+    fun getPlayableStation(station: RadioRegistryStation) = registryRepository.toPlayableStation(station)
 
     /**
      * Load top voted stations
