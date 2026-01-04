@@ -121,7 +121,7 @@ Please note that you **cannot** submit clearnet stations here, even if they are 
 - [I2P Project](https://geti2p.net/) - Anonymous networking on Android
 - Built with [Claude Code](https://github.com/anthropics/claude-code)
 - [SQLCipher](https://www.zetetic.net/sqlcipher/) - Database encryption
-- [Tor/I2P Station API](http://www.api.deutsia.com) - Tor/I2P API, may be open-sourced in the future
+- [Tor/I2P Station API](http://api.deutsia.com) - Tor/I2P API, may be open-sourced in the future
 ---
 
 ## License
