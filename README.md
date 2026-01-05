@@ -21,7 +21,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.6.0** Dynamic API migration for I2P/Tor stations - now fetches live station lists instead of hardcoded bundles
+- **New Release: v1.6.1** Added Parallel Radio Registry API loading for Privacy Stations, updated API Tor URL as the API now uses Onionbalance
 
 ---
 
