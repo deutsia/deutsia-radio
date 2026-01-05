@@ -29,7 +29,7 @@ class RadioRegistryClient(private val context: Context) {
 
         // API Base URLs
         private const val CLEARNET_BASE_URL = "https://api.deutsia.com"
-        private const val TOR_BASE_URL = "http://hujzvles33iouzuolttpxpfan4sjaqylc2unkz5tmcobztzfwgkl57yd.onion"
+        private const val TOR_BASE_URL = "http://ccq2dfnskeccxmojoo2kwk23oyynf2fvczdfcpapdmek36waqnjhpvid.onion"
 
         // Timeouts
         private const val CONNECT_TIMEOUT_SECONDS = 15L
@@ -142,21 +142,18 @@ class RadioRegistryClient(private val context: Context) {
                 return Pair(null, CLEARNET_BASE_URL)
             }
         }
-        // Priority 3: Tor available but not forced - use clearnet URL through Tor for reliability
-        // This provides IP privacy (via Tor) while avoiding unreliable .onion connections
-        // Only Force Tor mode uses the .onion URL for maximum privacy
+        // Priority 3: Use Tor if available (opportunistic, for privacy)
         else if (torEnabled && torConnected) {
             val socksHost = TorManager.getProxyHost()
             val socksPort = TorManager.getProxyPort()
 
             if (socksPort > 0) {
-                Log.d(TAG, "Routing Radio Registry API through Tor to clearnet (not .onion) for reliability")
+                Log.d(TAG, "Opportunistically routing Radio Registry API through Tor")
                 builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(socksHost, socksPort)))
                 builder.dns(SOCKS5_DNS)
                 builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
                 builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-                // Use clearnet URL for reliability - user IP is still hidden via Tor proxy
-                return Pair(builder.build(), CLEARNET_BASE_URL)
+                return Pair(builder.build(), TOR_BASE_URL)
             }
         }
 
