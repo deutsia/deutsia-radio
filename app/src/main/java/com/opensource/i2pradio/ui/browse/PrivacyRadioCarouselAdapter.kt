@@ -31,6 +31,22 @@ class PrivacyRadioCarouselAdapter(
 
     private var likedUuids: Set<String> = emptySet()
 
+    // Cover art loading is disabled initially to ensure basic station data renders first
+    // This prevents Tor-proxied image loading from blocking the carousel display
+    private var coverArtLoadingEnabled = false
+
+    /**
+     * Enable cover art loading. Call this after the carousel has been populated and rendered.
+     * This allows cover art to load asynchronously over Tor without blocking the initial render.
+     */
+    fun enableCoverArtLoading() {
+        if (!coverArtLoadingEnabled) {
+            coverArtLoadingEnabled = true
+            // Trigger rebind of all visible items to start loading cover art
+            notifyItemRangeChanged(0, itemCount, PAYLOAD_LOAD_COVER_ART)
+        }
+    }
+
     fun updateLikedUuids(uuids: Set<String>) {
         val oldLikedUuids = likedUuids
         likedUuids = uuids
@@ -64,6 +80,9 @@ class PrivacyRadioCarouselAdapter(
         if (payloads.contains(PAYLOAD_LIKED_STATUS)) {
             val uuid = "registry_${station.id}"
             holder.updateLikedStatus(likedUuids.contains(uuid))
+        }
+        if (payloads.contains(PAYLOAD_LOAD_COVER_ART)) {
+            holder.loadCoverArt(station.faviconUrl)
         }
     }
 
@@ -104,15 +123,16 @@ class PrivacyRadioCarouselAdapter(
             imageLoadDisposable?.dispose()
 
             // Set default icon immediately so basic station info is visible right away
+            // Cover art loading over Tor is deferred to avoid blocking carousel rendering
             stationImage.setImageResource(R.drawable.ic_radio)
 
-            // Delay cover art loading to prioritize rendering basic station info first
-            // This ensures stations appear immediately with default icons, then cover art loads async
-            if (!station.faviconUrl.isNullOrEmpty()) {
+            // Only load cover art after the adapter has been attached and rendered
+            // This prevents Tor-proxied image loading from interfering with initial render
+            if (!station.faviconUrl.isNullOrEmpty() && coverArtLoadingEnabled) {
                 val faviconUrl = station.faviconUrl
                 pendingImageLoadRunnable = Runnable {
-                    // Check if view is still attached
-                    if (stationImage.isAttachedToWindow) {
+                    // Check if view is still attached and cover art loading is still enabled
+                    if (stationImage.isAttachedToWindow && coverArtLoadingEnabled) {
                         imageLoadDisposable = stationImage.loadSecurePrivacy(faviconUrl) {
                             crossfade(true)
                             placeholder(R.drawable.ic_radio)
@@ -120,7 +140,7 @@ class PrivacyRadioCarouselAdapter(
                         }
                     }
                 }
-                // Delay cover art loading by 100ms to let RecyclerView finish layout pass
+                // Delay cover art loading significantly to ensure carousel is fully rendered first
                 handler.postDelayed(pendingImageLoadRunnable!!, COVER_ART_LOAD_DELAY_MS)
             }
 
@@ -153,6 +173,28 @@ class PrivacyRadioCarouselAdapter(
                 if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
             )
         }
+
+        /**
+         * Load cover art for this station. Called when cover art loading is enabled
+         * after the carousel has been rendered.
+         */
+        fun loadCoverArt(faviconUrl: String?) {
+            if (!faviconUrl.isNullOrEmpty() && coverArtLoadingEnabled) {
+                pendingImageLoadRunnable?.let { handler.removeCallbacks(it) }
+                imageLoadDisposable?.dispose()
+
+                pendingImageLoadRunnable = Runnable {
+                    if (stationImage.isAttachedToWindow) {
+                        imageLoadDisposable = stationImage.loadSecurePrivacy(faviconUrl) {
+                            crossfade(true)
+                            placeholder(R.drawable.ic_radio)
+                            error(R.drawable.ic_radio)
+                        }
+                    }
+                }
+                handler.postDelayed(pendingImageLoadRunnable!!, COVER_ART_LOAD_DELAY_MS)
+            }
+        }
     }
 
     private class DiffCallback : DiffUtil.ItemCallback<RadioRegistryStation>() {
@@ -167,8 +209,9 @@ class PrivacyRadioCarouselAdapter(
 
     companion object {
         private const val PAYLOAD_LIKED_STATUS = "liked_status"
+        private const val PAYLOAD_LOAD_COVER_ART = "load_cover_art"
         // Delay cover art loading to ensure basic station data renders first
         // This prevents cover art loading over Tor from blocking the carousel display
-        private const val COVER_ART_LOAD_DELAY_MS = 100L
+        private const val COVER_ART_LOAD_DELAY_MS = 150L
     }
 }

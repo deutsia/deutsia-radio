@@ -42,6 +42,7 @@ import com.opensource.i2pradio.data.radiobrowser.RadioBrowserResult
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
 import com.opensource.i2pradio.ui.RadioViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -893,18 +894,35 @@ class BrowseStationsFragment : Fragment() {
         }
 
         // Privacy Radio observers
+        // Cover art loading is deferred to prevent Tor-proxied image loading from blocking carousel render
         viewModel.privacyTorStations.observe(viewLifecycleOwner) { stations ->
             if (stations.isNotEmpty()) {
                 swapToRealAdapter(torStationsRecyclerView, torStationsAdapter)
             }
-            torStationsAdapter.submitList(stations)
+            torStationsAdapter.submitList(stations) {
+                // After list is submitted and rendered, enable cover art loading
+                if (stations.isNotEmpty()) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        delay(PRIVACY_CAROUSEL_COVER_ART_DELAY_MS)
+                        torStationsAdapter.enableCoverArtLoading()
+                    }
+                }
+            }
         }
 
         viewModel.privacyI2pStations.observe(viewLifecycleOwner) { stations ->
             if (stations.isNotEmpty()) {
                 swapToRealAdapter(i2pStationsRecyclerView, i2pStationsAdapter)
             }
-            i2pStationsAdapter.submitList(stations)
+            i2pStationsAdapter.submitList(stations) {
+                // After list is submitted and rendered, enable cover art loading
+                if (stations.isNotEmpty()) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        delay(PRIVACY_CAROUSEL_COVER_ART_DELAY_MS)
+                        i2pStationsAdapter.enableCoverArtLoading()
+                    }
+                }
+            }
         }
     }
 
@@ -1930,5 +1948,11 @@ class BrowseStationsFragment : Fragment() {
         skeletonCarouselAdapters.clear()
         skeletonListAdapter?.stopAllShimmers()
         skeletonListAdapter = null
+    }
+
+    companion object {
+        // Delay before loading cover art for privacy station carousels
+        // This ensures basic station data renders first before Tor-proxied image loading starts
+        private const val PRIVACY_CAROUSEL_COVER_ART_DELAY_MS = 500L
     }
 }
