@@ -2,6 +2,14 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.6.1]
+
+### Added
+- **Privacy Stations carousel now loads in parallel** Switched from loading Tor stations, then I2p, to both at the same time. 
+
+### Changed
+**Radio Registry API URL:** Updated Radio Registry API Url to the current Tor master url. This change exists because the API now utilizes Onionbalance, which is a load-balancing way of hosting Tor services, offering better reliability. 
+
 ## [1.6.0]
 
 ### Added
