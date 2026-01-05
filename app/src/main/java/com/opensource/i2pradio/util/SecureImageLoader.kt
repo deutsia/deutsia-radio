@@ -379,12 +379,8 @@ fun ImageView.loadSecure(
         val dataStr = data?.toString() ?: ""
         if (SecureImageLoader.shouldUseProxy(dataStr)) {
             android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping remote image: $dataStr")
-            // Return a no-op disposable
-            return object : Disposable {
-                override val job: kotlinx.coroutines.Job = kotlinx.coroutines.Job()
-                override val isDisposed: Boolean = true
-                override fun dispose() {}
-            }
+            // Return a no-op disposable - just load nothing and return immediately
+            return this.load(null as Any?, SecureImageLoader.getImageLoader(context), builder)
         }
     }
 
@@ -421,12 +417,8 @@ fun ImageView.loadSecurePrivacy(
         val dataStr = data?.toString() ?: ""
         if (SecureImageLoader.shouldUseProxy(dataStr)) {
             android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping remote privacy image: $dataStr")
-            // Return a no-op disposable
-            return object : Disposable {
-                override val job: kotlinx.coroutines.Job = kotlinx.coroutines.Job()
-                override val isDisposed: Boolean = true
-                override fun dispose() {}
-            }
+            // Return a no-op disposable - just load nothing and return immediately
+            return this.load(null as Any?, SecureImageLoader.getPrivacyImageLoader(context), builder)
         }
     }
 
