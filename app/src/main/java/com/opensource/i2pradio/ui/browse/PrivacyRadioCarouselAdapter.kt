@@ -1,6 +1,8 @@
 package com.opensource.i2pradio.ui.browse
 
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -72,6 +74,8 @@ class PrivacyRadioCarouselAdapter(
         private val rankBadge: TextView = itemView.findViewById(R.id.rankBadge)
         private val btnLike: ImageButton = itemView.findViewById(R.id.btnLike)
         private var imageLoadDisposable: Disposable? = null
+        private var pendingImageLoadRunnable: Runnable? = null
+        private val handler = Handler(Looper.getMainLooper())
 
         fun bind(station: RadioRegistryStation, rank: Int) {
             stationName.text = station.name
@@ -95,15 +99,29 @@ class PrivacyRadioCarouselAdapter(
             }
             stationInfo.text = spannable
 
-            // Load station image using secure loader
+            // Cancel any pending image load from view recycling
+            pendingImageLoadRunnable?.let { handler.removeCallbacks(it) }
             imageLoadDisposable?.dispose()
+
+            // Set default icon immediately so basic station info is visible right away
             stationImage.setImageResource(R.drawable.ic_radio)
+
+            // Delay cover art loading to prioritize rendering basic station info first
+            // This ensures stations appear immediately with default icons, then cover art loads async
             if (!station.faviconUrl.isNullOrEmpty()) {
-                imageLoadDisposable = stationImage.loadSecurePrivacy(station.faviconUrl) {
-                    crossfade(true)
-                    placeholder(R.drawable.ic_radio)
-                    error(R.drawable.ic_radio)
+                val faviconUrl = station.faviconUrl
+                pendingImageLoadRunnable = Runnable {
+                    // Check if view is still attached
+                    if (stationImage.isAttachedToWindow) {
+                        imageLoadDisposable = stationImage.loadSecurePrivacy(faviconUrl) {
+                            crossfade(true)
+                            placeholder(R.drawable.ic_radio)
+                            error(R.drawable.ic_radio)
+                        }
+                    }
                 }
+                // Delay cover art loading by 100ms to let RecyclerView finish layout pass
+                handler.postDelayed(pendingImageLoadRunnable!!, COVER_ART_LOAD_DELAY_MS)
             }
 
             // Rank badge
@@ -149,5 +167,8 @@ class PrivacyRadioCarouselAdapter(
 
     companion object {
         private const val PAYLOAD_LIKED_STATUS = "liked_status"
+        // Delay cover art loading to ensure basic station data renders first
+        // This prevents cover art loading over Tor from blocking the carousel display
+        private const val COVER_ART_LOAD_DELAY_MS = 100L
     }
 }
