@@ -17,6 +17,7 @@ import com.opensource.i2pradio.data.radioregistry.RadioRegistryResult
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 /**
@@ -221,6 +222,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     /**
      * Load privacy radio stations from the Radio Registry API.
      * Loads both Tor and I2P stations for the Privacy Radio section.
+     * API calls are made in parallel to reduce total loading time.
      */
     fun loadPrivacyRadioData(forceRefresh: Boolean = false) {
         if (privacyRadioDataLoaded && !forceRefresh) return
@@ -228,37 +230,51 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _isPrivacyRadioLoading.value = true
         _privacyRadioError.value = null
 
+        // Launch parallel requests for Tor and I2P stations
+        // Each updates its LiveData as soon as data arrives, not waiting for the other
         viewModelScope.launch {
-            try {
-                // Load Tor stations from API
-                when (val result = registryRepository.getTorStations(limit = 20)) {
-                    is RadioRegistryResult.Success -> {
-                        _privacyTorStations.value = result.data.take(10)
-                    }
-                    is RadioRegistryResult.Error -> {
-                        _privacyRadioError.value = result.message
-                    }
-                    is RadioRegistryResult.Loading -> {}
-                }
-
-                // Load I2P stations from API
-                when (val result = registryRepository.getI2pStations(limit = 20)) {
-                    is RadioRegistryResult.Success -> {
-                        _privacyI2pStations.value = result.data.take(10)
-                    }
-                    is RadioRegistryResult.Error -> {
-                        if (_privacyRadioError.value == null) {
-                            _privacyRadioError.value = result.message
+            // Launch Tor stations fetch
+            val torJob = async {
+                try {
+                    when (val result = registryRepository.getTorStations(limit = 20)) {
+                        is RadioRegistryResult.Success -> {
+                            _privacyTorStations.postValue(result.data.take(10))
                         }
+                        is RadioRegistryResult.Error -> {
+                            _privacyRadioError.postValue(result.message)
+                        }
+                        is RadioRegistryResult.Loading -> {}
                     }
-                    is RadioRegistryResult.Loading -> {}
+                } catch (e: Exception) {
+                    _privacyRadioError.postValue(e.message)
                 }
-
-                _isPrivacyRadioLoading.value = false
-            } catch (e: Exception) {
-                _privacyRadioError.value = e.message
-                _isPrivacyRadioLoading.value = false
             }
+
+            // Launch I2P stations fetch in parallel
+            val i2pJob = async {
+                try {
+                    when (val result = registryRepository.getI2pStations(limit = 20)) {
+                        is RadioRegistryResult.Success -> {
+                            _privacyI2pStations.postValue(result.data.take(10))
+                        }
+                        is RadioRegistryResult.Error -> {
+                            if (_privacyRadioError.value == null) {
+                                _privacyRadioError.postValue(result.message)
+                            }
+                        }
+                        is RadioRegistryResult.Loading -> {}
+                    }
+                } catch (e: Exception) {
+                    if (_privacyRadioError.value == null) {
+                        _privacyRadioError.postValue(e.message)
+                    }
+                }
+            }
+
+            // Wait for both to complete before setting loading to false
+            torJob.await()
+            i2pJob.await()
+            _isPrivacyRadioLoading.postValue(false)
         }
     }
 

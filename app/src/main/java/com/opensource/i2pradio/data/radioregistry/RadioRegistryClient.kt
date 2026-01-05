@@ -29,7 +29,7 @@ class RadioRegistryClient(private val context: Context) {
 
         // API Base URLs
         private const val CLEARNET_BASE_URL = "https://api.deutsia.com"
-        private const val TOR_BASE_URL = "http://hujzvles33iouzuolttpxpfan4sjaqylc2unkz5tmcobztzfwgkl57yd.onion"
+        private const val TOR_BASE_URL = "http://ccq2dfnskeccxmojoo2kwk23oyynf2fvczdfcpapdmek36waqnjhpvid.onion"
 
         // Timeouts
         private const val CONNECT_TIMEOUT_SECONDS = 15L
