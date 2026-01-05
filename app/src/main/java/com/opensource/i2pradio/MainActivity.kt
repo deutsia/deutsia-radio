@@ -382,6 +382,14 @@ class MainActivity : AppCompatActivity() {
         bottomSheet.show(supportFragmentManager, TorQuickControlBottomSheet.TAG)
     }
 
+    /**
+     * Navigate to the Settings tab.
+     * Used by other fragments to programmatically switch to settings.
+     */
+    fun navigateToSettings() {
+        viewPager.currentItem = 3
+    }
+
     private fun setupMiniPlayer() {
         miniPlayerView = MiniPlayerView(this)
         miniPlayerContainer.addView(miniPlayerView)

@@ -269,6 +269,24 @@
     <string name="settings_export_stations">Export Stations</string>
     <string name="settings_export_stations_description">Export your stations to a file</string>
 
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Network &amp; API</string>
+    <string name="settings_network_api_info">The app only connects to: RadioBrowser API (station discovery), Radio Registry API (Tor/I2P stations), cover art servers, and raw stream URLs you play.</string>
+    <string name="settings_disable_radiobrowser">Disable RadioBrowser API</string>
+    <string name="settings_disable_radiobrowser_description">Stop fetching stations from RadioBrowser</string>
+    <string name="settings_disable_radioregistry">Disable Radio Registry API</string>
+    <string name="settings_disable_radioregistry_description">Stop fetching Tor/I2P stations from API</string>
+    <string name="settings_disable_cover_art">Disable Cover Art</string>
+    <string name="settings_disable_cover_art_description">Don\'t fetch station artwork from external servers</string>
+    <string name="settings_api_offline_note">Disabling both APIs allows fully offline browsing from your local library only.</string>
+    <string name="settings_add_i2p_stations_offline">Add I2P Stations (Offline)</string>
+    <string name="settings_add_i2p_stations_offline_description">Add from bundled list (no network)</string>
+    <string name="settings_add_tor_stations_offline">Add Tor Stations (Offline)</string>
+    <string name="settings_add_tor_stations_offline_description">Add from bundled list (no network)</string>
+    <string name="browse_api_disabled_title">Station Discovery Disabled</string>
+    <string name="browse_api_disabled_message">RadioBrowser API is disabled. Enable it in Settings to browse stations.</string>
+    <string name="browse_api_disabled_button">Go to Settings</string>
+
     <!-- Settings - About -->
     <string name="settings_about">About</string>
     <string name="settings_version">Version 1.5</string>

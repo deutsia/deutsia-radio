@@ -106,6 +106,11 @@ class SettingsFragment : Fragment() {
     private var requireAuthSwitch: MaterialSwitch? = null
     private var databaseEncryptionSwitch: MaterialSwitch? = null
 
+    // Network & API UI elements
+    private var disableRadioBrowserSwitch: MaterialSwitch? = null
+    private var disableRadioRegistrySwitch: MaterialSwitch? = null
+    private var disableCoverArtSwitch: MaterialSwitch? = null
+
     // ViewModel for observing current station (for miniplayer padding)
     private val radioViewModel: RadioViewModel by activityViewModels()
 
@@ -537,9 +542,17 @@ class SettingsFragment : Fragment() {
         requireAuthSwitch = view.findViewById(R.id.requireAuthSwitch)
         databaseEncryptionSwitch = view.findViewById(R.id.databaseEncryptionSwitch)
 
+        // Network & API UI elements
+        disableRadioBrowserSwitch = view.findViewById(R.id.disableRadioBrowserSwitch)
+        disableRadioRegistrySwitch = view.findViewById(R.id.disableRadioRegistrySwitch)
+        disableCoverArtSwitch = view.findViewById(R.id.disableCoverArtSwitch)
+
         // Setup authentication controls
         setupAuthenticationControls()
         setupDatabaseEncryptionControls()
+
+        // Setup Network & API controls
+        setupNetworkApiControls()
 
         // Setup custom proxy controls
         setupCustomProxyControls()
@@ -1336,7 +1349,7 @@ class SettingsFragment : Fragment() {
 
     /**
      * Show import dialog for curated I2P/Tor station lists.
-     * Fetches stations from the API and caches them for the import step.
+     * Fetches stations from the API, or uses bundled JSON if API is disabled.
      */
     private fun showImportCuratedListDialog(type: String) {
         val networkName = when (type) {
@@ -1350,67 +1363,119 @@ class SettingsFragment : Fragment() {
         // Clear any previous pending import
         pendingImportStations = null
 
+        // Check if Radio Registry API is disabled - use bundled JSON instead
+        val isApiDisabled = PreferencesHelper.isRadioRegistryApiDisabled(context)
+
         lifecycleScope.launch(Dispatchers.IO) {
-            // Fetch stations from API
-            val apiResult = try {
-                when (type) {
-                    "tor" -> registryRepository.getTorStations(onlineOnly = true, limit = 200)
-                    "i2p" -> registryRepository.getI2pStations(onlineOnly = true, limit = 200)
-                    else -> null
+            val stations: List<RadioStation> = if (isApiDisabled) {
+                // Load from bundled JSON files
+                loadBundledStations(context, type)
+            } else {
+                // Fetch from API
+                val apiResult = try {
+                    when (type) {
+                        "tor" -> registryRepository.getTorStations(onlineOnly = true, limit = 200)
+                        "i2p" -> registryRepository.getI2pStations(onlineOnly = true, limit = 200)
+                        else -> null
+                    }
+                } catch (e: Exception) {
+                    RadioRegistryResult.Error(e.message ?: "Unknown error", e)
                 }
-            } catch (e: Exception) {
-                RadioRegistryResult.Error(e.message ?: "Unknown error", e)
+
+                when (apiResult) {
+                    is RadioRegistryResult.Success -> apiResult.data.map { it.toRadioStation() }
+                    is RadioRegistryResult.Error -> {
+                        withContext(Dispatchers.Main) {
+                            if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.failed_to_fetch_stations, networkName),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                        emptyList()
+                    }
+                    else -> emptyList()
+                }
             }
 
             withContext(Dispatchers.Main) {
                 if (!isAdded) return@withContext
 
-                when (apiResult) {
-                    is RadioRegistryResult.Success -> {
-                        val stations = apiResult.data.map { it.toRadioStation() }
-
-                        if (stations.isEmpty()) {
-                            if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                                Toast.makeText(
-                                    context,
-                                    getString(R.string.no_stations_found_in_list, networkName),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                            return@withContext
-                        }
-
-                        // Cache stations for the import step
-                        pendingImportStations = stations
-
-                        AlertDialog.Builder(context)
-                            .setTitle(getString(R.string.import_curated_title, networkName))
-                            .setMessage(getString(R.string.import_curated_message, stations.size, networkName))
-                            .setPositiveButton(getString(R.string.button_import)) { _, _ ->
-                                performPendingImport(networkName)
-                            }
-                            .setNegativeButton(getString(R.string.button_cancel)) { _, _ ->
-                                pendingImportStations = null
-                            }
-                            .setOnCancelListener {
-                                pendingImportStations = null
-                            }
-                            .show()
+                if (stations.isEmpty()) {
+                    if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.no_stations_found_in_list, networkName),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    is RadioRegistryResult.Error -> {
-                        if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                            Toast.makeText(
-                                context,
-                                getString(R.string.failed_to_fetch_stations, networkName),
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                    return@withContext
+                }
+
+                // Cache stations for the import step
+                pendingImportStations = stations
+
+                AlertDialog.Builder(context)
+                    .setTitle(getString(R.string.import_curated_title, networkName))
+                    .setMessage(getString(R.string.import_curated_message, stations.size, networkName))
+                    .setPositiveButton(getString(R.string.button_import)) { _, _ ->
+                        performPendingImport(networkName)
                     }
-                    else -> {
-                        // Loading state - shouldn't happen in this flow
+                    .setNegativeButton(getString(R.string.button_cancel)) { _, _ ->
+                        pendingImportStations = null
                     }
+                    .setOnCancelListener {
+                        pendingImportStations = null
+                    }
+                    .show()
+            }
+        }
+    }
+
+    /**
+     * Load stations from bundled JSON files in assets.
+     * Used when Radio Registry API is disabled for offline operation.
+     */
+    private fun loadBundledStations(context: Context, type: String): List<RadioStation> {
+        val filename = when (type) {
+            "i2p" -> "i2p_stations.json"
+            "tor" -> "tor_stations.json"
+            else -> return emptyList()
+        }
+
+        return try {
+            val jsonString = context.assets.open(filename).bufferedReader().use { it.readText() }
+            val jsonObject = org.json.JSONObject(jsonString)
+            val stationsArray = jsonObject.getJSONArray("stations")
+
+            val stations = mutableListOf<RadioStation>()
+            for (i in 0 until stationsArray.length()) {
+                val stationJson = stationsArray.getJSONObject(i)
+                val station = RadioStation(
+                    id = 0, // Will be assigned on insert
+                    name = stationJson.optString("name", ""),
+                    streamUrl = stationJson.optString("streamUrl", ""),
+                    genre = stationJson.optString("genre", "Other"),
+                    coverArtUri = stationJson.optString("coverArtUri", null).takeIf { it?.isNotEmpty() == true },
+                    useProxy = stationJson.optBoolean("useProxy", false),
+                    proxyType = stationJson.optString("proxyType", "NONE"),
+                    proxyHost = stationJson.optString("proxyHost", ""),
+                    proxyPort = stationJson.optInt("proxyPort", 0),
+                    codec = stationJson.optString("codec", ""),
+                    country = stationJson.optString("country", ""),
+                    countryCode = stationJson.optString("countryCode", ""),
+                    source = "bundled_${type}"
+                )
+                if (station.name.isNotEmpty() && station.streamUrl.isNotEmpty()) {
+                    stations.add(station)
                 }
             }
+            stations
+        } catch (e: Exception) {
+            android.util.Log.e("SettingsFragment", "Failed to load bundled $type stations", e)
+            emptyList()
         }
     }
 
@@ -2504,6 +2569,100 @@ class SettingsFragment : Fragment() {
             .create()
 
         dialog.show()
+    }
+
+    /**
+     * Setup Network & API controls for disabling external API connections.
+     * These settings allow users to run the app in a more offline/private mode.
+     */
+    private fun setupNetworkApiControls() {
+        // Initialize switch states from preferences
+        disableRadioBrowserSwitch?.isChecked = PreferencesHelper.isRadioBrowserApiDisabled(requireContext())
+        disableRadioRegistrySwitch?.isChecked = PreferencesHelper.isRadioRegistryApiDisabled(requireContext())
+        disableCoverArtSwitch?.isChecked = PreferencesHelper.isCoverArtDisabled(requireContext())
+
+        // Disable RadioBrowser API switch
+        disableRadioBrowserSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setRadioBrowserApiDisabled(requireContext(), isChecked)
+        }
+
+        // Disable Radio Registry API switch
+        disableRadioRegistrySwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setRadioRegistryApiDisabled(requireContext(), isChecked)
+
+            // Update the import station buttons' text to reflect offline mode
+            updateImportButtonsForApiState()
+        }
+
+        // Disable Cover Art switch
+        disableCoverArtSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setCoverArtDisabled(requireContext(), isChecked)
+        }
+
+        // Initial update of import buttons based on API state
+        updateImportButtonsForApiState()
+    }
+
+    /**
+     * Update import I2P/Tor station buttons text based on Radio Registry API state.
+     * When API is disabled, show that import uses bundled offline data.
+     */
+    private fun updateImportButtonsForApiState() {
+        val isApiDisabled = PreferencesHelper.isRadioRegistryApiDisabled(requireContext())
+
+        if (isApiDisabled) {
+            // Update descriptions to indicate offline mode
+            i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_offline_description)
+            torStationsDescription?.text = getString(R.string.settings_add_tor_stations_offline_description)
+        } else {
+            // Fetch counts from API as normal
+            updateStationCounts()
+        }
     }
 
     /**

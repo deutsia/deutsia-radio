@@ -59,10 +59,17 @@ class RadioRegistryClient(private val context: Context) {
     /**
      * Build an OkHttpClient respecting Force Tor and Force Custom Proxy settings.
      *
-     * @return OkHttpClient configured with appropriate proxy, or null if Force Tor is enabled
-     *         but Tor is not available (to prevent IP leaks)
+     * @return OkHttpClient configured with appropriate proxy, or null if:
+     *         - Radio Registry API is disabled in settings
+     *         - Force Tor is enabled but Tor is not available (to prevent IP leaks)
      */
     private fun buildHttpClient(): Pair<OkHttpClient?, String> {
+        // Check if Radio Registry API is disabled
+        if (PreferencesHelper.isRadioRegistryApiDisabled(context)) {
+            Log.d(TAG, "Radio Registry API is disabled in settings")
+            return Pair(null, CLEARNET_BASE_URL)
+        }
+
         val builder = OkHttpClient.Builder()
 
         val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)

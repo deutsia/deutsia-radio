@@ -102,6 +102,8 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var loadingContainer: FrameLayout
     private lateinit var emptyStateContainer: LinearLayout
     private lateinit var torWarningBanner: MaterialCardView
+    private lateinit var apiDisabledBanner: MaterialCardView
+    private lateinit var apiDisabledSettingsButton: com.google.android.material.button.MaterialButton
 
     // Adapters
     private lateinit var stationsAdapter: BrowseStationsAdapter
@@ -262,6 +264,8 @@ class BrowseStationsFragment : Fragment() {
         loadingContainer = view.findViewById(R.id.loadingContainer)
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
         torWarningBanner = view.findViewById(R.id.torWarningBanner)
+        apiDisabledBanner = view.findViewById(R.id.apiDisabledBanner)
+        apiDisabledSettingsButton = view.findViewById(R.id.apiDisabledSettingsButton)
     }
 
     private fun setupDiscoveryMode() {
@@ -733,6 +737,33 @@ class BrowseStationsFragment : Fragment() {
         // Observe current station to dynamically adjust bottom padding for miniplayer
         radioViewModel.currentStation.observe(viewLifecycleOwner) { station ->
             updateBottomPaddingForMiniplayer(station != null)
+        }
+
+        // Setup API disabled banner click handler
+        apiDisabledSettingsButton.setOnClickListener {
+            // Navigate to settings fragment
+            (activity as? MainActivity)?.navigateToSettings()
+        }
+
+        // Check API disabled state
+        checkApiDisabledState()
+    }
+
+    /**
+     * Check if RadioBrowser API is disabled and show/hide the banner accordingly.
+     * When disabled, hide the discovery content and show the banner.
+     */
+    private fun checkApiDisabledState() {
+        val isApiDisabled = com.opensource.i2pradio.ui.PreferencesHelper.isRadioBrowserApiDisabled(requireContext())
+
+        if (isApiDisabled) {
+            // Hide discovery content and show API disabled banner
+            discoveryContainer.visibility = View.GONE
+            apiDisabledBanner.visibility = View.VISIBLE
+        } else {
+            // Show discovery content and hide API disabled banner
+            discoveryContainer.visibility = View.VISIBLE
+            apiDisabledBanner.visibility = View.GONE
         }
     }
 
@@ -1914,6 +1945,9 @@ class BrowseStationsFragment : Fragment() {
         // This catches changes made in other screens (e.g., deleting a station in library)
         viewModel.refreshLikedAndSavedUuids()
         refreshCarouselLikeStates()
+
+        // Re-check API disabled state when returning from settings
+        checkApiDisabledState()
     }
 
     override fun onPause() {

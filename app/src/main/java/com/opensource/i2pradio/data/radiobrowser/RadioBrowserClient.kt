@@ -62,10 +62,17 @@ class RadioBrowserClient(private val context: Context) {
      * IMPORTANT: This ensures RadioBrowser API calls respect the same proxy settings
      * as media streams to prevent privacy leaks.
      *
-     * @return OkHttpClient configured with appropriate proxy, or null if Force Tor is enabled
-     *         but Tor is not available (to prevent IP leaks)
+     * @return OkHttpClient configured with appropriate proxy, or null if:
+     *         - RadioBrowser API is disabled in settings
+     *         - Force Tor is enabled but Tor is not available (to prevent IP leaks)
      */
     private fun buildHttpClient(): OkHttpClient? {
+        // Check if RadioBrowser API is disabled
+        if (PreferencesHelper.isRadioBrowserApiDisabled(context)) {
+            Log.d(TAG, "RadioBrowser API is disabled in settings")
+            return null
+        }
+
         val builder = OkHttpClient.Builder()
 
         val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
