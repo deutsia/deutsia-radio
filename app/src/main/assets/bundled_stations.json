@@ -3,11 +3,13 @@
   "description": "Bundled starter stations for deutsia radio - featuring multinet (I2P, Tor, clearnet)",
   "stations": [
     {
-      "name": "Radio TGFB",
-      "streamUrl": "http://tgfb6wl5n4eaa5p6tdw56gqcmtevnxsjgwifrud4iffmural6z7q.b32.i2p/listen/tgfb/aac",
-      "genre": "Jazz",
+      "name": "eQtv Ukraine",
+      "streamUrl": "http://mrkssh4b2qkrf5hl4yxrwbtuowbmjugozaa7emaybnokw5jtcydq.b32.i2p/eqtv.aac",
+      "genre": "News/Journalism",
+      "country": "Ukraine",
+      "countryCode": "UA",
       "codec": "AAC",
-      "coverArtUri": "http://hujzvles33iouzuolttpxpfan4sjaqylc2unkz5tmcobztzfwgkl57yd.onion/static/covers/b35e504bdced714c.png",
+      "coverArtUri": "http://ccq2dfnskeccxmojoo2kwk23oyynf2fvczdfcpapdmek36waqnjhpvid.onion/static/covers/aec5a3bd267fe913.png",
       "useProxy": true,
       "proxyType": "I2P",
       "proxyHost": "127.0.0.1",
