@@ -142,26 +142,22 @@ class RadioRegistryClient(private val context: Context) {
                 return Pair(null, CLEARNET_BASE_URL)
             }
         }
-        // Priority 3: Use Tor if available (opportunistic, for privacy)
-        else if (torEnabled && torConnected) {
-            val socksHost = TorManager.getProxyHost()
-            val socksPort = TorManager.getProxyPort()
-
-            if (socksPort > 0) {
-                Log.d(TAG, "Opportunistically routing Radio Registry API through Tor")
-                builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(socksHost, socksPort)))
-                builder.dns(SOCKS5_DNS)
-                builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-                builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-                return Pair(builder.build(), TOR_BASE_URL)
-            }
-        }
 
         // Default: Direct connection to clearnet
-        Log.d(TAG, "Using direct connection for Radio Registry API")
+        // Note: Cover art images are routed through Tor separately via SecureImageLoader
+        // when Tor is available, so we don't need to proxy the API requests here.
+        Log.d(TAG, "Using direct connection for Radio Registry API (clearnet)")
         builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         return Pair(builder.build(), CLEARNET_BASE_URL)
+    }
+
+    /**
+     * Check if the Radio Registry API is disabled by user preference.
+     * When disabled, all API calls return empty/default results to enable offline mode.
+     */
+    private fun isApiDisabled(): Boolean {
+        return PreferencesHelper.isRadioRegistryApiDisabled(context)
     }
 
     /**
@@ -171,6 +167,13 @@ class RadioRegistryClient(private val context: Context) {
         endpoint: String,
         parser: (String) -> T
     ): RadioRegistryResult<T> {
+        // Check if API is disabled by user preference
+        if (isApiDisabled()) {
+            Log.d(TAG, "Radio Registry API is disabled by user preference")
+            // Return an error that indicates API is disabled - callers can handle this gracefully
+            return RadioRegistryResult.Error("Radio Registry API is disabled", null)
+        }
+
         return withContext(Dispatchers.IO) {
             try {
                 val (client, baseUrl) = buildHttpClient()

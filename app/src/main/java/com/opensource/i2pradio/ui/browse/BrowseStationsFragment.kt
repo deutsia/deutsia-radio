@@ -78,10 +78,16 @@ class BrowseStationsFragment : Fragment() {
 
     // Privacy Radio (API) views
     private lateinit var privacyRadioSection: LinearLayout
+    private lateinit var torStationsSection: LinearLayout
     private lateinit var torStationsRecyclerView: RecyclerView
     private lateinit var torStationsSeeAll: TextView
+    private lateinit var i2pStationsSection: LinearLayout
     private lateinit var i2pStationsRecyclerView: RecyclerView
     private lateinit var i2pStationsSeeAll: TextView
+
+    // Genre chips that depend on Radio Registry API (hidden when disabled)
+    private var torGenreChip: Chip? = null
+    private var i2pGenreChip: Chip? = null
 
     // Results mode views
     private lateinit var resultsContainer: LinearLayout
@@ -238,8 +244,10 @@ class BrowseStationsFragment : Fragment() {
 
         // Privacy Radio views
         privacyRadioSection = view.findViewById(R.id.privacyRadioSection)
+        torStationsSection = view.findViewById(R.id.torStationsSection)
         torStationsRecyclerView = view.findViewById(R.id.torStationsRecyclerView)
         torStationsSeeAll = view.findViewById(R.id.torStationsSeeAll)
+        i2pStationsSection = view.findViewById(R.id.i2pStationsSection)
         i2pStationsRecyclerView = view.findViewById(R.id.i2pStationsRecyclerView)
         i2pStationsSeeAll = view.findViewById(R.id.i2pStationsSeeAll)
 
@@ -415,6 +423,12 @@ class BrowseStationsFragment : Fragment() {
                     }
                 }
             }
+        }
+
+        // Track tor/i2p chips so we can hide them when Radio Registry API is disabled
+        when (genreData.tag.lowercase()) {
+            "tor" -> torGenreChip = chip
+            "i2p" -> i2pGenreChip = chip
         }
 
         return chip
@@ -805,6 +819,9 @@ class BrowseStationsFragment : Fragment() {
             topVotedPreviewAdapter.updateLikedUuids(uuids)
             popularAdapter.updateLikedUuids(uuids)
             newStationsAdapter.updateLikedUuids(uuids)
+            // Privacy Radio adapters
+            torStationsAdapter.updateLikedUuids(uuids)
+            i2pStationsAdapter.updateLikedUuids(uuids)
         }
 
         viewModel.selectedCountry.observe(viewLifecycleOwner) { country ->
@@ -832,6 +849,23 @@ class BrowseStationsFragment : Fragment() {
             } else {
                 languageFilterChip.visibility = View.GONE
             }
+        }
+
+        // Hide Privacy Radio section when Radio Registry API is disabled
+        // Note: Other API states are handled by BrowseContainerFragment which swaps fragments
+        viewModel.isRadioRegistryApiDisabled.observe(viewLifecycleOwner) { isDisabled ->
+            val visibility = if (isDisabled) View.GONE else View.VISIBLE
+            // Hide Privacy Radio header
+            privacyRadioSection.visibility = visibility
+            // Hide Tor section (header + carousel)
+            torStationsSection.visibility = visibility
+            torStationsRecyclerView.visibility = visibility
+            // Hide I2P section (header + carousel)
+            i2pStationsSection.visibility = visibility
+            i2pStationsRecyclerView.visibility = visibility
+            // Hide Tor/I2P genre chips
+            torGenreChip?.visibility = visibility
+            i2pGenreChip?.visibility = visibility
         }
     }
 
@@ -918,6 +952,9 @@ class BrowseStationsFragment : Fragment() {
         topVotedPreviewAdapter.updateLikedUuids(likedUuids)
         popularAdapter.updateLikedUuids(likedUuids)
         newStationsAdapter.updateLikedUuids(likedUuids)
+        // Privacy Radio adapters
+        torStationsAdapter.updateLikedUuids(likedUuids)
+        i2pStationsAdapter.updateLikedUuids(likedUuids)
     }
 
     private fun switchToResultsMode(focusSearch: Boolean = false) {
@@ -1914,6 +1951,10 @@ class BrowseStationsFragment : Fragment() {
         // This catches changes made in other screens (e.g., deleting a station in library)
         viewModel.refreshLikedAndSavedUuids()
         refreshCarouselLikeStates()
+
+        // Refresh API disabled status when returning from settings
+        // This ensures UI adapts if user changed Network & API settings
+        viewModel.refreshApiDisabledStatus()
     }
 
     override fun onPause() {

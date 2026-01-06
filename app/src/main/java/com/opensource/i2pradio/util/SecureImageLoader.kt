@@ -124,9 +124,28 @@ object SecureImageLoader {
      * Local content (file://, content://) should bypass proxy.
      */
     fun shouldUseProxy(uri: String?): Boolean {
+        return isRemoteUrl(uri)
+    }
+
+    /**
+     * Check if a URI is a remote URL (http/https).
+     * Used to determine if cover art should be blocked when disabled.
+     * Local URIs (file://, content://) are NOT considered remote.
+     */
+    fun isRemoteUrl(uri: String?): Boolean {
         if (uri.isNullOrEmpty()) return false
         val lowerUri = uri.lowercase()
         return lowerUri.startsWith("http://") || lowerUri.startsWith("https://")
+    }
+
+    /**
+     * Check if a URI is a local file or content URI.
+     * Local URIs are allowed even when cover art is disabled.
+     */
+    fun isLocalUri(uri: String?): Boolean {
+        if (uri.isNullOrEmpty()) return false
+        val lowerUri = uri.lowercase()
+        return lowerUri.startsWith("file://") || lowerUri.startsWith("content://")
     }
 
     /**
@@ -265,6 +284,40 @@ object SecureImageLoader {
         return getCurrentProxyConfig(context).mode == ProxyMode.BLOCKED
     }
 
+    /**
+     * Check if cover art loading is disabled by user preference.
+     * When disabled, remote images should not be loaded.
+     */
+    fun isCoverArtDisabled(context: Context): Boolean {
+        return PreferencesHelper.isCoverArtDisabled(context)
+    }
+
+    /**
+     * Clear the remote image cache (memory and disk).
+     * Called when cover art is disabled to remove cached external images.
+     * Does not affect local images (content:// or file://).
+     */
+    fun clearRemoteImageCache(context: Context) {
+        android.util.Log.d(TAG, "Clearing remote image cache")
+
+        // Clear the cached image loaders to force recreation
+        cachedImageLoader?.memoryCache?.clear()
+        cachedImageLoader?.diskCache?.clear()
+        cachedImageLoader = null
+        cachedProxyConfig = null
+
+        cachedPrivacyImageLoader?.memoryCache?.clear()
+        cachedPrivacyImageLoader?.diskCache?.clear()
+        cachedPrivacyImageLoader = null
+        cachedPrivacyProxyConfig = null
+
+        // Also clear the default Coil image loader cache
+        coil.Coil.imageLoader(context).memoryCache?.clear()
+        coil.Coil.imageLoader(context).diskCache?.clear()
+
+        android.util.Log.d(TAG, "Image cache cleared")
+    }
+
     private fun buildImageLoader(context: Context, config: ProxyConfig): ImageLoader {
         val builder = ImageLoader.Builder(context)
 
@@ -364,6 +417,10 @@ object SecureImageLoader {
  * Uses SecureImageLoader for remote URLs (http/https).
  * Local content URIs (file://, content://) and drawable resources bypass proxy.
  *
+ * Cover art behavior when disabled:
+ * - Remote URLs (http/https): BLOCKED - shows placeholder
+ * - Local URIs (file://, content://): ALLOWED - still loads
+ *
  * @param data The image source (URL string, Uri, DrawableRes, etc.)
  * @param builder Optional builder to customize the image request
  * @return Disposable to cancel the request if needed
@@ -372,6 +429,19 @@ fun ImageView.loadSecure(
     data: Any?,
     builder: ImageRequest.Builder.() -> Unit = {}
 ): Disposable {
+    // Check if cover art is disabled for remote URLs
+    // Local files (file://, content://) are ALWAYS allowed even when cover art is disabled
+    if (SecureImageLoader.isCoverArtDisabled(context) && SecureImageLoader.isRemoteUrl(data?.toString())) {
+        android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping remote image: $data")
+        // Return a no-op disposable, image will show placeholder/default
+        return object : Disposable {
+            override val job: kotlinx.coroutines.Deferred<coil.request.ImageResult>
+                get() = kotlinx.coroutines.CompletableDeferred<coil.request.ImageResult>().apply { cancel() }
+            override val isDisposed: Boolean get() = true
+            override fun dispose() {}
+        }
+    }
+
     val imageLoader = SecureImageLoader.getImageLoader(context)
     return this.load(data, imageLoader, builder)
 }
@@ -386,7 +456,11 @@ fun ImageView.loadSecure(
  * - Cover art for currently playing Tor/I2P stations
  * - Any image from a privacy station source
  *
- * Behavior:
+ * Cover art behavior when disabled:
+ * - Remote URLs (http/https): BLOCKED - shows placeholder
+ * - Local URIs (file://, content://): ALLOWED - still loads
+ *
+ * Proxy behavior:
  * - If Force Tor is enabled: Uses force mode settings
  * - If Tor is connected (not forced): Routes through Tor
  * - If Tor is not connected: Image loading is blocked (fails gracefully with placeholder)
@@ -399,6 +473,19 @@ fun ImageView.loadSecurePrivacy(
     data: Any?,
     builder: ImageRequest.Builder.() -> Unit = {}
 ): Disposable {
+    // Check if cover art is disabled for remote URLs
+    // Local files (file://, content://) are ALWAYS allowed even when cover art is disabled
+    if (SecureImageLoader.isCoverArtDisabled(context) && SecureImageLoader.isRemoteUrl(data?.toString())) {
+        android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping privacy image: $data")
+        // Return a no-op disposable, image will show placeholder/default
+        return object : Disposable {
+            override val job: kotlinx.coroutines.Deferred<coil.request.ImageResult>
+                get() = kotlinx.coroutines.CompletableDeferred<coil.request.ImageResult>().apply { cancel() }
+            override val isDisposed: Boolean get() = true
+            override fun dispose() {}
+        }
+    }
+
     val imageLoader = SecureImageLoader.getPrivacyImageLoader(context)
     return this.load(data, imageLoader, builder)
 }

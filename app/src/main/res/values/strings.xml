@@ -269,6 +269,29 @@
     <string name="settings_export_stations">Export Stations</string>
     <string name="settings_export_stations_description">Export your stations to a file</string>
 
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Network &amp; API</string>
+    <string name="settings_disable_radiobrowser_api">Disable RadioBrowser API</string>
+    <string name="settings_disable_radiobrowser_api_description">Stop fetching clearnet stations from RadioBrowser</string>
+    <string name="settings_disable_radio_registry_api">Disable Radio Registry API</string>
+    <string name="settings_disable_radio_registry_api_description">Stop fetching Tor/I2P stations from Radio Registry</string>
+    <string name="settings_disable_cover_art">Disable Cover Art</string>
+    <string name="settings_disable_cover_art_description">Prevent loading station artwork from external servers</string>
+    <string name="settings_network_api_info">The app only connects to: RadioBrowser API for clearnet stations, Radio Registry API for Tor/I2P stations, external servers for station cover art, and radio streams when playing.</string>
+    <string name="settings_offline_mode_note">Both APIs disabled: Browse tab shows local library only. You can still play saved stations and import stations from files.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">Offline Mode</string>
+    <string name="browse_offline_mode_message">External APIs are disabled in settings. Go to your Library to access saved stations, or enable APIs in Settings to browse online stations.</string>
+    <string name="browse_radiobrowser_disabled">RadioBrowser API disabled</string>
+    <string name="browse_radioregistry_disabled">Privacy stations API disabled</string>
+    <string name="browse_disabled_title">Browse Disabled</string>
+    <string name="browse_disabled_message">Both RadioBrowser and Radio Registry APIs are disabled in settings. Enable at least one API to browse online stations.</string>
+    <string name="browse_disabled_tip_title">Your saved stations still work</string>
+    <string name="browse_disabled_tip_message">Go to your Library tab to play stations you\'ve already saved, or import stations from a file.</string>
+    <string name="browse_privacy_only_title">Privacy Radio</string>
+    <string name="browse_privacy_only_message">RadioBrowser API is disabled. Showing Tor and I2P stations only.</string>
+
     <!-- Settings - About -->
     <string name="settings_about">About</string>
     <string name="settings_version">Version 1.6</string>

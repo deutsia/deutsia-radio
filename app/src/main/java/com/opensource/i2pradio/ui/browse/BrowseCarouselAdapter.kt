@@ -113,6 +113,29 @@ class BrowseCarouselAdapter(
             btnLike.setImageResource(
                 if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
             )
+            // Animate the tint color change
+            if (isLiked) {
+                btnLike.imageTintList = android.content.res.ColorStateList.valueOf(
+                    itemView.context.getColor(R.color.color_favorite)
+                )
+                // Pulse animation for visual feedback
+                btnLike.animate()
+                    .scaleX(1.3f)
+                    .scaleY(1.3f)
+                    .setDuration(100)
+                    .withEndAction {
+                        btnLike.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .start()
+                    }
+                    .start()
+            } else {
+                btnLike.imageTintList = android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.WHITE
+                )
+            }
         }
     }
 

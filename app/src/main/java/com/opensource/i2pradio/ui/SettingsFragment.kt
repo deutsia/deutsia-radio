@@ -106,6 +106,12 @@ class SettingsFragment : Fragment() {
     private var requireAuthSwitch: MaterialSwitch? = null
     private var databaseEncryptionSwitch: MaterialSwitch? = null
 
+    // Network & API UI elements
+    private var disableRadioBrowserApiSwitch: MaterialSwitch? = null
+    private var disableRadioRegistryApiSwitch: MaterialSwitch? = null
+    private var disableCoverArtSwitch: MaterialSwitch? = null
+    private var offlineModeNote: TextView? = null
+
     // ViewModel for observing current station (for miniplayer padding)
     private val radioViewModel: RadioViewModel by activityViewModels()
 
@@ -537,9 +543,18 @@ class SettingsFragment : Fragment() {
         requireAuthSwitch = view.findViewById(R.id.requireAuthSwitch)
         databaseEncryptionSwitch = view.findViewById(R.id.databaseEncryptionSwitch)
 
+        // Network & API UI elements
+        disableRadioBrowserApiSwitch = view.findViewById(R.id.disableRadioBrowserApiSwitch)
+        disableRadioRegistryApiSwitch = view.findViewById(R.id.disableRadioRegistryApiSwitch)
+        disableCoverArtSwitch = view.findViewById(R.id.disableCoverArtSwitch)
+        offlineModeNote = view.findViewById(R.id.offlineModeNote)
+
         // Setup authentication controls
         setupAuthenticationControls()
         setupDatabaseEncryptionControls()
+
+        // Setup Network & API controls
+        setupNetworkApiControls()
 
         // Setup custom proxy controls
         setupCustomProxyControls()
@@ -2560,6 +2575,107 @@ class SettingsFragment : Fragment() {
         // Enable switch only if password is set OR encryption is already enabled
         // (allow disabling even if password was removed)
         databaseEncryptionSwitch?.isEnabled = hasPassword || isEncryptionEnabled
+    }
+
+    /**
+     * Setup Network & API controls for privacy settings.
+     * Allows disabling RadioBrowser API, Radio Registry API, and cover art loading.
+     */
+    private fun setupNetworkApiControls() {
+        // Initialize switch states from preferences
+        disableRadioBrowserApiSwitch?.isChecked = PreferencesHelper.isRadioBrowserApiDisabled(requireContext())
+        disableRadioRegistryApiSwitch?.isChecked = PreferencesHelper.isRadioRegistryApiDisabled(requireContext())
+        disableCoverArtSwitch?.isChecked = PreferencesHelper.isCoverArtDisabled(requireContext())
+
+        // Update offline mode note visibility
+        updateOfflineModeNoteVisibility()
+
+        // RadioBrowser API switch
+        disableRadioBrowserApiSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setRadioBrowserApiDisabled(requireContext(), isChecked)
+            updateOfflineModeNoteVisibility()
+        }
+
+        // Radio Registry API switch
+        disableRadioRegistryApiSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setRadioRegistryApiDisabled(requireContext(), isChecked)
+            updateOfflineModeNoteVisibility()
+        }
+
+        // Cover Art switch
+        disableCoverArtSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            // Animate the switch
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            PreferencesHelper.setCoverArtDisabled(requireContext(), isChecked)
+            // Invalidate image loader cache when setting changes
+            com.opensource.i2pradio.util.SecureImageLoader.invalidateCache()
+
+            // When cover art is disabled, clear the entire cache to remove external images
+            if (isChecked) {
+                com.opensource.i2pradio.util.SecureImageLoader.clearRemoteImageCache(requireContext())
+            }
+
+            // Recreate activity to refresh all views with updated cover art setting
+            // Use a short delay to let the animation complete
+            view?.postDelayed({
+                activity?.recreate()
+            }, 300)
+        }
+    }
+
+    /**
+     * Update the visibility of the offline mode note based on API settings.
+     * Shows when both RadioBrowser and Radio Registry APIs are disabled.
+     */
+    private fun updateOfflineModeNoteVisibility() {
+        val isOfflineMode = PreferencesHelper.isOfflineMode(requireContext())
+        offlineModeNote?.visibility = if (isOfflineMode) View.VISIBLE else View.GONE
     }
 
     /**
