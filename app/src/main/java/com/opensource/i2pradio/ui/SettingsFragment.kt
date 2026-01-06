@@ -2660,6 +2660,12 @@ class SettingsFragment : Fragment() {
             if (isChecked) {
                 com.opensource.i2pradio.util.SecureImageLoader.clearRemoteImageCache(requireContext())
             }
+
+            // Recreate activity to refresh all views with updated cover art setting
+            // Use a short delay to let the animation complete
+            view?.postDelayed({
+                activity?.recreate()
+            }, 300)
         }
     }
 

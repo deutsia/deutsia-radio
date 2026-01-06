@@ -819,6 +819,9 @@ class BrowseStationsFragment : Fragment() {
             topVotedPreviewAdapter.updateLikedUuids(uuids)
             popularAdapter.updateLikedUuids(uuids)
             newStationsAdapter.updateLikedUuids(uuids)
+            // Privacy Radio adapters
+            torStationsAdapter.updateLikedUuids(uuids)
+            i2pStationsAdapter.updateLikedUuids(uuids)
         }
 
         viewModel.selectedCountry.observe(viewLifecycleOwner) { country ->
@@ -949,6 +952,9 @@ class BrowseStationsFragment : Fragment() {
         topVotedPreviewAdapter.updateLikedUuids(likedUuids)
         popularAdapter.updateLikedUuids(likedUuids)
         newStationsAdapter.updateLikedUuids(likedUuids)
+        // Privacy Radio adapters
+        torStationsAdapter.updateLikedUuids(likedUuids)
+        i2pStationsAdapter.updateLikedUuids(likedUuids)
     }
 
     private fun switchToResultsMode(focusSearch: Boolean = false) {

@@ -24,10 +24,13 @@ import com.opensource.i2pradio.util.loadSecurePrivacy
  */
 class PrivacyRadioListAdapter(
     private val onStationClick: (RadioRegistryStation) -> Unit,
-    private val onLikeClick: (RadioRegistryStation) -> Unit
+    private val onLikeClick: (RadioRegistryStation) -> Unit,
+    private val onAddClick: ((RadioRegistryStation) -> Unit)? = null,
+    private val onRemoveClick: ((RadioRegistryStation) -> Unit)? = null
 ) : ListAdapter<RadioRegistryStation, PrivacyRadioListAdapter.ViewHolder>(DiffCallback()) {
 
     private var likedUuids: Set<String> = emptySet()
+    private var savedUuids: Set<String> = emptySet()
 
     fun updateLikedUuids(uuids: Set<String>) {
         val oldLikedUuids = likedUuids
@@ -39,6 +42,20 @@ class PrivacyRadioListAdapter(
             val isLiked = uuids.contains(uuid)
             if (wasLiked != isLiked) {
                 notifyItemChanged(index, PAYLOAD_LIKED_STATUS)
+            }
+        }
+    }
+
+    fun updateSavedUuids(uuids: Set<String>) {
+        val oldSavedUuids = savedUuids
+        savedUuids = uuids
+
+        currentList.forEachIndexed { index, station ->
+            val uuid = "registry_${station.id}"
+            val wasSaved = oldSavedUuids.contains(uuid)
+            val isSaved = uuids.contains(uuid)
+            if (wasSaved != isSaved) {
+                notifyItemChanged(index, PAYLOAD_SAVED_STATUS)
             }
         }
     }
@@ -59,9 +76,12 @@ class PrivacyRadioListAdapter(
             return
         }
         val station = getItem(position)
+        val uuid = "registry_${station.id}"
         if (payloads.contains(PAYLOAD_LIKED_STATUS)) {
-            val uuid = "registry_${station.id}"
             holder.updateLikedStatus(likedUuids.contains(uuid))
+        }
+        if (payloads.contains(PAYLOAD_SAVED_STATUS)) {
+            holder.updateSavedStatus(savedUuids.contains(uuid))
         }
     }
 
@@ -101,8 +121,22 @@ class PrivacyRadioListAdapter(
             // Hide quality info for privacy radio stations (no bitrate data)
             qualityInfo.visibility = View.GONE
 
-            // Hide action button (these are browsing results, not saved stations)
-            actionButton.visibility = View.GONE
+            // Show action button for add/remove from library
+            val uuid = "registry_${station.id}"
+            val isSaved = savedUuids.contains(uuid)
+            if (onAddClick != null || onRemoveClick != null) {
+                actionButton.visibility = View.VISIBLE
+                updateSavedStatus(isSaved)
+                actionButton.setOnClickListener {
+                    if (savedUuids.contains(uuid)) {
+                        onRemoveClick?.invoke(station)
+                    } else {
+                        onAddClick?.invoke(station)
+                    }
+                }
+            } else {
+                actionButton.visibility = View.GONE
+            }
 
             // Load station image using secure loader
             imageLoadDisposable?.dispose()
@@ -116,7 +150,6 @@ class PrivacyRadioListAdapter(
             }
 
             // Like state
-            val uuid = "registry_${station.id}"
             updateLikedStatus(likedUuids.contains(uuid))
 
             // Online indicator - change image alpha if offline
@@ -131,6 +164,42 @@ class PrivacyRadioListAdapter(
             likeButton.setIconResource(
                 if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
             )
+            // Animate the tint color change
+            if (isLiked) {
+                likeButton.setIconTintResource(R.color.color_favorite)
+                // Pulse animation for visual feedback
+                likeButton.animate()
+                    .scaleX(1.3f)
+                    .scaleY(1.3f)
+                    .setDuration(100)
+                    .withEndAction {
+                        likeButton.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .start()
+                    }
+                    .start()
+            } else {
+                // Reset to default theme color
+                val typedValue = android.util.TypedValue()
+                itemView.context.theme.resolveAttribute(
+                    com.google.android.material.R.attr.colorOnSurfaceVariant,
+                    typedValue,
+                    true
+                )
+                if (typedValue.resourceId != 0) {
+                    likeButton.setIconTintResource(typedValue.resourceId)
+                } else {
+                    likeButton.iconTint = android.content.res.ColorStateList.valueOf(typedValue.data)
+                }
+            }
+        }
+
+        fun updateSavedStatus(isSaved: Boolean) {
+            actionButton.setIconResource(if (isSaved) R.drawable.ic_check else R.drawable.ic_add)
+            actionButton.isEnabled = true
+            actionButton.alpha = 1f
         }
     }
 
@@ -146,5 +215,6 @@ class PrivacyRadioListAdapter(
 
     companion object {
         private const val PAYLOAD_LIKED_STATUS = "liked_status"
+        private const val PAYLOAD_SAVED_STATUS = "saved_status"
     }
 }

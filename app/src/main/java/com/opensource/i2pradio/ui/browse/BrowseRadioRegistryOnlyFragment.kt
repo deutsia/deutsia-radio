@@ -73,6 +73,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == MainActivity.BROADCAST_LIKE_STATE_CHANGED) {
                 viewModel.refreshLikedAndSavedUuids()
+                refreshCarouselLikeStates()
             }
         }
     }
@@ -189,7 +190,9 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     private fun setupResultsMode() {
         resultsAdapter = PrivacyRadioListAdapter(
             onStationClick = { station -> playPrivacyStation(station) },
-            onLikeClick = { station -> likePrivacyStation(station) }
+            onLikeClick = { station -> likePrivacyStation(station) },
+            onAddClick = { station -> addPrivacyStation(station) },
+            onRemoveClick = { station -> removePrivacyStation(station) }
         )
 
         resultsRecyclerView.adapter = resultsAdapter
@@ -295,6 +298,25 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 }
             }
         }
+
+        // Observe liked UUIDs to update adapters
+        viewModel.likedStationUuids.observe(viewLifecycleOwner) { uuids ->
+            torStationsAdapter.updateLikedUuids(uuids)
+            i2pStationsAdapter.updateLikedUuids(uuids)
+            resultsAdapter.updateLikedUuids(uuids)
+        }
+
+        // Observe saved UUIDs to update adapters
+        viewModel.savedStationUuids.observe(viewLifecycleOwner) { uuids ->
+            resultsAdapter.updateSavedUuids(uuids)
+        }
+    }
+
+    private fun refreshCarouselLikeStates() {
+        val likedUuids = viewModel.likedStationUuids.value ?: emptySet()
+        torStationsAdapter.updateLikedUuids(likedUuids)
+        i2pStationsAdapter.updateLikedUuids(likedUuids)
+        resultsAdapter.updateLikedUuids(likedUuids)
     }
 
     private fun playPrivacyStation(station: RadioRegistryStation) {
@@ -323,6 +345,50 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         val radioStation = viewModel.getPlayableStation(station)
         val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
         likeStation(browserStation)
+    }
+
+    private fun addPrivacyStation(station: RadioRegistryStation) {
+        val radioStation = viewModel.getPlayableStation(station)
+        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        addStation(browserStation)
+    }
+
+    private fun removePrivacyStation(station: RadioRegistryStation) {
+        val radioStation = viewModel.getPlayableStation(station)
+        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        removeStation(browserStation)
+    }
+
+    private fun addStation(station: RadioBrowserStation) {
+        viewModel.addToLibrary(station)
+        viewModel.refreshLikedAndSavedUuids()
+
+        if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.station_added_to_library, station.name),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        val broadcastIntent = Intent(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
+    }
+
+    private fun removeStation(station: RadioBrowserStation) {
+        viewModel.removeFromLibrary(station)
+        viewModel.refreshLikedAndSavedUuids()
+
+        if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.station_removed_from_library, station.name),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        val broadcastIntent = Intent(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
+        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
     }
 
     private fun likeStation(station: RadioBrowserStation) {
@@ -370,6 +436,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(likeStateReceiver, filter)
 
         viewModel.refreshLikedAndSavedUuids()
+        refreshCarouselLikeStates()
     }
 
     override fun onPause() {
