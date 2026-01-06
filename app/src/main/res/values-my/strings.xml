@@ -1,10 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">deutsia radio</string>
     <string name="tab_radios">စာကြည့်တိုက်</string>
     <string name="tab_now_playing">ယခုဖွင့်နေသည်</string>
     <string name="tab_settings">ဆက်တင်များ</string>
 
-    <!-- Equalizer -->
+    
     <string name="equalizer">အသံညှိစက်</string>
     <string name="equalizer_no_audio">ဦးစွာ စတေးရှင်းတစ်ခုကို ဖွင့်ပါ</string>
     <string name="equalizer_not_found">အသံညှိစက် အက်ပ်မတွေ့ပါ။ Wavelet ကဲ့သို့ အသံညှိစက်အက်ပ်ကို တပ်ဆင်ပါ။</string>
@@ -15,23 +16,23 @@
     <string name="equalizer_bass_boost">အသံနိမ့် မြှင့်တင်ရေး</string>
     <string name="equalizer_surround_sound">ပတ်ဝန်းကျင် အသံ</string>
 
-    <!-- Sort options -->
+    
     <string name="sort_default">မူလ</string>
     <string name="sort_name">အမည်</string>
     <string name="sort_recent">မကြာသေးမီ</string>
     <string name="sort_liked">နှစ်သက်သော</string>
     <string name="sort_genre">အမျိုးအစား</string>
 
-    <!-- Search -->
+    
     <string name="search_stations">စာကြည့်တိုက်တွင် ရှာရန်</string>
     <string name="search_countries">နိုင်ငံများကို ရှာပါ…</string>
     <string name="search_genres">အမျိုးအစားများကို ရှာပါ…</string>
 
-    <!-- Genre filter -->
+    
     <string name="genre_all">အမျိုးအစားအားလုံး</string>
     <string name="filter_by_genre">အမျိုးအစားအလိုက် စစ်ထုတ်ရန်</string>
 
-    <!-- Genre Names -->
+    
     <string name="genre_alternative">Alternative</string>
     <string name="genre_ambient">Ambient</string>
     <string name="genre_blues">Blues</string>
@@ -65,10 +66,10 @@
     <string name="genre_world">ကမ္ဘာ့</string>
     <string name="genre_other">အခြား</string>
 
-     <!-- about -->
+     
     <string name="about_description">deutsia radio သည် clearnet၊ Tor (.onion) နှင့် I2P ကွန်ရက်များမှ ထုတ်လွှင့်မှုများကို ပေါင်းစည်းထားသော အခမဲ့ပွင့်လင်းအရင်းအမြစ် မာလ်တီနက် ရေဒီယိုပလေယာဖြစ်သည်။ InviZible Pro ပေါင်းစည်းမှုနှင့် ပြင်ဆင်နိုင်သော leak ကာကွယ်မှုဖြင့် Material You အင်တာဖေ့စ်တွင် သင့်အကြိုက်ဆုံး စတေးရှင်းများကို ခံစားပါ</string>
 
-    <!-- Browse/Discover Stations -->
+    
     <string name="tab_browse">ရှာဖွေရန်</string>
     <string name="search_radio_browser">စတေးရှင်းထောင်ပေါင်းများစွာကို ရှာပါ…</string>
     <string name="browse_top_voted">အများဆုံး မဲရသော</string>
@@ -109,7 +110,7 @@
     <string name="back">နောက်သို့</string>
     <string name="browse_all_stations">စခန်းအားလုံး</string>
 
-    <!-- Notification and Status Messages -->
+    
     <string name="notification_connecting">ချိတ်ဆက်နေသည်...</string>
     <string name="notification_paused">ခေတ္တရပ်ထားသည်</string>
     <string name="notification_playing">ဖွင့်နေသည်</string>
@@ -124,7 +125,7 @@
     <string name="notification_action_pause">ခေတ္တရပ်ရန်</string>
     <string name="notification_action_stop">ရပ်ရန်</string>
 
-    <!-- Recording Messages -->
+    
     <string name="recording_failed">ရိုက်ကူးမှု မအောင်မြင်ပါ: %s</string>
     <string name="recording_saved">ရိုက်ကူးမှုကို သိမ်းဆည်းပြီးပါပြီ: %1$s (%2$dKB)</string>
     <string name="recording_stopping">ရိုက်ကူးမှုကို ရပ်နေသည်...</string>
@@ -132,7 +133,7 @@
     <string name="recording_no_station">စတေးရှင်း မဖွင့်ထားပါ</string>
     <string name="recording_directory_updated">ရိုက်ကူးမှု ဖိုင်တွဲကို အပ်ဒိတ်လုပ်ပြီးပါပြီ</string>
 
-    <!-- Dialog Titles and Buttons -->
+    
     <string name="dialog_add_station">ရေဒီယိုစတေးရှင်း ထည့်ရန်</string>
     <string name="dialog_edit_station">ရေဒီယိုစတေးရှင်း တည်းဖြတ်ရန်</string>
     <string name="dialog_sort_stations">စတေးရှင်းများကို စီရန်</string>
@@ -152,7 +153,7 @@
     <string name="button_choose_image">ပုံကို ရွေးချယ်ရန်</string>
     <string name="button_clear">ရှင်းလင်းရန်</string>
 
-    <!-- Settings - Appearance -->
+    
     <string name="settings_appearance">အသွင်အပြင်</string>
     <string name="settings_theme">အပြင်အဆင်</string>
     <string name="settings_theme_description">အလင်း၊ အမှောင် သို့မဟုတ် စနစ် ရွေးချယ်ပါ</string>
@@ -174,7 +175,7 @@
     <string name="settings_disable_toasts">Toast မက်ဆေ့ချ်များ ပိတ်ထားရန်</string>
     <string name="settings_disable_toasts_description">သတိပေးချက်နှင့် အမှားများအတွက် ပေါ်လာသော အသိပေးချက်များ ဖျောက်ထားရန်</string>
 
-    <!-- Language Names -->
+    
     <string name="language_choose">ဘာသာစကားကို ရွေးချယ်ပါ</string>
     <string name="language_system_default">စနစ် မူလအတိုင်း</string>
     <string name="language_arabic">العربية</string>
@@ -195,7 +196,7 @@
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_chinese">中文</string>
 
-    <!-- Settings - Tor Network -->
+    
     <string name="settings_tor_network">Tor ကွန်ရက်</string>
     <string name="settings_enable_tor">Tor ကို ဖွင့်ရန် (InviZible Pro မှတစ်ဆင့်)</string>
     <string name="settings_enable_tor_description">Tor ကွန်ရက်မှတစ်ဆင့် ချိတ်ဆက်ပါ</string>
@@ -208,7 +209,7 @@
     <string name="settings_tor_info">InviZible Pro လိုအပ်သည် (Play Store သို့မဟုတ် F-Droid မှ အခမဲ့)။ အမြန်ဝင်ရောက်ရန် toolbar ရှိ Tor အိုင်ကွန်ကို တို့ပါ။\n\nအတင်းအဓမ္မ မုဒ်များသည် Tor မရနိုင်သောအခါ ချိတ်ဆက်မှုများကို ပိတ်ဆို့သည်။</string>
     <string name="settings_tor_privacy_notice">ကိုယ်ရေးလုံခြုံမှု: Tor အတင်းအဓမ္မ ဖွင့်မထားပါက၊ clearnet စတေးရှင်းများနှင့် ပုံများသည် အင်တာနက်သို့ တိုက်ရိုက်ချိတ်ဆက်သည်။ အသံဖမ်းယူမှုများသည် ထုတ်လွှင့်မှုကဲ့သို့ တူညီသော ချိတ်ဆက်မှုကို သုံးသည်။</string>
 
-    <!-- Settings - Custom Proxy -->
+    
     <string name="settings_custom_proxy">စိတ်ကြိုက် Proxy</string>
     <string name="settings_enable_custom_proxy">စိတ်ကြိုက် Proxy ကို ဖွင့်ရန်</string>
     <string name="settings_enable_custom_proxy_description">ချိတ်ဆက်မှုများအတွက် စိတ်ကြိုက် proxy ကို သုံးပါ</string>
@@ -220,13 +221,13 @@
     <string name="settings_force_custom_proxy_except_tor_i2p_description">clearnet အသွားအလာအားလုံးကို စိတ်ကြိုက် proxy မှတစ်ဆင့် ပို့ပါ၊ သို့သော် Tor နှင့် I2P စတေးရှင်းများကို ၎င်းတို့၏ မူရင်း proxies များကို သုံးခွင့်ပြုပါ။</string>
     <string name="settings_custom_proxy_privacy_notice">ကိုယ်ရေးလုံခြုံမှု: စိတ်ကြိုက် Proxy အတင်းအဓမ္မ ဖွင့်မထားပါက၊ clearnet စတေးရှင်းများနှင့် ပုံများသည် အင်တာနက်သို့ တိုက်ရိုက်ချိတ်ဆက်သည်။ အသံဖမ်းယူမှုများသည် ထုတ်လွှင့်မှုကဲ့သို့ တူညီသော ချိတ်ဆက်မှုကို သုံးသည်။</string>
 
-    <!-- Settings - Bandwidth -->
+    
     <string name="settings_bandwidth_usage">အင်တာနက် အသုံးပြုမှု</string>
     <string name="settings_total_usage">စုစုပေါင်း အသုံးပြုမှု (တစ်သက်လုံး)</string>
     <string name="settings_session_usage">Session အသုံးပြုမှု</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
-    <!-- Settings - Playback -->
+    
     <string name="settings_playback">ဖွင့်ခြင်း</string>
     <string name="settings_sleep_timer">အိပ်စက် အချိန်တိုင်း</string>
     <string name="settings_sleep_timer_description">သတ်မှတ်ချိန်ကျပြီး နောက် အလိုအလျောက် ရပ်ရန်</string>
@@ -246,7 +247,7 @@
     <string name="settings_record_all_stations">စတေးရှင်းအားလုံးကို ရိုက်ကူးရန်</string>
     <string name="settings_record_all_stations_description">ဖိုင်တူတွင် စတေးရှင်းအသစ်၏ ထုတ်လွှင့်မှုသို့ ပြောင်းပါ</string>
 
-    <!-- Settings - Station Management -->
+    
     <string name="settings_station_management">စတေးရှင်း စီမံခန့်ခွဲမှု</string>
     <string name="settings_import_from_file">ဖိုင်မှ တင်သွင်းရန်</string>
     <string name="settings_import_from_file_description">CSV၊ JSON၊ M3U သို့မဟုတ် PLS မှ တင်သွင်းပါ</string>
@@ -259,7 +260,7 @@
     <string name="settings_export_stations">စတေးရှင်းများကို ထုတ်ယူရန်</string>
     <string name="settings_export_stations_description">သင့်စတေးရှင်းများကို ဖိုင်သို့ ထုတ်ယူပါ</string>
 
-    <!-- Settings - About -->
+    
     <string name="settings_about">အကြောင်း</string>
     <string name="settings_version">ဗားရှင်း 1.5</string>
     <string name="settings_view_github">GitHub တွင် ကြည့်ရန်</string>
@@ -269,7 +270,7 @@
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
     <string name="settings_copy_address">လိပ်စာကို ကူးယူရန်</string>
 
-    <!-- Tor Control Bottom Sheet -->
+    
     <string name="tor_connection_details">ချိတ်ဆက်မှု အသေးစိတ်</string>
     <string name="tor_proxy_host">Proxy လက်ခံဌာန</string>
     <string name="tor_socks_port">SOCKS Port</string>
@@ -278,7 +279,7 @@
     <string name="tor_connect">Tor သို့ ချိတ်ဆက်ရန်</string>
     <string name="tor_open_invizible">InviZible Pro ကို ဖွင့်ရန်</string>
 
-    <!-- Tor Status Messages -->
+    
     <string name="tor_status_connecting">ချိတ်ဆက်နေသည်...</string>
     <string name="tor_status_connected">Tor ချိတ်ဆက်ပြီးပါပြီ</string>
     <string name="tor_status_disconnected">Tor ချိတ်ဆက်မထားပါ</string>
@@ -287,7 +288,7 @@
     <string name="tor_status_leak_warning">Leak သတိပေးချက်</string>
     <string name="tor_status_install_invizible">InviZible Pro ကို တပ်ဆင်ပါ</string>
 
-    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    
     <string name="tor_status_off_description">Tor ချိတ်ဆက်မထားပါ။ ချိတ်ဆက်ရန် တို့ပါ။</string>
     <string name="tor_status_connecting_description">Tor ချိတ်ဆက်နေသည်...</string>
     <string name="tor_status_connected_description">Tor ချိတ်ဆက်ပြီးပါပြီ။ အသေးစိတ်ကြည့်ရန် တို့ပါ။</string>
@@ -323,14 +324,14 @@
     <string name="tor_control_button_open_invizible">InviZible Pro ကို ဖွင့်ပါ</string>
 
 
-    <!-- Add/Edit Radio Dialog -->
+    
     <string name="add_edit_tor_info">ထည့်သွင်းထားသော Tor ကို သုံးနေသည် - proxy config မလိုပါ</string>
     <string name="add_edit_authentication_optional">အထောက်အထား (ရွေးချယ်နိုင်သော)</string>
     <string name="add_edit_advanced_options">အဆင့်မြင့် ရွေးချယ်စရာများ</string>
     <string name="add_edit_cover_art">အဖုံးပုံ</string>
     <string name="add_edit_or_enter_url">သို့မဟုတ် ပုံ URL ကို ထည့်ပါ</string>
 
-    <!-- Input Hints -->
+    
     <string name="hint_station_name">စတေးရှင်း အမည်</string>
     <string name="hint_stream_url">Stream URL</string>
     <string name="hint_genre">အမျိုးအစား</string>
@@ -347,7 +348,7 @@
     <string name="hint_password_optional_caps">စကားဝှက် (ရွေးချယ်နိုင်သော)</string>
     <string name="hint_auth_type">အထောက်အထား အမျိုးအစား</string>
 
-    <!-- Default Values -->
+    
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
@@ -355,7 +356,7 @@
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
-    <!-- Now Playing Fragment -->
+    
     <string name="now_playing_time_placeholder">00:00</string>
     <string name="now_playing_live">တိုက်ရိုက်</string>
     <string name="now_playing_no_station">စတေးရှင်း မဖွင့်ထားပါ</string>
@@ -363,14 +364,14 @@
     <string name="now_playing_volume_title">ရေဒီယို အသံအတိုး</string>
     <string name="now_playing_volume_description">ရေဒီယို ထုတ်လွှင့်မှုကိုသာ ညှိပါ</string>
 
-    <!-- Toast Messages -->
+    
     <string name="toast_session_bandwidth_reset">Session bandwidth ကို ပြန်လည်သတ်မှတ်ပြီးပါပြီ</string>
     <string name="toast_custom_proxy_saved">စိတ်ကြိုက် proxy ဆက်တင်များကို သိမ်းဆည်းပြီးပါပြီ</string>
     <string name="toast_custom_proxy_cleared">စိတ်ကြိုက် proxy ဆက်တင်များကို ရှင်းလင်းပြီးပါပြီ</string>
     <string name="toast_address_copied">လိပ်စာကို clipboard သို့ ကူးယူပြီးပါပြီ</string>
     <string name="toast_using_default_directory">မူလ ဖိုင်တွဲကို သုံးနေသည်</string>
 
-    <!-- Custom Proxy Status Messages -->
+    
     <string name="custom_proxy_status_connected">ချိတ်ဆက်ပြီးပါပြီ</string>
     <string name="custom_proxy_status_configured">Proxy ကို ပြင်ဆင်သတ်မှတ်ပြီးပါပြီ</string>
     <string name="custom_proxy_status_not_configured">ပြင်ဆင်သတ်မှတ်မထားပါ</string>
@@ -378,7 +379,7 @@
     <string name="custom_proxy_status_leak_warning">Leak သတိပေးချက်</string>
     <string name="custom_proxy_status_leak_detail">အတင်းအဓမ္မ ဖွင့်ထားသော်လည်း ပြင်ဆင်သတ်မှတ်မထားပါ</string>
 
-    <!-- Tor Service Notification Messages -->
+    
     <string name="tor_channel_name">Tor ချိတ်ဆက်မှု</string>
     <string name="tor_channel_description">Tor ချိတ်ဆက်မှု အခြေအနေကို ပြသည်</string>
     <string name="tor_notification_disconnected">Tor ချိတ်ဆက်မထားပါ</string>
@@ -392,11 +393,11 @@
     <string name="tor_notification_install_invizible">Tor ပံ့ပိုးမှုအတွက် InviZible Pro ကို တပ်ဆင်ပါ</string>
     <string name="tor_notification_action_stop">Tor ကို ရပ်ရန်</string>
 
-    <!-- Other Error Messages -->
+    
     <string name="error_unknown">မသိသော အမှား</string>
     <string name="folder_custom">စိတ်ကြိုက် ဖိုင်တွဲ</string>
 
-    <!-- AddEditRadioDialog Default Values -->
+    
     <string name="default_genre_other">အခြား</string>
     <string name="default_proxy_none">မရှိပါ</string>
     <string name="default_proxy_i2p">I2P</string>
@@ -411,7 +412,7 @@
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
-    <!-- Security & Privacy -->
+    
     <string name="settings_security_privacy">လုံခြုံရေးနှင့် ကိုယ်ရေးကိုယ်တာ</string>
     <string name="settings_app_lock">အက်ပ် သော့ခတ်မှု</string>
     <string name="settings_app_lock_description">အက်ပ်ကို ဖွင့်ရန် စကားဝှက် သို့မဟုတ် ဇီဝအထောက်အထား လိုအပ်ရန်</string>
@@ -434,7 +435,7 @@
     <string name="settings_database_encryption_password_required_title">အက်ပ် စကားဝှက် လိုအပ်သည်</string>
     <string name="settings_database_encryption_password_required_message">ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုသည် ကုဒ်ဝှက်မှု သော့ကို ဖန်တီးရန် သင့် အက်ပ် စကားဝှက်ကို သုံးသည်။ ဦးစွာ အပေါ်က \"အက်ပ် သော့ခတ်မှု\" ကို ဖွင့်ပြီး အက်ပ် စကားဝှက်ကို သတ်မှတ်ပါ။\n\nသတ်မှတ်ပြီးရင် တူညီသော စကားဝှက်ကို သုံး၍ ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို ဖွင့်နိုင်ပါသည် - သီးခြား စကားဝှက် မလိုပါ။</string>
 
-    <!-- Authentication Dialog -->
+    
     <string name="auth_dialog_title">အက်ပ် စကားဝှက် သတ်မှတ်ရန်</string>
     <string name="auth_dialog_change_title">စကားဝှက် ပြောင်းလဲရန်</string>
     <string name="auth_dialog_change_message">မှတ်ချက်: ဒေတာဘေ့စ် ကုဒ်ဝှက်မှု ဖွင့်ထားရင် စကားဝှက်အသစ်ကို သုံးရန် အလိုအလျောက် အပ်ဒိတ်လုပ်မည်။</string>
@@ -456,7 +457,7 @@
     <string name="auth_decrypting_database">ဒေတာဘေ့စ်ကို ကုဒ်ဖြည်နေသည်…</string>
     <string name="auth_rekeying_database">စကားဝှက်အသစ်ဖြင့် ဒေတာဘေ့စ် ကုဒ်ဝှက်မှုကို အပ်ဒိတ်လုပ်နေသည်…</string>
 
-    <!-- Authentication Activity -->
+    
     <string name="auth_unlock_app">deutsia radio ကို သော့ဖွင့်ပါ</string>
     <string name="auth_enter_password">သင့်စကားဝှက်ကို ထည့်ပါ</string>
     <string name="auth_password_hint">စကားဝှက်</string>
@@ -467,7 +468,7 @@
     <string name="auth_biometric_subtitle">ဆက်လက်လုပ်ဆောင်ရန် အထောက်အထား အတည်ပြုပါ</string>
     <string name="auth_biometric_negative">စကားဝှက် သုံးပါ</string>
 
-    <!-- Delete Confirmation Dialog -->
+    
     <string name="delete_stations_message">%1$d ဘူတာ%2$s ကို ဖျက်ရန် သေချာပါသလား?</string>
     <string name="delete_stations_message_single">%d ဘူတာကို ဖျက်ရန် သေချာပါသလား?</string>
     <string name="delete_stations_message_plural">%d ဘူတာကို ဖျက်ရန် သေချာပါသလား?</string>
@@ -476,7 +477,7 @@
     <string name="deleted_stations_message_single">%d ဘူတာ ဖျက်လိုက်ပါပြီ</string>
     <string name="deleted_stations_message_plural">%d ဘူတာ ဖျက်လိုက်ပါပြီ</string>
 
-    <!-- Proxy Type Labels -->
+    
     <string name="proxy_label_i2p"> • I2P</string>
     <string name="proxy_label_tor"> • Tor</string>
     <string name="proxy_label_custom"> • စိတ်ကြိုက်</string>
@@ -485,7 +486,7 @@
     <string name="proxy_type_custom">စိတ်ကြိုက်</string>
     <string name="proxy_type_none">မရှိပါ</string>
 
-    <!-- Tor Status Messages (TorManager) -->
+    
     <string name="tor_status_not_active">Tor လုပ်ငန်းလည်ပတ်မှု မရှိပါ</string>
     <string name="tor_status_connecting_network">Tor ကွန်ရက်သို့ ချိတ်ဆက်နေသည်...</string>
     <string name="tor_status_connected_via_tor">Tor မှတစ်ဆင့် ချိတ်ဆက်ပြီး</string>
@@ -497,7 +498,7 @@
     <string name="tor_status_detail_tap_to_connect">ချိတ်ဆက်ရန် တို့ပါ</string>
     <string name="tor_status_detail_install_invizible">Play Store သို့မဟုတ် F-Droid မှ InviZible Pro ကို ထည့်သွင်းပါ</string>
 
-    <!-- Settings Fragment Tor/Proxy Status -->
+    
     <string name="settings_tor_disconnected_status">ချိတ်ဆက်မှု ဖြတ်တောက်ထားသည်</string>
     <string name="settings_tor_not_running_detail">Tor လုပ်ဆောင်နေခြင်း မရှိပါ</string>
     <string name="button_start_tor">စတင်ပါ</string>
@@ -519,7 +520,7 @@
     <string name="warning_tor_not_connected_except_i2p">⚠️ Tor ချိတ်ဆက်မထားပါ! Tor ချိတ်ဆက်သည်အထိ I2P မဟုတ်သော စထရင်များ ကျရှုံးလိမ့်မည်။</string>
     <string name="button_off">ပိတ်ထားသည်</string>
 
-    <!-- Import/Export Dialogs -->
+    
     <string name="dialog_import_stations">ဘူတာများ တင်သွင်းပါ</string>
     <string name="import_message">ရေဒီယိုဘူတာများ တင်သွင်းရန် ဖိုင်တစ်ခု ရွေးပါ။\n\nပံ့ပိုးသော ပုံစံများ:\n• CSV\n• JSON\n• M3U သီချင်းစာရင်း\n• PLS သီချင်းစာရင်း</string>
     <string name="button_select_file">ဖိုင်ရွေးပါ</string>
@@ -542,7 +543,7 @@
     <string name="exported_stations_success">ဘူတာ %1$d ခုကို %2$s သို့ တင်ပို့ပြီး</string>
     <string name="export_error_message">တင်ပို့မှု အမှား: %s</string>
 
-    <!-- Recording Error Messages -->
+    
     <string name="recording_error_no_stream">ဖွင့်နေသော စထရင် မရှိပါ</string>
     <string name="recording_error_cannot_create_directory">ဖိုင်တွဲ ဖန်တီး၍ မရပါ</string>
     <string name="recording_error_connection_failed">ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
@@ -555,13 +556,13 @@
     <string name="recording_error_io">I/O အမှား: %s</string>
     <string name="recording_error_generic">အမှား: %s</string>
 
-    <!-- Custom Proxy Messages -->
+    
     <string name="custom_proxy_not_configured_notification">စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်မထားပါ</string>
     <string name="custom_proxy_configured_description">စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်ထားပြီး။ အသေးစိတ် ကြည့်ရန် တို့ပါ။</string>
     <string name="custom_proxy_not_configured_description">စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်မထားပါ။ ပြင်ဆင်ရန် တို့ပါ။</string>
     <string name="custom_proxy_privacy_warning_description">စိတ်ကြိုက် ပရောက်ဆီ အတင်းအကြပ် ဖွင့်ထားသည် သို့သော် ပြင်ဆင်မထားပါ။ ကိုယ်ရေးလုံခြုံမှု အန္တရာယ်ရှိနိုင်သည်။</string>
 
-    <!-- Proxy Configuration Dialog -->
+    
     <string name="dialog_configure_global_proxy">တစ်ကမ္ဘာလုံး စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်ပါ</string>
     <string name="validation_enter_proxy_host">❌ ပရောက်ဆီ ဟိုစ် ထည့်ပါ</string>
     <string name="testing_connection">ချိတ်ဆက်မှု စမ်းသပ်နေသည်...</string>
@@ -573,22 +574,22 @@
     <string name="auth_basic_caps">Basic</string>
     <string name="auth_digest_caps">Digest</string>
 
-    <!-- Reset Bandwidth Dialog -->
+    
     <string name="dialog_reset_session_bandwidth">အစည်းအဝေး bandwidth ပြန်လည်သတ်မှတ်ပါ</string>
     <string name="reset_bandwidth_message">အစည်းအဝေး bandwidth ကောင်တာကို သုညသို့ ပြန်လည်သတ်မှတ်မလား?</string>
 
-    <!-- Browse Filter Messages -->
+    
     <string name="all_filters_applied">စစ်ထုတ်မှု အားလုံး အသုံးပြုပြီးပြီ</string>
 
-    <!-- Database Encryption -->
+    
     <string name="password_change_rekey_failed">စကားဝှက် ပြောင်းလဲပြီးပါပြီ သို့သော် ဒေတာဘေ့စ် ပြန်လည်ကုဒ်ဝှက်မှု မအောင်မြင်ပါ: %s</string>
 
-    <!-- Empty State -->
+    
     <string name="empty_state_title">ဘူတာရုံ မတွေ့ရှိပါ</string>
     <string name="empty_state_message">သင်၏ ပထမဆုံး ဘူတာရုံကို ထည့်ပါ။\nအောက်ပါ ခလုတ်ကို နှိပ်ပါ။</string>
     <string name="empty_state_add_button">ဘူတာရုံ အသစ် ထည့်ပါ</string>
 
-    <!-- Stream Error Messages (Toasts) -->
+    
     <string name="error_stream_failed">ထုတ်လွှင့်မှုသို့ ချိတ်ဆက်ရန် မအောင်မြင်ပါ</string>
     <string name="error_stream_max_retries">အကြိမ်ပေါင်းများစွာ ကြိုးစားပြီးနောက် ချိတ်ဆက်မှု မအောင်မြင်ပါ</string>
     <string name="error_tor_not_connected">Tor ချိတ်ဆက်မထားပါ။ ဤထုတ်လွှင့်မှုကို ဖွင့်ရန် Tor ကို ဖွင့်ပါ။</string>
@@ -596,7 +597,7 @@
     <string name="error_tor_required_for_clearnet">Tor ချိတ်ဆက်မထားပါ။ Force Tor မုဒ်တွင် clearnet ထုတ်လွှင့်မှုများအတွက် Tor လိုအပ်သည်။</string>
     <string name="error_custom_proxy_not_configured">စိတ်ကြိုက် ပရောက်ဆီ စီစဉ်မထားပါ။ ဆက်တင်များတွင် စီစဉ်ပါ။</string>
 
-    <!-- Content Descriptions (Accessibility) -->
+    
     <string name="cd_add_radio_station">ရေဒီယို ဘူတာရုံ ထည့်ပါ</string>
     <string name="cd_embedded_tor">ပါဝင်သော Tor</string>
     <string name="cd_cover_art_preview">အဖုံးပုံ အကြိုကြည့်ရှုခြင်း</string>
@@ -615,4 +616,22 @@
     <string name="cd_like_station">ဘူတာရုံကို အကြိုက်ဆုံးထဲ ထည့်ပါ</string>
     <string name="cd_add_to_library">စာကြည့်တိုက်သို့ ထည့်ပါ</string>
     <string name="cd_stop">ရပ်</string>
+<string name="browse_i2p_stations">I2P Stations</string>
+    <string name="browse_privacy_radio">Privacy Radio</string>
+    <string name="browse_privacy_radio_subtitle">Anonymous radio stations via Tor and I2P</string>
+    <string name="browse_tor_stations">Tor Stations</string>
+    <string name="button_add">Add</string>
+    <string name="custom_proxy_blocked_snackbar">No data leaked — streams are blocked. Configure your proxy below.</string>
+    <string name="custom_proxy_status_proxy_required">Proxy Required</string>
+    <string name="custom_proxy_status_proxy_required_description">Streams are blocked until proxy is configured. Tap to configure.</string>
+    <string name="custom_proxy_status_proxy_required_detail">Streams blocked until configured</string>
+    <string name="failed_to_fetch_stations">Failed to fetch %s stations from server</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
+    <string name="notification_i2p_not_connected">I2P not running - stream blocked</string>
+    <string name="now_playing_connecting">Connecting…</string>
+    <string name="searching">Searching…</string>
+    <string name="settings_color_classic">Classic</string>
+    <string name="settings_color_classic_default">Classic (Default)</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 does not support remote DNS resolution. DNS queries may be resolved locally, which could reveal the domains you access to your ISP. Consider using SOCKS5 for better privacy.</string>
 </resources>

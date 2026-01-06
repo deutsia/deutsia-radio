@@ -1,13 +1,11 @@
-<!--
-    Farsi/Persian (فارسی) Translation
--->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">deutsia radio</string>
     <string name="tab_radios">کتابخانه</string>
     <string name="tab_now_playing">در حال پخش</string>
     <string name="tab_settings">تنظیمات</string>
 
-    <!-- Equalizer -->
+    
     <string name="equalizer">اکولایزر</string>
     <string name="equalizer_no_audio">ابتدا یک ایستگاه را پخش کنید</string>
     <string name="equalizer_not_found">برنامه اکولایزر یافت نشد. برنامه‌ای مانند Wavelet را نصب کنید.</string>
@@ -18,23 +16,23 @@
     <string name="equalizer_bass_boost">تقویت بیس</string>
     <string name="equalizer_surround_sound">صدای فراگیر</string>
 
-    <!-- Sort options -->
+    
     <string name="sort_default">پیش‌فرض</string>
     <string name="sort_name">نام</string>
     <string name="sort_recent">اخیر</string>
     <string name="sort_liked">پسندیده</string>
     <string name="sort_genre">ژانر</string>
 
-    <!-- Search -->
+    
     <string name="search_stations">جستجوی کتابخانه</string>
     <string name="search_countries">جستجوی کشورها…</string>
     <string name="search_genres">جستجوی ژانرها…</string>
 
-    <!-- Genre filter -->
+    
     <string name="genre_all">همه ژانرها</string>
     <string name="filter_by_genre">فیلتر بر اساس ژانر</string>
 
-    <!-- Genre Names -->
+    
     <string name="genre_alternative">آلترناتیو</string>
     <string name="genre_ambient">محیطی</string>
     <string name="genre_blues">بلوز</string>
@@ -68,10 +66,10 @@
     <string name="genre_world">جهانی</string>
     <string name="genre_other">دیگر</string>
 
-     <!-- about -->
+     
     <string name="about_description">deutsia radio یک پخش‌کننده رادیوی چند شبکه‌ای رایگان و متن‌باز است که جریان‌ها از شبکه‌های clearnet، Tor (.onion) و I2P را گرد هم می‌آورد. از ایستگاه‌های مورد علاقه خود در رابط Material You با یکپارچگی InviZible Pro و جلوگیری از نشت قابل پیکربندی لذت ببرید</string>
 
-    <!-- Browse/Discover Stations -->
+    
     <string name="tab_browse">مرور</string>
     <string name="search_radio_browser">جستجو در هزاران ایستگاه…</string>
     <string name="browse_top_voted">پررأی‌ترین</string>
@@ -112,7 +110,7 @@
     <string name="back">بازگشت</string>
     <string name="browse_all_stations">همه ایستگاه‌ها</string>
 
-    <!-- Notification and Status Messages -->
+    
     <string name="notification_connecting">در حال اتصال...</string>
     <string name="notification_paused">متوقف شده</string>
     <string name="notification_playing">در حال پخش</string>
@@ -127,7 +125,7 @@
     <string name="notification_action_pause">توقف</string>
     <string name="notification_action_stop">متوقف کردن</string>
 
-    <!-- Recording Messages -->
+    
     <string name="recording_failed">ضبط ناموفق بود: %s</string>
     <string name="recording_saved">ضبط ذخیره شد: %1$s (%2$dKB)</string>
     <string name="recording_stopping">در حال توقف ضبط...</string>
@@ -135,7 +133,7 @@
     <string name="recording_no_station">ایستگاهی در حال پخش نیست</string>
     <string name="recording_directory_updated">پوشه ضبط به‌روزرسانی شد</string>
 
-    <!-- Dialog Titles and Buttons -->
+    
     <string name="dialog_add_station">افزودن ایستگاه رادیویی</string>
     <string name="dialog_edit_station">ویرایش ایستگاه رادیویی</string>
     <string name="dialog_sort_stations">مرتب‌سازی ایستگاه‌ها</string>
@@ -155,7 +153,7 @@
     <string name="button_choose_image">انتخاب تصویر</string>
     <string name="button_clear">پاک کردن</string>
 
-    <!-- Settings - Appearance -->
+    
     <string name="settings_appearance">ظاهر</string>
     <string name="settings_theme">پوسته</string>
     <string name="settings_theme_description">روشن، تیره یا سیستم را انتخاب کنید</string>
@@ -177,7 +175,7 @@
     <string name="settings_disable_toasts">غیرفعال کردن پیام‌های تست</string>
     <string name="settings_disable_toasts_description">مخفی کردن اعلان‌های بازشو برای هشدارها و خطاها</string>
 
-    <!-- Language Names -->
+    
     <string name="language_choose">انتخاب زبان</string>
     <string name="language_system_default">پیش‌فرض سیستم</string>
     <string name="language_arabic">العربية</string>
@@ -198,7 +196,7 @@
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_chinese">中文</string>
 
-    <!-- Settings - Tor Network -->
+    
     <string name="settings_tor_network">شبکه Tor</string>
     <string name="settings_enable_tor">فعال‌سازی Tor (از طریق InviZible Pro)</string>
     <string name="settings_enable_tor_description">اتصال از طریق شبکه Tor</string>
@@ -211,7 +209,7 @@
     <string name="settings_tor_info">به InviZible Pro نیاز دارد (رایگان از Play Store یا F-Droid). برای دسترسی سریع روی آیکون Tor در نوار ابزار ضربه بزنید.\n\nحالت‌های اجبار هنگامی که Tor در دسترس نیست، اتصالات را مسدود می‌کنند.</string>
     <string name="settings_tor_privacy_notice">حریم خصوصی: بدون فعال‌سازی اجبار Tor، ایستگاه‌های clearnet و تصاویر مستقیماً به اینترنت متصل می‌شوند. ضبط‌ها از همان اتصال جریان استفاده می‌کنند.</string>
 
-    <!-- Settings - Custom Proxy -->
+    
     <string name="settings_custom_proxy">پروکسی سفارشی</string>
     <string name="settings_enable_custom_proxy">فعال‌سازی پروکسی سفارشی</string>
     <string name="settings_enable_custom_proxy_description">استفاده از پروکسی سفارشی برای اتصالات</string>
@@ -223,13 +221,13 @@
     <string name="settings_force_custom_proxy_except_tor_i2p_description">مسیریابی همه ترافیک clearnet از طریق پروکسی سفارشی، اما اجازه دهید ایستگاه‌های Tor و I2P از پروکسی‌های بومی خود استفاده کنند.</string>
     <string name="settings_custom_proxy_privacy_notice">حریم خصوصی: بدون فعال‌سازی اجبار پروکسی سفارشی، ایستگاه‌های clearnet و تصاویر مستقیماً به اینترنت متصل می‌شوند. ضبط‌ها از همان اتصال جریان استفاده می‌کنند.</string>
 
-    <!-- Settings - Bandwidth -->
+    
     <string name="settings_bandwidth_usage">مصرف پهنای باند</string>
     <string name="settings_total_usage">مصرف کل (طول عمر)</string>
     <string name="settings_session_usage">مصرف جلسه</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
-    <!-- Settings - Playback -->
+    
     <string name="settings_playback">پخش</string>
     <string name="settings_sleep_timer">تایمر خواب</string>
     <string name="settings_sleep_timer_description">توقف خودکار پخش پس از زمان تنظیم شده</string>
@@ -249,7 +247,7 @@
     <string name="settings_record_all_stations">ضبط همه ایستگاه‌ها</string>
     <string name="settings_record_all_stations_description">تغییر به جریان ایستگاه جدید در همان فایل</string>
 
-    <!-- Settings - Station Management -->
+    
     <string name="settings_station_management">مدیریت ایستگاه</string>
     <string name="settings_import_from_file">وارد کردن از فایل</string>
     <string name="settings_import_from_file_description">وارد کردن از CSV، JSON، M3U یا PLS</string>
@@ -262,7 +260,7 @@
     <string name="settings_export_stations">خروجی ایستگاه‌ها</string>
     <string name="settings_export_stations_description">خروجی گرفتن ایستگاه‌های خود به فایل</string>
 
-    <!-- Settings - About -->
+    
     <string name="settings_about">درباره</string>
     <string name="settings_version">نسخه 1.5</string>
     <string name="settings_view_github">مشاهده در GitHub</string>
@@ -272,7 +270,7 @@
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
     <string name="settings_copy_address">کپی آدرس</string>
 
-    <!-- Tor Control Bottom Sheet -->
+    
     <string name="tor_connection_details">جزئیات اتصال</string>
     <string name="tor_proxy_host">میزبان پروکسی</string>
     <string name="tor_socks_port">پورت SOCKS</string>
@@ -281,7 +279,7 @@
     <string name="tor_connect">اتصال به Tor</string>
     <string name="tor_open_invizible">باز کردن InviZible Pro</string>
 
-    <!-- Tor Status Messages -->
+    
     <string name="tor_status_connecting">در حال اتصال...</string>
     <string name="tor_status_connected">Tor متصل شد</string>
     <string name="tor_status_disconnected">Tor قطع شد</string>
@@ -290,7 +288,7 @@
     <string name="tor_status_leak_warning">هشدار نشت</string>
     <string name="tor_status_install_invizible">نصب InviZible Pro</string>
 
-    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    
     <string name="tor_status_off_description">Tor قطع است. برای اتصال لمس کنید.</string>
     <string name="tor_status_connecting_description">Tor در حال اتصال است...</string>
     <string name="tor_status_connected_description">Tor متصل است. برای مشاهده جزئیات لمس کنید.</string>
@@ -326,14 +324,14 @@
     <string name="tor_control_button_open_invizible">باز کردن InviZible Pro</string>
 
 
-    <!-- Add/Edit Radio Dialog -->
+    
     <string name="add_edit_tor_info">استفاده از Tor تعبیه شده - نیازی به پیکربندی پروکسی نیست</string>
     <string name="add_edit_authentication_optional">احراز هویت (اختیاری)</string>
     <string name="add_edit_advanced_options">گزینه‌های پیشرفته</string>
     <string name="add_edit_cover_art">تصویر جلد</string>
     <string name="add_edit_or_enter_url">یا URL تصویر را وارد کنید</string>
 
-    <!-- Input Hints -->
+    
     <string name="hint_station_name">نام ایستگاه</string>
     <string name="hint_stream_url">URL جریان</string>
     <string name="hint_genre">ژانر</string>
@@ -350,7 +348,7 @@
     <string name="hint_password_optional_caps">رمز عبور (اختیاری)</string>
     <string name="hint_auth_type">نوع احراز هویت</string>
 
-    <!-- Default Values -->
+    
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
@@ -358,7 +356,7 @@
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
-    <!-- Now Playing Fragment -->
+    
     <string name="now_playing_time_placeholder">00:00</string>
     <string name="now_playing_live">زنده</string>
     <string name="now_playing_no_station">ایستگاهی در حال پخش نیست</string>
@@ -366,14 +364,14 @@
     <string name="now_playing_volume_title">حجم صدای رادیو</string>
     <string name="now_playing_volume_description">فقط جریان رادیو را تنظیم می‌کند</string>
 
-    <!-- Toast Messages -->
+    
     <string name="toast_session_bandwidth_reset">پهنای باند جلسه بازنشانی شد</string>
     <string name="toast_custom_proxy_saved">تنظیمات پروکسی سفارشی ذخیره شد</string>
     <string name="toast_custom_proxy_cleared">تنظیمات پروکسی سفارشی پاک شد</string>
     <string name="toast_address_copied">آدرس به کلیپ‌بورد کپی شد</string>
     <string name="toast_using_default_directory">در حال استفاده از پوشه پیش‌فرض</string>
 
-    <!-- Custom Proxy Status Messages -->
+    
     <string name="custom_proxy_status_connected">متصل</string>
     <string name="custom_proxy_status_configured">پروکسی پیکربندی شد</string>
     <string name="custom_proxy_status_not_configured">پیکربندی نشده</string>
@@ -381,7 +379,7 @@
     <string name="custom_proxy_status_leak_warning">هشدار نشت</string>
     <string name="custom_proxy_status_leak_detail">اجبار فعال اما پیکربندی نشده</string>
 
-    <!-- Tor Service Notification Messages -->
+    
     <string name="tor_channel_name">اتصال Tor</string>
     <string name="tor_channel_description">وضعیت اتصال Tor را نمایش می‌دهد</string>
     <string name="tor_notification_disconnected">Tor قطع شد</string>
@@ -395,11 +393,11 @@
     <string name="tor_notification_install_invizible">لطفاً InviZible Pro را برای پشتیبانی Tor نصب کنید</string>
     <string name="tor_notification_action_stop">توقف Tor</string>
 
-    <!-- Other Error Messages -->
+    
     <string name="error_unknown">خطای ناشناخته</string>
     <string name="folder_custom">پوشه سفارشی</string>
 
-    <!-- AddEditRadioDialog Default Values -->
+    
     <string name="default_genre_other">سایر</string>
     <string name="default_proxy_none">هیچ</string>
     <string name="default_proxy_i2p">I2P</string>
@@ -414,7 +412,7 @@
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
-    <!-- Security & Privacy -->
+    
     <string name="settings_security_privacy">امنیت و حریم خصوصی</string>
     <string name="settings_app_lock">قفل برنامه</string>
     <string name="settings_app_lock_description">نیاز به رمز عبور یا بیومتریک برای باز کردن قفل برنامه</string>
@@ -437,7 +435,7 @@
     <string name="settings_database_encryption_password_required_title">رمز عبور برنامه لازم است</string>
     <string name="settings_database_encryption_password_required_message">رمزنگاری پایگاه داده از رمز عبور برنامه شما برای تولید کلید رمزنگاری استفاده می‌کند. لطفاً ابتدا با فعال‌سازی \"قفل برنامه\" در بالا، رمز عبور برنامه را تنظیم کنید.\n\nپس از تنظیم، می‌توانید رمزنگاری پایگاه داده را با استفاده از همان رمز عبور فعال کنید - نیازی به رمز عبور جداگانه نیست.</string>
 
-    <!-- Authentication Dialog -->
+    
     <string name="auth_dialog_title">تنظیم رمز عبور برنامه</string>
     <string name="auth_dialog_change_title">تغییر رمز عبور</string>
     <string name="auth_dialog_change_message">توجه: اگر رمزنگاری پایگاه داده فعال است، به طور خودکار برای استفاده از رمز عبور جدید به‌روزرسانی می‌شود.</string>
@@ -459,7 +457,7 @@
     <string name="auth_decrypting_database">در حال رمزگشایی پایگاه داده…</string>
     <string name="auth_rekeying_database">در حال به‌روزرسانی رمزنگاری پایگاه داده با رمز عبور جدید…</string>
 
-    <!-- Authentication Activity -->
+    
     <string name="auth_unlock_app">باز کردن قفل deutsia radio</string>
     <string name="auth_enter_password">رمز عبور خود را وارد کنید</string>
     <string name="auth_password_hint">رمز عبور</string>
@@ -470,7 +468,7 @@
     <string name="auth_biometric_subtitle">برای ادامه احراز هویت کنید</string>
     <string name="auth_biometric_negative">استفاده از رمز عبور</string>
 
-    <!-- Delete Confirmation Dialog -->
+    
     <string name="delete_stations_message">آیا مطمئن هستید که می‌خواهید %1$d ایستگاه%2$s را حذف کنید؟</string>
     <string name="delete_stations_message_single">آیا مطمئن هستید که می‌خواهید %d ایستگاه را حذف کنید؟</string>
     <string name="delete_stations_message_plural">آیا مطمئن هستید که می‌خواهید %d ایستگاه را حذف کنید؟</string>
@@ -479,7 +477,7 @@
     <string name="deleted_stations_message_single">%d ایستگاه حذف شد</string>
     <string name="deleted_stations_message_plural">%d ایستگاه حذف شد</string>
 
-    <!-- Proxy Type Labels -->
+    
     <string name="proxy_label_i2p"> • I2P</string>
     <string name="proxy_label_tor"> • Tor</string>
     <string name="proxy_label_custom"> • سفارشی</string>
@@ -488,7 +486,7 @@
     <string name="proxy_type_custom">سفارشی</string>
     <string name="proxy_type_none">هیچ</string>
 
-    <!-- Tor Status Messages (TorManager) -->
+    
     <string name="tor_status_not_active">Tor فعال نیست</string>
     <string name="tor_status_connecting_network">در حال اتصال به شبکه Tor...</string>
     <string name="tor_status_connected_via_tor">از طریق Tor متصل شد</string>
@@ -500,7 +498,7 @@
     <string name="tor_status_detail_tap_to_connect">برای اتصال ضربه بزنید</string>
     <string name="tor_status_detail_install_invizible">InviZible Pro را از Play Store یا F-Droid نصب کنید</string>
 
-    <!-- Settings Fragment Tor/Proxy Status -->
+    
     <string name="settings_tor_disconnected_status">قطع شده</string>
     <string name="settings_tor_not_running_detail">Tor در حال اجرا نیست</string>
     <string name="button_start_tor">شروع</string>
@@ -522,7 +520,7 @@
     <string name="warning_tor_not_connected_except_i2p">⚠️ Tor متصل نیست! پخش‌های غیر I2P تا زمان اتصال Tor ناموفق خواهند بود.</string>
     <string name="button_off">خاموش</string>
 
-    <!-- Import/Export Dialogs -->
+    
     <string name="dialog_import_stations">وارد کردن ایستگاه‌ها</string>
     <string name="import_message">یک فایل برای وارد کردن ایستگاه‌های رادیویی انتخاب کنید.\n\nفرمت‌های پشتیبانی شده:\n• CSV\n• JSON\n• فهرست پخش M3U\n• فهرست پخش PLS</string>
     <string name="button_select_file">انتخاب فایل</string>
@@ -545,7 +543,7 @@
     <string name="exported_stations_success">%1$d ایستگاه به %2$s صادر شد</string>
     <string name="export_error_message">خطای صادر کردن: %s</string>
 
-    <!-- Recording Error Messages -->
+    
     <string name="recording_error_no_stream">هیچ جریانی در حال پخش نیست</string>
     <string name="recording_error_cannot_create_directory">نمی‌توان دایرکتوری ایجاد کرد</string>
     <string name="recording_error_connection_failed">اتصال ناموفق بود</string>
@@ -558,13 +556,13 @@
     <string name="recording_error_io">خطای ورودی/خروجی: %s</string>
     <string name="recording_error_generic">خطا: %s</string>
 
-    <!-- Custom Proxy Messages -->
+    
     <string name="custom_proxy_not_configured_notification">پروکسی سفارشی پیکربندی نشده است</string>
     <string name="custom_proxy_configured_description">پروکسی سفارشی پیکربندی شده است. برای مشاهده جزئیات ضربه بزنید.</string>
     <string name="custom_proxy_not_configured_description">پروکسی سفارشی پیکربندی نشده است. برای پیکربندی ضربه بزنید.</string>
     <string name="custom_proxy_privacy_warning_description">پروکسی سفارشی اجباری فعال است اما پیکربندی نشده. حریم خصوصی ممکن است به خطر بیفتد.</string>
 
-    <!-- Proxy Configuration Dialog -->
+    
     <string name="dialog_configure_global_proxy">پیکربندی پروکسی سفارشی سراسری</string>
     <string name="validation_enter_proxy_host">❌ لطفاً یک میزبان پروکسی وارد کنید</string>
     <string name="testing_connection">آزمایش اتصال...</string>
@@ -576,22 +574,22 @@
     <string name="auth_basic_caps">Basic</string>
     <string name="auth_digest_caps">Digest</string>
 
-    <!-- Reset Bandwidth Dialog -->
+    
     <string name="dialog_reset_session_bandwidth">بازنشانی پهنای باند جلسه</string>
     <string name="reset_bandwidth_message">شمارنده پهنای باند جلسه به صفر بازنشانی شود؟</string>
 
-    <!-- Browse Filter Messages -->
+    
     <string name="all_filters_applied">همه فیلترها از قبل اعمال شده‌اند</string>
 
-    <!-- Database Encryption -->
+    
     <string name="password_change_rekey_failed">رمز عبور تغییر کرد اما رمزگذاری مجدد پایگاه داده ناموفق بود: %s</string>
 
-    <!-- Empty State -->
+    
     <string name="empty_state_title">ایستگاهی یافت نشد</string>
     <string name="empty_state_message">با افزودن اولین ایستگاه خود شروع کنید.\nروی دکمه زیر کلیک کنید.</string>
     <string name="empty_state_add_button">افزودن ایستگاه جدید</string>
 
-    <!-- Stream Error Messages (Toasts) -->
+    
     <string name="error_stream_failed">اتصال به پخش ناموفق بود</string>
     <string name="error_stream_max_retries">اتصال پس از چندین تلاش ناموفق بود</string>
     <string name="error_tor_not_connected">Tor متصل نیست. Tor را فعال کنید تا این پخش را اجرا کنید.</string>
@@ -599,7 +597,7 @@
     <string name="error_tor_required_for_clearnet">Tor متصل نیست. حالت اجباری Tor نیاز به Tor برای پخش‌های clearnet دارد.</string>
     <string name="error_custom_proxy_not_configured">پروکسی سفارشی پیکربندی نشده است. آن را در تنظیمات پیکربندی کنید.</string>
 
-    <!-- Content Descriptions (Accessibility) -->
+    
     <string name="cd_add_radio_station">افزودن ایستگاه رادیویی</string>
     <string name="cd_embedded_tor">Tor تعبیه شده</string>
     <string name="cd_cover_art_preview">پیش‌نمایش تصویر جلد</string>
@@ -618,4 +616,22 @@
     <string name="cd_like_station">افزودن ایستگاه به علاقه‌مندی‌ها</string>
     <string name="cd_add_to_library">افزودن به کتابخانه</string>
     <string name="cd_stop">توقف</string>
+<string name="browse_i2p_stations">I2P Stations</string>
+    <string name="browse_privacy_radio">Privacy Radio</string>
+    <string name="browse_privacy_radio_subtitle">Anonymous radio stations via Tor and I2P</string>
+    <string name="browse_tor_stations">Tor Stations</string>
+    <string name="button_add">Add</string>
+    <string name="custom_proxy_blocked_snackbar">No data leaked — streams are blocked. Configure your proxy below.</string>
+    <string name="custom_proxy_status_proxy_required">Proxy Required</string>
+    <string name="custom_proxy_status_proxy_required_description">Streams are blocked until proxy is configured. Tap to configure.</string>
+    <string name="custom_proxy_status_proxy_required_detail">Streams blocked until configured</string>
+    <string name="failed_to_fetch_stations">Failed to fetch %s stations from server</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
+    <string name="notification_i2p_not_connected">I2P not running - stream blocked</string>
+    <string name="now_playing_connecting">Connecting…</string>
+    <string name="searching">Searching…</string>
+    <string name="settings_color_classic">Classic</string>
+    <string name="settings_color_classic_default">Classic (Default)</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 does not support remote DNS resolution. DNS queries may be resolved locally, which could reveal the domains you access to your ISP. Consider using SOCKS5 for better privacy.</string>
 </resources>

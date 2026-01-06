@@ -1,10 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">deutsia radio</string>
     <string name="tab_radios">लाइब्रेरी</string>
     <string name="tab_now_playing">अभी चल रहा है</string>
     <string name="tab_settings">सेटिंग्स</string>
 
-    <!-- Equalizer -->
+    
     <string name="equalizer">इक्वलाइज़र</string>
     <string name="equalizer_no_audio">पहले एक स्टेशन चलाएं</string>
     <string name="equalizer_not_found">कोई इक्वलाइज़र ऐप नहीं मिला। Wavelet जैसा इक्वलाइज़र ऐप इंस्टॉल करें।</string>
@@ -15,23 +16,23 @@
     <string name="equalizer_bass_boost">बास बूस्टर</string>
     <string name="equalizer_surround_sound">सराउंड साउंड</string>
 
-    <!-- Sort options -->
+    
     <string name="sort_default">डिफ़ॉल्ट</string>
     <string name="sort_name">नाम</string>
     <string name="sort_recent">हाल के</string>
     <string name="sort_liked">पसंदीदा</string>
     <string name="sort_genre">शैली</string>
 
-    <!-- Search -->
+    
     <string name="search_stations">लाइब्रेरी खोजें</string>
     <string name="search_countries">देश खोजें…</string>
     <string name="search_genres">शैली खोजें…</string>
 
-    <!-- Genre filter -->
+    
     <string name="genre_all">सभी शैलियां</string>
     <string name="filter_by_genre">शैली के अनुसार फ़िल्टर करें</string>
 
-    <!-- Genre Names -->
+    
     <string name="genre_alternative">वैकल्पिक</string>
     <string name="genre_ambient">परिवेशीय</string>
     <string name="genre_blues">ब्लूज़</string>
@@ -65,10 +66,10 @@
     <string name="genre_world">विश्व</string>
     <string name="genre_other">अन्य</string>
 
-     <!-- about -->
+     
     <string name="about_description">deutsia radio एक मुफ़्त और ओपन-सोर्स मल्टीनेट रेडियो प्लेयर है जो clearnet, Tor (.onion) और I2P नेटवर्क से स्ट्रीम को एक साथ लाता है। Material You इंटरफ़ेस में InviZible Pro एकीकरण और कॉन्फ़िगर करने योग्य लीक रोकथाम के साथ अपने पसंदीदा स्टेशनों का आनंद लें</string>
 
-    <!-- Browse/Discover Stations -->
+    
     <string name="tab_browse">ब्राउज़ करें</string>
     <string name="search_radio_browser">हजारों स्टेशनों को खोजें…</string>
     <string name="browse_top_voted">सबसे अधिक वोट वाले</string>
@@ -109,7 +110,7 @@
     <string name="back">वापस</string>
     <string name="browse_all_stations">सभी स्टेशन</string>
 
-    <!-- Notification and Status Messages -->
+    
     <string name="notification_connecting">कनेक्ट हो रहा है...</string>
     <string name="notification_paused">रोका गया</string>
     <string name="notification_playing">चल रहा है</string>
@@ -124,7 +125,7 @@
     <string name="notification_action_pause">रोकें</string>
     <string name="notification_action_stop">बंद करें</string>
 
-    <!-- Recording Messages -->
+    
     <string name="recording_failed">रिकॉर्डिंग विफल: %s</string>
     <string name="recording_saved">रिकॉर्डिंग सहेजी गई: %1$s (%2$dKB)</string>
     <string name="recording_stopping">रिकॉर्डिंग बंद हो रही है...</string>
@@ -132,7 +133,7 @@
     <string name="recording_no_station">कोई स्टेशन नहीं चल रहा</string>
     <string name="recording_directory_updated">रिकॉर्डिंग निर्देशिका अपडेट हुई</string>
 
-    <!-- Dialog Titles and Buttons -->
+    
     <string name="dialog_add_station">रेडियो स्टेशन जोड़ें</string>
     <string name="dialog_edit_station">रेडियो स्टेशन संपादित करें</string>
     <string name="dialog_sort_stations">स्टेशन क्रमबद्ध करें</string>
@@ -152,7 +153,7 @@
     <string name="button_choose_image">छवि चुनें</string>
     <string name="button_clear">साफ़ करें</string>
 
-    <!-- Settings - Appearance -->
+    
     <string name="settings_appearance">दिखावट</string>
     <string name="settings_theme">थीम</string>
     <string name="settings_theme_description">हल्का, गहरा या सिस्टम चुनें</string>
@@ -174,7 +175,7 @@
     <string name="settings_disable_toasts">टोस्ट संदेश अक्षम करें</string>
     <string name="settings_disable_toasts_description">चेतावनियों और त्रुटियों के लिए पॉपअप सूचनाएं छिपाएं</string>
 
-    <!-- Language Names -->
+    
     <string name="language_choose">भाषा चुनें</string>
     <string name="language_system_default">सिस्टम डिफ़ॉल्ट</string>
     <string name="language_arabic">العربية</string>
@@ -195,7 +196,7 @@
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_chinese">中文</string>
 
-    <!-- Settings - Tor Network -->
+    
     <string name="settings_tor_network">Tor नेटवर्क</string>
     <string name="settings_enable_tor">Tor सक्षम करें (InviZible Pro के माध्यम से)</string>
     <string name="settings_enable_tor_description">Tor नेटवर्क के माध्यम से कनेक्ट करें</string>
@@ -208,7 +209,7 @@
     <string name="settings_tor_info">InviZible Pro की आवश्यकता है (Play Store या F-Droid से मुफ़्त)। त्वरित पहुंच के लिए टूलबार में Tor आइकन पर टैप करें।\n\nफ़ोर्स मोड Tor उपलब्ध न होने पर कनेक्शन ब्लॉक करते हैं।</string>
     <string name="settings_tor_privacy_notice">गोपनीयता: Tor फ़ोर्स सक्षम किए बिना, clearnet स्टेशन और चित्र सीधे इंटरनेट से कनेक्ट होते हैं। रिकॉर्डिंग स्ट्रीम के समान कनेक्शन का उपयोग करती हैं।</string>
 
-    <!-- Settings - Custom Proxy -->
+    
     <string name="settings_custom_proxy">कस्टम प्रॉक्सी</string>
     <string name="settings_enable_custom_proxy">कस्टम प्रॉक्सी सक्षम करें</string>
     <string name="settings_enable_custom_proxy_description">कनेक्शन के लिए कस्टम प्रॉक्सी का उपयोग करें</string>
@@ -220,13 +221,13 @@
     <string name="settings_force_custom_proxy_except_tor_i2p_description">सभी clearnet ट्रैफ़िक को कस्टम प्रॉक्सी के माध्यम से रूट करें, लेकिन Tor और I2P स्टेशनों को उनके मूल प्रॉक्सी का उपयोग करने दें।</string>
     <string name="settings_custom_proxy_privacy_notice">गोपनीयता: कस्टम प्रॉक्सी फ़ोर्स सक्षम किए बिना, clearnet स्टेशन और चित्र सीधे इंटरनेट से कनेक्ट होते हैं। रिकॉर्डिंग स्ट्रीम के समान कनेक्शन का उपयोग करती हैं।</string>
 
-    <!-- Settings - Bandwidth -->
+    
     <string name="settings_bandwidth_usage">बैंडविड्थ उपयोग</string>
     <string name="settings_total_usage">कुल उपयोग (जीवनकाल)</string>
     <string name="settings_session_usage">सत्र उपयोग</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
-    <!-- Settings - Playback -->
+    
     <string name="settings_playback">प्लेबैक</string>
     <string name="settings_sleep_timer">स्लीप टाइमर</string>
     <string name="settings_sleep_timer_description">निर्धारित समय के बाद स्वचालित रूप से प्लेबैक बंद करें</string>
@@ -246,7 +247,7 @@
     <string name="settings_record_all_stations">सभी स्टेशन रिकॉर्ड करें</string>
     <string name="settings_record_all_stations_description">एक ही फ़ाइल में नए स्टेशन की स्ट्रीम पर स्विच करें</string>
 
-    <!-- Settings - Station Management -->
+    
     <string name="settings_station_management">स्टेशन प्रबंधन</string>
     <string name="settings_import_from_file">फ़ाइल से आयात करें</string>
     <string name="settings_import_from_file_description">CSV, JSON, M3U या PLS से आयात करें</string>
@@ -259,7 +260,7 @@
     <string name="settings_export_stations">स्टेशन निर्यात करें</string>
     <string name="settings_export_stations_description">अपने स्टेशनों को फ़ाइल में निर्यात करें</string>
 
-    <!-- Settings - About -->
+    
     <string name="settings_about">के बारे में</string>
     <string name="settings_version">संस्करण 1.5</string>
     <string name="settings_view_github">GitHub पर देखें</string>
@@ -269,7 +270,7 @@
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
     <string name="settings_copy_address">पता कॉपी करें</string>
 
-    <!-- Tor Control Bottom Sheet -->
+    
     <string name="tor_connection_details">कनेक्शन विवरण</string>
     <string name="tor_proxy_host">प्रॉक्सी होस्ट</string>
     <string name="tor_socks_port">SOCKS पोर्ट</string>
@@ -278,7 +279,7 @@
     <string name="tor_connect">Tor से कनेक्ट करें</string>
     <string name="tor_open_invizible">InviZible Pro खोलें</string>
 
-    <!-- Tor Status Messages -->
+    
     <string name="tor_status_connecting">कनेक्ट हो रहा है...</string>
     <string name="tor_status_connected">Tor कनेक्ट किया गया</string>
     <string name="tor_status_disconnected">Tor डिसकनेक्ट किया गया</string>
@@ -287,7 +288,7 @@
     <string name="tor_status_leak_warning">लीक चेतावनी</string>
     <string name="tor_status_install_invizible">InviZible Pro इंस्टॉल करें</string>
 
-    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    
     <string name="tor_status_off_description">Tor डिसकनेक्ट है। कनेक्ट करने के लिए टैप करें।</string>
     <string name="tor_status_connecting_description">Tor कनेक्ट हो रहा है...</string>
     <string name="tor_status_connected_description">Tor कनेक्ट है। विवरण देखने के लिए टैप करें।</string>
@@ -322,14 +323,14 @@
     <string name="tor_control_button_install">InviZible Pro इंस्टॉल करें</string>
     <string name="tor_control_button_open_invizible">InviZible Pro खोलें</string>
 
-    <!-- Add/Edit Radio Dialog -->
+    
     <string name="add_edit_tor_info">एम्बेडेड Tor का उपयोग - कोई प्रॉक्सी कॉन्फ़िगरेशन आवश्यक नहीं</string>
     <string name="add_edit_authentication_optional">प्रमाणीकरण (वैकल्पिक)</string>
     <string name="add_edit_advanced_options">उन्नत विकल्प</string>
     <string name="add_edit_cover_art">कवर आर्ट</string>
     <string name="add_edit_or_enter_url">या छवि URL दर्ज करें</string>
 
-    <!-- Input Hints -->
+    
     <string name="hint_station_name">स्टेशन का नाम</string>
     <string name="hint_stream_url">स्ट्रीम URL</string>
     <string name="hint_genre">शैली</string>
@@ -346,7 +347,7 @@
     <string name="hint_password_optional_caps">पासवर्ड (वैकल्पिक)</string>
     <string name="hint_auth_type">प्रमाणीकरण प्रकार</string>
 
-    <!-- Default Values -->
+    
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
@@ -354,7 +355,7 @@
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
-    <!-- Now Playing Fragment -->
+    
     <string name="now_playing_time_placeholder">00:00</string>
     <string name="now_playing_live">लाइव</string>
     <string name="now_playing_no_station">कोई स्टेशन नहीं चल रहा</string>
@@ -362,14 +363,14 @@
     <string name="now_playing_volume_title">रेडियो वॉल्यूम</string>
     <string name="now_playing_volume_description">केवल रेडियो स्ट्रीम समायोजित करता है</string>
 
-    <!-- Toast Messages -->
+    
     <string name="toast_session_bandwidth_reset">सत्र बैंडविड्थ रीसेट</string>
     <string name="toast_custom_proxy_saved">कस्टम प्रॉक्सी सेटिंग्स सहेजी गईं</string>
     <string name="toast_custom_proxy_cleared">कस्टम प्रॉक्सी सेटिंग्स साफ़ हुईं</string>
     <string name="toast_address_copied">पता क्लिपबोर्ड पर कॉपी किया गया</string>
     <string name="toast_using_default_directory">डिफ़ॉल्ट निर्देशिका का उपयोग किया जा रहा है</string>
 
-    <!-- Custom Proxy Status Messages -->
+    
     <string name="custom_proxy_status_connected">कनेक्ट किया गया</string>
     <string name="custom_proxy_status_configured">प्रॉक्सी कॉन्फ़िगर किया गया</string>
     <string name="custom_proxy_status_not_configured">कॉन्फ़िगर नहीं किया गया</string>
@@ -377,7 +378,7 @@
     <string name="custom_proxy_status_leak_warning">लीक चेतावनी</string>
     <string name="custom_proxy_status_leak_detail">फ़ोर्स सक्षम लेकिन कॉन्फ़िगर नहीं</string>
 
-    <!-- Tor Service Notification Messages -->
+    
     <string name="tor_channel_name">Tor कनेक्शन</string>
     <string name="tor_channel_description">Tor कनेक्शन स्थिति दिखाता है</string>
     <string name="tor_notification_disconnected">Tor डिसकनेक्ट किया गया</string>
@@ -391,11 +392,11 @@
     <string name="tor_notification_install_invizible">कृपया Tor समर्थन के लिए InviZible Pro इंस्टॉल करें</string>
     <string name="tor_notification_action_stop">Tor बंद करें</string>
 
-    <!-- Other Error Messages -->
+    
     <string name="error_unknown">अज्ञात त्रुटि</string>
     <string name="folder_custom">कस्टम फ़ोल्डर</string>
 
-    <!-- AddEditRadioDialog Default Values -->
+    
     <string name="default_genre_other">अन्य</string>
     <string name="default_proxy_none">कोई नहीं</string>
     <string name="default_proxy_i2p">I2P</string>
@@ -410,7 +411,7 @@
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
-    <!-- Security & Privacy -->
+    
     <string name="settings_security_privacy">सुरक्षा और गोपनीयता</string>
     <string name="settings_app_lock">ऐप लॉक</string>
     <string name="settings_app_lock_description">ऐप अनलॉक करने के लिए पासवर्ड या बायोमेट्रिक चाहिए</string>
@@ -433,7 +434,7 @@
     <string name="settings_database_encryption_password_required_title">ऐप पासवर्ड आवश्यक</string>
     <string name="settings_database_encryption_password_required_message">डेटाबेस एन्क्रिप्शन एन्क्रिप्शन कुंजी उत्पन्न करने के लिए आपके ऐप पासवर्ड का उपयोग करता है। कृपया पहले ऊपर \"ऐप लॉक\" सक्षम करके एक ऐप पासवर्ड सेट करें।\n\nएक बार सेट हो जाने पर, आप उसी पासवर्ड का उपयोग करके डेटाबेस एन्क्रिप्शन सक्षम कर सकते हैं - कोई अलग पासवर्ड आवश्यक नहीं।</string>
 
-    <!-- Authentication Dialog -->
+    
     <string name="auth_dialog_title">ऐप पासवर्ड सेट करें</string>
     <string name="auth_dialog_change_title">पासवर्ड बदलें</string>
     <string name="auth_dialog_change_message">नोट: यदि डेटाबेस एन्क्रिप्शन सक्षम है, तो इसे स्वचालित रूप से नए पासवर्ड का उपयोग करने के लिए अपडेट किया जाएगा।</string>
@@ -455,7 +456,7 @@
     <string name="auth_decrypting_database">डेटाबेस डिक्रिप्ट हो रहा है…</string>
     <string name="auth_rekeying_database">नए पासवर्ड के साथ डेटाबेस एन्क्रिप्शन अपडेट हो रहा है…</string>
 
-    <!-- Authentication Activity -->
+    
     <string name="auth_unlock_app">deutsia radio अनलॉक करें</string>
     <string name="auth_enter_password">अपना पासवर्ड दर्ज करें</string>
     <string name="auth_password_hint">पासवर्ड</string>
@@ -466,7 +467,7 @@
     <string name="auth_biometric_subtitle">जारी रखने के लिए प्रमाणीकरण करें</string>
     <string name="auth_biometric_negative">पासवर्ड उपयोग करें</string>
 
-    <!-- Delete Confirmation Dialog -->
+    
     <string name="delete_stations_message">क्या आप वाकई %1$d स्टेशन%2$s को हटाना चाहते हैं?</string>
     <string name="delete_stations_message_single">क्या आप वाकई %d स्टेशन को हटाना चाहते हैं?</string>
     <string name="delete_stations_message_plural">क्या आप वाकई %d स्टेशन को हटाना चाहते हैं?</string>
@@ -475,7 +476,7 @@
     <string name="deleted_stations_message_single">%d स्टेशन हटा दिया गया</string>
     <string name="deleted_stations_message_plural">%d स्टेशन हटा दिए गए</string>
 
-    <!-- Proxy Type Labels -->
+    
     <string name="proxy_label_i2p"> • I2P</string>
     <string name="proxy_label_tor"> • Tor</string>
     <string name="proxy_label_custom"> • कस्टम</string>
@@ -484,7 +485,7 @@
     <string name="proxy_type_custom">कस्टम</string>
     <string name="proxy_type_none">कोई नहीं</string>
 
-    <!-- Tor Status Messages (TorManager) -->
+    
     <string name="tor_status_not_active">Tor सक्रिय नहीं है</string>
     <string name="tor_status_connecting_network">Tor नेटवर्क से कनेक्ट हो रहा है...</string>
     <string name="tor_status_connected_via_tor">Tor के माध्यम से कनेक्ट किया गया</string>
@@ -496,7 +497,7 @@
     <string name="tor_status_detail_tap_to_connect">कनेक्ट करने के लिए टैप करें</string>
     <string name="tor_status_detail_install_invizible">Play Store या F-Droid से InviZible Pro इंस्टॉल करें</string>
 
-    <!-- Settings Fragment Tor/Proxy Status -->
+    
     <string name="settings_tor_disconnected_status">डिस्कनेक्ट किया गया</string>
     <string name="settings_tor_not_running_detail">Tor चल नहीं रहा है</string>
     <string name="button_start_tor">शुरू करें</string>
@@ -518,7 +519,7 @@
     <string name="warning_tor_not_connected_except_i2p">⚠️ Tor कनेक्ट नहीं है! Tor कनेक्ट होने तक गैर-I2P स्ट्रीम विफल हो जाएंगे।</string>
     <string name="button_off">बंद</string>
 
-    <!-- Import/Export Dialogs -->
+    
     <string name="dialog_import_stations">स्टेशन आयात करें</string>
     <string name="import_message">रेडियो स्टेशन आयात करने के लिए एक फ़ाइल चुनें।\n\nसमर्थित प्रारूप:\n• CSV\n• JSON\n• M3U प्लेलिस्ट\n• PLS प्लेलिस्ट</string>
     <string name="button_select_file">फ़ाइल चुनें</string>
@@ -541,7 +542,7 @@
     <string name="exported_stations_success">%1$d स्टेशन %2$s में निर्यात किए गए</string>
     <string name="export_error_message">निर्यात त्रुटि: %s</string>
 
-    <!-- Recording Error Messages -->
+    
     <string name="recording_error_no_stream">कोई स्ट्रीम नहीं चल रहा है</string>
     <string name="recording_error_cannot_create_directory">डायरेक्टरी नहीं बनाई जा सकती</string>
     <string name="recording_error_connection_failed">कनेक्शन विफल</string>
@@ -554,13 +555,13 @@
     <string name="recording_error_io">I/O त्रुटि: %s</string>
     <string name="recording_error_generic">त्रुटि: %s</string>
 
-    <!-- Custom Proxy Messages -->
+    
     <string name="custom_proxy_not_configured_notification">कस्टम प्रॉक्सी कॉन्फ़िगर नहीं है</string>
     <string name="custom_proxy_configured_description">कस्टम प्रॉक्सी कॉन्फ़िगर है। विवरण देखने के लिए टैप करें।</string>
     <string name="custom_proxy_not_configured_description">कस्टम प्रॉक्सी कॉन्फ़िगर नहीं है। कॉन्फ़िगर करने के लिए टैप करें।</string>
     <string name="custom_proxy_privacy_warning_description">फ़ोर्स कस्टम प्रॉक्सी सक्षम है लेकिन कॉन्फ़िगर नहीं है। गोपनीयता खतरे में हो सकती है।</string>
 
-    <!-- Proxy Configuration Dialog -->
+    
     <string name="dialog_configure_global_proxy">वैश्विक कस्टम प्रॉक्सी कॉन्फ़िगर करें</string>
     <string name="validation_enter_proxy_host">❌ कृपया एक प्रॉक्सी होस्ट दर्ज करें</string>
     <string name="testing_connection">कनेक्शन परीक्षण हो रहा है...</string>
@@ -572,22 +573,22 @@
     <string name="auth_basic_caps">Basic</string>
     <string name="auth_digest_caps">Digest</string>
 
-    <!-- Reset Bandwidth Dialog -->
+    
     <string name="dialog_reset_session_bandwidth">सत्र बैंडविड्थ रीसेट करें</string>
     <string name="reset_bandwidth_message">सत्र बैंडविड्थ काउंटर को शून्य पर रीसेट करें?</string>
 
-    <!-- Browse Filter Messages -->
+    
     <string name="all_filters_applied">सभी फ़िल्टर पहले से लागू हैं</string>
 
-    <!-- Database Encryption -->
+    
     <string name="password_change_rekey_failed">पासवर्ड बदल गया लेकिन डेटाबेस पुन: एन्क्रिप्ट करने में विफल: %s</string>
 
-    <!-- Empty State -->
+    
     <string name="empty_state_title">कोई स्टेशन नहीं मिला</string>
     <string name="empty_state_message">अपना पहला स्टेशन जोड़कर शुरू करें।\nनीचे दिए गए बटन पर क्लिक करें।</string>
     <string name="empty_state_add_button">नया स्टेशन जोड़ें</string>
 
-    <!-- Stream Error Messages (Toasts) -->
+    
     <string name="error_stream_failed">स्ट्रीम से कनेक्ट करने में विफल</string>
     <string name="error_stream_max_retries">कई प्रयासों के बाद कनेक्शन विफल</string>
     <string name="error_tor_not_connected">Tor कनेक्ट नहीं है। इस स्ट्रीम को चलाने के लिए Tor सक्षम करें।</string>
@@ -595,7 +596,7 @@
     <string name="error_tor_required_for_clearnet">Tor कनेक्ट नहीं है। फोर्स Tor मोड के लिए क्लियरनेट स्ट्रीम में Tor आवश्यक है।</string>
     <string name="error_custom_proxy_not_configured">कस्टम प्रॉक्सी कॉन्फ़िगर नहीं है। सेटिंग्स में कॉन्फ़िगर करें।</string>
 
-    <!-- Content Descriptions (Accessibility) -->
+    
     <string name="cd_add_radio_station">रेडियो स्टेशन जोड़ें</string>
     <string name="cd_embedded_tor">एम्बेडेड Tor</string>
     <string name="cd_cover_art_preview">कवर आर्ट पूर्वावलोकन</string>
@@ -614,4 +615,22 @@
     <string name="cd_like_station">स्टेशन को पसंदीदा में जोड़ें</string>
     <string name="cd_add_to_library">लाइब्रेरी में जोड़ें</string>
     <string name="cd_stop">रोकें</string>
+<string name="browse_i2p_stations">I2P Stations</string>
+    <string name="browse_privacy_radio">Privacy Radio</string>
+    <string name="browse_privacy_radio_subtitle">Anonymous radio stations via Tor and I2P</string>
+    <string name="browse_tor_stations">Tor Stations</string>
+    <string name="button_add">Add</string>
+    <string name="custom_proxy_blocked_snackbar">No data leaked — streams are blocked. Configure your proxy below.</string>
+    <string name="custom_proxy_status_proxy_required">Proxy Required</string>
+    <string name="custom_proxy_status_proxy_required_description">Streams are blocked until proxy is configured. Tap to configure.</string>
+    <string name="custom_proxy_status_proxy_required_detail">Streams blocked until configured</string>
+    <string name="failed_to_fetch_stations">Failed to fetch %s stations from server</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
+    <string name="notification_i2p_not_connected">I2P not running - stream blocked</string>
+    <string name="now_playing_connecting">Connecting…</string>
+    <string name="searching">Searching…</string>
+    <string name="settings_color_classic">Classic</string>
+    <string name="settings_color_classic_default">Classic (Default)</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 does not support remote DNS resolution. DNS queries may be resolved locally, which could reveal the domains you access to your ISP. Consider using SOCKS5 for better privacy.</string>
 </resources>

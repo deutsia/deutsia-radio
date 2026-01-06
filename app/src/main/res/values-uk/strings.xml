@@ -1,13 +1,11 @@
-<!--
-    Ukrainian (Українська) Translation
--->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">deutsia radio</string>
     <string name="tab_radios">Бібліотека</string>
     <string name="tab_now_playing">Зараз грає</string>
     <string name="tab_settings">Налаштування</string>
 
-    <!-- Equalizer -->
+    
     <string name="equalizer">Еквалайзер</string>
     <string name="equalizer_no_audio">Спочатку запустіть станцію</string>
     <string name="equalizer_not_found">Додаток еквалайзера не знайдено. Встановіть еквалайзер, наприклад Wavelet.</string>
@@ -18,23 +16,23 @@
     <string name="equalizer_bass_boost">Підсилення басів</string>
     <string name="equalizer_surround_sound">Об\'ємний звук</string>
 
-    <!-- Sort options -->
+    
     <string name="sort_default">За замовчуванням</string>
     <string name="sort_name">За назвою</string>
     <string name="sort_recent">Нещодавні</string>
     <string name="sort_liked">Улюблені</string>
     <string name="sort_genre">За жанром</string>
 
-    <!-- Search -->
+    
     <string name="search_stations">Пошук у бібліотеці</string>
     <string name="search_countries">Пошук країн…</string>
     <string name="search_genres">Пошук жанрів…</string>
 
-    <!-- Genre filter -->
+    
     <string name="genre_all">Усі жанри</string>
     <string name="filter_by_genre">Фільтр за жанром</string>
 
-    <!-- Genre Names -->
+    
     <string name="genre_alternative">Альтернатива</string>
     <string name="genre_ambient">Ембієнт</string>
     <string name="genre_blues">Блюз</string>
@@ -68,10 +66,10 @@
     <string name="genre_world">Світова</string>
     <string name="genre_other">Інше</string>
 
-     <!-- about -->
+     
     <string name="about_description">deutsia radio — це безплатний радіоплеєр з відкритим кодом, який об\'єднує потоки з clearnet, Tor (.onion) та I2P мереж. Насолоджуйтесь улюбленими станціями в Material You інтерфейсі з інтеграцією InviZible Pro та налаштованим запобіганням витоків</string>
 
-    <!-- Browse/Discover Stations -->
+    
     <string name="tab_browse">Огляд</string>
     <string name="search_radio_browser">Пошук серед тисяч станцій…</string>
     <string name="browse_top_voted">Найпопулярніші</string>
@@ -112,7 +110,7 @@
     <string name="back">Назад</string>
     <string name="browse_all_stations">Усі станції</string>
 
-    <!-- Notification and Status Messages -->
+    
     <string name="notification_connecting">Підключення...</string>
     <string name="notification_paused">Призупинено</string>
     <string name="notification_playing">Відтворення</string>
@@ -127,7 +125,7 @@
     <string name="notification_action_pause">Пауза</string>
     <string name="notification_action_stop">Стоп</string>
 
-    <!-- Recording Messages -->
+    
     <string name="recording_failed">Помилка запису: %s</string>
     <string name="recording_saved">Запис збережено: %1$s (%2$dКБ)</string>
     <string name="recording_stopping">Зупинка запису...</string>
@@ -135,7 +133,7 @@
     <string name="recording_no_station">Станція не відтворюється</string>
     <string name="recording_directory_updated">Каталог запису оновлено</string>
 
-    <!-- Dialog Titles and Buttons -->
+    
     <string name="dialog_add_station">Додати радіостанцію</string>
     <string name="dialog_edit_station">Редагувати радіостанцію</string>
     <string name="dialog_sort_stations">Сортування станцій</string>
@@ -155,7 +153,7 @@
     <string name="button_choose_image">Вибрати зображення</string>
     <string name="button_clear">Очистити</string>
 
-    <!-- Settings - Appearance -->
+    
     <string name="settings_appearance">Зовнішній вигляд</string>
     <string name="settings_theme">Тема</string>
     <string name="settings_theme_description">Виберіть світлу, темну або системну</string>
@@ -177,7 +175,7 @@
     <string name="settings_disable_toasts">Вимкнути спливаючі повідомлення</string>
     <string name="settings_disable_toasts_description">Приховати спливаючі сповіщення про попередження та помилки</string>
 
-    <!-- Language Names -->
+    
     <string name="language_choose">Вибрати мову</string>
     <string name="language_system_default">Системна</string>
     <string name="language_arabic">العربية</string>
@@ -198,7 +196,7 @@
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_chinese">中文</string>
 
-    <!-- Settings - Tor Network -->
+    
     <string name="settings_tor_network">Мережа Tor</string>
     <string name="settings_enable_tor">Увімкнути Tor (через InviZible Pro)</string>
     <string name="settings_enable_tor_description">Підключатися через мережу Tor</string>
@@ -211,7 +209,7 @@
     <string name="settings_tor_info">Потрібен InviZible Pro (безплатно з Play Store або F-Droid). Натисніть іконку Tor на панелі інструментів для швидкого доступу.\n\nРежими примусу блокують з\'єднання, коли Tor недоступний.</string>
     <string name="settings_tor_privacy_notice">Конфіденційність: Без увімкненого примусового Tor, clearnet станції та зображення підключаються безпосередньо до інтернету. Записи використовують те саме з\'єднання, що й потік.</string>
 
-    <!-- Settings - Custom Proxy -->
+    
     <string name="settings_custom_proxy">Власний проксі</string>
     <string name="settings_enable_custom_proxy">Увімкнути власний проксі</string>
     <string name="settings_enable_custom_proxy_description">Використовувати власний проксі для з\'єднань</string>
@@ -223,13 +221,13 @@
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Маршрутизувати весь clearnet трафік через власний проксі, але дозволяти Tor та I2P станціям використовувати їх власні проксі.</string>
     <string name="settings_custom_proxy_privacy_notice">Конфіденційність: Без увімкненого примусового власного проксі, clearnet станції та зображення підключаються безпосередньо до інтернету. Записи використовують те саме з\'єднання, що й потік.</string>
 
-    <!-- Settings - Bandwidth -->
+    
     <string name="settings_bandwidth_usage">Використання трафіку</string>
     <string name="settings_total_usage">Загальне використання (за весь час)</string>
     <string name="settings_session_usage">Використання сесії</string>
     <string name="settings_bandwidth_zero">0 Б</string>
 
-    <!-- Settings - Playback -->
+    
     <string name="settings_playback">Відтворення</string>
     <string name="settings_sleep_timer">Таймер сну</string>
     <string name="settings_sleep_timer_description">Автозупинка відтворення через встановлений час</string>
@@ -249,7 +247,7 @@
     <string name="settings_record_all_stations">Записувати всі станції</string>
     <string name="settings_record_all_stations_description">Переключатися на потік нової станції в тому ж файлі</string>
 
-    <!-- Settings - Station Management -->
+    
     <string name="settings_station_management">Керування станціями</string>
     <string name="settings_import_from_file">Імпорт з файлу</string>
     <string name="settings_import_from_file_description">Імпорт з CSV, JSON, M3U або PLS</string>
@@ -262,7 +260,7 @@
     <string name="settings_export_stations">Експорт станцій</string>
     <string name="settings_export_stations_description">Експортувати ваші станції у файл</string>
 
-    <!-- Settings - About -->
+    
     <string name="settings_about">Про програму</string>
     <string name="settings_version">Версія 1.5</string>
     <string name="settings_view_github">Переглянути на GitHub</string>
@@ -272,7 +270,7 @@
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
     <string name="settings_copy_address">Копіювати адресу</string>
 
-    <!-- Tor Control Bottom Sheet -->
+    
     <string name="tor_connection_details">Деталі з\'єднання</string>
     <string name="tor_proxy_host">Хост проксі</string>
     <string name="tor_socks_port">Порт SOCKS</string>
@@ -281,7 +279,7 @@
     <string name="tor_connect">Підключитися до Tor</string>
     <string name="tor_open_invizible">Відкрити InviZible Pro</string>
 
-    <!-- Tor Status Messages -->
+    
     <string name="tor_status_connecting">Підключення...</string>
     <string name="tor_status_connected">Tor підключено</string>
     <string name="tor_status_disconnected">Tor відключено</string>
@@ -290,7 +288,7 @@
     <string name="tor_status_leak_warning">Попередження про витік</string>
     <string name="tor_status_install_invizible">Встановити InviZible Pro</string>
 
-    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    
     <string name="tor_status_off_description">Tor відключено. Натисніть для підключення.</string>
     <string name="tor_status_connecting_description">Tor підключається...</string>
     <string name="tor_status_connected_description">Tor підключено. Натисніть для перегляду деталей.</string>
@@ -326,14 +324,14 @@
     <string name="tor_control_button_open_invizible">Відкрити InviZible Pro</string>
 
 
-    <!-- Add/Edit Radio Dialog -->
+    
     <string name="add_edit_tor_info">Використовується вбудований Tor - налаштування проксі не потрібне</string>
     <string name="add_edit_authentication_optional">Автентифікація (необов\'язково)</string>
     <string name="add_edit_advanced_options">Розширені параметри</string>
     <string name="add_edit_cover_art">Обкладинка</string>
     <string name="add_edit_or_enter_url">Або введіть URL зображення</string>
 
-    <!-- Input Hints -->
+    
     <string name="hint_station_name">Назва станції</string>
     <string name="hint_stream_url">URL потоку</string>
     <string name="hint_genre">Жанр</string>
@@ -350,7 +348,7 @@
     <string name="hint_password_optional_caps">Пароль (необов\'язково)</string>
     <string name="hint_auth_type">Тип автентифікації</string>
 
-    <!-- Default Values -->
+    
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
@@ -358,7 +356,7 @@
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 дБ</string>
 
-    <!-- Now Playing Fragment -->
+    
     <string name="now_playing_time_placeholder">00:00</string>
     <string name="now_playing_live">НАЖИВО</string>
     <string name="now_playing_no_station">Станція не відтворюється</string>
@@ -366,14 +364,14 @@
     <string name="now_playing_volume_title">Гучність радіо</string>
     <string name="now_playing_volume_description">Регулює лише потік радіо</string>
 
-    <!-- Toast Messages -->
+    
     <string name="toast_session_bandwidth_reset">Трафік сесії скинуто</string>
     <string name="toast_custom_proxy_saved">Налаштування власного проксі збережено</string>
     <string name="toast_custom_proxy_cleared">Налаштування власного проксі очищено</string>
     <string name="toast_address_copied">Адресу скопійовано в буфер обміну</string>
     <string name="toast_using_default_directory">Використовується каталог за замовчуванням</string>
 
-    <!-- Custom Proxy Status Messages -->
+    
     <string name="custom_proxy_status_connected">Підключено</string>
     <string name="custom_proxy_status_configured">Проксі налаштовано</string>
     <string name="custom_proxy_status_not_configured">Не налаштовано</string>
@@ -381,7 +379,7 @@
     <string name="custom_proxy_status_leak_warning">Попередження про витік</string>
     <string name="custom_proxy_status_leak_detail">Примус увімкнено, але не налаштовано</string>
 
-    <!-- Tor Service Notification Messages -->
+    
     <string name="tor_channel_name">З\'єднання Tor</string>
     <string name="tor_channel_description">Показує статус з\'єднання Tor</string>
     <string name="tor_notification_disconnected">Tor відключено</string>
@@ -395,11 +393,11 @@
     <string name="tor_notification_install_invizible">Будь ласка, встановіть InviZible Pro для підтримки Tor</string>
     <string name="tor_notification_action_stop">Зупинити Tor</string>
 
-    <!-- Other Error Messages -->
+    
     <string name="error_unknown">Невідома помилка</string>
     <string name="folder_custom">Власна папка</string>
 
-    <!-- AddEditRadioDialog Default Values -->
+    
     <string name="default_genre_other">Інше</string>
     <string name="default_proxy_none">Немає</string>
     <string name="default_proxy_i2p">I2P</string>
@@ -414,7 +412,7 @@
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
-    <!-- Security & Privacy -->
+    
     <string name="settings_security_privacy">Безпека та приватність</string>
     <string name="settings_app_lock">Блокування додатка</string>
     <string name="settings_app_lock_description">Вимагати пароль або біометрію для розблокування додатка</string>
@@ -437,7 +435,7 @@
     <string name="settings_database_encryption_password_required_title">Потрібен пароль додатка</string>
     <string name="settings_database_encryption_password_required_message">Шифрування бази даних використовує ваш пароль додатка для генерації ключа шифрування. Спочатку встановіть пароль додатка, увімкнувши \"Блокування додатка\" вище.\n\nПісля встановлення ви зможете увімкнути шифрування бази даних, використовуючи той самий пароль - окремий пароль не потрібен.</string>
 
-    <!-- Authentication Dialog -->
+    
     <string name="auth_dialog_title">Встановити пароль додатка</string>
     <string name="auth_dialog_change_title">Змінити пароль</string>
     <string name="auth_dialog_change_message">Примітка: Якщо шифрування бази даних увімкнено, воно буде автоматично оновлено для використання нового пароля.</string>
@@ -459,7 +457,7 @@
     <string name="auth_decrypting_database">Розшифрування бази даних…</string>
     <string name="auth_rekeying_database">Оновлення шифрування бази даних новим паролем…</string>
 
-    <!-- Authentication Activity -->
+    
     <string name="auth_unlock_app">Розблокувати deutsia radio</string>
     <string name="auth_enter_password">Введіть ваш пароль</string>
     <string name="auth_password_hint">Пароль</string>
@@ -470,7 +468,7 @@
     <string name="auth_biometric_subtitle">Автентифікуйтеся для продовження</string>
     <string name="auth_biometric_negative">Використати пароль</string>
 
-    <!-- Delete Confirmation Dialog -->
+    
     <string name="delete_stations_message">Ви впевнені, що хочете видалити %1$d станці%2$s?</string>
     <string name="delete_stations_message_single">Ви впевнені, що хочете видалити %d станцію?</string>
     <string name="delete_stations_message_plural">Ви впевнені, що хочете видалити %d станцій?</string>
@@ -479,7 +477,7 @@
     <string name="deleted_stations_message_single">Видалена %d станція</string>
     <string name="deleted_stations_message_plural">Видалено %d станцій</string>
 
-    <!-- Proxy Type Labels -->
+    
     <string name="proxy_label_i2p"> • I2P</string>
     <string name="proxy_label_tor"> • Tor</string>
     <string name="proxy_label_custom"> • Користувацький</string>
@@ -488,7 +486,7 @@
     <string name="proxy_type_custom">Користувацький</string>
     <string name="proxy_type_none">Немає</string>
 
-    <!-- Tor Status Messages (TorManager) -->
+    
     <string name="tor_status_not_active">Tor не активний</string>
     <string name="tor_status_connecting_network">Підключення до мережі Tor...</string>
     <string name="tor_status_connected_via_tor">Підключено через Tor</string>
@@ -500,7 +498,7 @@
     <string name="tor_status_detail_tap_to_connect">Торкніться для підключення</string>
     <string name="tor_status_detail_install_invizible">Встановіть InviZible Pro з Play Store або F-Droid</string>
 
-    <!-- Settings Fragment Tor/Proxy Status -->
+    
     <string name="settings_tor_disconnected_status">Відключено</string>
     <string name="settings_tor_not_running_detail">Tor не запущено</string>
     <string name="button_start_tor">Запустити</string>
@@ -522,7 +520,7 @@
     <string name="warning_tor_not_connected_except_i2p">⚠️ Tor не підключено! Не-I2P трансляції будуть недоступні до підключення Tor.</string>
     <string name="button_off">Вимк</string>
 
-    <!-- Import/Export Dialogs -->
+    
     <string name="dialog_import_stations">Імпорт станцій</string>
     <string name="import_message">Виберіть файл для імпорту радіостанцій.\n\nПідтримувані формати:\n• CSV\n• JSON\n• Плейлист M3U\n• Плейлист PLS</string>
     <string name="button_select_file">Вибрати файл</string>
@@ -545,7 +543,7 @@
     <string name="exported_stations_success">Експортовано %1$d станцій до %2$s</string>
     <string name="export_error_message">Помилка експорту: %s</string>
 
-    <!-- Recording Error Messages -->
+    
     <string name="recording_error_no_stream">Немає потоку, що відтворюється</string>
     <string name="recording_error_cannot_create_directory">Неможливо створити директорію</string>
     <string name="recording_error_connection_failed">Не вдалося підключитися</string>
@@ -558,13 +556,13 @@
     <string name="recording_error_io">Помилка вводу/виводу: %s</string>
     <string name="recording_error_generic">Помилка: %s</string>
 
-    <!-- Custom Proxy Messages -->
+    
     <string name="custom_proxy_not_configured_notification">Користувацький проксі не налаштовано</string>
     <string name="custom_proxy_configured_description">Користувацький проксі налаштовано. Торкніться для перегляду деталей.</string>
     <string name="custom_proxy_not_configured_description">Користувацький проксі не налаштовано. Торкніться для налаштування.</string>
     <string name="custom_proxy_privacy_warning_description">Примусовий користувацький проксі увімкнено, але не налаштовано. Конфіденційність може бути під загрозою.</string>
 
-    <!-- Proxy Configuration Dialog -->
+    
     <string name="dialog_configure_global_proxy">Налаштування глобального користувацького проксі</string>
     <string name="validation_enter_proxy_host">❌ Будь ласка, введіть хост проксі</string>
     <string name="testing_connection">Перевірка з\'єднання...</string>
@@ -576,22 +574,22 @@
     <string name="auth_basic_caps">Basic</string>
     <string name="auth_digest_caps">Digest</string>
 
-    <!-- Reset Bandwidth Dialog -->
+    
     <string name="dialog_reset_session_bandwidth">Скидання трафіку сесії</string>
     <string name="reset_bandwidth_message">Скинути лічильник трафіку сесії до нуля?</string>
 
-    <!-- Browse Filter Messages -->
+    
     <string name="all_filters_applied">Усі фільтри вже застосовано</string>
 
-    <!-- Database Encryption -->
+    
     <string name="password_change_rekey_failed">Пароль змінено, але не вдалося перешифрувати базу даних: %s</string>
 
-    <!-- Empty State -->
+    
     <string name="empty_state_title">Станцій не знайдено</string>
     <string name="empty_state_message">Почніть з додавання першої станції.\nНатисніть кнопку нижче.</string>
     <string name="empty_state_add_button">Додати нову станцію</string>
 
-    <!-- Stream Error Messages (Toasts) -->
+    
     <string name="error_stream_failed">Не вдалося підключитися до потоку</string>
     <string name="error_stream_max_retries">Підключення не вдалося після кількох спроб</string>
     <string name="error_tor_not_connected">Tor не підключено. Увімкніть Tor для відтворення цього потоку.</string>
@@ -599,7 +597,7 @@
     <string name="error_tor_required_for_clearnet">Tor не підключено. Примусовий режим Tor вимагає Tor для звичайних потоків.</string>
     <string name="error_custom_proxy_not_configured">Користувацький проксі не налаштовано. Налаштуйте його в Налаштуваннях.</string>
 
-    <!-- Content Descriptions (Accessibility) -->
+    
     <string name="cd_add_radio_station">Додати радіостанцію</string>
     <string name="cd_embedded_tor">Вбудований Tor</string>
     <string name="cd_cover_art_preview">Попередній перегляд обкладинки</string>
@@ -618,4 +616,22 @@
     <string name="cd_like_station">Додати станцію до обраних</string>
     <string name="cd_add_to_library">Додати до бібліотеки</string>
     <string name="cd_stop">Зупинити</string>
+<string name="browse_i2p_stations">I2P Stations</string>
+    <string name="browse_privacy_radio">Privacy Radio</string>
+    <string name="browse_privacy_radio_subtitle">Anonymous radio stations via Tor and I2P</string>
+    <string name="browse_tor_stations">Tor Stations</string>
+    <string name="button_add">Add</string>
+    <string name="custom_proxy_blocked_snackbar">No data leaked — streams are blocked. Configure your proxy below.</string>
+    <string name="custom_proxy_status_proxy_required">Proxy Required</string>
+    <string name="custom_proxy_status_proxy_required_description">Streams are blocked until proxy is configured. Tap to configure.</string>
+    <string name="custom_proxy_status_proxy_required_detail">Streams blocked until configured</string>
+    <string name="failed_to_fetch_stations">Failed to fetch %s stations from server</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
+    <string name="notification_i2p_not_connected">I2P not running - stream blocked</string>
+    <string name="now_playing_connecting">Connecting…</string>
+    <string name="searching">Searching…</string>
+    <string name="settings_color_classic">Classic</string>
+    <string name="settings_color_classic_default">Classic (Default)</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 does not support remote DNS resolution. DNS queries may be resolved locally, which could reveal the domains you access to your ISP. Consider using SOCKS5 for better privacy.</string>
 </resources>

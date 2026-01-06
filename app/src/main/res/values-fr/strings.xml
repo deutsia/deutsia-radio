@@ -1,20 +1,11 @@
-<!--
-    French (Français) Translation
-
-    Instructions:
-    - Translate only the text between the tags, NOT the name attributes
-    - Keep formatting placeholders like %s, %d intact
-    - Escape apostrophes: don\'t
-    - Do not translate: "deutsia radio", "Orbot", "Material You", technical terms
-    - See TRANSLATION_GUIDE.md for complete guidelines
--->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">deutsia radio</string>
     <string name="tab_radios">Bibliothèque</string>
     <string name="tab_now_playing">En lecture</string>
     <string name="tab_settings">Paramètres</string>
 
-    <!-- Equalizer -->
+    
     <string name="equalizer">Égaliseur</string>
     <string name="equalizer_no_audio">Lancez d\'abord une station</string>
     <string name="equalizer_not_found">Aucune application d\'égaliseur trouvée. Installez une application d\'égaliseur comme Wavelet.</string>
@@ -25,23 +16,23 @@
     <string name="equalizer_bass_boost">Amplificateur de basses</string>
     <string name="equalizer_surround_sound">Son surround</string>
 
-    <!-- Sort options -->
+    
     <string name="sort_default">Par défaut</string>
     <string name="sort_name">Nom</string>
     <string name="sort_recent">Récentes</string>
     <string name="sort_liked">Favoris</string>
     <string name="sort_genre">Genre</string>
 
-    <!-- Search -->
+    
     <string name="search_stations">Rechercher dans la bibliothèque</string>
     <string name="search_countries">Rechercher des pays…</string>
     <string name="search_genres">Rechercher des genres…</string>
 
-    <!-- Genre filter -->
+    
     <string name="genre_all">Tous les genres</string>
     <string name="filter_by_genre">Filtrer par genre</string>
 
-    <!-- Genre Names -->
+    
     <string name="genre_alternative">Alternative</string>
     <string name="genre_ambient">Ambient</string>
     <string name="genre_blues">Blues</string>
@@ -75,10 +66,10 @@
     <string name="genre_world">Monde</string>
     <string name="genre_other">Autre</string>
 
-     <!-- about -->
+     
     <string name="about_description">deutsia radio est un lecteur radio multiréseau gratuit et open source qui rassemble les flux du clearnet, de Tor (.onion) et des réseaux I2P. Profitez de vos stations préférées dans une interface Material You avec intégration InviZible Pro et prévention des fuites configurable</string>
 
-    <!-- Browse/Discover Stations -->
+    
     <string name="tab_browse">Parcourir</string>
     <string name="search_radio_browser">Rechercher parmi des milliers de stations…</string>
     <string name="browse_top_voted">Les mieux notées</string>
@@ -119,7 +110,7 @@
     <string name="back">Retour</string>
     <string name="browse_all_stations">Toutes les stations</string>
 
-    <!-- Notification and Status Messages -->
+    
     <string name="notification_connecting">Connexion...</string>
     <string name="notification_paused">En pause</string>
     <string name="notification_playing">Lecture en cours</string>
@@ -134,7 +125,7 @@
     <string name="notification_action_pause">Pause</string>
     <string name="notification_action_stop">Arrêter</string>
 
-    <!-- Recording Messages -->
+    
     <string name="recording_failed">Échec de l\'enregistrement : %s</string>
     <string name="recording_saved">Enregistrement sauvegardé : %1$s (%2$dKo)</string>
     <string name="recording_stopping">Arrêt de l\'enregistrement...</string>
@@ -142,7 +133,7 @@
     <string name="recording_no_station">Aucune station en lecture</string>
     <string name="recording_directory_updated">Répertoire d\'enregistrement mis à jour</string>
 
-    <!-- Dialog Titles and Buttons -->
+    
     <string name="dialog_add_station">Ajouter une station</string>
     <string name="dialog_edit_station">Modifier la station</string>
     <string name="dialog_sort_stations">Trier les stations</string>
@@ -162,7 +153,7 @@
     <string name="button_choose_image">Choisir une image</string>
     <string name="button_clear">Effacer</string>
 
-    <!-- Settings - Appearance -->
+    
     <string name="settings_appearance">Apparence</string>
     <string name="settings_theme">Thème</string>
     <string name="settings_theme_description">Choisissez clair, sombre ou système</string>
@@ -184,7 +175,7 @@
     <string name="settings_disable_toasts">Désactiver les messages toast</string>
     <string name="settings_disable_toasts_description">Masquer les notifications pour les avertissements et erreurs</string>
 
-    <!-- Language Names -->
+    
     <string name="language_choose">Choisir la langue</string>
     <string name="language_system_default">Par défaut du système</string>
     <string name="language_arabic">العربية</string>
@@ -205,7 +196,7 @@
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_chinese">中文</string>
 
-    <!-- Settings - Tor Network -->
+    
     <string name="settings_tor_network">Réseau Tor</string>
     <string name="settings_enable_tor">Activer Tor (via InviZible Pro)</string>
     <string name="settings_enable_tor_description">Se connecter via le réseau Tor</string>
@@ -218,7 +209,7 @@
     <string name="settings_tor_info">Nécessite InviZible Pro (gratuit sur Play Store ou F-Droid). Utilisez le mode proxy pour une meilleure compatibilité. Appuyez sur l\'icône Tor dans la barre d\'outils pour un accès rapide.\n\nLes modes forcés bloquent les connexions lorsque Tor n\'est pas disponible.</string>
     <string name="settings_tor_privacy_notice">Confidentialité : Sans forcer Tor activé, les stations clearnet et les images se connectent directement à Internet. Les enregistrements utilisent la même connexion que le flux.</string>
 
-    <!-- Settings - Custom Proxy -->
+    
     <string name="settings_custom_proxy">Proxy personnalisé</string>
     <string name="settings_enable_custom_proxy">Activer le proxy personnalisé</string>
     <string name="settings_enable_custom_proxy_description">Utiliser un proxy personnalisé pour les connexions</string>
@@ -230,13 +221,13 @@
     <string name="settings_force_custom_proxy_except_tor_i2p_description">Acheminer tout le trafic clearnet via le proxy personnalisé, mais autoriser les stations Tor et I2P à utiliser leurs proxys natifs.</string>
     <string name="settings_custom_proxy_privacy_notice">Confidentialité : Sans forcer le proxy personnalisé activé, les stations clearnet et les images se connectent directement à Internet. Les enregistrements utilisent la même connexion que le flux.</string>
 
-    <!-- Settings - Bandwidth -->
+    
     <string name="settings_bandwidth_usage">Utilisation de la bande passante</string>
     <string name="settings_total_usage">Utilisation totale (à vie)</string>
     <string name="settings_session_usage">Utilisation de la session</string>
     <string name="settings_bandwidth_zero">0 o</string>
 
-    <!-- Settings - Playback -->
+    
     <string name="settings_playback">Lecture</string>
     <string name="settings_sleep_timer">Minuteur de veille</string>
     <string name="settings_sleep_timer_description">Arrêter automatiquement la lecture après le temps défini</string>
@@ -256,7 +247,7 @@
     <string name="settings_record_all_stations">Enregistrer toutes les stations</string>
     <string name="settings_record_all_stations_description">Basculer vers le flux de la nouvelle station dans le même fichier</string>
 
-    <!-- Settings - Station Management -->
+    
     <string name="settings_station_management">Gestion des stations</string>
     <string name="settings_import_from_file">Importer depuis un fichier</string>
     <string name="settings_import_from_file_description">Importer depuis CSV, JSON, M3U ou PLS</string>
@@ -269,7 +260,7 @@
     <string name="settings_export_stations">Exporter les stations</string>
     <string name="settings_export_stations_description">Exporter vos stations vers un fichier</string>
 
-    <!-- Settings - About -->
+    
     <string name="settings_about">À propos</string>
     <string name="settings_version">Version 1.5</string>
     <string name="settings_view_github">Voir sur GitHub</string>
@@ -279,7 +270,7 @@
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
     <string name="settings_copy_address">Copier l\'adresse</string>
 
-    <!-- Tor Control Bottom Sheet -->
+    
     <string name="tor_connection_details">Détails de connexion</string>
     <string name="tor_proxy_host">Hôte proxy</string>
     <string name="tor_socks_port">Port SOCKS</string>
@@ -288,7 +279,7 @@
     <string name="tor_connect">Se connecter à Tor</string>
     <string name="tor_open_invizible">Ouvrir InviZible Pro</string>
 
-    <!-- Tor Status Messages -->
+    
     <string name="tor_status_connecting">Connexion...</string>
     <string name="tor_status_connected">Tor connecté</string>
     <string name="tor_status_disconnected">Tor déconnecté</string>
@@ -297,7 +288,7 @@
     <string name="tor_status_leak_warning">Alerte de fuite</string>
     <string name="tor_status_install_invizible">Installer InviZible Pro</string>
 
-    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    
     <string name="tor_status_off_description">Tor est déconnecté. Appuyez pour connecter.</string>
     <string name="tor_status_connecting_description">Tor se connecte...</string>
     <string name="tor_status_connected_description">Tor est connecté. Appuyez pour voir les détails.</string>
@@ -332,14 +323,14 @@
     <string name="tor_control_button_install">Installer InviZible Pro</string>
     <string name="tor_control_button_open_invizible">Ouvrir InviZible Pro</string>
 
-    <!-- Add/Edit Radio Dialog -->
+    
     <string name="add_edit_tor_info">Utilisation de Tor intégré - aucune configuration de proxy nécessaire</string>
     <string name="add_edit_authentication_optional">Authentification (facultatif)</string>
     <string name="add_edit_advanced_options">Options avancées</string>
     <string name="add_edit_cover_art">Pochette</string>
     <string name="add_edit_or_enter_url">Ou saisir l\'URL de l\'image</string>
 
-    <!-- Input Hints -->
+    
     <string name="hint_station_name">Nom de la station</string>
     <string name="hint_stream_url">URL du flux</string>
     <string name="hint_genre">Genre</string>
@@ -356,7 +347,7 @@
     <string name="hint_password_optional_caps">Mot de passe (facultatif)</string>
     <string name="hint_auth_type">Type d\'authentification</string>
 
-    <!-- Default Values -->
+    
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
@@ -364,7 +355,7 @@
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
-    <!-- Now Playing Fragment -->
+    
     <string name="now_playing_time_placeholder">00:00</string>
     <string name="now_playing_live">EN DIRECT</string>
     <string name="now_playing_no_station">Aucune station en lecture</string>
@@ -372,14 +363,14 @@
     <string name="now_playing_volume_title">Volume de la radio</string>
     <string name="now_playing_volume_description">Ajuste uniquement le flux radio</string>
 
-    <!-- Toast Messages -->
+    
     <string name="toast_session_bandwidth_reset">Bande passante de session réinitialisée</string>
     <string name="toast_custom_proxy_saved">Paramètres du proxy personnalisé enregistrés</string>
     <string name="toast_custom_proxy_cleared">Paramètres du proxy personnalisé effacés</string>
     <string name="toast_address_copied">Adresse copiée dans le presse-papiers</string>
     <string name="toast_using_default_directory">Utilisation du répertoire par défaut</string>
 
-    <!-- Custom Proxy Status Messages -->
+    
     <string name="custom_proxy_status_connected">Connecté</string>
     <string name="custom_proxy_status_configured">Proxy configuré</string>
     <string name="custom_proxy_status_not_configured">Non configuré</string>
@@ -387,7 +378,7 @@
     <string name="custom_proxy_status_leak_warning">Alerte de fuite</string>
     <string name="custom_proxy_status_leak_detail">Force activée mais non configurée</string>
 
-    <!-- Tor Service Notification Messages -->
+    
     <string name="tor_channel_name">Connexion Tor</string>
     <string name="tor_channel_description">Affiche l\'état de connexion Tor</string>
     <string name="tor_notification_disconnected">Tor déconnecté</string>
@@ -401,11 +392,11 @@
     <string name="tor_notification_install_invizible">Veuillez installer InviZible Pro pour le support Tor</string>
     <string name="tor_notification_action_stop">Arrêter Tor</string>
 
-    <!-- Other Error Messages -->
+    
     <string name="error_unknown">Erreur inconnue</string>
     <string name="folder_custom">Dossier personnalisé</string>
 
-    <!-- AddEditRadioDialog Default Values -->
+    
     <string name="default_genre_other">Autre</string>
     <string name="default_proxy_none">Aucun</string>
     <string name="default_proxy_i2p">I2P</string>
@@ -420,7 +411,7 @@
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
-    <!-- Security & Privacy -->
+    
     <string name="settings_security_privacy">Sécurité &amp; confidentialité</string>
     <string name="settings_app_lock">Verrouillage de l\'application</string>
     <string name="settings_app_lock_description">Exiger un mot de passe ou une biométrie pour déverrouiller l\'application</string>
@@ -443,7 +434,7 @@
     <string name="settings_database_encryption_password_required_title">Mot de passe d\'application requis</string>
     <string name="settings_database_encryption_password_required_message">Le chiffrement de la base de données utilise votre mot de passe d\'application pour générer la clé de chiffrement. Veuillez d\'abord définir un mot de passe d\'application en activant « Verrouillage de l\'application » ci-dessus.\n\nUne fois défini, vous pouvez activer le chiffrement de la base de données en utilisant le même mot de passe - aucun mot de passe séparé n\'est nécessaire.</string>
 
-    <!-- Authentication Dialog -->
+    
     <string name="auth_dialog_title">Définir le mot de passe de l\'application</string>
     <string name="auth_dialog_change_title">Changer le mot de passe</string>
     <string name="auth_dialog_change_message">Remarque : Si le chiffrement de la base de données est activé, il sera automatiquement mis à jour pour utiliser le nouveau mot de passe.</string>
@@ -465,7 +456,7 @@
     <string name="auth_decrypting_database">Déchiffrement de la base de données…</string>
     <string name="auth_rekeying_database">Mise à jour du chiffrement de la base de données avec le nouveau mot de passe…</string>
 
-    <!-- Authentication Activity -->
+    
     <string name="auth_unlock_app">Déverrouiller deutsia radio</string>
     <string name="auth_enter_password">Entrez votre mot de passe</string>
     <string name="auth_password_hint">Mot de passe</string>
@@ -476,7 +467,7 @@
     <string name="auth_biometric_subtitle">Authentifiez-vous pour continuer</string>
     <string name="auth_biometric_negative">Utiliser le mot de passe</string>
 
-    <!-- Delete Confirmation Dialog -->
+    
     <string name="delete_stations_message">Voulez-vous vraiment supprimer %1$d station%2$s ?</string>
     <string name="delete_stations_message_single">Voulez-vous vraiment supprimer %d station ?</string>
     <string name="delete_stations_message_plural">Voulez-vous vraiment supprimer %d stations ?</string>
@@ -485,7 +476,7 @@
     <string name="deleted_stations_message_single">%d station supprimée</string>
     <string name="deleted_stations_message_plural">%d stations supprimées</string>
 
-    <!-- Proxy Type Labels -->
+    
     <string name="proxy_label_i2p"> • I2P</string>
     <string name="proxy_label_tor"> • Tor</string>
     <string name="proxy_label_custom"> • Personnalisé</string>
@@ -494,7 +485,7 @@
     <string name="proxy_type_custom">Personnalisé</string>
     <string name="proxy_type_none">Aucun</string>
 
-    <!-- Tor Status Messages (TorManager) -->
+    
     <string name="tor_status_not_active">Tor n\'est pas actif</string>
     <string name="tor_status_connecting_network">Connexion au réseau Tor...</string>
     <string name="tor_status_connected_via_tor">Connecté via Tor</string>
@@ -506,7 +497,7 @@
     <string name="tor_status_detail_tap_to_connect">Appuyez pour vous connecter</string>
     <string name="tor_status_detail_install_invizible">Installez InviZible Pro depuis Play Store ou F-Droid</string>
 
-    <!-- Settings Fragment Tor/Proxy Status -->
+    
     <string name="settings_tor_disconnected_status">Déconnecté</string>
     <string name="settings_tor_not_running_detail">Tor n\'est pas en cours d\'exécution</string>
     <string name="button_start_tor">Démarrer</string>
@@ -528,7 +519,7 @@
     <string name="warning_tor_not_connected_except_i2p">⚠️ Tor non connecté ! Les flux non-I2P échoueront jusqu\'à la connexion de Tor.</string>
     <string name="button_off">Désactivé</string>
 
-    <!-- Import/Export Dialogs -->
+    
     <string name="dialog_import_stations">Importer des stations</string>
     <string name="import_message">Sélectionnez un fichier pour importer des stations de radio.\n\nFormats pris en charge :\n• CSV\n• JSON\n• Playlist M3U\n• Playlist PLS</string>
     <string name="button_select_file">Sélectionner un fichier</string>
@@ -551,7 +542,7 @@
     <string name="exported_stations_success">%1$d station(s) exportée(s) vers %2$s</string>
     <string name="export_error_message">Erreur d\'exportation : %s</string>
 
-    <!-- Recording Error Messages -->
+    
     <string name="recording_error_no_stream">Aucun flux en lecture</string>
     <string name="recording_error_cannot_create_directory">Impossible de créer le répertoire</string>
     <string name="recording_error_connection_failed">Échec de connexion</string>
@@ -564,13 +555,13 @@
     <string name="recording_error_io">Erreur E/S : %s</string>
     <string name="recording_error_generic">Erreur : %s</string>
 
-    <!-- Custom Proxy Messages -->
+    
     <string name="custom_proxy_not_configured_notification">Proxy personnalisé non configuré</string>
     <string name="custom_proxy_configured_description">Le proxy personnalisé est configuré. Appuyez pour voir les détails.</string>
     <string name="custom_proxy_not_configured_description">Le proxy personnalisé n\'est pas configuré. Appuyez pour configurer.</string>
     <string name="custom_proxy_privacy_warning_description">Proxy personnalisé forcé activé mais non configuré. La confidentialité peut être compromise.</string>
 
-    <!-- Proxy Configuration Dialog -->
+    
     <string name="dialog_configure_global_proxy">Configurer le proxy personnalisé global</string>
     <string name="validation_enter_proxy_host">❌ Veuillez saisir un hôte proxy</string>
     <string name="testing_connection">Test de connexion...</string>
@@ -582,22 +573,22 @@
     <string name="auth_basic_caps">Basic</string>
     <string name="auth_digest_caps">Digest</string>
 
-    <!-- Reset Bandwidth Dialog -->
+    
     <string name="dialog_reset_session_bandwidth">Réinitialiser la bande passante de session</string>
     <string name="reset_bandwidth_message">Réinitialiser le compteur de bande passante de session à zéro ?</string>
 
-    <!-- Browse Filter Messages -->
+    
     <string name="all_filters_applied">Tous les filtres sont déjà appliqués</string>
 
-    <!-- Database Encryption -->
+    
     <string name="password_change_rekey_failed">Mot de passe modifié mais échec de la re-clé de la base de données : %s</string>
 
-    <!-- Empty State -->
+    
     <string name="empty_state_title">Aucune station trouvée</string>
     <string name="empty_state_message">Commencez par ajouter votre première station.\nCliquez sur le bouton ci-dessous.</string>
     <string name="empty_state_add_button">Ajouter une nouvelle station</string>
 
-    <!-- Stream Error Messages (Toasts) -->
+    
     <string name="error_stream_failed">Échec de connexion au flux</string>
     <string name="error_stream_max_retries">Connexion échouée après plusieurs tentatives</string>
     <string name="error_tor_not_connected">Tor n\'est pas connecté. Activez Tor pour lire ce flux.</string>
@@ -605,7 +596,7 @@
     <string name="error_tor_required_for_clearnet">Tor n\'est pas connecté. Le mode Tor forcé nécessite Tor pour les flux clearnet.</string>
     <string name="error_custom_proxy_not_configured">Proxy personnalisé non configuré. Configurez-le dans les Paramètres.</string>
 
-    <!-- Content Descriptions (Accessibility) -->
+    
     <string name="cd_add_radio_station">Ajouter une station de radio</string>
     <string name="cd_embedded_tor">Tor intégré</string>
     <string name="cd_cover_art_preview">Aperçu de la pochette</string>
@@ -624,4 +615,22 @@
     <string name="cd_like_station">Ajouter aux favoris</string>
     <string name="cd_add_to_library">Ajouter à la bibliothèque</string>
     <string name="cd_stop">Arrêter</string>
+<string name="browse_i2p_stations">I2P Stations</string>
+    <string name="browse_privacy_radio">Privacy Radio</string>
+    <string name="browse_privacy_radio_subtitle">Anonymous radio stations via Tor and I2P</string>
+    <string name="browse_tor_stations">Tor Stations</string>
+    <string name="button_add">Add</string>
+    <string name="custom_proxy_blocked_snackbar">No data leaked — streams are blocked. Configure your proxy below.</string>
+    <string name="custom_proxy_status_proxy_required">Proxy Required</string>
+    <string name="custom_proxy_status_proxy_required_description">Streams are blocked until proxy is configured. Tap to configure.</string>
+    <string name="custom_proxy_status_proxy_required_detail">Streams blocked until configured</string>
+    <string name="failed_to_fetch_stations">Failed to fetch %s stations from server</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
+    <string name="notification_i2p_not_connected">I2P not running - stream blocked</string>
+    <string name="now_playing_connecting">Connecting…</string>
+    <string name="searching">Searching…</string>
+    <string name="settings_color_classic">Classic</string>
+    <string name="settings_color_classic_default">Classic (Default)</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 does not support remote DNS resolution. DNS queries may be resolved locally, which could reveal the domains you access to your ISP. Consider using SOCKS5 for better privacy.</string>
 </resources>
