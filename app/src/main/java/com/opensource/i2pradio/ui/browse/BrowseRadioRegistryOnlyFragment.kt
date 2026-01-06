@@ -339,6 +339,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 } else {
                     loadingContainer.visibility = View.GONE
                 }
+                swipeRefresh.isRefreshing = isLoading && resultsAdapter.itemCount > 0
             }
         }
 
