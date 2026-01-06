@@ -40,6 +40,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     // Discovery mode views
     private lateinit var discoveryContainer: View
+    private lateinit var discoveryContentContainer: LinearLayout
     private lateinit var torStationsRecyclerView: RecyclerView
     private lateinit var torStationsSeeAll: TextView
     private lateinit var i2pStationsRecyclerView: RecyclerView
@@ -66,6 +67,10 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     private var isInResultsMode = false
     private var currentStationType: StationType = StationType.TOR
 
+    // Miniplayer spacing for dynamic bottom padding
+    private var miniplayerSpacing = 0
+    private var browseBasePadding = 0
+
     private enum class StationType { TOR, I2P }
 
     // Broadcast receiver for like state changes
@@ -90,14 +95,20 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         findViews(view)
         setupAdapters()
         setupResultsMode()
+        setupSharedViews()
         observeViewModel()
 
         return view
     }
 
     private fun findViews(view: View) {
+        // Get miniplayer spacing dimensions
+        miniplayerSpacing = resources.getDimensionPixelSize(R.dimen.miniplayer_spacing)
+        browseBasePadding = resources.getDimensionPixelSize(R.dimen.browse_base_padding)
+
         // Discovery views
         discoveryContainer = view.findViewById(R.id.discoveryContainer)
+        discoveryContentContainer = view.findViewById(R.id.discoveryContentContainer)
         torStationsRecyclerView = view.findViewById(R.id.torStationsRecyclerView)
         torStationsSeeAll = view.findViewById(R.id.torStationsSeeAll)
         i2pStationsRecyclerView = view.findViewById(R.id.i2pStationsRecyclerView)
@@ -208,6 +219,38 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 StationType.I2P -> viewModel.loadApiI2pStations()
             }
         }
+    }
+
+    private fun setupSharedViews() {
+        // Observe current station to dynamically adjust bottom padding for miniplayer
+        radioViewModel.currentStation.observe(viewLifecycleOwner) { station ->
+            updateBottomPaddingForMiniplayer(station != null)
+        }
+    }
+
+    /**
+     * Update bottom padding on scrollable containers based on miniplayer visibility.
+     * When a station is playing, the miniplayer is visible and we need extra padding.
+     * When nothing is playing, we still apply a small base padding for visual spacing.
+     */
+    private fun updateBottomPaddingForMiniplayer(isMiniplayerVisible: Boolean) {
+        val bottomPadding = if (isMiniplayerVisible) miniplayerSpacing else browseBasePadding
+
+        // Update discovery container padding
+        discoveryContentContainer.setPadding(
+            discoveryContentContainer.paddingLeft,
+            discoveryContentContainer.paddingTop,
+            discoveryContentContainer.paddingRight,
+            bottomPadding
+        )
+
+        // Update results list padding
+        resultsRecyclerView.setPadding(
+            resultsRecyclerView.paddingLeft,
+            resultsRecyclerView.paddingTop,
+            resultsRecyclerView.paddingRight,
+            bottomPadding
+        )
     }
 
     private fun showResultsMode(stationType: StationType) {
