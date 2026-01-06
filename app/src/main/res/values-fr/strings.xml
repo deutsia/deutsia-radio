@@ -622,15 +622,15 @@
     <string name="button_add">Ajouter</string>
     <string name="custom_proxy_blocked_snackbar">Aucune fuite de données — les flux sont bloqués. Configurez votre proxy ci-dessous.</string>
     <string name="custom_proxy_status_proxy_required">Proxy Requis</string>
-    <string name="custom_proxy_status_proxy_required_description">Les flux sont bloqués jusqu'à la configuration du proxy. Appuyez pour configurer.</string>
-    <string name="custom_proxy_status_proxy_required_detail">Flux bloqués jusqu'à configuration</string>
+    <string name="custom_proxy_status_proxy_required_description">Les flux sont bloqués jusqu\'à la configuration du proxy. Appuyez pour configurer.</string>
+    <string name="custom_proxy_status_proxy_required_detail">Flux bloqués jusqu\'à configuration</string>
     <string name="failed_to_fetch_stations">Échec de récupération des stations %s depuis le serveur</string>
     <string name="genre_i2p">I2P</string>
     <string name="genre_tor">Tor</string>
-    <string name="notification_i2p_not_connected">I2P n'est pas en cours d'exécution - flux bloqué</string>
+    <string name="notification_i2p_not_connected">I2P n\'est pas en cours d\'exécution - flux bloqué</string>
     <string name="now_playing_connecting">Connexion…</string>
     <string name="searching">Recherche…</string>
     <string name="settings_color_classic">Classique</string>
     <string name="settings_color_classic_default">Classique (Par défaut)</string>
-    <string name="warning_socks4_dns_limitation">SOCKS4 ne prend pas en charge la résolution DNS distante. Les requêtes DNS peuvent être résolues localement, ce qui pourrait révéler les domaines auxquels vous accédez à votre FAI. Envisagez d'utiliser SOCKS5 pour une meilleure confidentialité.</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 ne prend pas en charge la résolution DNS distante. Les requêtes DNS peuvent être résolues localement, ce qui pourrait révéler les domaines auxquels vous accédez à votre FAI. Envisagez d\'utiliser SOCKS5 pour une meilleure confidentialité.</string>
 </resources>

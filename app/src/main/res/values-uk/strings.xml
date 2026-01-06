@@ -633,5 +633,5 @@
     <string name="searching">Пошук…</string>
     <string name="settings_color_classic">Класичний</string>
     <string name="settings_color_classic_default">Класичний (За замовчуванням)</string>
-    <string name="warning_socks4_dns_limitation">SOCKS4 не підтримує віддалене розв'язання DNS. DNS-запити можуть розв'язуватися локально, що може розкрити домени, до яких ви звертаєтеся, вашому інтернет-провайдеру. Розгляньте можливість використання SOCKS5 для кращої конфіденційності.</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 не підтримує віддалене розв\'язання DNS. DNS-запити можуть розв\'язуватися локально, що може розкрити домени, до яких ви звертаєтеся, вашому інтернет-провайдеру. Розгляньте можливість використання SOCKS5 для кращої конфіденційності.</string>
 </resources>

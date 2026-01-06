@@ -621,7 +621,7 @@
     <string name="browse_privacy_radio_subtitle">Tor ve I2P üzerinden anonim radyo istasyonları</string>
     <string name="browse_tor_stations">Tor İstasyonları</string>
     <string name="button_add">Ekle</string>
-    <string name="custom_proxy_blocked_snackbar">Veri sızıntısı yok — yayınlar engellendi. Proxy'nizi aşağıda yapılandırın.</string>
+    <string name="custom_proxy_blocked_snackbar">Veri sızıntısı yok — yayınlar engellendi. Proxy\'nizi aşağıda yapılandırın.</string>
     <string name="custom_proxy_status_proxy_required">Proxy Gerekli</string>
     <string name="custom_proxy_status_proxy_required_description">Proxy yapılandırılana kadar yayınlar engellendi. Yapılandırmak için dokunun.</string>
     <string name="custom_proxy_status_proxy_required_detail">Yapılandırılana kadar yayınlar engellendi</string>
@@ -633,5 +633,5 @@
     <string name="searching">Aranıyor…</string>
     <string name="settings_color_classic">Klasik</string>
     <string name="settings_color_classic_default">Klasik (Varsayılan)</string>
-    <string name="warning_socks4_dns_limitation">SOCKS4 uzak DNS çözümlemesini desteklemez. DNS sorguları yerel olarak çözümlenebilir, bu da eriştiğiniz alan adlarını İSS'nize açığa çıkarabilir. Daha iyi gizlilik için SOCKS5 kullanmayı düşünün.</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 uzak DNS çözümlemesini desteklemez. DNS sorguları yerel olarak çözümlenebilir, bu da eriştiğiniz alan adlarını İSS\'nize açığa çıkarabilir. Daha iyi gizlilik için SOCKS5 kullanmayı düşünün.</string>
 </resources>
