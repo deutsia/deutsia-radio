@@ -1,13 +1,11 @@
-<!--
-    Arabic (العربية) Translation
--->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">deutsia radio</string>
     <string name="tab_radios">المكتبة</string>
     <string name="tab_now_playing">قيد التشغيل</string>
     <string name="tab_settings">الإعدادات</string>
 
-    <!-- Equalizer -->
+    
     <string name="equalizer">المعادل</string>
     <string name="equalizer_no_audio">قم بتشغيل محطة أولاً</string>
     <string name="equalizer_not_found">لم يتم العثور على تطبيق معادل. قم بتثبيت تطبيق معادل مثل Wavelet.</string>
@@ -18,23 +16,23 @@
     <string name="equalizer_bass_boost">معزز الجهير</string>
     <string name="equalizer_surround_sound">صوت محيطي</string>
 
-    <!-- Sort options -->
+    
     <string name="sort_default">افتراضي</string>
     <string name="sort_name">الاسم</string>
     <string name="sort_recent">الأحدث</string>
     <string name="sort_liked">المفضلة</string>
     <string name="sort_genre">النوع</string>
 
-    <!-- Search -->
+    
     <string name="search_stations">البحث في المكتبة</string>
     <string name="search_countries">البحث عن الدول…</string>
     <string name="search_genres">البحث عن الأنواع…</string>
 
-    <!-- Genre filter -->
+    
     <string name="genre_all">جميع الأنواع</string>
     <string name="filter_by_genre">التصفية حسب النوع</string>
 
-    <!-- Genre Names -->
+    
     <string name="genre_alternative">البديل</string>
     <string name="genre_ambient">المحيطة</string>
     <string name="genre_blues">البلوز</string>
@@ -68,10 +66,10 @@
     <string name="genre_world">عالمية</string>
     <string name="genre_other">أخرى</string>
 
-     <!-- about -->
+     
     <string name="about_description">deutsia radio هو مشغل راديو متعدد الشبكات مجاني ومفتوح المصدر يجمع البث من شبكات clearnet و Tor (.onion) و I2P. استمتع بمحطاتك المفضلة في واجهة Material You مع تكامل InviZible Pro ومنع التسرب القابل للتكوين</string>
 
-    <!-- Browse/Discover Stations -->
+    
     <string name="tab_browse">تصفح</string>
     <string name="search_radio_browser">البحث عن آلاف المحطات…</string>
     <string name="browse_top_voted">الأكثر تصويتاً</string>
@@ -112,7 +110,7 @@
     <string name="back">رجوع</string>
     <string name="browse_all_stations">جميع المحطات</string>
 
-    <!-- Notification and Status Messages -->
+    
     <string name="notification_connecting">جارٍ الاتصال...</string>
     <string name="notification_paused">متوقف مؤقتاً</string>
     <string name="notification_playing">قيد التشغيل</string>
@@ -127,7 +125,7 @@
     <string name="notification_action_pause">إيقاف مؤقت</string>
     <string name="notification_action_stop">إيقاف</string>
 
-    <!-- Recording Messages -->
+    
     <string name="recording_failed">فشل التسجيل: %s</string>
     <string name="recording_saved">تم حفظ التسجيل: %1$s (%2$dKB)</string>
     <string name="recording_stopping">جارٍ إيقاف التسجيل...</string>
@@ -135,7 +133,7 @@
     <string name="recording_no_station">لا توجد محطة قيد التشغيل</string>
     <string name="recording_directory_updated">تم تحديث دليل التسجيل</string>
 
-    <!-- Dialog Titles and Buttons -->
+    
     <string name="dialog_add_station">إضافة محطة راديو</string>
     <string name="dialog_edit_station">تحرير محطة راديو</string>
     <string name="dialog_sort_stations">ترتيب المحطات</string>
@@ -155,7 +153,7 @@
     <string name="button_choose_image">اختر صورة</string>
     <string name="button_clear">مسح</string>
 
-    <!-- Settings - Appearance -->
+    
     <string name="settings_appearance">المظهر</string>
     <string name="settings_theme">السمة</string>
     <string name="settings_theme_description">اختر فاتح أو داكن أو النظام</string>
@@ -177,7 +175,7 @@
     <string name="settings_disable_toasts">تعطيل رسائل التنبيه</string>
     <string name="settings_disable_toasts_description">إخفاء الإشعارات المنبثقة للتحذيرات والأخطاء</string>
 
-    <!-- Language Names -->
+    
     <string name="language_choose">اختيار اللغة</string>
     <string name="language_system_default">افتراضي النظام</string>
     <string name="language_arabic">العربية</string>
@@ -198,7 +196,7 @@
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_chinese">中文</string>
 
-    <!-- Settings - Tor Network -->
+    
     <string name="settings_tor_network">شبكة Tor</string>
     <string name="settings_enable_tor">تمكين Tor (عبر InviZible Pro)</string>
     <string name="settings_enable_tor_description">الاتصال عبر شبكة Tor</string>
@@ -211,7 +209,7 @@
     <string name="settings_tor_info">يتطلب InviZible Pro (مجاني من Play Store أو F-Droid). انقر على أيقونة Tor في شريط الأدوات للوصول السريع.\n\nتحظر أوضاع الفرض الاتصالات عندما يكون Tor غير متوفر.</string>
     <string name="settings_tor_privacy_notice">الخصوصية: بدون تفعيل فرض Tor، تتصل محطات clearnet والصور مباشرة بالإنترنت. تستخدم التسجيلات نفس الاتصال المستخدم للبث.</string>
 
-    <!-- Settings - Custom Proxy -->
+    
     <string name="settings_custom_proxy">وكيل مخصص</string>
     <string name="settings_enable_custom_proxy">تمكين وكيل مخصص</string>
     <string name="settings_enable_custom_proxy_description">استخدام وكيل مخصص للاتصالات</string>
@@ -223,13 +221,13 @@
     <string name="settings_force_custom_proxy_except_tor_i2p_description">توجيه جميع حركة المرور clearnet عبر وكيل مخصص، ولكن السماح لمحطات Tor و I2P باستخدام وكلائها الأصليين.</string>
     <string name="settings_custom_proxy_privacy_notice">الخصوصية: بدون تفعيل فرض الوكيل المخصص، تتصل محطات clearnet والصور مباشرة بالإنترنت. تستخدم التسجيلات نفس الاتصال المستخدم للبث.</string>
 
-    <!-- Settings - Bandwidth -->
+    
     <string name="settings_bandwidth_usage">استخدام النطاق الترددي</string>
     <string name="settings_total_usage">الاستخدام الإجمالي (مدى الحياة)</string>
     <string name="settings_session_usage">استخدام الجلسة</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
-    <!-- Settings - Playback -->
+    
     <string name="settings_playback">التشغيل</string>
     <string name="settings_sleep_timer">مؤقت النوم</string>
     <string name="settings_sleep_timer_description">إيقاف التشغيل تلقائياً بعد الوقت المحدد</string>
@@ -249,7 +247,7 @@
     <string name="settings_record_all_stations">تسجيل جميع المحطات</string>
     <string name="settings_record_all_stations_description">التبديل إلى بث المحطة الجديدة في نفس الملف</string>
 
-    <!-- Settings - Station Management -->
+    
     <string name="settings_station_management">إدارة المحطات</string>
     <string name="settings_import_from_file">استيراد من ملف</string>
     <string name="settings_import_from_file_description">الاستيراد من CSV أو JSON أو M3U أو PLS</string>
@@ -262,7 +260,7 @@
     <string name="settings_export_stations">تصدير المحطات</string>
     <string name="settings_export_stations_description">تصدير محطاتك إلى ملف</string>
 
-    <!-- Settings - About -->
+    
     <string name="settings_about">حول</string>
     <string name="settings_version">الإصدار 1.5</string>
     <string name="settings_view_github">عرض على GitHub</string>
@@ -272,7 +270,7 @@
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
     <string name="settings_copy_address">نسخ العنوان</string>
 
-    <!-- Tor Control Bottom Sheet -->
+    
     <string name="tor_connection_details">تفاصيل الاتصال</string>
     <string name="tor_proxy_host">مضيف الوكيل</string>
     <string name="tor_socks_port">منفذ SOCKS</string>
@@ -281,7 +279,7 @@
     <string name="tor_connect">الاتصال بـ Tor</string>
     <string name="tor_open_invizible">فتح InviZible Pro</string>
 
-    <!-- Tor Status Messages -->
+    
     <string name="tor_status_connecting">جارٍ الاتصال...</string>
     <string name="tor_status_connected">متصل بـ Tor</string>
     <string name="tor_status_disconnected">تم قطع اتصال Tor</string>
@@ -290,7 +288,7 @@
     <string name="tor_status_leak_warning">تحذير من التسرب</string>
     <string name="tor_status_install_invizible">تثبيت InviZible Pro</string>
 
-    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    
     <string name="tor_status_off_description">تم قطع اتصال Tor. انقر للاتصال.</string>
     <string name="tor_status_connecting_description">جارٍ الاتصال بـ Tor...</string>
     <string name="tor_status_connected_description">متصل بـ Tor. انقر لعرض التفاصيل.</string>
@@ -325,14 +323,14 @@
     <string name="tor_control_button_install">تثبيت InviZible Pro</string>
     <string name="tor_control_button_open_invizible">فتح InviZible Pro</string>
 
-    <!-- Add/Edit Radio Dialog -->
+    
     <string name="add_edit_tor_info">استخدام Tor المضمن - لا حاجة لتكوين الوكيل</string>
     <string name="add_edit_authentication_optional">المصادقة (اختياري)</string>
     <string name="add_edit_advanced_options">خيارات متقدمة</string>
     <string name="add_edit_cover_art">صورة الغلاف</string>
     <string name="add_edit_or_enter_url">أو أدخل عنوان URL للصورة</string>
 
-    <!-- Input Hints -->
+    
     <string name="hint_station_name">اسم المحطة</string>
     <string name="hint_stream_url">عنوان URL للبث</string>
     <string name="hint_genre">النوع</string>
@@ -349,7 +347,7 @@
     <string name="hint_password_optional_caps">كلمة المرور (اختياري)</string>
     <string name="hint_auth_type">نوع المصادقة</string>
 
-    <!-- Default Values -->
+    
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
@@ -357,7 +355,7 @@
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
-    <!-- Now Playing Fragment -->
+    
     <string name="now_playing_time_placeholder">00:00</string>
     <string name="now_playing_live">مباشر</string>
     <string name="now_playing_no_station">لا توجد محطة قيد التشغيل</string>
@@ -365,14 +363,14 @@
     <string name="now_playing_volume_title">مستوى صوت الراديو</string>
     <string name="now_playing_volume_description">يضبط بث الراديو فقط</string>
 
-    <!-- Toast Messages -->
+    
     <string name="toast_session_bandwidth_reset">تمت إعادة تعيين نطاق الجلسة الترددي</string>
     <string name="toast_custom_proxy_saved">تم حفظ إعدادات الوكيل المخصص</string>
     <string name="toast_custom_proxy_cleared">تم مسح إعدادات الوكيل المخصص</string>
     <string name="toast_address_copied">تم نسخ العنوان إلى الحافظة</string>
     <string name="toast_using_default_directory">استخدام الدليل الافتراضي</string>
 
-    <!-- Custom Proxy Status Messages -->
+    
     <string name="custom_proxy_status_connected">متصل</string>
     <string name="custom_proxy_status_configured">تم تكوين الوكيل</string>
     <string name="custom_proxy_status_not_configured">غير مكوّن</string>
@@ -380,7 +378,7 @@
     <string name="custom_proxy_status_leak_warning">تحذير من التسرب</string>
     <string name="custom_proxy_status_leak_detail">تم التمكين القسري ولكن غير مكوّن</string>
 
-    <!-- Tor Service Notification Messages -->
+    
     <string name="tor_channel_name">اتصال Tor</string>
     <string name="tor_channel_description">يعرض حالة اتصال Tor</string>
     <string name="tor_notification_disconnected">تم قطع اتصال Tor</string>
@@ -394,11 +392,11 @@
     <string name="tor_notification_install_invizible">يرجى تثبيت InviZible Pro لدعم Tor</string>
     <string name="tor_notification_action_stop">إيقاف Tor</string>
 
-    <!-- Other Error Messages -->
+    
     <string name="error_unknown">خطأ غير معروف</string>
     <string name="folder_custom">مجلد مخصص</string>
 
-    <!-- AddEditRadioDialog Default Values -->
+    
     <string name="default_genre_other">أخرى</string>
     <string name="default_proxy_none">لا شيء</string>
     <string name="default_proxy_i2p">I2P</string>
@@ -413,7 +411,7 @@
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
-    <!-- Security & Privacy -->
+    
     <string name="settings_security_privacy">الأمان &amp; الخصوصية</string>
     <string name="settings_app_lock">قفل التطبيق</string>
     <string name="settings_app_lock_description">يتطلب كلمة مرور أو بصمة لفتح التطبيق</string>
@@ -436,7 +434,7 @@
     <string name="settings_database_encryption_password_required_title">كلمة مرور التطبيق مطلوبة</string>
     <string name="settings_database_encryption_password_required_message">يستخدم تشفير قاعدة البيانات كلمة مرور التطبيق لإنشاء مفتاح التشفير. يرجى تعيين كلمة مرور للتطبيق أولاً عن طريق تمكين \"قفل التطبيق\" أعلاه.\n\nبمجرد التعيين، يمكنك تمكين تشفير قاعدة البيانات باستخدام نفس كلمة المرور - لا حاجة لكلمة مرور منفصلة.</string>
 
-    <!-- Authentication Dialog -->
+    
     <string name="auth_dialog_title">تعيين كلمة مرور التطبيق</string>
     <string name="auth_dialog_change_title">تغيير كلمة المرور</string>
     <string name="auth_dialog_change_message">ملاحظة: إذا تم تمكين تشفير قاعدة البيانات، فسيتم تحديثه تلقائياً لاستخدام كلمة المرور الجديدة.</string>
@@ -458,7 +456,7 @@
     <string name="auth_decrypting_database">جارٍ فك تشفير قاعدة البيانات…</string>
     <string name="auth_rekeying_database">جارٍ تحديث تشفير قاعدة البيانات بكلمة المرور الجديدة…</string>
 
-    <!-- Authentication Activity -->
+    
     <string name="auth_unlock_app">فتح قفل deutsia radio</string>
     <string name="auth_enter_password">أدخل كلمة المرور</string>
     <string name="auth_password_hint">كلمة المرور</string>
@@ -469,7 +467,7 @@
     <string name="auth_biometric_subtitle">المصادقة للمتابعة</string>
     <string name="auth_biometric_negative">استخدام كلمة المرور</string>
 
-    <!-- Delete Confirmation Dialog -->
+    
     <string name="delete_stations_message">هل أنت متأكد من حذف %1$d محطة%2$s؟</string>
     <string name="delete_stations_message_single">هل أنت متأكد من حذف %d محطة؟</string>
     <string name="delete_stations_message_plural">هل أنت متأكد من حذف %d محطة؟</string>
@@ -478,7 +476,7 @@
     <string name="deleted_stations_message_single">تم حذف %d محطة</string>
     <string name="deleted_stations_message_plural">تم حذف %d محطة</string>
 
-    <!-- Proxy Type Labels -->
+    
     <string name="proxy_label_i2p"> • I2P</string>
     <string name="proxy_label_tor"> • Tor</string>
     <string name="proxy_label_custom"> • مخصص</string>
@@ -487,7 +485,7 @@
     <string name="proxy_type_custom">مخصص</string>
     <string name="proxy_type_none">لا يوجد</string>
 
-    <!-- Tor Status Messages (TorManager) -->
+    
     <string name="tor_status_not_active">Tor غير نشط</string>
     <string name="tor_status_connecting_network">الاتصال بشبكة Tor...</string>
     <string name="tor_status_connected_via_tor">متصل عبر Tor</string>
@@ -499,7 +497,7 @@
     <string name="tor_status_detail_tap_to_connect">اضغط للاتصال</string>
     <string name="tor_status_detail_install_invizible">قم بتثبيت InviZible Pro من Play Store أو F-Droid</string>
 
-    <!-- Settings Fragment Tor/Proxy Status -->
+    
     <string name="settings_tor_disconnected_status">غير متصل</string>
     <string name="settings_tor_not_running_detail">Tor غير قيد التشغيل</string>
     <string name="button_start_tor">ابدأ</string>
@@ -521,7 +519,7 @@
     <string name="warning_tor_not_connected_except_i2p">⚠️ Tor غير متصل! ستفشل البثوث غير I2P حتى يتصل Tor.</string>
     <string name="button_off">إيقاف</string>
 
-    <!-- Import/Export Dialogs -->
+    
     <string name="dialog_import_stations">استيراد المحطات</string>
     <string name="import_message">حدد ملفًا لاستيراد محطات الراديو منه.\n\nالتنسيقات المدعومة:\n• CSV\n• JSON\n• قائمة تشغيل M3U\n• قائمة تشغيل PLS</string>
     <string name="button_select_file">تحديد ملف</string>
@@ -544,7 +542,7 @@
     <string name="exported_stations_success">تم تصدير %1$d محطة إلى %2$s</string>
     <string name="export_error_message">خطأ في التصدير: %s</string>
 
-    <!-- Recording Error Messages -->
+    
     <string name="recording_error_no_stream">لا يوجد بث قيد التشغيل</string>
     <string name="recording_error_cannot_create_directory">لا يمكن إنشاء الدليل</string>
     <string name="recording_error_connection_failed">فشل الاتصال</string>
@@ -557,13 +555,13 @@
     <string name="recording_error_io">خطأ إدخال/إخراج: %s</string>
     <string name="recording_error_generic">خطأ: %s</string>
 
-    <!-- Custom Proxy Messages -->
+    
     <string name="custom_proxy_not_configured_notification">البروكسي المخصص غير مهيأ</string>
     <string name="custom_proxy_configured_description">البروكسي المخصص مهيأ. اضغط لعرض التفاصيل.</string>
     <string name="custom_proxy_not_configured_description">البروكسي المخصص غير مهيأ. اضغط للتهيئة.</string>
     <string name="custom_proxy_privacy_warning_description">فرض البروكسي المخصص مفعّل لكنه غير مهيأ. قد تكون الخصوصية معرضة للخطر.</string>
 
-    <!-- Proxy Configuration Dialog -->
+    
     <string name="dialog_configure_global_proxy">تهيئة البروكسي المخصص العام</string>
     <string name="validation_enter_proxy_host">❌ يرجى إدخال مضيف البروكسي</string>
     <string name="testing_connection">اختبار الاتصال...</string>
@@ -575,22 +573,22 @@
     <string name="auth_basic_caps">Basic</string>
     <string name="auth_digest_caps">Digest</string>
 
-    <!-- Reset Bandwidth Dialog -->
+    
     <string name="dialog_reset_session_bandwidth">إعادة تعيين عرض النطاق للجلسة</string>
     <string name="reset_bandwidth_message">إعادة تعيين عداد عرض النطاق للجلسة إلى الصفر؟</string>
 
-    <!-- Browse Filter Messages -->
+    
     <string name="all_filters_applied">جميع الفلاتر مطبقة بالفعل</string>
 
-    <!-- Database Encryption -->
+    
     <string name="password_change_rekey_failed">تم تغيير كلمة المرور لكن فشل إعادة تشفير قاعدة البيانات: %s</string>
 
-    <!-- Empty State -->
+    
     <string name="empty_state_title">لم يتم العثور على محطات</string>
     <string name="empty_state_message">ابدأ بإضافة محطتك الأولى.\nانقر على الزر أدناه.</string>
     <string name="empty_state_add_button">إضافة محطة جديدة</string>
 
-    <!-- Stream Error Messages (Toasts) -->
+    
     <string name="error_stream_failed">فشل الاتصال بالبث</string>
     <string name="error_stream_max_retries">فشل الاتصال بعد عدة محاولات</string>
     <string name="error_tor_not_connected">Tor غير متصل. قم بتفعيل Tor لتشغيل هذا البث.</string>
@@ -598,7 +596,7 @@
     <string name="error_tor_required_for_clearnet">Tor غير متصل. وضع إجبار Tor يتطلب Tor للبث العادي.</string>
     <string name="error_custom_proxy_not_configured">البروكسي المخصص غير مهيأ. قم بتهيئته في الإعدادات.</string>
 
-    <!-- Content Descriptions (Accessibility) -->
+    
     <string name="cd_add_radio_station">إضافة محطة راديو</string>
     <string name="cd_embedded_tor">Tor مدمج</string>
     <string name="cd_cover_art_preview">معاينة صورة الغلاف</string>
@@ -617,4 +615,22 @@
     <string name="cd_like_station">إضافة المحطة للمفضلة</string>
     <string name="cd_add_to_library">إضافة للمكتبة</string>
     <string name="cd_stop">إيقاف</string>
+<string name="browse_i2p_stations">محطات I2P</string>
+    <string name="browse_privacy_radio">راديو الخصوصية</string>
+    <string name="browse_privacy_radio_subtitle">محطات راديو مجهولة عبر Tor و I2P</string>
+    <string name="browse_tor_stations">محطات Tor</string>
+    <string name="button_add">إضافة</string>
+    <string name="custom_proxy_blocked_snackbar">لم تتسرب أي بيانات — البث محظور. قم بتكوين الوكيل أدناه.</string>
+    <string name="custom_proxy_status_proxy_required">الوكيل مطلوب</string>
+    <string name="custom_proxy_status_proxy_required_description">البث محظور حتى يتم تكوين الوكيل. اضغط للتكوين.</string>
+    <string name="custom_proxy_status_proxy_required_detail">البث محظور حتى التكوين</string>
+    <string name="failed_to_fetch_stations">فشل في جلب محطات %s من الخادم</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
+    <string name="notification_i2p_not_connected">I2P غير قيد التشغيل - البث محظور</string>
+    <string name="now_playing_connecting">جارٍ الاتصال…</string>
+    <string name="searching">جارٍ البحث…</string>
+    <string name="settings_color_classic">كلاسيكي</string>
+    <string name="settings_color_classic_default">كلاسيكي (افتراضي)</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 لا يدعم حل DNS البعيد. قد يتم حل استعلامات DNS محليًا، مما قد يكشف النطاقات التي تصل إليها لمزود خدمة الإنترنت الخاص بك. فكر في استخدام SOCKS5 لمزيد من الخصوصية.</string>
 </resources>

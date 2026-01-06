@@ -1,13 +1,11 @@
-<!--
-    Chinese Simplified (简体中文) Translation
--->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">deutsia radio</string>
     <string name="tab_radios">资料库</string>
     <string name="tab_now_playing">正在播放</string>
     <string name="tab_settings">设置</string>
 
-    <!-- Equalizer -->
+    
     <string name="equalizer">均衡器</string>
     <string name="equalizer_no_audio">请先播放电台</string>
     <string name="equalizer_not_found">未找到均衡器应用。请安装 Wavelet 等均衡器应用。</string>
@@ -18,23 +16,23 @@
     <string name="equalizer_bass_boost">低音增强</string>
     <string name="equalizer_surround_sound">环绕声</string>
 
-    <!-- Sort options -->
+    
     <string name="sort_default">默认</string>
     <string name="sort_name">名称</string>
     <string name="sort_recent">最近</string>
     <string name="sort_liked">喜欢</string>
     <string name="sort_genre">类型</string>
 
-    <!-- Search -->
+    
     <string name="search_stations">搜索资料库</string>
     <string name="search_countries">搜索国家…</string>
     <string name="search_genres">搜索类型…</string>
 
-    <!-- Genre filter -->
+    
     <string name="genre_all">所有类型</string>
     <string name="filter_by_genre">按类型筛选</string>
 
-    <!-- Genre Names -->
+    
     <string name="genre_alternative">另类摇滚</string>
     <string name="genre_ambient">氛围音乐</string>
     <string name="genre_blues">布鲁斯</string>
@@ -68,10 +66,10 @@
     <string name="genre_world">世界音乐</string>
     <string name="genre_other">其他</string>
 
-     <!-- about -->
+     
     <string name="about_description">deutsia radio 是一款免费开源的多网络电台播放器，整合了来自明网、Tor（.onion）和 I2P 网络的流媒体。在具有 InviZible Pro 集成和可配置泄漏防护的 Material You 界面中享受您喜爱的电台</string>
 
-    <!-- Browse/Discover Stations -->
+    
     <string name="tab_browse">浏览</string>
     <string name="search_radio_browser">搜索数千个电台…</string>
     <string name="browse_top_voted">最多投票</string>
@@ -112,7 +110,7 @@
     <string name="back">返回</string>
     <string name="browse_all_stations">所有电台</string>
 
-    <!-- Notification and Status Messages -->
+    
     <string name="notification_connecting">连接中...</string>
     <string name="notification_paused">已暂停</string>
     <string name="notification_playing">播放中</string>
@@ -127,7 +125,7 @@
     <string name="notification_action_pause">暂停</string>
     <string name="notification_action_stop">停止</string>
 
-    <!-- Recording Messages -->
+    
     <string name="recording_failed">录制失败：%s</string>
     <string name="recording_saved">录制已保存：%1$s (%2$dKB)</string>
     <string name="recording_stopping">停止录制中...</string>
@@ -135,7 +133,7 @@
     <string name="recording_no_station">无电台播放</string>
     <string name="recording_directory_updated">录制目录已更新</string>
 
-    <!-- Dialog Titles and Buttons -->
+    
     <string name="dialog_add_station">添加电台</string>
     <string name="dialog_edit_station">编辑电台</string>
     <string name="dialog_sort_stations">排序电台</string>
@@ -155,7 +153,7 @@
     <string name="button_choose_image">选择图片</string>
     <string name="button_clear">清除</string>
 
-    <!-- Settings - Appearance -->
+    
     <string name="settings_appearance">外观</string>
     <string name="settings_theme">主题</string>
     <string name="settings_theme_description">选择浅色、深色或跟随系统</string>
@@ -177,7 +175,7 @@
     <string name="settings_disable_toasts">禁用消息提示</string>
     <string name="settings_disable_toasts_description">隐藏警告和错误的弹出通知</string>
 
-    <!-- Language Names -->
+    
     <string name="language_choose">选择语言</string>
     <string name="language_system_default">系统默认</string>
     <string name="language_arabic">العربية</string>
@@ -198,7 +196,7 @@
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_chinese">中文</string>
 
-    <!-- Settings - Tor Network -->
+    
     <string name="settings_tor_network">Tor 网络</string>
     <string name="settings_enable_tor">启用 Tor（通过 InviZible Pro）</string>
     <string name="settings_enable_tor_description">通过 Tor 网络连接</string>
@@ -211,7 +209,7 @@
     <string name="settings_tor_info">需要 InviZible Pro（可从 Play Store 或 F-Droid 免费获取）。点击工具栏中的 Tor 图标以快速访问。\n\n强制模式会在 Tor 不可用时阻止连接。</string>
     <string name="settings_tor_privacy_notice">隐私提示：未启用强制 Tor 时，明网电台和图片会直接连接到互联网。录制使用与流相同的连接。</string>
 
-    <!-- Settings - Custom Proxy -->
+    
     <string name="settings_custom_proxy">自定义代理</string>
     <string name="settings_enable_custom_proxy">启用自定义代理</string>
     <string name="settings_enable_custom_proxy_description">连接使用自定义代理</string>
@@ -223,13 +221,13 @@
     <string name="settings_force_custom_proxy_except_tor_i2p_description">通过自定义代理路由所有明网流量，但允许 Tor 和 I2P 电台使用其原生代理。</string>
     <string name="settings_custom_proxy_privacy_notice">隐私提示：未启用强制自定义代理时，明网电台和图片会直接连接到互联网。录制使用与流相同的连接。</string>
 
-    <!-- Settings - Bandwidth -->
+    
     <string name="settings_bandwidth_usage">带宽使用</string>
     <string name="settings_total_usage">总使用量（生命周期）</string>
     <string name="settings_session_usage">会话使用量</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
-    <!-- Settings - Playback -->
+    
     <string name="settings_playback">播放</string>
     <string name="settings_sleep_timer">睡眠定时器</string>
     <string name="settings_sleep_timer_description">设定时间后自动停止播放</string>
@@ -249,7 +247,7 @@
     <string name="settings_record_all_stations">录制所有电台</string>
     <string name="settings_record_all_stations_description">在同一文件中切换到新电台的流</string>
 
-    <!-- Settings - Station Management -->
+    
     <string name="settings_station_management">电台管理</string>
     <string name="settings_import_from_file">从文件导入</string>
     <string name="settings_import_from_file_description">从 CSV、JSON、M3U 或 PLS 导入</string>
@@ -262,7 +260,7 @@
     <string name="settings_export_stations">导出电台</string>
     <string name="settings_export_stations_description">将您的电台导出到文件</string>
 
-    <!-- Settings - About -->
+    
     <string name="settings_about">关于</string>
     <string name="settings_version">版本 1.5</string>
     <string name="settings_view_github">在 GitHub 上查看</string>
@@ -272,7 +270,7 @@
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
     <string name="settings_copy_address">复制地址</string>
 
-    <!-- Tor Control Bottom Sheet -->
+    
     <string name="tor_connection_details">连接详情</string>
     <string name="tor_proxy_host">代理主机</string>
     <string name="tor_socks_port">SOCKS 端口</string>
@@ -281,7 +279,7 @@
     <string name="tor_connect">连接到 Tor</string>
     <string name="tor_open_invizible">打开 InviZible Pro</string>
 
-    <!-- Tor Status Messages -->
+    
     <string name="tor_status_connecting">连接中...</string>
     <string name="tor_status_connected">Tor已连接</string>
     <string name="tor_status_disconnected">Tor已断开</string>
@@ -290,7 +288,7 @@
     <string name="tor_status_leak_warning">泄漏警告</string>
     <string name="tor_status_install_invizible">安装InviZible Pro</string>
 
-    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    
     <string name="tor_status_off_description">Tor已断开连接。点击以连接。</string>
     <string name="tor_status_connecting_description">Tor正在连接...</string>
     <string name="tor_status_connected_description">Tor已连接。点击查看详情。</string>
@@ -326,14 +324,14 @@
     <string name="tor_control_button_open_invizible">打开InviZible Pro</string>
 
 
-    <!-- Add/Edit Radio Dialog -->
+    
     <string name="add_edit_tor_info">使用嵌入式 Tor - 无需配置代理</string>
     <string name="add_edit_authentication_optional">身份验证（可选）</string>
     <string name="add_edit_advanced_options">高级选项</string>
     <string name="add_edit_cover_art">封面艺术</string>
     <string name="add_edit_or_enter_url">或输入图片 URL</string>
 
-    <!-- Input Hints -->
+    
     <string name="hint_station_name">电台名称</string>
     <string name="hint_stream_url">流 URL</string>
     <string name="hint_genre">类型</string>
@@ -350,7 +348,7 @@
     <string name="hint_password_optional_caps">密码（可选）</string>
     <string name="hint_auth_type">认证类型</string>
 
-    <!-- Default Values -->
+    
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
@@ -358,7 +356,7 @@
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
-    <!-- Now Playing Fragment -->
+    
     <string name="now_playing_time_placeholder">00:00</string>
     <string name="now_playing_live">直播</string>
     <string name="now_playing_no_station">无电台播放</string>
@@ -366,14 +364,14 @@
     <string name="now_playing_volume_title">电台音量</string>
     <string name="now_playing_volume_description">仅调整电台流</string>
 
-    <!-- Toast Messages -->
+    
     <string name="toast_session_bandwidth_reset">会话带宽已重置</string>
     <string name="toast_custom_proxy_saved">自定义代理设置已保存</string>
     <string name="toast_custom_proxy_cleared">自定义代理设置已清除</string>
     <string name="toast_address_copied">地址已复制到剪贴板</string>
     <string name="toast_using_default_directory">使用默认目录</string>
 
-    <!-- Custom Proxy Status Messages -->
+    
     <string name="custom_proxy_status_connected">已连接</string>
     <string name="custom_proxy_status_configured">代理已配置</string>
     <string name="custom_proxy_status_not_configured">未配置</string>
@@ -381,7 +379,7 @@
     <string name="custom_proxy_status_leak_warning">泄漏警告</string>
     <string name="custom_proxy_status_leak_detail">强制已启用但未配置</string>
 
-    <!-- Tor Service Notification Messages -->
+    
     <string name="tor_channel_name">Tor 连接</string>
     <string name="tor_channel_description">显示 Tor 连接状态</string>
     <string name="tor_notification_disconnected">Tor 已断开</string>
@@ -395,11 +393,11 @@
     <string name="tor_notification_install_invizible">请安装 InviZible Pro 以获得 Tor 支持</string>
     <string name="tor_notification_action_stop">停止 Tor</string>
 
-    <!-- Other Error Messages -->
+    
     <string name="error_unknown">未知错误</string>
     <string name="folder_custom">自定义文件夹</string>
 
-    <!-- AddEditRadioDialog Default Values -->
+    
     <string name="default_genre_other">其他</string>
     <string name="default_proxy_none">无</string>
     <string name="default_proxy_i2p">I2P</string>
@@ -414,7 +412,7 @@
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
-    <!-- Security & Privacy -->
+    
     <string name="settings_security_privacy">安全 &amp; 隐私</string>
     <string name="settings_app_lock">应用锁</string>
     <string name="settings_app_lock_description">需要密码或生物识别来解锁应用</string>
@@ -437,7 +435,7 @@
     <string name="settings_database_encryption_password_required_title">需要应用密码</string>
     <string name="settings_database_encryption_password_required_message">数据库加密使用您的应用密码来生成加密密钥。请先通过启用上面的"应用锁"来设置应用密码。\n\n设置后，您可以使用相同的密码启用数据库加密 - 无需单独的密码。</string>
 
-    <!-- Authentication Dialog -->
+    
     <string name="auth_dialog_title">设置应用密码</string>
     <string name="auth_dialog_change_title">更改密码</string>
     <string name="auth_dialog_change_message">注意：如果启用了数据库加密，它将自动更新以使用新密码。</string>
@@ -459,7 +457,7 @@
     <string name="auth_decrypting_database">解密数据库中…</string>
     <string name="auth_rekeying_database">使用新密码更新数据库加密中…</string>
 
-    <!-- Authentication Activity -->
+    
     <string name="auth_unlock_app">解锁 deutsia radio</string>
     <string name="auth_enter_password">输入您的密码</string>
     <string name="auth_password_hint">密码</string>
@@ -470,7 +468,7 @@
     <string name="auth_biometric_subtitle">认证以继续</string>
     <string name="auth_biometric_negative">使用密码</string>
 
-    <!-- Delete Confirmation Dialog -->
+    
     <string name="delete_stations_message">确定要删除 %1$d 个电台%2$s吗？</string>
     <string name="delete_stations_message_single">确定要删除 %d 个电台吗？</string>
     <string name="delete_stations_message_plural">确定要删除 %d 个电台吗？</string>
@@ -479,7 +477,7 @@
     <string name="deleted_stations_message_single">已删除 %d 个电台</string>
     <string name="deleted_stations_message_plural">已删除 %d 个电台</string>
 
-    <!-- Proxy Type Labels -->
+    
     <string name="proxy_label_i2p"> • I2P</string>
     <string name="proxy_label_tor"> • Tor</string>
     <string name="proxy_label_custom"> • 自定义</string>
@@ -488,7 +486,7 @@
     <string name="proxy_type_custom">自定义</string>
     <string name="proxy_type_none">无</string>
 
-    <!-- Tor Status Messages (TorManager) -->
+    
     <string name="tor_status_not_active">Tor 未激活</string>
     <string name="tor_status_connecting_network">正在连接到 Tor 网络...</string>
     <string name="tor_status_connected_via_tor">已通过 Tor 连接</string>
@@ -500,7 +498,7 @@
     <string name="tor_status_detail_tap_to_connect">点击连接</string>
     <string name="tor_status_detail_install_invizible">从 Play Store 或 F-Droid 安装 InviZible Pro</string>
 
-    <!-- Settings Fragment Tor/Proxy Status -->
+    
     <string name="settings_tor_disconnected_status">已断开连接</string>
     <string name="settings_tor_not_running_detail">Tor 未运行</string>
     <string name="button_start_tor">启动</string>
@@ -522,7 +520,7 @@
     <string name="warning_tor_not_connected_except_i2p">⚠️ Tor 未连接！在 Tor 连接之前，非 I2P 流将失败。</string>
     <string name="button_off">关闭</string>
 
-    <!-- Import/Export Dialogs -->
+    
     <string name="dialog_import_stations">导入电台</string>
     <string name="import_message">选择一个文件以导入广播电台。\n\n支持的格式：\n• CSV\n• JSON\n• M3U 播放列表\n• PLS 播放列表</string>
     <string name="button_select_file">选择文件</string>
@@ -545,7 +543,7 @@
     <string name="exported_stations_success">已将 %1$d 个电台导出到 %2$s</string>
     <string name="export_error_message">导出错误：%s</string>
 
-    <!-- Recording Error Messages -->
+    
     <string name="recording_error_no_stream">没有正在播放的流</string>
     <string name="recording_error_cannot_create_directory">无法创建目录</string>
     <string name="recording_error_connection_failed">连接失败</string>
@@ -558,13 +556,13 @@
     <string name="recording_error_io">I/O 错误：%s</string>
     <string name="recording_error_generic">错误：%s</string>
 
-    <!-- Custom Proxy Messages -->
+    
     <string name="custom_proxy_not_configured_notification">自定义代理未配置</string>
     <string name="custom_proxy_configured_description">自定义代理已配置。点击查看详情。</string>
     <string name="custom_proxy_not_configured_description">自定义代理未配置。点击配置。</string>
     <string name="custom_proxy_privacy_warning_description">强制自定义代理已启用但未配置。隐私可能受到威胁。</string>
 
-    <!-- Proxy Configuration Dialog -->
+    
     <string name="dialog_configure_global_proxy">配置全局自定义代理</string>
     <string name="validation_enter_proxy_host">❌ 请输入代理主机</string>
     <string name="testing_connection">正在测试连接...</string>
@@ -576,22 +574,22 @@
     <string name="auth_basic_caps">Basic</string>
     <string name="auth_digest_caps">Digest</string>
 
-    <!-- Reset Bandwidth Dialog -->
+    
     <string name="dialog_reset_session_bandwidth">重置会话带宽</string>
     <string name="reset_bandwidth_message">将会话带宽计数器重置为零？</string>
 
-    <!-- Browse Filter Messages -->
+    
     <string name="all_filters_applied">所有筛选器已应用</string>
 
-    <!-- Database Encryption -->
+    
     <string name="password_change_rekey_failed">密码已更改，但数据库重新加密失败：%s</string>
 
-    <!-- Empty State -->
+    
     <string name="empty_state_title">未找到电台</string>
     <string name="empty_state_message">添加您的第一个电台开始收听。\n点击下方按钮。</string>
     <string name="empty_state_add_button">添加新电台</string>
 
-    <!-- Stream Error Messages (Toasts) -->
+    
     <string name="error_stream_failed">连接流失败</string>
     <string name="error_stream_max_retries">多次尝试后连接失败</string>
     <string name="error_tor_not_connected">Tor 未连接。启用 Tor 以播放此流。</string>
@@ -599,7 +597,7 @@
     <string name="error_tor_required_for_clearnet">Tor 未连接。强制 Tor 模式需要 Tor 来播放明网流。</string>
     <string name="error_custom_proxy_not_configured">自定义代理未配置。请在设置中配置。</string>
 
-    <!-- Content Descriptions (Accessibility) -->
+    
     <string name="cd_add_radio_station">添加电台</string>
     <string name="cd_embedded_tor">内置 Tor</string>
     <string name="cd_cover_art_preview">封面预览</string>
@@ -618,4 +616,22 @@
     <string name="cd_like_station">添加电台到收藏</string>
     <string name="cd_add_to_library">添加到媒体库</string>
     <string name="cd_stop">停止</string>
+<string name="browse_i2p_stations">I2P 电台</string>
+    <string name="browse_privacy_radio">隐私广播</string>
+    <string name="browse_privacy_radio_subtitle">通过 Tor 和 I2P 的匿名广播电台</string>
+    <string name="browse_tor_stations">Tor 电台</string>
+    <string name="button_add">添加</string>
+    <string name="custom_proxy_blocked_snackbar">没有数据泄露 — 流已被阻止。请在下方配置您的代理。</string>
+    <string name="custom_proxy_status_proxy_required">需要代理</string>
+    <string name="custom_proxy_status_proxy_required_description">在配置代理之前流被阻止。点击以配置。</string>
+    <string name="custom_proxy_status_proxy_required_detail">在配置之前流被阻止</string>
+    <string name="failed_to_fetch_stations">无法从服务器获取 %s 电台</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
+    <string name="notification_i2p_not_connected">I2P 未运行 - 流已被阻止</string>
+    <string name="now_playing_connecting">正在连接…</string>
+    <string name="searching">正在搜索…</string>
+    <string name="settings_color_classic">经典</string>
+    <string name="settings_color_classic_default">经典（默认）</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 不支持远程 DNS 解析。DNS 查询可能在本地解析，这可能会向您的 ISP 透露您访问的域名。考虑使用 SOCKS5 以获得更好的隐私保护。</string>
 </resources>

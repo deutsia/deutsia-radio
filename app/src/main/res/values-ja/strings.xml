@@ -1,13 +1,11 @@
-<!--
-    Japanese (日本語) Translation
--->
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">deutsia radio</string>
     <string name="tab_radios">ライブラリ</string>
     <string name="tab_now_playing">再生中</string>
     <string name="tab_settings">設定</string>
 
-    <!-- Equalizer -->
+    
     <string name="equalizer">イコライザー</string>
     <string name="equalizer_no_audio">まずステーションを開始してください</string>
     <string name="equalizer_not_found">イコライザーアプリが見つかりません。Waveletなどのイコライザーアプリをインストールしてください。</string>
@@ -18,23 +16,23 @@
     <string name="equalizer_bass_boost">バスブースト</string>
     <string name="equalizer_surround_sound">サラウンドサウンド</string>
 
-    <!-- Sort options -->
+    
     <string name="sort_default">デフォルト</string>
     <string name="sort_name">名前</string>
     <string name="sort_recent">最近</string>
     <string name="sort_liked">お気に入り</string>
     <string name="sort_genre">ジャンル</string>
 
-    <!-- Search -->
+    
     <string name="search_stations">ライブラリを検索</string>
     <string name="search_countries">国を検索…</string>
     <string name="search_genres">ジャンルを検索…</string>
 
-    <!-- Genre filter -->
+    
     <string name="genre_all">すべてのジャンル</string>
     <string name="filter_by_genre">ジャンルでフィルター</string>
 
-    <!-- Genre Names -->
+    
     <string name="genre_alternative">オルタナティブ</string>
     <string name="genre_ambient">アンビエント</string>
     <string name="genre_blues">ブルース</string>
@@ -68,10 +66,10 @@
     <string name="genre_world">ワールド</string>
     <string name="genre_other">その他</string>
 
-     <!-- about -->
+     
     <string name="about_description">deutsia radioは、clearnet、Tor（.onion）、I2Pネットワークからのストリームをまとめた無料のオープンソースマルチネットラジオプレーヤーです。InviZible Pro統合と設定可能なリーク防止機能を備えたMaterial Youインターフェースでお気に入りのステーションをお楽しみください</string>
 
-    <!-- Browse/Discover Stations -->
+    
     <string name="tab_browse">閲覧</string>
     <string name="search_radio_browser">数千のステーションを検索…</string>
     <string name="browse_top_voted">最も投票されたステーション</string>
@@ -112,7 +110,7 @@
     <string name="back">戻る</string>
     <string name="browse_all_stations">すべてのステーション</string>
 
-    <!-- Notification and Status Messages -->
+    
     <string name="notification_connecting">接続中...</string>
     <string name="notification_paused">一時停止</string>
     <string name="notification_playing">再生中</string>
@@ -127,7 +125,7 @@
     <string name="notification_action_pause">一時停止</string>
     <string name="notification_action_stop">停止</string>
 
-    <!-- Recording Messages -->
+    
     <string name="recording_failed">録音に失敗しました: %s</string>
     <string name="recording_saved">録音を保存しました: %1$s (%2$dKB)</string>
     <string name="recording_stopping">録音を停止中...</string>
@@ -135,7 +133,7 @@
     <string name="recording_no_station">ステーションが再生されていません</string>
     <string name="recording_directory_updated">録音ディレクトリを更新しました</string>
 
-    <!-- Dialog Titles and Buttons -->
+    
     <string name="dialog_add_station">ラジオステーションを追加</string>
     <string name="dialog_edit_station">ラジオステーションを編集</string>
     <string name="dialog_sort_stations">ステーションを並べ替え</string>
@@ -155,7 +153,7 @@
     <string name="button_choose_image">画像を選択</string>
     <string name="button_clear">クリア</string>
 
-    <!-- Settings - Appearance -->
+    
     <string name="settings_appearance">外観</string>
     <string name="settings_theme">テーマ</string>
     <string name="settings_theme_description">ライト、ダーク、またはシステムを選択</string>
@@ -177,7 +175,7 @@
     <string name="settings_disable_toasts">トースト通知を無効にする</string>
     <string name="settings_disable_toasts_description">警告とエラーのポップアップ通知を非表示にする</string>
 
-    <!-- Language Names -->
+    
     <string name="language_choose">言語を選択</string>
     <string name="language_system_default">システムデフォルト</string>
     <string name="language_arabic">العربية</string>
@@ -198,7 +196,7 @@
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_chinese">中文</string>
 
-    <!-- Settings - Tor Network -->
+    
     <string name="settings_tor_network">Torネットワーク</string>
     <string name="settings_enable_tor">Torを有効化（InviZible Pro経由）</string>
     <string name="settings_enable_tor_description">Torネットワーク経由で接続</string>
@@ -211,7 +209,7 @@
     <string name="settings_tor_info">InviZible Proが必要です（Play StoreまたはF-Droidから無料）。ツールバーのTorアイコンをタップして素早くアクセスできます。\n\n強制モードは、Torが利用できない場合に接続をブロックします。</string>
     <string name="settings_tor_privacy_notice">プライバシー：Tor強制が無効の場合、clearnetステーションと画像はインターネットに直接接続されます。録音はストリームと同じ接続を使用します。</string>
 
-    <!-- Settings - Custom Proxy -->
+    
     <string name="settings_custom_proxy">カスタムプロキシ</string>
     <string name="settings_enable_custom_proxy">カスタムプロキシを有効化</string>
     <string name="settings_enable_custom_proxy_description">接続にカスタムプロキシを使用</string>
@@ -223,13 +221,13 @@
     <string name="settings_force_custom_proxy_except_tor_i2p_description">すべてのclearnetトラフィックをカスタムプロキシ経由でルーティングしますが、TorとI2Pステーションがネイティブプロキシを使用することを許可します。</string>
     <string name="settings_custom_proxy_privacy_notice">プライバシー：カスタムプロキシ強制が無効の場合、clearnetステーションと画像はインターネットに直接接続されます。録音はストリームと同じ接続を使用します。</string>
 
-    <!-- Settings - Bandwidth -->
+    
     <string name="settings_bandwidth_usage">帯域幅使用量</string>
     <string name="settings_total_usage">合計使用量（累計）</string>
     <string name="settings_session_usage">セッション使用量</string>
     <string name="settings_bandwidth_zero">0 B</string>
 
-    <!-- Settings - Playback -->
+    
     <string name="settings_playback">再生</string>
     <string name="settings_sleep_timer">スリープタイマー</string>
     <string name="settings_sleep_timer_description">設定時間後に再生を自動停止</string>
@@ -249,7 +247,7 @@
     <string name="settings_record_all_stations">すべてのステーションを録音</string>
     <string name="settings_record_all_stations_description">同じファイルで新しいステーションのストリームに切り替え</string>
 
-    <!-- Settings - Station Management -->
+    
     <string name="settings_station_management">ステーション管理</string>
     <string name="settings_import_from_file">ファイルからインポート</string>
     <string name="settings_import_from_file_description">CSV、JSON、M3U、またはPLSからインポート</string>
@@ -262,7 +260,7 @@
     <string name="settings_export_stations">ステーションをエクスポート</string>
     <string name="settings_export_stations_description">ステーションをファイルにエクスポート</string>
 
-    <!-- Settings - About -->
+    
     <string name="settings_about">このアプリについて</string>
     <string name="settings_version">バージョン 1.5</string>
     <string name="settings_view_github">GitHubで見る</string>
@@ -272,7 +270,7 @@
     <string name="settings_monero_address">83GGx86c6ZePiz8tEcGYtGJYmnjuP8W9cfLx6s98WAu8YkenjLr4zFC4RxcCk3hwFUiv59wS8KRPzNUUUqTrrYXCJAk4nrN</string>
     <string name="settings_copy_address">アドレスをコピー</string>
 
-    <!-- Tor Control Bottom Sheet -->
+    
     <string name="tor_connection_details">接続の詳細</string>
     <string name="tor_proxy_host">プロキシホスト</string>
     <string name="tor_socks_port">SOCKSポート</string>
@@ -281,7 +279,7 @@
     <string name="tor_connect">Torに接続</string>
     <string name="tor_open_invizible">InviZible Proを開く</string>
 
-    <!-- Tor Status Messages -->
+    
     <string name="tor_status_connecting">接続中...</string>
     <string name="tor_status_connected">Tor接続済み</string>
     <string name="tor_status_disconnected">Tor切断済み</string>
@@ -290,7 +288,7 @@
     <string name="tor_status_leak_warning">リーク警告</string>
     <string name="tor_status_install_invizible">InviZible Proをインストール</string>
 
-    <!-- Tor Status ContentDescriptions (for accessibility) -->
+    
     <string name="tor_status_off_description">Torが切断されています。タップして接続します。</string>
     <string name="tor_status_connecting_description">Tor接続中...</string>
     <string name="tor_status_connected_description">Torが接続されています。タップして詳細を表示します。</string>
@@ -325,14 +323,14 @@
     <string name="tor_control_button_install">InviZible Proをインストール</string>
     <string name="tor_control_button_open_invizible">InviZible Proを開く</string>
 
-    <!-- Add/Edit Radio Dialog -->
+    
     <string name="add_edit_tor_info">埋め込みTorを使用 - プロキシ設定は不要</string>
     <string name="add_edit_authentication_optional">認証（オプション）</string>
     <string name="add_edit_advanced_options">詳細オプション</string>
     <string name="add_edit_cover_art">カバーアート</string>
     <string name="add_edit_or_enter_url">または画像URLを入力</string>
 
-    <!-- Input Hints -->
+    
     <string name="hint_station_name">ステーション名</string>
     <string name="hint_stream_url">ストリームURL</string>
     <string name="hint_genre">ジャンル</string>
@@ -349,7 +347,7 @@
     <string name="hint_password_optional_caps">パスワード（オプション）</string>
     <string name="hint_auth_type">認証タイプ</string>
 
-    <!-- Default Values -->
+    
     <string name="default_proxy_host_i2p">127.0.0.1</string>
     <string name="default_proxy_port_i2p">4444</string>
     <string name="default_proxy_port_http">8080</string>
@@ -357,7 +355,7 @@
     <string name="default_timeout">30</string>
     <string name="default_equalizer_db">0 dB</string>
 
-    <!-- Now Playing Fragment -->
+    
     <string name="now_playing_time_placeholder">00:00</string>
     <string name="now_playing_live">ライブ</string>
     <string name="now_playing_no_station">ステーションが再生されていません</string>
@@ -365,14 +363,14 @@
     <string name="now_playing_volume_title">ラジオ音量</string>
     <string name="now_playing_volume_description">ラジオストリームのみを調整</string>
 
-    <!-- Toast Messages -->
+    
     <string name="toast_session_bandwidth_reset">セッション帯域幅をリセットしました</string>
     <string name="toast_custom_proxy_saved">カスタムプロキシ設定を保存しました</string>
     <string name="toast_custom_proxy_cleared">カスタムプロキシ設定をクリアしました</string>
     <string name="toast_address_copied">アドレスをクリップボードにコピーしました</string>
     <string name="toast_using_default_directory">デフォルトディレクトリを使用しています</string>
 
-    <!-- Custom Proxy Status Messages -->
+    
     <string name="custom_proxy_status_connected">接続済み</string>
     <string name="custom_proxy_status_configured">プロキシ設定済み</string>
     <string name="custom_proxy_status_not_configured">未設定</string>
@@ -380,7 +378,7 @@
     <string name="custom_proxy_status_leak_warning">リーク警告</string>
     <string name="custom_proxy_status_leak_detail">強制が有効ですが設定されていません</string>
 
-    <!-- Tor Service Notification Messages -->
+    
     <string name="tor_channel_name">Tor接続</string>
     <string name="tor_channel_description">Tor接続ステータスを表示</string>
     <string name="tor_notification_disconnected">Tor切断</string>
@@ -394,11 +392,11 @@
     <string name="tor_notification_install_invizible">Torサポートのため、InviZible Proをインストールしてください</string>
     <string name="tor_notification_action_stop">Torを停止</string>
 
-    <!-- Other Error Messages -->
+    
     <string name="error_unknown">不明なエラー</string>
     <string name="folder_custom">カスタムフォルダ</string>
 
-    <!-- AddEditRadioDialog Default Values -->
+    
     <string name="default_genre_other">その他</string>
     <string name="default_proxy_none">なし</string>
     <string name="default_proxy_i2p">I2P</string>
@@ -413,7 +411,7 @@
     <string name="default_port_8080">8080</string>
     <string name="default_timeout_30">30</string>
 
-    <!-- Security & Privacy -->
+    
     <string name="settings_security_privacy">セキュリティとプライバシー</string>
     <string name="settings_app_lock">アプリロック</string>
     <string name="settings_app_lock_description">アプリのロック解除にパスワードまたは生体認証を要求</string>
@@ -436,7 +434,7 @@
     <string name="settings_database_encryption_password_required_title">アプリパスワードが必要です</string>
     <string name="settings_database_encryption_password_required_message">データベース暗号化は、アプリパスワードを使用して暗号化キーを生成します。まず、上記の「アプリロック」を有効にしてアプリパスワードを設定してください。\n\n設定後、同じパスワードを使用してデータベース暗号化を有効にできます - 別のパスワードは不要です。</string>
 
-    <!-- Authentication Dialog -->
+    
     <string name="auth_dialog_title">アプリパスワードを設定</string>
     <string name="auth_dialog_change_title">パスワードを変更</string>
     <string name="auth_dialog_change_message">注：データベース暗号化が有効な場合、新しいパスワードを使用するように自動的に更新されます。</string>
@@ -458,7 +456,7 @@
     <string name="auth_decrypting_database">データベースを復号化中…</string>
     <string name="auth_rekeying_database">新しいパスワードでデータベース暗号化を更新中…</string>
 
-    <!-- Authentication Activity -->
+    
     <string name="auth_unlock_app">deutsia radioのロックを解除</string>
     <string name="auth_enter_password">パスワードを入力してください</string>
     <string name="auth_password_hint">パスワード</string>
@@ -469,7 +467,7 @@
     <string name="auth_biometric_subtitle">続行するには認証してください</string>
     <string name="auth_biometric_negative">パスワードを使用</string>
 
-    <!-- Delete Confirmation Dialog -->
+    
     <string name="delete_stations_message">%1$d個のステーション%2$sを削除してもよろしいですか？</string>
     <string name="delete_stations_message_single">%d個のステーションを削除してもよろしいですか？</string>
     <string name="delete_stations_message_plural">%d個のステーションを削除してもよろしいですか？</string>
@@ -478,7 +476,7 @@
     <string name="deleted_stations_message_single">%d個のステーションを削除しました</string>
     <string name="deleted_stations_message_plural">%d個のステーションを削除しました</string>
 
-    <!-- Proxy Type Labels -->
+    
     <string name="proxy_label_i2p"> • I2P</string>
     <string name="proxy_label_tor"> • Tor</string>
     <string name="proxy_label_custom"> • カスタム</string>
@@ -487,7 +485,7 @@
     <string name="proxy_type_custom">カスタム</string>
     <string name="proxy_type_none">なし</string>
 
-    <!-- Tor Status Messages (TorManager) -->
+    
     <string name="tor_status_not_active">Torは有効ではありません</string>
     <string name="tor_status_connecting_network">Torネットワークに接続中...</string>
     <string name="tor_status_connected_via_tor">Tor経由で接続されました</string>
@@ -499,7 +497,7 @@
     <string name="tor_status_detail_tap_to_connect">タップして接続</string>
     <string name="tor_status_detail_install_invizible">Play StoreまたはF-DroidからInviZible Proをインストールしてください</string>
 
-    <!-- Settings Fragment Tor/Proxy Status -->
+    
     <string name="settings_tor_disconnected_status">切断されました</string>
     <string name="settings_tor_not_running_detail">Torは実行されていません</string>
     <string name="button_start_tor">開始</string>
@@ -521,7 +519,7 @@
     <string name="warning_tor_not_connected_except_i2p">⚠️ Torが接続されていません！Torが接続されるまで非I2Pストリームは失敗します。</string>
     <string name="button_off">オフ</string>
 
-    <!-- Import/Export Dialogs -->
+    
     <string name="dialog_import_stations">ステーションをインポート</string>
     <string name="import_message">ラジオステーションをインポートするファイルを選択してください。\n\nサポートされている形式:\n• CSV\n• JSON\n• M3Uプレイリスト\n• PLSプレイリスト</string>
     <string name="button_select_file">ファイルを選択</string>
@@ -544,7 +542,7 @@
     <string name="exported_stations_success">%1$d個のステーションを%2$sにエクスポートしました</string>
     <string name="export_error_message">エクスポートエラー: %s</string>
 
-    <!-- Recording Error Messages -->
+    
     <string name="recording_error_no_stream">再生中のストリームがありません</string>
     <string name="recording_error_cannot_create_directory">ディレクトリを作成できません</string>
     <string name="recording_error_connection_failed">接続に失敗しました</string>
@@ -557,13 +555,13 @@
     <string name="recording_error_io">I/Oエラー: %s</string>
     <string name="recording_error_generic">エラー: %s</string>
 
-    <!-- Custom Proxy Messages -->
+    
     <string name="custom_proxy_not_configured_notification">カスタムプロキシが設定されていません</string>
     <string name="custom_proxy_configured_description">カスタムプロキシが設定されています。タップして詳細を表示します。</string>
     <string name="custom_proxy_not_configured_description">カスタムプロキシが設定されていません。タップして設定します。</string>
     <string name="custom_proxy_privacy_warning_description">強制カスタムプロキシが有効ですが、設定されていません。プライバシーが危険にさらされる可能性があります。</string>
 
-    <!-- Proxy Configuration Dialog -->
+    
     <string name="dialog_configure_global_proxy">グローバルカスタムプロキシを設定</string>
     <string name="validation_enter_proxy_host">❌ プロキシホストを入力してください</string>
     <string name="testing_connection">接続をテスト中...</string>
@@ -575,22 +573,22 @@
     <string name="auth_basic_caps">Basic</string>
     <string name="auth_digest_caps">Digest</string>
 
-    <!-- Reset Bandwidth Dialog -->
+    
     <string name="dialog_reset_session_bandwidth">セッション帯域幅をリセット</string>
     <string name="reset_bandwidth_message">セッション帯域幅カウンターをゼロにリセットしますか？</string>
 
-    <!-- Browse Filter Messages -->
+    
     <string name="all_filters_applied">すべてのフィルターがすでに適用されています</string>
 
-    <!-- Database Encryption -->
+    
     <string name="password_change_rekey_failed">パスワードは変更されましたが、データベースの再暗号化に失敗しました: %s</string>
 
-    <!-- Empty State -->
+    
     <string name="empty_state_title">ステーションが見つかりません</string>
     <string name="empty_state_message">最初のステーションを追加してください。\n下のボタンをクリックしてください。</string>
     <string name="empty_state_add_button">新しいステーションを追加</string>
 
-    <!-- Stream Error Messages (Toasts) -->
+    
     <string name="error_stream_failed">ストリームへの接続に失敗しました</string>
     <string name="error_stream_max_retries">複数回の試行後に接続に失敗しました</string>
     <string name="error_tor_not_connected">Torが接続されていません。このストリームを再生するにはTorを有効にしてください。</string>
@@ -598,7 +596,7 @@
     <string name="error_tor_required_for_clearnet">Torが接続されていません。Tor強制モードではクリアネットストリームにTorが必要です。</string>
     <string name="error_custom_proxy_not_configured">カスタムプロキシが設定されていません。設定で構成してください。</string>
 
-    <!-- Content Descriptions (Accessibility) -->
+    
     <string name="cd_add_radio_station">ラジオ局を追加</string>
     <string name="cd_embedded_tor">組み込み Tor</string>
     <string name="cd_cover_art_preview">カバーアートプレビュー</string>
@@ -617,4 +615,22 @@
     <string name="cd_like_station">お気に入りに追加</string>
     <string name="cd_add_to_library">ライブラリに追加</string>
     <string name="cd_stop">停止</string>
+<string name="browse_i2p_stations">I2Pステーション</string>
+    <string name="browse_privacy_radio">プライバシーラジオ</string>
+    <string name="browse_privacy_radio_subtitle">TorとI2P経由の匿名ラジオ局</string>
+    <string name="browse_tor_stations">Torステーション</string>
+    <string name="button_add">追加</string>
+    <string name="custom_proxy_blocked_snackbar">データ漏洩なし — ストリームはブロックされています。以下でプロキシを設定してください。</string>
+    <string name="custom_proxy_status_proxy_required">プロキシが必要</string>
+    <string name="custom_proxy_status_proxy_required_description">プロキシが設定されるまでストリームはブロックされます。タップして設定してください。</string>
+    <string name="custom_proxy_status_proxy_required_detail">設定されるまでストリームはブロック</string>
+    <string name="failed_to_fetch_stations">サーバーから%sステーションの取得に失敗しました</string>
+    <string name="genre_i2p">I2P</string>
+    <string name="genre_tor">Tor</string>
+    <string name="notification_i2p_not_connected">I2Pが実行されていません - ストリームがブロックされました</string>
+    <string name="now_playing_connecting">接続中…</string>
+    <string name="searching">検索中…</string>
+    <string name="settings_color_classic">クラシック</string>
+    <string name="settings_color_classic_default">クラシック（デフォルト）</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4はリモートDNS解決をサポートしていません。DNSクエリがローカルで解決される可能性があり、アクセスするドメインがISPに明らかになる可能性があります。より良いプライバシーのためにSOCKS5の使用を検討してください。</string>
 </resources>
