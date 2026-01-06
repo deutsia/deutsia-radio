@@ -1,13 +1,17 @@
 package com.opensource.i2pradio.ui.browse
 
+import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -18,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
@@ -33,19 +38,35 @@ import kotlinx.coroutines.launch
  */
 class BrowseRadioRegistryOnlyFragment : Fragment() {
 
-    // Privacy Radio views
+    // Discovery mode views
+    private lateinit var discoveryContainer: View
     private lateinit var torStationsRecyclerView: RecyclerView
     private lateinit var torStationsSeeAll: TextView
     private lateinit var i2pStationsRecyclerView: RecyclerView
     private lateinit var i2pStationsSeeAll: TextView
 
+    // Results mode views
+    private lateinit var resultsContainer: LinearLayout
+    private lateinit var resultsTitle: TextView
+    private lateinit var btnBackToDiscovery: View
+    private lateinit var resultsRecyclerView: RecyclerView
+    private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var loadingContainer: FrameLayout
+    private lateinit var emptyStateContainer: LinearLayout
+
     // Adapters
     private lateinit var torStationsAdapter: PrivacyRadioCarouselAdapter
     private lateinit var i2pStationsAdapter: PrivacyRadioCarouselAdapter
+    private lateinit var resultsAdapter: PrivacyRadioListAdapter
 
     private val viewModel: BrowseViewModel by viewModels()
     private val radioViewModel: RadioViewModel by activityViewModels()
     private lateinit var repository: RadioBrowserRepository
+
+    private var isInResultsMode = false
+    private var currentStationType: StationType = StationType.TOR
+
+    private enum class StationType { TOR, I2P }
 
     // Broadcast receiver for like state changes
     private val likeStateReceiver = object : BroadcastReceiver() {
@@ -67,16 +88,28 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
         findViews(view)
         setupAdapters()
+        setupResultsMode()
         observeViewModel()
 
         return view
     }
 
     private fun findViews(view: View) {
+        // Discovery views
+        discoveryContainer = view.findViewById(R.id.discoveryContainer)
         torStationsRecyclerView = view.findViewById(R.id.torStationsRecyclerView)
         torStationsSeeAll = view.findViewById(R.id.torStationsSeeAll)
         i2pStationsRecyclerView = view.findViewById(R.id.i2pStationsRecyclerView)
         i2pStationsSeeAll = view.findViewById(R.id.i2pStationsSeeAll)
+
+        // Results views
+        resultsContainer = view.findViewById(R.id.resultsContainer)
+        resultsTitle = view.findViewById(R.id.resultsTitle)
+        btnBackToDiscovery = view.findViewById(R.id.btnBackToDiscovery)
+        resultsRecyclerView = view.findViewById(R.id.resultsRecyclerView)
+        swipeRefresh = view.findViewById(R.id.swipeRefresh)
+        loadingContainer = view.findViewById(R.id.loadingContainer)
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
     }
 
     private fun setupAdapters() {
@@ -100,25 +133,116 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         torStationsRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(torStationsRecyclerView)
 
         i2pStationsRecyclerView.adapter = skeletonI2pAdapter
         i2pStationsRecyclerView.layoutManager = LinearLayoutManager(
             requireContext(), LinearLayoutManager.HORIZONTAL, false
         )
+        setupCarouselTouchHandling(i2pStationsRecyclerView)
 
-        // See All buttons - show full list
+        // See All buttons
         torStationsSeeAll.setOnClickListener {
-            // TODO: Could navigate to a full list view
-            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                Toast.makeText(requireContext(), R.string.browse_tor_stations, Toast.LENGTH_SHORT).show()
-            }
+            showResultsMode(StationType.TOR)
         }
 
         i2pStationsSeeAll.setOnClickListener {
-            // TODO: Could navigate to a full list view
-            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                Toast.makeText(requireContext(), R.string.browse_i2p_stations, Toast.LENGTH_SHORT).show()
+            showResultsMode(StationType.I2P)
+        }
+    }
+
+    /**
+     * Set up touch handling for horizontal RecyclerViews to work with ViewPager2.
+     */
+    private fun setupCarouselTouchHandling(recyclerView: RecyclerView) {
+        recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            private var startX = 0f
+            private var startY = 0f
+            private val touchSlop = android.view.ViewConfiguration.get(requireContext()).scaledTouchSlop
+
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                when (e.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        startX = e.x
+                        startY = e.y
+                        rv.parent?.requestDisallowInterceptTouchEvent(true)
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        val dx = kotlin.math.abs(e.x - startX)
+                        val dy = kotlin.math.abs(e.y - startY)
+                        if (dy > touchSlop && dy > dx * 2) {
+                            rv.parent?.requestDisallowInterceptTouchEvent(false)
+                        }
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                }
+                return false
             }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+        })
+    }
+
+    private fun setupResultsMode() {
+        resultsAdapter = PrivacyRadioListAdapter(
+            onStationClick = { station -> playPrivacyStation(station) },
+            onLikeClick = { station -> likePrivacyStation(station) }
+        )
+
+        resultsRecyclerView.adapter = resultsAdapter
+        resultsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        btnBackToDiscovery.setOnClickListener {
+            switchToDiscoveryMode()
+        }
+
+        swipeRefresh.setOnRefreshListener {
+            when (currentStationType) {
+                StationType.TOR -> viewModel.loadApiTorStations()
+                StationType.I2P -> viewModel.loadApiI2pStations()
+            }
+        }
+    }
+
+    private fun showResultsMode(stationType: StationType) {
+        isInResultsMode = true
+        currentStationType = stationType
+        discoveryContainer.visibility = View.GONE
+        resultsContainer.visibility = View.VISIBLE
+
+        when (stationType) {
+            StationType.TOR -> {
+                resultsTitle.text = getString(R.string.browse_tor_stations)
+                // Use the already loaded stations
+                val stations = viewModel.privacyTorStations.value ?: emptyList()
+                resultsAdapter.submitList(stations)
+                updateEmptyState(stations.isEmpty())
+            }
+            StationType.I2P -> {
+                resultsTitle.text = getString(R.string.browse_i2p_stations)
+                val stations = viewModel.privacyI2pStations.value ?: emptyList()
+                resultsAdapter.submitList(stations)
+                updateEmptyState(stations.isEmpty())
+            }
+        }
+    }
+
+    private fun switchToDiscoveryMode() {
+        isInResultsMode = false
+        resultsContainer.visibility = View.GONE
+        discoveryContainer.visibility = View.VISIBLE
+    }
+
+    private fun updateEmptyState(isEmpty: Boolean) {
+        if (isEmpty) {
+            emptyStateContainer.visibility = View.VISIBLE
+            resultsRecyclerView.visibility = View.GONE
+        } else {
+            emptyStateContainer.visibility = View.GONE
+            resultsRecyclerView.visibility = View.VISIBLE
         }
     }
 
@@ -131,8 +255,16 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                     currentAdapter.stopAllShimmers()
                 }
                 torStationsRecyclerView.adapter = torStationsAdapter
+                setupCarouselTouchHandling(torStationsRecyclerView)
             }
             torStationsAdapter.submitList(stations)
+
+            // Update results if in results mode showing Tor stations
+            if (isInResultsMode && currentStationType == StationType.TOR) {
+                resultsAdapter.submitList(stations)
+                updateEmptyState(stations.isEmpty())
+                swipeRefresh.isRefreshing = false
+            }
         }
 
         viewModel.privacyI2pStations.observe(viewLifecycleOwner) { stations ->
@@ -142,8 +274,26 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                     currentAdapter.stopAllShimmers()
                 }
                 i2pStationsRecyclerView.adapter = i2pStationsAdapter
+                setupCarouselTouchHandling(i2pStationsRecyclerView)
             }
             i2pStationsAdapter.submitList(stations)
+
+            // Update results if in results mode showing I2P stations
+            if (isInResultsMode && currentStationType == StationType.I2P) {
+                resultsAdapter.submitList(stations)
+                updateEmptyState(stations.isEmpty())
+                swipeRefresh.isRefreshing = false
+            }
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isInResultsMode) {
+                if (isLoading && resultsAdapter.itemCount == 0) {
+                    loadingContainer.visibility = View.VISIBLE
+                } else {
+                    loadingContainer.visibility = View.GONE
+                }
+            }
         }
     }
 

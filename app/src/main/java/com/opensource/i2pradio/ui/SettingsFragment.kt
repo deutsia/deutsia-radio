@@ -2655,6 +2655,11 @@ class SettingsFragment : Fragment() {
             PreferencesHelper.setCoverArtDisabled(requireContext(), isChecked)
             // Invalidate image loader cache when setting changes
             com.opensource.i2pradio.util.SecureImageLoader.invalidateCache()
+
+            // When cover art is disabled, clear the entire cache to remove external images
+            if (isChecked) {
+                com.opensource.i2pradio.util.SecureImageLoader.clearRemoteImageCache(requireContext())
+            }
         }
     }
 

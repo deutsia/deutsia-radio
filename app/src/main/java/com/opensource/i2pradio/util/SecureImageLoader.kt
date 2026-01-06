@@ -273,6 +273,32 @@ object SecureImageLoader {
         return PreferencesHelper.isCoverArtDisabled(context)
     }
 
+    /**
+     * Clear the remote image cache (memory and disk).
+     * Called when cover art is disabled to remove cached external images.
+     * Does not affect local images (content:// or file://).
+     */
+    fun clearRemoteImageCache(context: Context) {
+        android.util.Log.d(TAG, "Clearing remote image cache")
+
+        // Clear the cached image loaders to force recreation
+        cachedImageLoader?.memoryCache?.clear()
+        cachedImageLoader?.diskCache?.clear()
+        cachedImageLoader = null
+        cachedProxyConfig = null
+
+        cachedPrivacyImageLoader?.memoryCache?.clear()
+        cachedPrivacyImageLoader?.diskCache?.clear()
+        cachedPrivacyImageLoader = null
+        cachedPrivacyProxyConfig = null
+
+        // Also clear the default Coil image loader cache
+        coil.Coil.imageLoader(context).memoryCache?.clear()
+        coil.Coil.imageLoader(context).diskCache?.clear()
+
+        android.util.Log.d(TAG, "Image cache cleared")
+    }
+
     private fun buildImageLoader(context: Context, config: ProxyConfig): ImageLoader {
         val builder = ImageLoader.Builder(context)
 
