@@ -632,5 +632,5 @@
     <string name="searching">Ricerca…</string>
     <string name="settings_color_classic">Classico</string>
     <string name="settings_color_classic_default">Classico (Predefinito)</string>
-    <string name="warning_socks4_dns_limitation">SOCKS4 non supporta la risoluzione DNS remota. Le query DNS potrebbero essere risolte localmente, il che potrebbe rivelare i domini a cui accedi al tuo ISP. Considera l'uso di SOCKS5 per una migliore privacy.</string>
+    <string name="warning_socks4_dns_limitation">SOCKS4 non supporta la risoluzione DNS remota. Le query DNS potrebbero essere risolte localmente, il che potrebbe rivelare i domini a cui accedi al tuo ISP. Considera l\'uso di SOCKS5 per una migliore privacy.</string>
 </resources>
