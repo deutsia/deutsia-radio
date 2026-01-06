@@ -7,13 +7,13 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.request.Disposable
+import com.google.android.material.button.MaterialButton
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
 import com.opensource.i2pradio.util.loadSecurePrivacy
@@ -66,10 +66,12 @@ class PrivacyRadioListAdapter(
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val stationImage: ImageView = itemView.findViewById(R.id.stationImage)
+        private val stationIcon: ImageView = itemView.findViewById(R.id.stationIcon)
         private val stationName: TextView = itemView.findViewById(R.id.stationName)
         private val stationInfo: TextView = itemView.findViewById(R.id.stationInfo)
-        private val btnLike: ImageButton = itemView.findViewById(R.id.btnLike)
+        private val qualityInfo: TextView = itemView.findViewById(R.id.qualityInfo)
+        private val likeButton: MaterialButton = itemView.findViewById(R.id.likeButton)
+        private val actionButton: MaterialButton = itemView.findViewById(R.id.actionButton)
         private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioRegistryStation) {
@@ -96,11 +98,17 @@ class PrivacyRadioListAdapter(
             }
             stationInfo.text = spannable
 
+            // Hide quality info for privacy radio stations (no bitrate data)
+            qualityInfo.visibility = View.GONE
+
+            // Hide action button (these are browsing results, not saved stations)
+            actionButton.visibility = View.GONE
+
             // Load station image using secure loader
             imageLoadDisposable?.dispose()
-            stationImage.setImageResource(R.drawable.ic_radio)
+            stationIcon.setImageResource(R.drawable.ic_radio)
             if (!station.faviconUrl.isNullOrEmpty()) {
-                imageLoadDisposable = stationImage.loadSecurePrivacy(station.faviconUrl) {
+                imageLoadDisposable = stationIcon.loadSecurePrivacy(station.faviconUrl) {
                     crossfade(true)
                     placeholder(R.drawable.ic_radio)
                     error(R.drawable.ic_radio)
@@ -112,15 +120,15 @@ class PrivacyRadioListAdapter(
             updateLikedStatus(likedUuids.contains(uuid))
 
             // Online indicator - change image alpha if offline
-            stationImage.alpha = if (station.isOnline) 1.0f else 0.5f
+            stationIcon.alpha = if (station.isOnline) 1.0f else 0.5f
 
             // Click listeners
             itemView.setOnClickListener { onStationClick(station) }
-            btnLike.setOnClickListener { onLikeClick(station) }
+            likeButton.setOnClickListener { onLikeClick(station) }
         }
 
         fun updateLikedStatus(isLiked: Boolean) {
-            btnLike.setImageResource(
+            likeButton.setIconResource(
                 if (isLiked) R.drawable.ic_favorite else R.drawable.ic_favorite_border
             )
         }
