@@ -184,9 +184,23 @@ class RadioBrowserClient(private val context: Context) {
     }
 
     /**
+     * Check if the RadioBrowser API is disabled by user preference.
+     * When disabled, all API calls return empty results to enable offline mode.
+     */
+    private fun isApiDisabled(): Boolean {
+        return PreferencesHelper.isRadioBrowserApiDisabled(context)
+    }
+
+    /**
      * Execute an API request with retry logic
      */
     private suspend fun executeRequest(endpoint: String, retries: Int = 2): RadioBrowserResult<List<RadioBrowserStation>> {
+        // Check if API is disabled by user preference
+        if (isApiDisabled()) {
+            Log.d(TAG, "RadioBrowser API is disabled by user preference")
+            return RadioBrowserResult.Success(emptyList())
+        }
+
         return withContext(Dispatchers.IO) {
             var lastException: Exception? = null
 
@@ -426,6 +440,12 @@ class RadioBrowserClient(private val context: Context) {
      * Get list of available countries with station counts
      */
     suspend fun getCountries(): RadioBrowserResult<List<CountryInfo>> {
+        // Check if API is disabled by user preference
+        if (isApiDisabled()) {
+            Log.d(TAG, "RadioBrowser API is disabled - returning empty countries list")
+            return RadioBrowserResult.Success(emptyList())
+        }
+
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
@@ -486,6 +506,12 @@ class RadioBrowserClient(private val context: Context) {
      * Get list of available tags with station counts
      */
     suspend fun getTags(limit: Int = 100): RadioBrowserResult<List<TagInfo>> {
+        // Check if API is disabled by user preference
+        if (isApiDisabled()) {
+            Log.d(TAG, "RadioBrowser API is disabled - returning empty tags list")
+            return RadioBrowserResult.Success(emptyList())
+        }
+
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
@@ -548,6 +574,12 @@ class RadioBrowserClient(private val context: Context) {
      * Get list of available languages with station counts
      */
     suspend fun getLanguages(limit: Int = 100): RadioBrowserResult<List<LanguageInfo>> {
+        // Check if API is disabled by user preference
+        if (isApiDisabled()) {
+            Log.d(TAG, "RadioBrowser API is disabled - returning empty languages list")
+            return RadioBrowserResult.Success(emptyList())
+        }
+
         return withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()

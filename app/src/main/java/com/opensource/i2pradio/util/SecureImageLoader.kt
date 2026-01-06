@@ -265,6 +265,14 @@ object SecureImageLoader {
         return getCurrentProxyConfig(context).mode == ProxyMode.BLOCKED
     }
 
+    /**
+     * Check if cover art loading is disabled by user preference.
+     * When disabled, remote images should not be loaded.
+     */
+    fun isCoverArtDisabled(context: Context): Boolean {
+        return PreferencesHelper.isCoverArtDisabled(context)
+    }
+
     private fun buildImageLoader(context: Context, config: ProxyConfig): ImageLoader {
         val builder = ImageLoader.Builder(context)
 
@@ -364,6 +372,8 @@ object SecureImageLoader {
  * Uses SecureImageLoader for remote URLs (http/https).
  * Local content URIs (file://, content://) and drawable resources bypass proxy.
  *
+ * If cover art is disabled in settings, remote images are skipped (shows placeholder).
+ *
  * @param data The image source (URL string, Uri, DrawableRes, etc.)
  * @param builder Optional builder to customize the image request
  * @return Disposable to cancel the request if needed
@@ -372,6 +382,17 @@ fun ImageView.loadSecure(
     data: Any?,
     builder: ImageRequest.Builder.() -> Unit = {}
 ): Disposable {
+    // Check if cover art is disabled for remote URLs
+    if (SecureImageLoader.isCoverArtDisabled(context) && SecureImageLoader.shouldUseProxy(data?.toString())) {
+        android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping remote image load")
+        // Return a no-op disposable, image will show placeholder/default
+        return object : Disposable {
+            override val job: kotlinx.coroutines.Job get() = kotlinx.coroutines.Job()
+            override val isDisposed: Boolean get() = true
+            override fun dispose() {}
+        }
+    }
+
     val imageLoader = SecureImageLoader.getImageLoader(context)
     return this.load(data, imageLoader, builder)
 }
@@ -387,6 +408,7 @@ fun ImageView.loadSecure(
  * - Any image from a privacy station source
  *
  * Behavior:
+ * - If cover art is disabled: Skips loading (shows placeholder)
  * - If Force Tor is enabled: Uses force mode settings
  * - If Tor is connected (not forced): Routes through Tor
  * - If Tor is not connected: Image loading is blocked (fails gracefully with placeholder)
@@ -399,6 +421,17 @@ fun ImageView.loadSecurePrivacy(
     data: Any?,
     builder: ImageRequest.Builder.() -> Unit = {}
 ): Disposable {
+    // Check if cover art is disabled for remote URLs
+    if (SecureImageLoader.isCoverArtDisabled(context) && SecureImageLoader.shouldUseProxy(data?.toString())) {
+        android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping privacy image load")
+        // Return a no-op disposable, image will show placeholder/default
+        return object : Disposable {
+            override val job: kotlinx.coroutines.Job get() = kotlinx.coroutines.Job()
+            override val isDisposed: Boolean get() = true
+            override fun dispose() {}
+        }
+    }
+
     val imageLoader = SecureImageLoader.getPrivacyImageLoader(context)
     return this.load(data, imageLoader, builder)
 }

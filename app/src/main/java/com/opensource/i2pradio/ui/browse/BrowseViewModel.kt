@@ -16,6 +16,7 @@ import com.opensource.i2pradio.data.radioregistry.RadioRegistryRepository
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryResult
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
 import com.opensource.i2pradio.tor.TorManager
+import com.opensource.i2pradio.ui.PreferencesHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -121,6 +122,16 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     private val _privacyRadioError = MutableLiveData<String?>(null)
     val privacyRadioError: LiveData<String?> = _privacyRadioError
 
+    // API disabled states (for UI adaptation)
+    private val _isRadioBrowserApiDisabled = MutableLiveData(false)
+    val isRadioBrowserApiDisabled: LiveData<Boolean> = _isRadioBrowserApiDisabled
+
+    private val _isRadioRegistryApiDisabled = MutableLiveData(false)
+    val isRadioRegistryApiDisabled: LiveData<Boolean> = _isRadioRegistryApiDisabled
+
+    private val _isOfflineMode = MutableLiveData(false)
+    val isOfflineMode: LiveData<Boolean> = _isOfflineMode
+
     // Track if privacy radio data has been loaded
     private var privacyRadioDataLoaded = false
 
@@ -167,6 +178,9 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         // This handles the race condition where the ViewModel loads before Tor is ready
         TorManager.addStateListener(torStateListener, notifyImmediately = false)
 
+        // Check initial API status
+        refreshApiDisabledStatus()
+
         // Load initial data
         loadAllStations()
         loadCountries()
@@ -174,6 +188,23 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         loadLanguages()
         loadDiscoveryData()
         loadPrivacyRadioData()
+    }
+
+    /**
+     * Refresh the API disabled status from preferences.
+     * Should be called when the fragment resumes to detect setting changes.
+     */
+    fun refreshApiDisabledStatus() {
+        val radioBrowserDisabled = PreferencesHelper.isRadioBrowserApiDisabled(getApplication())
+        val radioRegistryDisabled = PreferencesHelper.isRadioRegistryApiDisabled(getApplication())
+        val offlineMode = radioBrowserDisabled && radioRegistryDisabled
+
+        _isRadioBrowserApiDisabled.value = radioBrowserDisabled
+        _isRadioRegistryApiDisabled.value = radioRegistryDisabled
+        _isOfflineMode.value = offlineMode
+
+        android.util.Log.d("BrowseViewModel", "API status refreshed - RadioBrowser disabled: $radioBrowserDisabled, " +
+                "RadioRegistry disabled: $radioRegistryDisabled, Offline mode: $offlineMode")
     }
 
     /**

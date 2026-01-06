@@ -165,12 +165,27 @@ class RadioRegistryClient(private val context: Context) {
     }
 
     /**
+     * Check if the Radio Registry API is disabled by user preference.
+     * When disabled, all API calls return empty/default results to enable offline mode.
+     */
+    private fun isApiDisabled(): Boolean {
+        return PreferencesHelper.isRadioRegistryApiDisabled(context)
+    }
+
+    /**
      * Execute an API request
      */
     private suspend fun <T> executeRequest(
         endpoint: String,
         parser: (String) -> T
     ): RadioRegistryResult<T> {
+        // Check if API is disabled by user preference
+        if (isApiDisabled()) {
+            Log.d(TAG, "Radio Registry API is disabled by user preference")
+            // Return an error that indicates API is disabled - callers can handle this gracefully
+            return RadioRegistryResult.Error("Radio Registry API is disabled", null)
+        }
+
         return withContext(Dispatchers.IO) {
             try {
                 val (client, baseUrl) = buildHttpClient()

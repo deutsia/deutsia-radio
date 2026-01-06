@@ -59,6 +59,11 @@ object PreferencesHelper {
     // UI settings
     private const val KEY_TOAST_MESSAGES_DISABLED = "toast_messages_disabled"
 
+    // Network & API settings
+    private const val KEY_DISABLE_RADIOBROWSER_API = "disable_radiobrowser_api"
+    private const val KEY_DISABLE_RADIO_REGISTRY_API = "disable_radio_registry_api"
+    private const val KEY_DISABLE_COVER_ART = "disable_cover_art"
+
     // Currently playing station persistence
     private const val KEY_CURRENT_STATION_JSON = "current_station_json"
 
@@ -791,6 +796,76 @@ object PreferencesHelper {
     fun isToastMessagesDisabled(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_TOAST_MESSAGES_DISABLED, false)
+    }
+
+    // ===== Network & API Settings =====
+
+    /**
+     * Set whether RadioBrowser API is disabled.
+     * When disabled, the app won't fetch stations from RadioBrowser (radio-browser.info).
+     */
+    fun setRadioBrowserApiDisabled(context: Context, disabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_DISABLE_RADIOBROWSER_API, disabled)
+            .apply()
+    }
+
+    /**
+     * Check if RadioBrowser API is disabled.
+     * Default: false (API enabled)
+     */
+    fun isRadioBrowserApiDisabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_DISABLE_RADIOBROWSER_API, false)
+    }
+
+    /**
+     * Set whether Radio Registry API is disabled.
+     * When disabled, the app won't fetch Tor/I2P stations from the Radio Registry API.
+     */
+    fun setRadioRegistryApiDisabled(context: Context, disabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_DISABLE_RADIO_REGISTRY_API, disabled)
+            .apply()
+    }
+
+    /**
+     * Check if Radio Registry API is disabled.
+     * Default: false (API enabled)
+     */
+    fun isRadioRegistryApiDisabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_DISABLE_RADIO_REGISTRY_API, false)
+    }
+
+    /**
+     * Set whether cover art loading is disabled.
+     * When disabled, station artwork won't be loaded from external servers.
+     */
+    fun setCoverArtDisabled(context: Context, disabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_DISABLE_COVER_ART, disabled)
+            .apply()
+    }
+
+    /**
+     * Check if cover art loading is disabled.
+     * Default: false (cover art enabled)
+     */
+    fun isCoverArtDisabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_DISABLE_COVER_ART, false)
+    }
+
+    /**
+     * Check if both APIs are disabled (offline mode).
+     * In this mode, only local library stations are available.
+     */
+    fun isOfflineMode(context: Context): Boolean {
+        return isRadioBrowserApiDisabled(context) && isRadioRegistryApiDisabled(context)
     }
 
     // ===== Currently Playing Station Persistence =====
