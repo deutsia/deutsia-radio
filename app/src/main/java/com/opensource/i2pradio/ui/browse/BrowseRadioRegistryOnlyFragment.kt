@@ -360,13 +360,13 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     }
 
     private fun addStation(station: RadioBrowserStation) {
-        viewModel.addToLibrary(station)
+        viewModel.saveStation(station)
         viewModel.refreshLikedAndSavedUuids()
 
         if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
             Toast.makeText(
                 requireContext(),
-                getString(R.string.station_added_to_library, station.name),
+                getString(R.string.station_saved, station.name),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -376,13 +376,13 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     }
 
     private fun removeStation(station: RadioBrowserStation) {
-        viewModel.removeFromLibrary(station)
+        viewModel.removeStation(station)
         viewModel.refreshLikedAndSavedUuids()
 
         if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
             Toast.makeText(
                 requireContext(),
-                getString(R.string.station_removed_from_library, station.name),
+                getString(R.string.station_removed, station.name),
                 Toast.LENGTH_SHORT
             ).show()
         }
