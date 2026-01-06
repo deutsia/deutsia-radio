@@ -142,23 +142,11 @@ class RadioRegistryClient(private val context: Context) {
                 return Pair(null, CLEARNET_BASE_URL)
             }
         }
-        // Priority 3: Use Tor if available (opportunistic, for privacy)
-        else if (torEnabled && torConnected) {
-            val socksHost = TorManager.getProxyHost()
-            val socksPort = TorManager.getProxyPort()
-
-            if (socksPort > 0) {
-                Log.d(TAG, "Opportunistically routing Radio Registry API through Tor")
-                builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(socksHost, socksPort)))
-                builder.dns(SOCKS5_DNS)
-                builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-                builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-                return Pair(builder.build(), TOR_BASE_URL)
-            }
-        }
 
         // Default: Direct connection to clearnet
-        Log.d(TAG, "Using direct connection for Radio Registry API")
+        // Note: Cover art images are routed through Tor separately via SecureImageLoader
+        // when Tor is available, so we don't need to proxy the API requests here.
+        Log.d(TAG, "Using direct connection for Radio Registry API (clearnet)")
         builder.connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         builder.readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
         return Pair(builder.build(), CLEARNET_BASE_URL)
