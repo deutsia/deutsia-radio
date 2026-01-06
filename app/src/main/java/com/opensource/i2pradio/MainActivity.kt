@@ -37,7 +37,7 @@ import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
 import com.opensource.i2pradio.ui.TorStatusView
 import com.opensource.i2pradio.ui.CustomProxyStatusView
 import com.opensource.i2pradio.ui.LocaleHelper
-import com.opensource.i2pradio.ui.browse.BrowseStationsFragment
+import com.opensource.i2pradio.ui.browse.BrowseContainerFragment
 import com.opensource.i2pradio.utils.BiometricAuthManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -772,7 +772,7 @@ class MainActivity : AppCompatActivity() {
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> LibraryFragment()
-                1 -> BrowseStationsFragment()
+                1 -> BrowseContainerFragment()
                 2 -> NowPlayingFragment()
                 3 -> SettingsFragment()
                 else -> LibraryFragment()  // Fallback

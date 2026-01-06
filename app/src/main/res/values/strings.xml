@@ -285,6 +285,12 @@
     <string name="browse_offline_mode_message">External APIs are disabled in settings. Go to your Library to access saved stations, or enable APIs in Settings to browse online stations.</string>
     <string name="browse_radiobrowser_disabled">RadioBrowser API disabled</string>
     <string name="browse_radioregistry_disabled">Privacy stations API disabled</string>
+    <string name="browse_disabled_title">Browse Disabled</string>
+    <string name="browse_disabled_message">Both RadioBrowser and Radio Registry APIs are disabled in settings. Enable at least one API to browse online stations.</string>
+    <string name="browse_disabled_tip_title">Your saved stations still work</string>
+    <string name="browse_disabled_tip_message">Go to your Library tab to play stations you\'ve already saved, or import stations from a file.</string>
+    <string name="browse_privacy_only_title">Privacy Radio</string>
+    <string name="browse_privacy_only_message">RadioBrowser API is disabled. Showing Tor and I2P stations only.</string>
 
     <!-- Settings - About -->
     <string name="settings_about">About</string>

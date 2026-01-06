@@ -102,7 +102,6 @@ class BrowseStationsFragment : Fragment() {
     private lateinit var loadingContainer: FrameLayout
     private lateinit var emptyStateContainer: LinearLayout
     private lateinit var torWarningBanner: MaterialCardView
-    private lateinit var offlineModeBanner: MaterialCardView
 
     // Adapters
     private lateinit var stationsAdapter: BrowseStationsAdapter
@@ -263,7 +262,6 @@ class BrowseStationsFragment : Fragment() {
         loadingContainer = view.findViewById(R.id.loadingContainer)
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
         torWarningBanner = view.findViewById(R.id.torWarningBanner)
-        offlineModeBanner = view.findViewById(R.id.offlineModeBanner)
     }
 
     private fun setupDiscoveryMode() {
@@ -836,87 +834,13 @@ class BrowseStationsFragment : Fragment() {
             }
         }
 
-        // Observe API disabled states for UI adaptation
-        viewModel.isOfflineMode.observe(viewLifecycleOwner) { isOffline ->
-            offlineModeBanner.visibility = if (isOffline) View.VISIBLE else View.GONE
-            // Hide search bar in offline mode (no APIs to search)
-            discoverySearchBar.visibility = if (isOffline) View.GONE else View.VISIBLE
-        }
-
-        viewModel.isRadioBrowserApiDisabled.observe(viewLifecycleOwner) { isDisabled ->
-            // Hide RadioBrowser-related carousels when API is disabled
-            updateRadioBrowserSectionsVisibility(!isDisabled)
-        }
-
+        // Hide Privacy Radio section when Radio Registry API is disabled
+        // Note: Other API states are handled by BrowseContainerFragment which swaps fragments
         viewModel.isRadioRegistryApiDisabled.observe(viewLifecycleOwner) { isDisabled ->
-            // Hide Privacy Radio section when API is disabled
             privacyRadioSection.visibility = if (isDisabled) View.GONE else View.VISIBLE
-        }
-    }
-
-    /**
-     * Update visibility of RadioBrowser API dependent sections.
-     * Hides carousels that depend on the RadioBrowser API when it's disabled.
-     */
-    private fun updateRadioBrowserSectionsVisibility(visible: Boolean) {
-        val visibility = if (visible) View.VISIBLE else View.GONE
-
-        // Hide all RadioBrowser-related content
-        // Genre section (chips + see all)
-        view?.findViewById<View>(R.id.genreChipsRow1)?.parent?.let { parent ->
-            (parent as? View)?.visibility = visibility
-        }
-        view?.findViewById<View>(R.id.genreChipsRow2)?.parent?.let { parent ->
-            (parent as? View)?.visibility = visibility
-        }
-
-        // Country/Language carousels (USA, Germany, Spanish, French)
-        usaRecyclerView.parent?.let { parent ->
-            (parent as? View)?.parent?.let { grandparent ->
-                (grandparent as? View)?.visibility = visibility
-            }
-        }
-        germanyRecyclerView.parent?.let { parent ->
-            (parent as? View)?.parent?.let { grandparent ->
-                (grandparent as? View)?.visibility = visibility
-            }
-        }
-        spanishRecyclerView.parent?.let { parent ->
-            (parent as? View)?.parent?.let { grandparent ->
-                (grandparent as? View)?.visibility = visibility
-            }
-        }
-        frenchRecyclerView.parent?.let { parent ->
-            (parent as? View)?.parent?.let { grandparent ->
-                (grandparent as? View)?.visibility = visibility
-            }
-        }
-
-        // Trending/Top Voted/Popular/New carousels
-        trendingRecyclerView.parent?.let { parent ->
-            (parent as? View)?.parent?.let { grandparent ->
-                (grandparent as? View)?.visibility = visibility
-            }
-        }
-        topVotedPreviewRecyclerView.parent?.let { parent ->
-            (parent as? View)?.parent?.let { grandparent ->
-                (grandparent as? View)?.visibility = visibility
-            }
-        }
-        popularRecyclerView.parent?.let { parent ->
-            (parent as? View)?.parent?.let { grandparent ->
-                (grandparent as? View)?.visibility = visibility
-            }
-        }
-        newStationsRecyclerView.parent?.let { parent ->
-            (parent as? View)?.parent?.let { grandparent ->
-                (grandparent as? View)?.visibility = visibility
-            }
-        }
-
-        // Also hide genre header
-        genreSeeAll.parent?.let { parent ->
-            (parent as? View)?.visibility = visibility
+            // Also hide Tor/I2P recycler views
+            torStationsRecyclerView.visibility = if (isDisabled) View.GONE else View.VISIBLE
+            i2pStationsRecyclerView.visibility = if (isDisabled) View.GONE else View.VISIBLE
         }
     }
 
