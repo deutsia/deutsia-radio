@@ -15,6 +15,7 @@ import com.opensource.i2pradio.data.radiobrowser.TagInfo
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryRepository
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryResult
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
+import com.opensource.i2pradio.tor.TorManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -123,6 +124,20 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     // Track if privacy radio data has been loaded
     private var privacyRadioDataLoaded = false
 
+    // Track if privacy radio loading failed due to Tor not being ready (race condition)
+    private var privacyRadioNeedsTorRetry = false
+
+    // TorManager state listener for retrying privacy radio load when Tor connects
+    private val torStateListener: (TorManager.TorState) -> Unit = { state ->
+        if (state == TorManager.TorState.CONNECTED && privacyRadioNeedsTorRetry) {
+            // Tor is now connected, retry loading privacy radio data
+            android.util.Log.d("BrowseViewModel", "Tor connected, retrying privacy radio data load")
+            privacyRadioNeedsTorRetry = false
+            privacyRadioDataLoaded = false // Reset to allow reload
+            loadPrivacyRadioData(forceRefresh = true)
+        }
+    }
+
     // Track if discovery data has been loaded
     private var discoveryDataLoaded = false
 
@@ -148,6 +163,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     private var currentJob: Job? = null
 
     init {
+        // Register TorManager listener to retry privacy radio loading when Tor connects
+        // This handles the race condition where the ViewModel loads before Tor is ready
+        TorManager.addStateListener(torStateListener, notifyImmediately = false)
+
         // Load initial data
         loadAllStations()
         loadCountries()
@@ -223,6 +242,10 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      * Load privacy radio stations from the Radio Registry API.
      * Loads both Tor and I2P stations for the Privacy Radio section.
      * API calls are made in parallel to reduce total loading time.
+     *
+     * Handles the race condition where this is called before TorManager has
+     * completed its connection check. If loading fails because Tor is required
+     * but not connected, sets a flag to retry when Tor connects.
      */
     fun loadPrivacyRadioData(forceRefresh: Boolean = false) {
         if (privacyRadioDataLoaded && !forceRefresh) return
@@ -230,9 +253,23 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         _isPrivacyRadioLoading.value = true
         _privacyRadioError.value = null
 
+        // Check if Tor is required but not yet connected (race condition)
+        // If so, mark for retry when Tor connects
+        if (registryRepository.isTorRequiredButNotConnected()) {
+            android.util.Log.d("BrowseViewModel", "Tor required but not connected yet, will retry when Tor connects")
+            privacyRadioNeedsTorRetry = true
+            // Don't fail immediately - Tor might connect soon
+            // Keep loading state so skeleton shows while waiting
+        }
+
         // Launch parallel requests for Tor and I2P stations
         // Each updates its LiveData as soon as data arrives, not waiting for the other
         viewModelScope.launch {
+            var torFailed = false
+            var i2pFailed = false
+            var torError: String? = null
+            var i2pError: String? = null
+
             // Launch Tor stations fetch
             val torJob = async {
                 try {
@@ -241,12 +278,19 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                             _privacyTorStations.postValue(result.data.take(10))
                         }
                         is RadioRegistryResult.Error -> {
-                            _privacyRadioError.postValue(result.message)
+                            torFailed = true
+                            torError = result.message
+                            // Check if this is a Tor connection issue
+                            if (result.message?.contains("Tor") == true ||
+                                result.message?.contains("proxy") == true) {
+                                privacyRadioNeedsTorRetry = true
+                            }
                         }
                         is RadioRegistryResult.Loading -> {}
                     }
                 } catch (e: Exception) {
-                    _privacyRadioError.postValue(e.message)
+                    torFailed = true
+                    torError = e.message
                 }
             }
 
@@ -258,22 +302,35 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                             _privacyI2pStations.postValue(result.data.take(10))
                         }
                         is RadioRegistryResult.Error -> {
-                            if (_privacyRadioError.value == null) {
-                                _privacyRadioError.postValue(result.message)
+                            i2pFailed = true
+                            i2pError = result.message
+                            // Check if this is a Tor connection issue
+                            if (result.message?.contains("Tor") == true ||
+                                result.message?.contains("proxy") == true) {
+                                privacyRadioNeedsTorRetry = true
                             }
                         }
                         is RadioRegistryResult.Loading -> {}
                     }
                 } catch (e: Exception) {
-                    if (_privacyRadioError.value == null) {
-                        _privacyRadioError.postValue(e.message)
-                    }
+                    i2pFailed = true
+                    i2pError = e.message
                 }
             }
 
             // Wait for both to complete before setting loading to false
             torJob.await()
             i2pJob.await()
+
+            // Set error if both failed
+            if (torFailed && i2pFailed) {
+                _privacyRadioError.postValue(torError ?: i2pError)
+            } else if (torFailed) {
+                _privacyRadioError.postValue(torError)
+            } else if (i2pFailed) {
+                _privacyRadioError.postValue(i2pError)
+            }
+
             _isPrivacyRadioLoading.postValue(false)
         }
     }
@@ -1245,5 +1302,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     override fun onCleared() {
         super.onCleared()
         currentJob?.cancel()
+        // Remove TorManager listener to prevent memory leaks
+        TorManager.removeStateListener(torStateListener)
     }
 }
