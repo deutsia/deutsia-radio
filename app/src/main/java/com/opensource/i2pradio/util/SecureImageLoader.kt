@@ -387,7 +387,8 @@ fun ImageView.loadSecure(
         android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping remote image load")
         // Return a no-op disposable, image will show placeholder/default
         return object : Disposable {
-            override val job: kotlinx.coroutines.Job get() = kotlinx.coroutines.Job()
+            override val job: kotlinx.coroutines.Deferred<coil.request.ImageResult>
+                get() = kotlinx.coroutines.CompletableDeferred<coil.request.ImageResult>().apply { cancel() }
             override val isDisposed: Boolean get() = true
             override fun dispose() {}
         }
@@ -426,7 +427,8 @@ fun ImageView.loadSecurePrivacy(
         android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping privacy image load")
         // Return a no-op disposable, image will show placeholder/default
         return object : Disposable {
-            override val job: kotlinx.coroutines.Job get() = kotlinx.coroutines.Job()
+            override val job: kotlinx.coroutines.Deferred<coil.request.ImageResult>
+                get() = kotlinx.coroutines.CompletableDeferred<coil.request.ImageResult>().apply { cancel() }
             override val isDisposed: Boolean get() = true
             override fun dispose() {}
         }
