@@ -311,6 +311,7 @@
 
             <!-- Tor Stations Section -->
             <LinearLayout
+                android:id="@+id/torStationsSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -357,6 +358,7 @@
 
             <!-- I2P Stations Section -->
             <LinearLayout
+                android:id="@+id/i2pStationsSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
