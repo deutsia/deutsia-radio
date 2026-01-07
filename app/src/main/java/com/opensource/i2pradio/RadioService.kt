@@ -1680,10 +1680,25 @@ class RadioService : Service() {
                 .setAudioAttributes(audioAttributes, true)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
+                // Configure as live stream - prevents false end-of-stream during song transitions
+                val liveMediaItem = MediaItem.Builder()
+                    .setUri(streamUrl)
+                    .setLiveConfiguration(
+                        MediaItem.LiveConfiguration.Builder()
+                            .setMaxPlaybackSpeed(1.0f)  // Don't speed up to catch up
+                            .build()
+                    )
+                    .build()
+
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(streamUrl))
+                    .createMediaSource(liveMediaItem)
 
                 setMediaSource(mediaSource)
+
+                // Use REPEAT_MODE_ONE to treat stream as infinite - prevents STATE_ENDED
+                // from being triggered during song transitions (like browsers do)
+                repeatMode = Player.REPEAT_MODE_ONE
+
                 prepare()
                 playWhenReady = true
 
@@ -1722,7 +1737,9 @@ class RadioService : Service() {
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
                             Player.STATE_ENDED -> {
-                                android.util.Log.d("RadioService", "Stream ended, reconnecting...")
+                                // With REPEAT_MODE_ONE this should rarely trigger.
+                                // If it does, it indicates a true disconnection, not a song transition.
+                                android.util.Log.d("RadioService", "Stream ended unexpectedly (live stream), reconnecting...")
                                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
                                 broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
                                 scheduleReconnect()
