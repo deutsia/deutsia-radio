@@ -634,4 +634,19 @@
     <string name="settings_color_classic">کلاسیک</string>
     <string name="settings_color_classic_default">کلاسیک (پیش‌فرض)</string>
     <string name="warning_socks4_dns_limitation">SOCKS4 از تفکیک DNS از راه دور پشتیبانی نمی‌کند. پرس‌وجوهای DNS ممکن است به‌صورت محلی حل شوند که می‌تواند دامنه‌هایی را که به آنها دسترسی دارید به ISP شما فاش کند. برای حریم خصوصی بهتر از SOCKS5 استفاده کنید.</string>
+
+    <!-- Equalizer presets -->
+    <string name="equalizer_preset_custom">سفارشی</string>
+    <string name="equalizer_preset_flat">صاف</string>
+    <string name="equalizer_preset_bass_boost">تقویت بیس</string>
+    <string name="equalizer_preset_treble_boost">تقویت تربل</string>
+    <string name="equalizer_preset_rock">راک</string>
+    <string name="equalizer_preset_pop">پاپ</string>
+    <string name="equalizer_preset_classical">کلاسیک</string>
+    <string name="equalizer_preset_jazz">جز</string>
+
+    <!-- I2P status messages -->
+    <string name="i2p_status_checking">در حال بررسی دسترسی I2P…</string>
+    <string name="i2p_status_available">پروکسی I2P در %1$s:%2$d موجود است</string>
+    <string name="i2p_status_unavailable">I2P در حال اجرا نیست</string>
 </resources>

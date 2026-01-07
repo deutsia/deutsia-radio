@@ -633,4 +633,19 @@
     <string name="settings_color_classic">كلاسيكي</string>
     <string name="settings_color_classic_default">كلاسيكي (افتراضي)</string>
     <string name="warning_socks4_dns_limitation">SOCKS4 لا يدعم حل DNS البعيد. قد يتم حل استعلامات DNS محليًا، مما قد يكشف النطاقات التي تصل إليها لمزود خدمة الإنترنت الخاص بك. فكر في استخدام SOCKS5 لمزيد من الخصوصية.</string>
+
+    <!-- Equalizer presets -->
+    <string name="equalizer_preset_custom">مخصص</string>
+    <string name="equalizer_preset_flat">مسطح</string>
+    <string name="equalizer_preset_bass_boost">تعزيز الجهير</string>
+    <string name="equalizer_preset_treble_boost">تعزيز الطبقات العالية</string>
+    <string name="equalizer_preset_rock">روك</string>
+    <string name="equalizer_preset_pop">بوب</string>
+    <string name="equalizer_preset_classical">كلاسيكي</string>
+    <string name="equalizer_preset_jazz">جاز</string>
+
+    <!-- I2P status messages -->
+    <string name="i2p_status_checking">جارٍ التحقق من توفر I2P…</string>
+    <string name="i2p_status_available">وكيل I2P متاح على %1$s:%2$d</string>
+    <string name="i2p_status_unavailable">I2P لا يعمل</string>
 </resources>

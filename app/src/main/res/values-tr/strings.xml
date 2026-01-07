@@ -634,4 +634,19 @@
     <string name="settings_color_classic">Klasik</string>
     <string name="settings_color_classic_default">Klasik (Varsayılan)</string>
     <string name="warning_socks4_dns_limitation">SOCKS4 uzak DNS çözümlemesini desteklemez. DNS sorguları yerel olarak çözümlenebilir, bu da eriştiğiniz alan adlarını İSS\'nize açığa çıkarabilir. Daha iyi gizlilik için SOCKS5 kullanmayı düşünün.</string>
+
+    <!-- Equalizer Preset Names -->
+    <string name="equalizer_preset_custom">Özel</string>
+    <string name="equalizer_preset_flat">Düz</string>
+    <string name="equalizer_preset_bass_boost">Bas Güçlendirme</string>
+    <string name="equalizer_preset_treble_boost">Tiz Güçlendirme</string>
+    <string name="equalizer_preset_rock">Rock</string>
+    <string name="equalizer_preset_pop">Pop</string>
+    <string name="equalizer_preset_classical">Klasik</string>
+    <string name="equalizer_preset_jazz">Caz</string>
+
+    <!-- I2P Status Messages -->
+    <string name="i2p_status_checking">I2P kullanılabilirliği kontrol ediliyor…</string>
+    <string name="i2p_status_available">I2P proxy %1$s:%2$d adresinde mevcut</string>
+    <string name="i2p_status_unavailable">I2P çalışmıyor</string>
 </resources>

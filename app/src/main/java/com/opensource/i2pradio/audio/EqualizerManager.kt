@@ -5,6 +5,7 @@ import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
 import android.util.Log
+import com.opensource.i2pradio.R
 import com.opensource.i2pradio.ui.PreferencesHelper
 
 /**
@@ -181,7 +182,16 @@ class EqualizerManager(private val context: Context) {
         numberOfBands = FIXED_BAND_COUNT.toShort()
 
         // Create preset names for UI
-        presetNames = listOf("Custom", "Flat", "Bass Boost", "Treble Boost", "Rock", "Pop", "Classical", "Jazz")
+        presetNames = listOf(
+            context.getString(R.string.equalizer_preset_custom),
+            context.getString(R.string.equalizer_preset_flat),
+            context.getString(R.string.equalizer_preset_bass_boost),
+            context.getString(R.string.equalizer_preset_treble_boost),
+            context.getString(R.string.equalizer_preset_rock),
+            context.getString(R.string.equalizer_preset_pop),
+            context.getString(R.string.equalizer_preset_classical),
+            context.getString(R.string.equalizer_preset_jazz)
+        )
 
         // Use fixed frequencies as center frequencies for preview
         centerFrequencies = FIXED_BAND_FREQUENCIES

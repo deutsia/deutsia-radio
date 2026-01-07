@@ -634,4 +634,19 @@
     <string name="settings_color_classic">Cổ điển</string>
     <string name="settings_color_classic_default">Cổ điển (Mặc định)</string>
     <string name="warning_socks4_dns_limitation">SOCKS4 không hỗ trợ phân giải DNS từ xa. Các truy vấn DNS có thể được phân giải cục bộ, điều này có thể tiết lộ các tên miền bạn truy cập cho ISP của bạn. Hãy xem xét sử dụng SOCKS5 để có quyền riêng tư tốt hơn.</string>
+
+    <!-- Equalizer Preset Names -->
+    <string name="equalizer_preset_custom">Tùy chỉnh</string>
+    <string name="equalizer_preset_flat">Phẳng</string>
+    <string name="equalizer_preset_bass_boost">Tăng Bass</string>
+    <string name="equalizer_preset_treble_boost">Tăng Treble</string>
+    <string name="equalizer_preset_rock">Rock</string>
+    <string name="equalizer_preset_pop">Pop</string>
+    <string name="equalizer_preset_classical">Cổ điển</string>
+    <string name="equalizer_preset_jazz">Jazz</string>
+
+    <!-- I2P Status Messages -->
+    <string name="i2p_status_checking">Đang kiểm tra tính khả dụng của I2P…</string>
+    <string name="i2p_status_available">Proxy I2P khả dụng tại %1$s:%2$d</string>
+    <string name="i2p_status_unavailable">I2P không chạy</string>
 </resources>
