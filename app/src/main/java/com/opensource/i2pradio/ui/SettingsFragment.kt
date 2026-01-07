@@ -37,6 +37,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.audio.EqualizerManager
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
@@ -575,32 +576,30 @@ class SettingsFragment : Fragment() {
     /**
      * Opens the built-in equalizer using the app's own UI.
      * Uses Android's Equalizer API attached to the audio session.
+     * If no audio is playing, opens in preview mode where settings are saved
+     * and will be applied when playback starts.
      */
     private fun openBuiltInEqualizer() {
-        val equalizerManager = radioService?.getEqualizerManager()
-        if (equalizerManager == null) {
-            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
-            }
-            return
-        }
-
+        var equalizerManager = radioService?.getEqualizerManager()
         val audioSessionId = radioService?.getAudioSessionId() ?: 0
-        if (audioSessionId == 0) {
-            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
-            }
-            return
-        }
 
-        // Initialize equalizer if not already done
-        if (!equalizerManager.isInitialized()) {
-            val initialized = equalizerManager.initialize(audioSessionId)
-            if (!initialized) {
-                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                    Toast.makeText(requireContext(), getString(R.string.equalizer_init_failed), Toast.LENGTH_SHORT).show()
+        // If we have an active audio session, try to initialize the real equalizer
+        if (equalizerManager != null && audioSessionId > 0) {
+            if (!equalizerManager.isInitialized()) {
+                val initialized = equalizerManager.initialize(audioSessionId)
+                if (!initialized) {
+                    // Fall back to preview mode if initialization fails
+                    equalizerManager.initializeForPreview()
                 }
-                return
+            }
+        } else {
+            // No active audio session - use preview mode
+            // Create a temporary EqualizerManager for preview if service isn't bound
+            if (equalizerManager == null) {
+                equalizerManager = EqualizerManager(requireContext())
+            }
+            if (!equalizerManager.isInitialized()) {
+                equalizerManager.initializeForPreview()
             }
         }
 
