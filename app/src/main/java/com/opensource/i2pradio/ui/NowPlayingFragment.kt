@@ -482,7 +482,7 @@ class NowPlayingFragment : Fragment() {
                         val stationInfo = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
                         if (stationInfo != null) {
                             // Station is saved - remove it
-                            radioBrowserRepository.deleteByUuid(station.radioBrowserUuid)
+                            radioBrowserRepository.deleteStationByUuid(station.radioBrowserUuid)
                             withContext(Dispatchers.Main) {
                                 updateAddToLibraryButton(false)
                                 // Broadcast saved state change to all views
