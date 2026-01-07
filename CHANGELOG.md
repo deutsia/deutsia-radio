@@ -2,6 +2,17 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.6.2]
+
+### Added
+- **Security tests**: Tests verifying privacy and security guarantees
+- **API disable options**: Completely disable Radio Browser API + Radio Registry API for maximum privacy
+- **Cover art disable option**: Prevent artwork loading to reduce network fingerprinting
+
+### UI/UX Improvements
+- Added like option to the Now Playing Screen
+
+
 ## [1.6.1]
 
 ### Added
