@@ -168,6 +168,12 @@ class RadioService : Service() {
 
     private var reconnectRunnable: Runnable? = null
 
+    // Stream activity tracking for data-flow-based reconnection
+    // This mimics browser behavior: keep playing while data flows, reconnect only on true stall
+    private val lastDataReceivedTime = java.util.concurrent.atomic.AtomicLong(0L)
+    private var streamWatchdogRunnable: Runnable? = null
+    private val streamStallTimeoutMs = 5000L  // Reconnect if no data for 5 seconds
+
     private var currentMetadata: String? = null
     private var currentArtist: String? = null
     private var currentTitle: String? = null
@@ -1662,9 +1668,15 @@ class RadioService : Service() {
                 currentOkHttpClient!!
             }
 
-            val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
+            val baseDataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
                 .setUserAgent("DeutsiaRadio/1.0")
                 .setDefaultRequestProperties(mapOf("Icy-MetaData" to "1"))
+
+            // Wrap with LiveStreamDataSource to track data flow for smart reconnection
+            val dataSourceFactory = LiveStreamDataSource.Factory(
+                baseDataSourceFactory,
+                lastDataReceivedTime
+            )
 
             val loadControl = DefaultLoadControl.Builder()
                 .setBufferDurationsMs(5_000, 15_000, 1_000, 2_000)
@@ -1675,23 +1687,16 @@ class RadioService : Service() {
                 .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MUSIC)
                 .build()
 
+            // Initialize stream activity timestamp
+            lastDataReceivedTime.set(System.currentTimeMillis())
+
             player = ExoPlayer.Builder(this)
                 .setLoadControl(loadControl)
                 .setAudioAttributes(audioAttributes, true)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
-                // Configure as live stream - prevents false end-of-stream during song transitions
-                val liveMediaItem = MediaItem.Builder()
-                    .setUri(streamUrl)
-                    .setLiveConfiguration(
-                        MediaItem.LiveConfiguration.Builder()
-                            .setMaxPlaybackSpeed(1.0f)  // Don't speed up to catch up
-                            .build()
-                    )
-                    .build()
-
                 val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(liveMediaItem)
+                    .createMediaSource(MediaItem.fromUri(streamUrl))
 
                 setMediaSource(mediaSource)
 
@@ -1727,6 +1732,7 @@ class RadioService : Service() {
                                 }
                                 extractStreamInfo()
                                 startPlaybackTimeUpdates()
+                                startStreamWatchdog()  // Start data-flow monitoring
                                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = true)
                                 android.util.Log.d("RadioService", "Stream playing successfully")
                             }
@@ -1737,12 +1743,10 @@ class RadioService : Service() {
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
                             Player.STATE_ENDED -> {
-                                // With REPEAT_MODE_ONE this should rarely trigger.
-                                // If it does, it indicates a true disconnection, not a song transition.
-                                android.util.Log.d("RadioService", "Stream ended unexpectedly (live stream), reconnecting...")
-                                updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
-                                broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
-                                scheduleReconnect()
+                                // For live streams, STATE_ENDED can falsely trigger during song transitions.
+                                // Don't reconnect here - let the stream watchdog handle true stalls.
+                                // This mimics browser behavior of continuously consuming stream data.
+                                android.util.Log.d("RadioService", "STATE_ENDED received - ignoring for live stream (watchdog monitors data flow)")
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
@@ -1815,7 +1819,47 @@ class RadioService : Service() {
         }
     }
 
+    /**
+     * Starts a watchdog timer that monitors data flow from the stream.
+     * If no data is received for streamStallTimeoutMs, triggers a reconnection.
+     * This is more reliable than STATE_ENDED for detecting true disconnections.
+     */
+    private fun startStreamWatchdog() {
+        stopStreamWatchdog()  // Cancel any existing watchdog
+
+        streamWatchdogRunnable = object : Runnable {
+            override fun run() {
+                val timeSinceLastData = System.currentTimeMillis() - lastDataReceivedTime.get()
+
+                if (timeSinceLastData > streamStallTimeoutMs) {
+                    // Stream has stalled - no data received for too long
+                    android.util.Log.w("RadioService", "Stream stalled (no data for ${timeSinceLastData}ms), reconnecting...")
+                    updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
+                    broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
+                    scheduleReconnect()
+                } else {
+                    // Stream is healthy, check again in 1 second
+                    handler.postDelayed(this, 1000L)
+                }
+            }
+        }
+
+        // Start checking after 1 second
+        handler.postDelayed(streamWatchdogRunnable!!, 1000L)
+        android.util.Log.d("RadioService", "Stream watchdog started (timeout: ${streamStallTimeoutMs}ms)")
+    }
+
+    private fun stopStreamWatchdog() {
+        streamWatchdogRunnable?.let {
+            handler.removeCallbacks(it)
+            android.util.Log.d("RadioService", "Stream watchdog stopped")
+        }
+        streamWatchdogRunnable = null
+    }
+
     private fun scheduleReconnect() {
+        stopStreamWatchdog()  // Stop watchdog while reconnecting
+
         if (currentStreamUrl == null) {
             android.util.Log.d("RadioService", "No stream to reconnect to")
             broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
@@ -1853,8 +1897,9 @@ class RadioService : Service() {
     }
 
     private fun stopStream() {
-        // Stop playback time updates first
+        // Stop playback time updates and stream watchdog first
         stopPlaybackTimeUpdates()
+        stopStreamWatchdog()
 
         // Cancel only the reconnect runnable, not ALL callbacks
         // Using removeCallbacksAndMessages(null) is too aggressive and can
