@@ -38,6 +38,18 @@
         app:layout_constraintStart_toEndOf="@id/backButton"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Add to Library Button - positioned next to like button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addToLibraryButton"
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/cd_add_to_library"
+        app:icon="@drawable/ic_add"
+        app:layout_constraintEnd_toStartOf="@id/likeButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- Like Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/likeButton"
@@ -313,7 +325,7 @@
 
     </LinearLayout>
 
-    <!-- Recording Indicator - positioned on toolbar row, left of like button -->
+    <!-- Recording Indicator - positioned on toolbar row, left of add to library button -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordingIndicator"
         android:layout_width="wrap_content"
@@ -326,8 +338,8 @@
         app:cardElevation="2dp"
         app:strokeWidth="0dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/likeButton"
-        app:layout_constraintBottom_toBottomOf="@id/likeButton">
+        app:layout_constraintEnd_toStartOf="@id/addToLibraryButton"
+        app:layout_constraintBottom_toBottomOf="@id/addToLibraryButton">
 
         <LinearLayout
             android:layout_width="wrap_content"

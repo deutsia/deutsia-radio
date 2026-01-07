@@ -64,6 +64,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var metadataText: TextView
     private lateinit var streamInfoText: TextView
     private lateinit var likeButton: MaterialButton
+    private lateinit var addToLibraryButton: MaterialButton
     private lateinit var playPauseButton: FloatingActionButton
     private lateinit var recordButton: FloatingActionButton
     private lateinit var volumeButton: FloatingActionButton
@@ -300,6 +301,7 @@ class NowPlayingFragment : Fragment() {
         metadataText = view.findViewById(R.id.nowPlayingMetadata)
         streamInfoText = view.findViewById(R.id.nowPlayingStreamInfo)
         likeButton = view.findViewById(R.id.likeButton)
+        addToLibraryButton = view.findViewById(R.id.addToLibraryButton)
         playPauseButton = view.findViewById(R.id.playPauseButton)
         recordButton = view.findViewById(R.id.recordButton)
         volumeButton = view.findViewById(R.id.volumeButton)
@@ -454,6 +456,111 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
+        // Add to Library button click handler - same logic as browse screen add button
+        addToLibraryButton.setOnClickListener {
+            viewModel.getCurrentStation()?.let { station ->
+                // Animate the button with scale effect
+                addToLibraryButton.animate()
+                    .scaleX(0.85f)
+                    .scaleY(0.85f)
+                    .setDuration(80)
+                    .setInterpolator(DecelerateInterpolator())
+                    .withEndAction {
+                        addToLibraryButton.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(150)
+                            .setInterpolator(OvershootInterpolator(2f))
+                            .start()
+                    }
+                    .start()
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    // Check if this is a global radio (has radioBrowserUuid)
+                    if (!station.radioBrowserUuid.isNullOrEmpty()) {
+                        // For global radios, check if already saved in library
+                        val stationInfo = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
+                        if (stationInfo != null) {
+                            // Station is saved - remove it
+                            radioBrowserRepository.deleteStationByUuid(station.radioBrowserUuid)
+                            withContext(Dispatchers.Main) {
+                                updateAddToLibraryButton(false)
+                                // Broadcast saved state change to all views
+                                val broadcastIntent = Intent(MainActivity.BROADCAST_SAVED_STATE_CHANGED).apply {
+                                    putExtra(MainActivity.EXTRA_IS_SAVED, false)
+                                    putExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
+                                }
+                                LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
+                                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.station_removed, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        } else {
+                            // Station not saved - save it
+                            val radioBrowserStation = com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation(
+                                stationuuid = station.radioBrowserUuid,
+                                name = station.name,
+                                url = station.streamUrl,
+                                urlResolved = station.streamUrl,
+                                homepage = station.homepage ?: "",
+                                favicon = station.coverArtUri ?: "",
+                                tags = station.genre,
+                                country = station.country ?: "",
+                                countrycode = station.countryCode ?: "",
+                                state = "",
+                                language = "",
+                                languagecodes = "",
+                                votes = 0,
+                                lastchangetime = "",
+                                codec = station.codec ?: "",
+                                bitrate = station.bitrate,
+                                hls = false,
+                                lastcheckok = true,
+                                clickcount = 0,
+                                clicktrend = 0,
+                                sslError = false,
+                                geoLat = null,
+                                geoLong = null
+                            )
+                            radioBrowserRepository.saveStation(radioBrowserStation)
+                            withContext(Dispatchers.Main) {
+                                updateAddToLibraryButton(true)
+                                // Broadcast saved state change to all views
+                                val broadcastIntent = Intent(MainActivity.BROADCAST_SAVED_STATE_CHANGED).apply {
+                                    putExtra(MainActivity.EXTRA_IS_SAVED, true)
+                                    putExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
+                                }
+                                LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
+                                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.station_saved, station.name),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    } else {
+                        // For user stations, they're always in the library, so we just toggle visibility
+                        // This case shouldn't really happen for user stations as they're always local
+                        withContext(Dispatchers.Main) {
+                            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    getString(R.string.station_already_in_library),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Equalizer button click handler - opens built-in equalizer
         equalizerButton.setOnClickListener {
             openBuiltInEqualizer()
@@ -575,6 +682,22 @@ class NowPlayingFragment : Fragment() {
 
                 // Update like button state
                 updateLikeButton(station.isLiked)
+
+                // Update add to library button state
+                if (!station.radioBrowserUuid.isNullOrEmpty()) {
+                    // For global radios, check if saved in library
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val stationInfo = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
+                        withContext(Dispatchers.Main) {
+                            updateAddToLibraryButton(stationInfo != null)
+                            // Show/hide the button - only show for global radios
+                            addToLibraryButton.visibility = View.VISIBLE
+                        }
+                    }
+                } else {
+                    // For user stations, hide the add button (already in library)
+                    addToLibraryButton.visibility = View.GONE
+                }
 
                 // Reset metadata and stream info for new station
                 if (isNewStation) {
@@ -995,32 +1118,30 @@ class NowPlayingFragment : Fragment() {
     /**
      * Opens the built-in equalizer using the app's own UI.
      * Uses Android's Equalizer API attached to the audio session.
+     * If no audio is playing, opens in preview mode where settings are saved
+     * and will be applied when playback starts.
      */
     private fun openBuiltInEqualizer() {
-        val equalizerManager = radioService?.getEqualizerManager()
-        if (equalizerManager == null) {
-            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
-            }
-            return
-        }
-
+        var equalizerManager = radioService?.getEqualizerManager()
         val audioSessionId = radioService?.getAudioSessionId() ?: 0
-        if (audioSessionId == 0) {
-            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                Toast.makeText(requireContext(), getString(R.string.equalizer_no_audio), Toast.LENGTH_SHORT).show()
-            }
-            return
-        }
 
-        // Initialize equalizer if not already done
-        if (!equalizerManager.isInitialized()) {
-            val initialized = equalizerManager.initialize(audioSessionId)
-            if (!initialized) {
-                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                    Toast.makeText(requireContext(), getString(R.string.equalizer_init_failed), Toast.LENGTH_SHORT).show()
+        // If we have an active audio session, try to initialize the real equalizer
+        if (equalizerManager != null && audioSessionId > 0) {
+            if (!equalizerManager.isInitialized()) {
+                val initialized = equalizerManager.initialize(audioSessionId)
+                if (!initialized) {
+                    // Fall back to preview mode if initialization fails
+                    equalizerManager.initializeForPreview()
                 }
-                return
+            }
+        } else {
+            // No active audio session - use preview mode
+            // Create a temporary EqualizerManager for preview if service isn't bound
+            if (equalizerManager == null) {
+                equalizerManager = EqualizerManager(requireContext())
+            }
+            if (!equalizerManager.isInitialized()) {
+                equalizerManager.initializeForPreview()
             }
         }
 
@@ -1041,6 +1162,14 @@ class NowPlayingFragment : Fragment() {
                 )
             )
         }
+    }
+
+    /**
+     * Update the add to library button icon based on saved state.
+     * Uses same icon pattern as BrowseStationsAdapter action button.
+     */
+    private fun updateAddToLibraryButton(isSaved: Boolean) {
+        addToLibraryButton.setIconResource(if (isSaved) R.drawable.ic_check else R.drawable.ic_add)
     }
 
     private fun updateStreamInfo(bitrate: Int, codec: String) {

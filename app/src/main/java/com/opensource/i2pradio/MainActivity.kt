@@ -726,6 +726,10 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_RADIO_BROWSER_UUID = "radio_browser_uuid"
         const val EXTRA_IS_LIKED = "is_liked"
 
+        // Broadcast action for saved/library state changes
+        const val BROADCAST_SAVED_STATE_CHANGED = "com.opensource.i2pradio.SAVED_STATE_CHANGED"
+        const val EXTRA_IS_SAVED = "is_saved"
+
         // Broadcast action for proxy mode changes
         const val BROADCAST_PROXY_MODE_CHANGED = "com.opensource.i2pradio.PROXY_MODE_CHANGED"
 
