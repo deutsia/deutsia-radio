@@ -41,13 +41,12 @@
     <!-- Add to Library Button - positioned next to like button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/addToLibraryButton"
-        style="@style/Widget.Material3.Button.IconButton"
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:contentDescription="@string/cd_add_to_library"
         app:icon="@drawable/ic_add"
-        app:iconTint="?attr/colorOnSurface"
         app:layout_constraintEnd_toStartOf="@id/likeButton"
         app:layout_constraintTop_toTopOf="parent" />
 
