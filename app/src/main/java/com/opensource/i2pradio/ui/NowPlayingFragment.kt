@@ -342,79 +342,31 @@ class NowPlayingFragment : Fragment() {
         }
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
 
-        // Like button click handler
+        // Like button click handler - uses shared logic with station list
         likeButton.setOnClickListener {
             viewModel.getCurrentStation()?.let { station ->
                 lifecycleScope.launch(Dispatchers.IO) {
                     // Check if this is a global radio (has radioBrowserUuid)
                     if (!station.radioBrowserUuid.isNullOrEmpty()) {
-                        // For global radios, use RadioBrowserRepository which handles unsaved stations
-                        val stationInfo = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
-                        if (stationInfo != null && stationInfo.isLiked) {
-                            // Station exists and is liked - unlike it
-                            radioBrowserRepository.toggleLikeByUuid(station.radioBrowserUuid)
-                        } else {
-                            // Station doesn't exist or not liked - save and like it
-                            // Convert to RadioBrowserStation format for saving
-                            val radioBrowserStation = com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation(
-                                stationuuid = station.radioBrowserUuid,
-                                name = station.name,
-                                url = station.streamUrl,
-                                urlResolved = station.streamUrl,
-                                homepage = station.homepage ?: "",
-                                favicon = station.coverArtUri ?: "",
-                                tags = station.genre,
-                                country = station.country ?: "",
-                                countrycode = station.countryCode ?: "",
-                                state = "",
-                                language = "",
-                                languagecodes = "",
-                                votes = 0,
-                                lastchangetime = "",
-                                codec = station.codec ?: "",
-                                bitrate = station.bitrate,
-                                hls = false,
-                                lastcheckok = true,
-                                clickcount = 0,
-                                clicktrend = 0,
-                                sslError = false,
-                                geoLat = null,
-                                geoLong = null
-                            )
-                            radioBrowserRepository.saveStationAsLiked(radioBrowserStation)
-                        }
-                        // Refresh station to get updated like state
-                        val updatedStation = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
+                        // For global radios, use shared StationActionHelper logic
+                        // This matches BrowseStationsFragment behavior:
+                        // - Liking saves the station as liked
+                        // - Unliking deletes the station entirely from the library
+                        val result = StationActionHelper.toggleLikeForGlobalRadio(
+                            radioBrowserRepository,
+                            station
+                        )
+
                         withContext(Dispatchers.Main) {
-                            updatedStation?.let {
-                                viewModel.updateCurrentStationLikeState(it.isLiked)
-                                updateLikeButton(it.isLiked)
+                            // Update UI
+                            viewModel.updateCurrentStationLikeState(result.isLiked)
+                            updateLikeButton(result.isLiked)
+                            // Also update library button since station is added when liked, deleted when unliked
+                            updateAddToLibraryButton(result.isLiked)
 
-                                // Broadcast like state change to all views
-                                val broadcastIntent = Intent(com.opensource.i2pradio.MainActivity.BROADCAST_LIKE_STATE_CHANGED).apply {
-                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_IS_LIKED, it.isLiked)
-                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_STATION_ID, it.id)
-                                    putExtra(com.opensource.i2pradio.MainActivity.EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
-                                }
-                                LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
-
-                                // Show toast message
-                                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                                    if (it.isLiked) {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            getString(R.string.station_saved, station.name),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    } else {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            getString(R.string.station_removed, station.name),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-                            }
+                            // Broadcast and show toast using shared helper
+                            StationActionHelper.broadcastLikeStateChange(requireContext(), result)
+                            StationActionHelper.showLikeToast(requireContext(), station.name, result)
                         }
                     } else {
                         // For non-global radios (user stations, bundled stations), use regular toggle
@@ -456,7 +408,7 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        // Add to Library button click handler - same logic as browse screen add button
+        // Add to Library button click handler - uses shared logic with station list
         addToLibraryButton.setOnClickListener {
             viewModel.getCurrentStation()?.let { station ->
                 // Animate the button with scale effect
@@ -478,71 +430,24 @@ class NowPlayingFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.IO) {
                     // Check if this is a global radio (has radioBrowserUuid)
                     if (!station.radioBrowserUuid.isNullOrEmpty()) {
-                        // For global radios, check if already saved in library
-                        val stationInfo = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
-                        if (stationInfo != null) {
-                            // Station is saved - remove it
-                            radioBrowserRepository.deleteStationByUuid(station.radioBrowserUuid)
-                            withContext(Dispatchers.Main) {
-                                updateAddToLibraryButton(false)
-                                // Broadcast saved state change to all views
-                                val broadcastIntent = Intent(MainActivity.BROADCAST_SAVED_STATE_CHANGED).apply {
-                                    putExtra(MainActivity.EXTRA_IS_SAVED, false)
-                                    putExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
-                                }
-                                LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
-                                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        getString(R.string.station_removed, station.name),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                        // For global radios, use shared StationActionHelper logic
+                        val result = StationActionHelper.toggleSaveForGlobalRadio(
+                            radioBrowserRepository,
+                            station
+                        )
+
+                        withContext(Dispatchers.Main) {
+                            // Update UI
+                            updateAddToLibraryButton(result.isSaved)
+                            // Also update like button since station may have been removed
+                            if (!result.isSaved) {
+                                updateLikeButton(false)
+                                viewModel.updateCurrentStationLikeState(false)
                             }
-                        } else {
-                            // Station not saved - save it
-                            val radioBrowserStation = com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation(
-                                stationuuid = station.radioBrowserUuid,
-                                name = station.name,
-                                url = station.streamUrl,
-                                urlResolved = station.streamUrl,
-                                homepage = station.homepage ?: "",
-                                favicon = station.coverArtUri ?: "",
-                                tags = station.genre,
-                                country = station.country ?: "",
-                                countrycode = station.countryCode ?: "",
-                                state = "",
-                                language = "",
-                                languagecodes = "",
-                                votes = 0,
-                                lastchangetime = "",
-                                codec = station.codec ?: "",
-                                bitrate = station.bitrate,
-                                hls = false,
-                                lastcheckok = true,
-                                clickcount = 0,
-                                clicktrend = 0,
-                                sslError = false,
-                                geoLat = null,
-                                geoLong = null
-                            )
-                            radioBrowserRepository.saveStation(radioBrowserStation)
-                            withContext(Dispatchers.Main) {
-                                updateAddToLibraryButton(true)
-                                // Broadcast saved state change to all views
-                                val broadcastIntent = Intent(MainActivity.BROADCAST_SAVED_STATE_CHANGED).apply {
-                                    putExtra(MainActivity.EXTRA_IS_SAVED, true)
-                                    putExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID, station.radioBrowserUuid)
-                                }
-                                LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(broadcastIntent)
-                                if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        getString(R.string.station_saved, station.name),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
+
+                            // Broadcast and show toast using shared helper
+                            StationActionHelper.broadcastSaveStateChange(requireContext(), result)
+                            StationActionHelper.showSaveToast(requireContext(), station.name, result.isSaved)
                         }
                     } else {
                         // For user stations, they're always in the library, so we just toggle visibility
