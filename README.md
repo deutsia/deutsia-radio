@@ -21,7 +21,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.6.1** Added Parallel Radio Registry API loading for Privacy Stations, updated API Tor URL as the API now uses Onionbalance
+- **New Release: v1.6.2** Added API and cover art disable options, security tests, and UX/UI improvements
 
 ---
 
@@ -37,6 +37,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 - **Bundled Darknet Stations** Add pre-curated i2p/tor station lists to local library
 - **Add any station** Support for Tor, Clearnet, I2P and per-station level custom proxy stations
 - **Full DNS Protection** - No DNS leaks to ISP/System DNS in Force Tor/Proxy modes, backed by 47 unit and integration tests
+- **Disable API connections** - Completely disable API connections + external cover art and utilize the app with only your local library
 
 ---
 
