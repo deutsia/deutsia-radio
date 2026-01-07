@@ -386,20 +386,17 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     }
 
     private fun likePrivacyStation(station: RadioRegistryStation) {
-        val radioStation = viewModel.getPlayableStation(station)
-        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        val browserStation = RadioBrowserStation.fromRegistryStation(station)
         likeStation(browserStation)
     }
 
     private fun addPrivacyStation(station: RadioRegistryStation) {
-        val radioStation = viewModel.getPlayableStation(station)
-        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        val browserStation = RadioBrowserStation.fromRegistryStation(station)
         addStation(browserStation)
     }
 
     private fun removePrivacyStation(station: RadioRegistryStation) {
-        val radioStation = viewModel.getPlayableStation(station)
-        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        val browserStation = RadioBrowserStation.fromRegistryStation(station)
         removeStation(browserStation)
     }
 

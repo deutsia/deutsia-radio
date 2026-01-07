@@ -1331,8 +1331,7 @@ class BrowseStationsFragment : Fragment() {
      * Converts to RadioBrowserStation and uses existing like logic
      */
     private fun likePrivacyStation(station: RadioRegistryStation) {
-        val radioStation = viewModel.getPlayableStation(station)
-        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        val browserStation = RadioBrowserStation.fromRegistryStation(station)
         likeStation(browserStation)
     }
 
