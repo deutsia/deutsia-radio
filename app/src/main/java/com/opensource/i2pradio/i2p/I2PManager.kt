@@ -1,8 +1,10 @@
 package com.opensource.i2pradio.i2p
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.opensource.i2pradio.R
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.concurrent.CopyOnWriteArrayList
@@ -201,11 +203,11 @@ object I2PManager {
     /**
      * Get a human-readable status message.
      */
-    fun getStatusMessage(): String {
+    fun getStatusMessage(context: Context): String {
         return when (_state) {
-            I2PState.UNKNOWN -> "Checking I2P availability..."
-            I2PState.AVAILABLE -> "I2P proxy available at $_host:$_port"
-            I2PState.UNAVAILABLE -> "I2P is not running"
+            I2PState.UNKNOWN -> context.getString(R.string.i2p_status_checking)
+            I2PState.AVAILABLE -> context.getString(R.string.i2p_status_available, _host, _port)
+            I2PState.UNAVAILABLE -> context.getString(R.string.i2p_status_unavailable)
         }
     }
 }

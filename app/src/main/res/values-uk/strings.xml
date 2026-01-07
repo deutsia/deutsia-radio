@@ -634,4 +634,19 @@
     <string name="settings_color_classic">Класичний</string>
     <string name="settings_color_classic_default">Класичний (За замовчуванням)</string>
     <string name="warning_socks4_dns_limitation">SOCKS4 не підтримує віддалене розв\'язання DNS. DNS-запити можуть розв\'язуватися локально, що може розкрити домени, до яких ви звертаєтеся, вашому інтернет-провайдеру. Розгляньте можливість використання SOCKS5 для кращої конфіденційності.</string>
+
+    <!-- Equalizer Preset Names -->
+    <string name="equalizer_preset_custom">Власний</string>
+    <string name="equalizer_preset_flat">Плоский</string>
+    <string name="equalizer_preset_bass_boost">Підсилення басів</string>
+    <string name="equalizer_preset_treble_boost">Підсилення високих</string>
+    <string name="equalizer_preset_rock">Рок</string>
+    <string name="equalizer_preset_pop">Поп</string>
+    <string name="equalizer_preset_classical">Класика</string>
+    <string name="equalizer_preset_jazz">Джаз</string>
+
+    <!-- I2P Status Messages -->
+    <string name="i2p_status_checking">Перевірка доступності I2P…</string>
+    <string name="i2p_status_available">Проксі I2P доступний на %1$s:%2$d</string>
+    <string name="i2p_status_unavailable">I2P не запущено</string>
 </resources>
