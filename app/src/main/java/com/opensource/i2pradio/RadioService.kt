@@ -1732,9 +1732,13 @@ class RadioService : Service() {
                                 }
                                 extractStreamInfo()
                                 startPlaybackTimeUpdates()
-                                startStreamWatchdog()  // Start data-flow monitoring
+                                // Only use watchdog for proxy/darknet connections where
+                                // STATE_ENDED can falsely trigger during song transitions
+                                if (currentProxyType != ProxyType.NONE) {
+                                    startStreamWatchdog()
+                                }
                                 broadcastPlaybackStateChanged(isBuffering = false, isPlaying = true)
-                                android.util.Log.d("RadioService", "Stream playing successfully")
+                                android.util.Log.d("RadioService", "Stream playing successfully (proxy: $currentProxyType)")
                             }
                             Player.STATE_BUFFERING -> {
                                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_buffering)))
@@ -1743,10 +1747,17 @@ class RadioService : Service() {
                                 android.util.Log.d("RadioService", "Buffering stream...")
                             }
                             Player.STATE_ENDED -> {
-                                // For live streams, STATE_ENDED can falsely trigger during song transitions.
-                                // Don't reconnect here - let the stream watchdog handle true stalls.
-                                // This mimics browser behavior of continuously consuming stream data.
-                                android.util.Log.d("RadioService", "STATE_ENDED received - ignoring for live stream (watchdog monitors data flow)")
+                                // For clearnet streams, STATE_ENDED reliably indicates disconnection
+                                // For proxy/darknet streams, it can falsely trigger during song transitions
+                                if (currentProxyType == ProxyType.NONE) {
+                                    android.util.Log.d("RadioService", "Stream ended (clearnet), reconnecting...")
+                                    updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
+                                    broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
+                                    scheduleReconnect()
+                                } else {
+                                    // Proxy connection - let watchdog handle true stalls
+                                    android.util.Log.d("RadioService", "STATE_ENDED received on proxy stream - ignoring (watchdog monitors data flow)")
+                                }
                             }
                             Player.STATE_IDLE -> {
                                 android.util.Log.d("RadioService", "Player idle")
