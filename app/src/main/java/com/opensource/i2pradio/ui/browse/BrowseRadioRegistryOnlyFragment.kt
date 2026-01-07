@@ -339,6 +339,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 } else {
                     loadingContainer.visibility = View.GONE
                 }
+                swipeRefresh.isRefreshing = isLoading && resultsAdapter.itemCount > 0
             }
         }
 
@@ -385,20 +386,17 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     }
 
     private fun likePrivacyStation(station: RadioRegistryStation) {
-        val radioStation = viewModel.getPlayableStation(station)
-        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        val browserStation = RadioBrowserStation.fromRegistryStation(station)
         likeStation(browserStation)
     }
 
     private fun addPrivacyStation(station: RadioRegistryStation) {
-        val radioStation = viewModel.getPlayableStation(station)
-        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        val browserStation = RadioBrowserStation.fromRegistryStation(station)
         addStation(browserStation)
     }
 
     private fun removePrivacyStation(station: RadioRegistryStation) {
-        val radioStation = viewModel.getPlayableStation(station)
-        val browserStation = RadioBrowserStation.fromRadioStation(radioStation)
+        val browserStation = RadioBrowserStation.fromRegistryStation(station)
         removeStation(browserStation)
     }
 
@@ -436,6 +434,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     private fun likeStation(station: RadioBrowserStation) {
         val wasLiked = viewModel.likedStationUuids.value?.contains(station.stationuuid) ?: false
+        val wasSaved = viewModel.savedStationUuids.value?.contains(station.stationuuid) ?: false
 
         viewModel.toggleLike(station)
 
@@ -444,17 +443,40 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
             if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
                 if (!wasLiked) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.station_saved, station.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if (!wasSaved) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_saved, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_added_to_favorites, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 } else {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.station_removed, station.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val stationAge = if (updatedStation != null) {
+                        System.currentTimeMillis() - updatedStation.addedTimestamp
+                    } else {
+                        0L
+                    }
+
+                    val fiveMinutesInMillis = 5 * 60 * 1000
+                    if (stationAge > fiveMinutesInMillis) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_removed_from_favorites, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.station_removed, station.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
 

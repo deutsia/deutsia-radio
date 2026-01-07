@@ -5,8 +5,10 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
@@ -154,6 +156,30 @@ class PrivacyRadioListAdapter(
 
             // Online indicator - change image alpha if offline
             stationIcon.alpha = if (station.isOnline) 1.0f else 0.5f
+
+            // Touch feedback animation
+            itemView.setOnTouchListener { v, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        v.animate()
+                            .scaleX(0.97f)
+                            .scaleY(0.97f)
+                            .setDuration(100)
+                            .setInterpolator(DecelerateInterpolator())
+                            .start()
+                    }
+                    MotionEvent.ACTION_UP,
+                    MotionEvent.ACTION_CANCEL -> {
+                        v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .setInterpolator(DecelerateInterpolator())
+                            .start()
+                    }
+                }
+                false
+            }
 
             // Click listeners
             itemView.setOnClickListener { onStationClick(station) }
