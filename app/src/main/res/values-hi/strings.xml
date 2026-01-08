@@ -648,4 +648,28 @@
     <string name="i2p_status_checking">I2P उपलब्धता की जाँच हो रही है…</string>
     <string name="i2p_status_available">I2P प्रॉक्सी %1$s:%2$d पर उपलब्ध</string>
     <string name="i2p_status_unavailable">I2P चल नहीं रहा है</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">नेटवर्क और API</string>
+    <string name="settings_disable_radiobrowser_api">RadioBrowser API अक्षम करें</string>
+    <string name="settings_disable_radiobrowser_api_description">RadioBrowser से क्लियरनेट स्टेशन प्राप्त करना बंद करें</string>
+    <string name="settings_disable_radio_registry_api">Radio Registry API अक्षम करें</string>
+    <string name="settings_disable_radio_registry_api_description">Radio Registry से Tor/I2P स्टेशन प्राप्त करना बंद करें</string>
+    <string name="settings_disable_cover_art">कवर आर्ट अक्षम करें</string>
+    <string name="settings_disable_cover_art_description">बाहरी सर्वरों से स्टेशन आर्टवर्क लोड होने से रोकें</string>
+    <string name="settings_network_api_info">ऐप केवल इनसे कनेक्ट होता है: क्लियरनेट स्टेशनों के लिए RadioBrowser API, Tor/I2P स्टेशनों के लिए Radio Registry API, कवर आर्ट के लिए बाहरी सर्वर, और चलाते समय रेडियो स्ट्रीम।</string>
+    <string name="settings_offline_mode_note">दोनों APIs अक्षम: ब्राउज़ टैब केवल स्थानीय लाइब्रेरी दिखाता है। आप अभी भी सहेजे गए स्टेशन चला सकते हैं और फ़ाइलों से स्टेशन आयात कर सकते हैं।</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">ऑफ़लाइन मोड</string>
+    <string name="browse_offline_mode_message">बाहरी APIs सेटिंग्स में अक्षम हैं। सहेजे गए स्टेशनों तक पहुंचने के लिए अपनी लाइब्रेरी पर जाएं, या ऑनलाइन स्टेशन ब्राउज़ करने के लिए सेटिंग्स में APIs सक्षम करें।</string>
+    <string name="browse_radiobrowser_disabled">RadioBrowser API अक्षम है</string>
+    <string name="browse_radioregistry_disabled">गोपनीयता स्टेशन API अक्षम है</string>
+    <string name="browse_disabled_title">ब्राउज़िंग अक्षम</string>
+    <string name="browse_disabled_message">RadioBrowser और Radio Registry दोनों APIs सेटिंग्स में अक्षम हैं। ऑनलाइन स्टेशन ब्राउज़ करने के लिए कम से कम एक API सक्षम करें।</string>
+    <string name="browse_disabled_tip_title">आपके सहेजे गए स्टेशन अभी भी काम करते हैं</string>
+    <string name="browse_disabled_tip_message">पहले से सहेजे गए स्टेशन चलाने के लिए लाइब्रेरी टैब पर जाएं, या किसी फ़ाइल से स्टेशन आयात करें।</string>
+    <string name="browse_privacy_only_title">प्राइवेसी रेडियो</string>
+    <string name="browse_privacy_only_message">RadioBrowser API अक्षम है। केवल Tor और I2P स्टेशन दिखाए जा रहे हैं।</string>
+    <string name="station_already_in_library">स्टेशन पहले से आपकी लाइब्रेरी में है</string>
 </resources>

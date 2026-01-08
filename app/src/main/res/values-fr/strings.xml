@@ -648,4 +648,28 @@
     <string name="i2p_status_checking">Vérification de la disponibilité I2P…</string>
     <string name="i2p_status_available">Proxy I2P disponible sur %1$s:%2$d</string>
     <string name="i2p_status_unavailable">I2P n\'est pas en cours d\'exécution</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Réseau et API</string>
+    <string name="settings_disable_radiobrowser_api">Désactiver l\'API RadioBrowser</string>
+    <string name="settings_disable_radiobrowser_api_description">Arrêter de récupérer les stations clearnet depuis RadioBrowser</string>
+    <string name="settings_disable_radio_registry_api">Désactiver l\'API Radio Registry</string>
+    <string name="settings_disable_radio_registry_api_description">Arrêter de récupérer les stations Tor/I2P depuis Radio Registry</string>
+    <string name="settings_disable_cover_art">Désactiver les pochettes</string>
+    <string name="settings_disable_cover_art_description">Empêcher le chargement des images de stations depuis des serveurs externes</string>
+    <string name="settings_network_api_info">L\'application se connecte uniquement à : l\'API RadioBrowser pour les stations clearnet, l\'API Radio Registry pour les stations Tor/I2P, les serveurs externes pour les pochettes et les flux radio lors de la lecture.</string>
+    <string name="settings_offline_mode_note">Les deux APIs désactivées : l\'onglet Parcourir affiche uniquement la bibliothèque locale. Vous pouvez toujours lire les stations enregistrées et importer des stations depuis des fichiers.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">Mode hors ligne</string>
+    <string name="browse_offline_mode_message">Les APIs externes sont désactivées dans les paramètres. Accédez à votre Bibliothèque pour les stations enregistrées, ou activez les APIs dans Paramètres pour parcourir les stations en ligne.</string>
+    <string name="browse_radiobrowser_disabled">API RadioBrowser désactivée</string>
+    <string name="browse_radioregistry_disabled">API des stations de confidentialité désactivée</string>
+    <string name="browse_disabled_title">Parcourir désactivé</string>
+    <string name="browse_disabled_message">Les APIs RadioBrowser et Radio Registry sont toutes deux désactivées dans les paramètres. Activez au moins une API pour parcourir les stations en ligne.</string>
+    <string name="browse_disabled_tip_title">Vos stations enregistrées fonctionnent toujours</string>
+    <string name="browse_disabled_tip_message">Accédez à l\'onglet Bibliothèque pour lire les stations que vous avez déjà enregistrées, ou importez des stations depuis un fichier.</string>
+    <string name="browse_privacy_only_title">Radio Confidentialité</string>
+    <string name="browse_privacy_only_message">L\'API RadioBrowser est désactivée. Affichage des stations Tor et I2P uniquement.</string>
+    <string name="station_already_in_library">La station est déjà dans votre bibliothèque</string>
 </resources>

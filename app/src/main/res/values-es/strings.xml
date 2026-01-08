@@ -649,4 +649,28 @@
     <string name="i2p_status_checking">Comprobando disponibilidad de I2P…</string>
     <string name="i2p_status_available">Proxy I2P disponible en %1$s:%2$d</string>
     <string name="i2p_status_unavailable">I2P no está en ejecución</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Red y API</string>
+    <string name="settings_disable_radiobrowser_api">Desactivar API de RadioBrowser</string>
+    <string name="settings_disable_radiobrowser_api_description">Dejar de obtener emisoras de clearnet desde RadioBrowser</string>
+    <string name="settings_disable_radio_registry_api">Desactivar API de Radio Registry</string>
+    <string name="settings_disable_radio_registry_api_description">Dejar de obtener emisoras Tor/I2P desde Radio Registry</string>
+    <string name="settings_disable_cover_art">Desactivar carátulas</string>
+    <string name="settings_disable_cover_art_description">Evitar cargar imágenes de emisoras desde servidores externos</string>
+    <string name="settings_network_api_info">La aplicación solo se conecta a: API de RadioBrowser para emisoras de clearnet, API de Radio Registry para emisoras Tor/I2P, servidores externos para carátulas y transmisiones de radio al reproducir.</string>
+    <string name="settings_offline_mode_note">Ambas APIs desactivadas: La pestaña Explorar muestra solo la biblioteca local. Puedes seguir reproduciendo emisoras guardadas e importar emisoras desde archivos.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">Modo sin conexión</string>
+    <string name="browse_offline_mode_message">Las APIs externas están desactivadas en los ajustes. Ve a tu Biblioteca para acceder a emisoras guardadas, o activa las APIs en Ajustes para explorar emisoras en línea.</string>
+    <string name="browse_radiobrowser_disabled">API de RadioBrowser desactivada</string>
+    <string name="browse_radioregistry_disabled">API de emisoras de privacidad desactivada</string>
+    <string name="browse_disabled_title">Exploración desactivada</string>
+    <string name="browse_disabled_message">Tanto RadioBrowser como Radio Registry APIs están desactivadas en los ajustes. Activa al menos una API para explorar emisoras en línea.</string>
+    <string name="browse_disabled_tip_title">Tus emisoras guardadas aún funcionan</string>
+    <string name="browse_disabled_tip_message">Ve a la pestaña Biblioteca para reproducir emisoras que ya has guardado, o importa emisoras desde un archivo.</string>
+    <string name="browse_privacy_only_title">Radio de Privacidad</string>
+    <string name="browse_privacy_only_message">La API de RadioBrowser está desactivada. Mostrando solo emisoras Tor e I2P.</string>
+    <string name="station_already_in_library">La emisora ya está en tu biblioteca</string>
 </resources>

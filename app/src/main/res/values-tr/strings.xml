@@ -649,4 +649,28 @@
     <string name="i2p_status_checking">I2P kullanılabilirliği kontrol ediliyor…</string>
     <string name="i2p_status_available">I2P proxy %1$s:%2$d adresinde mevcut</string>
     <string name="i2p_status_unavailable">I2P çalışmıyor</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Ağ ve API</string>
+    <string name="settings_disable_radiobrowser_api">RadioBrowser API\'yi Devre Dışı Bırak</string>
+    <string name="settings_disable_radiobrowser_api_description">RadioBrowser\'dan clearnet istasyonları almayı durdur</string>
+    <string name="settings_disable_radio_registry_api">Radio Registry API\'yi Devre Dışı Bırak</string>
+    <string name="settings_disable_radio_registry_api_description">Radio Registry\'den Tor/I2P istasyonları almayı durdur</string>
+    <string name="settings_disable_cover_art">Kapak Resmini Devre Dışı Bırak</string>
+    <string name="settings_disable_cover_art_description">Harici sunuculardan istasyon görsellerinin yüklenmesini engelle</string>
+    <string name="settings_network_api_info">Uygulama yalnızca şunlara bağlanır: clearnet istasyonları için RadioBrowser API, Tor/I2P istasyonları için Radio Registry API, kapak resimleri için harici sunucular ve oynatırken radyo akışları.</string>
+    <string name="settings_offline_mode_note">Her iki API de devre dışı: Gözat sekmesi yalnızca yerel kütüphaneyi gösterir. Kayıtlı istasyonları çalmaya ve dosyalardan istasyon içe aktarmaya devam edebilirsiniz.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">Çevrimdışı Mod</string>
+    <string name="browse_offline_mode_message">Harici API\'ler ayarlarda devre dışı. Kayıtlı istasyonlara erişmek için Kütüphane\'ye gidin veya çevrimiçi istasyonlara göz atmak için Ayarlar\'da API\'leri etkinleştirin.</string>
+    <string name="browse_radiobrowser_disabled">RadioBrowser API devre dışı</string>
+    <string name="browse_radioregistry_disabled">Gizlilik istasyonları API devre dışı</string>
+    <string name="browse_disabled_title">Gözat Devre Dışı</string>
+    <string name="browse_disabled_message">Hem RadioBrowser hem de Radio Registry API\'leri ayarlarda devre dışı. Çevrimiçi istasyonlara göz atmak için en az bir API\'yi etkinleştirin.</string>
+    <string name="browse_disabled_tip_title">Kayıtlı istasyonlarınız hâlâ çalışıyor</string>
+    <string name="browse_disabled_tip_message">Zaten kaydettiğiniz istasyonları çalmak için Kütüphane sekmesine gidin veya bir dosyadan istasyon içe aktarın.</string>
+    <string name="browse_privacy_only_title">Gizlilik Radyosu</string>
+    <string name="browse_privacy_only_message">RadioBrowser API devre dışı. Yalnızca Tor ve I2P istasyonları gösteriliyor.</string>
+    <string name="station_already_in_library">İstasyon zaten kütüphanenizde</string>
 </resources>

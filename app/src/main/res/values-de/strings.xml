@@ -649,4 +649,28 @@
     <string name="i2p_status_checking">Überprüfe I2P-Verfügbarkeit…</string>
     <string name="i2p_status_available">I2P-Proxy verfügbar unter %1$s:%2$d</string>
     <string name="i2p_status_unavailable">I2P läuft nicht</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Netzwerk &amp; API</string>
+    <string name="settings_disable_radiobrowser_api">RadioBrowser-API deaktivieren</string>
+    <string name="settings_disable_radiobrowser_api_description">Abruf von Clearnet-Sendern von RadioBrowser stoppen</string>
+    <string name="settings_disable_radio_registry_api">Radio Registry-API deaktivieren</string>
+    <string name="settings_disable_radio_registry_api_description">Abruf von Tor/I2P-Sendern von Radio Registry stoppen</string>
+    <string name="settings_disable_cover_art">Cover-Art deaktivieren</string>
+    <string name="settings_disable_cover_art_description">Laden von Sender-Artwork von externen Servern verhindern</string>
+    <string name="settings_network_api_info">Die App verbindet sich nur mit: RadioBrowser-API für Clearnet-Sender, Radio Registry-API für Tor/I2P-Sender, externen Servern für Sender-Cover-Art und Radiostreams beim Abspielen.</string>
+    <string name="settings_offline_mode_note">Beide APIs deaktiviert: Der Durchsuchen-Tab zeigt nur die lokale Bibliothek. Sie können weiterhin gespeicherte Sender abspielen und Sender aus Dateien importieren.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">Offline-Modus</string>
+    <string name="browse_offline_mode_message">Externe APIs sind in den Einstellungen deaktiviert. Gehen Sie zu Ihrer Bibliothek, um gespeicherte Sender zu nutzen, oder aktivieren Sie APIs in den Einstellungen, um Online-Sender zu durchsuchen.</string>
+    <string name="browse_radiobrowser_disabled">RadioBrowser-API deaktiviert</string>
+    <string name="browse_radioregistry_disabled">Datenschutz-Sender-API deaktiviert</string>
+    <string name="browse_disabled_title">Durchsuchen deaktiviert</string>
+    <string name="browse_disabled_message">Sowohl RadioBrowser- als auch Radio Registry-APIs sind in den Einstellungen deaktiviert. Aktivieren Sie mindestens eine API, um Online-Sender zu durchsuchen.</string>
+    <string name="browse_disabled_tip_title">Ihre gespeicherten Sender funktionieren weiterhin</string>
+    <string name="browse_disabled_tip_message">Gehen Sie zum Bibliothek-Tab, um Sender abzuspielen, die Sie bereits gespeichert haben, oder importieren Sie Sender aus einer Datei.</string>
+    <string name="browse_privacy_only_title">Datenschutz-Radio</string>
+    <string name="browse_privacy_only_message">RadioBrowser-API ist deaktiviert. Es werden nur Tor- und I2P-Sender angezeigt.</string>
+    <string name="station_already_in_library">Sender ist bereits in Ihrer Bibliothek</string>
 </resources>
