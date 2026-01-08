@@ -649,4 +649,28 @@
     <string name="i2p_status_checking">I2P ရရှိနိုင်မှုကို စစ်ဆေးနေသည်…</string>
     <string name="i2p_status_available">I2P proxy %1$s:%2$d တွင် ရရှိနိုင်သည်</string>
     <string name="i2p_status_unavailable">I2P မလုပ်ဆောင်နေပါ</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">ကွန်ရက်နှင့် API</string>
+    <string name="settings_disable_radiobrowser_api">RadioBrowser API ပိတ်ရန်</string>
+    <string name="settings_disable_radiobrowser_api_description">RadioBrowser မှ clearnet စတေးရှင်းများ ရယူခြင်း ရပ်တန့်ရန်</string>
+    <string name="settings_disable_radio_registry_api">Radio Registry API ပိတ်ရန်</string>
+    <string name="settings_disable_radio_registry_api_description">Radio Registry မှ Tor/I2P စတေးရှင်းများ ရယူခြင်း ရပ်တန့်ရန်</string>
+    <string name="settings_disable_cover_art">Cover Art ပိတ်ရန်</string>
+    <string name="settings_disable_cover_art_description">ပြင်ပဆာဗာများမှ စတေးရှင်းပုံများ တင်ခြင်း တားဆီးရန်</string>
+    <string name="settings_network_api_info">အက်ပ်သည် ဤအရာများနှင့်သာ ချိတ်ဆက်သည်: clearnet စတေးရှင်းများအတွက် RadioBrowser API၊ Tor/I2P စတေးရှင်းများအတွက် Radio Registry API၊ cover art အတွက် ပြင်ပဆာဗာများနှင့် ဖွင့်သည့်အခါ ရေဒီယိုစတရိမ်များ။</string>
+    <string name="settings_offline_mode_note">API နှစ်ခုလုံး ပိတ်ထားသည်: Browse တက်ဘ်တွင် ဒေသတွင်း စာကြည့်တိုက်သာ ပြသသည်။ သိမ်းဆည်းထားသော စတေးရှင်းများကို ဖွင့်နိုင်ပြီး ဖိုင်များမှ တင်သွင်းနိုင်ပါသည်။</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">အော့ဖ်လိုင်းမုဒ်</string>
+    <string name="browse_offline_mode_message">ပြင်ပ API များကို ဆက်တင်များတွင် ပိတ်ထားသည်။ သိမ်းဆည်းထားသော စတေးရှင်းများကို ကြည့်ရန် Library သို့သွားပါ သို့မဟုတ် အွန်လိုင်းစတေးရှင်းများ ကြည့်ရန် ဆက်တင်များတွင် API များကို ဖွင့်ပါ။</string>
+    <string name="browse_radiobrowser_disabled">RadioBrowser API ပိတ်ထားသည်</string>
+    <string name="browse_radioregistry_disabled">ကိုယ်ရေးလုံခြုံရေး စတေးရှင်း API ပိတ်ထားသည်</string>
+    <string name="browse_disabled_title">Browse ပိတ်ထားသည်</string>
+    <string name="browse_disabled_message">RadioBrowser နှင့် Radio Registry API နှစ်ခုလုံးကို ဆက်တင်များတွင် ပိတ်ထားသည်။ အွန်လိုင်းစတေးရှင်းများ ကြည့်ရန် အနည်းဆုံး API တစ်ခု ဖွင့်ပါ။</string>
+    <string name="browse_disabled_tip_title">သင့်သိမ်းဆည်းထားသော စတေးရှင်းများ ဆက်အလုပ်လုပ်သည်</string>
+    <string name="browse_disabled_tip_message">သိမ်းဆည်းထားသော စတေးရှင်းများ ဖွင့်ရန် Library တက်ဘ်သို့သွားပါ သို့မဟုတ် ဖိုင်မှ တင်သွင်းပါ။</string>
+    <string name="browse_privacy_only_title">ကိုယ်ရေးလုံခြုံရေး ရေဒီယို</string>
+    <string name="browse_privacy_only_message">RadioBrowser API ပိတ်ထားသည်။ Tor နှင့် I2P စတေးရှင်းများသာ ပြသနေသည်။</string>
+    <string name="station_already_in_library">စတေးရှင်းသည် သင့် library တွင် ရှိပြီးသားဖြစ်သည်</string>
 </resources>

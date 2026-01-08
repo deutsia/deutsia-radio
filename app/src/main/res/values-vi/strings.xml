@@ -649,4 +649,28 @@
     <string name="i2p_status_checking">Đang kiểm tra tính khả dụng của I2P…</string>
     <string name="i2p_status_available">Proxy I2P khả dụng tại %1$s:%2$d</string>
     <string name="i2p_status_unavailable">I2P không chạy</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Mạng và API</string>
+    <string name="settings_disable_radiobrowser_api">Tắt API RadioBrowser</string>
+    <string name="settings_disable_radiobrowser_api_description">Ngừng lấy các đài clearnet từ RadioBrowser</string>
+    <string name="settings_disable_radio_registry_api">Tắt API Radio Registry</string>
+    <string name="settings_disable_radio_registry_api_description">Ngừng lấy các đài Tor/I2P từ Radio Registry</string>
+    <string name="settings_disable_cover_art">Tắt ảnh bìa</string>
+    <string name="settings_disable_cover_art_description">Ngăn tải hình ảnh đài từ máy chủ bên ngoài</string>
+    <string name="settings_network_api_info">Ứng dụng chỉ kết nối với: API RadioBrowser cho các đài clearnet, API Radio Registry cho các đài Tor/I2P, máy chủ bên ngoài cho ảnh bìa và luồng radio khi phát.</string>
+    <string name="settings_offline_mode_note">Cả hai API đã tắt: Tab Duyệt chỉ hiển thị thư viện cục bộ. Bạn vẫn có thể phát các đài đã lưu và nhập đài từ tệp.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">Chế độ ngoại tuyến</string>
+    <string name="browse_offline_mode_message">Các API bên ngoài đã bị tắt trong cài đặt. Vào Thư viện để truy cập các đài đã lưu, hoặc bật API trong Cài đặt để duyệt các đài trực tuyến.</string>
+    <string name="browse_radiobrowser_disabled">API RadioBrowser đã tắt</string>
+    <string name="browse_radioregistry_disabled">API đài riêng tư đã tắt</string>
+    <string name="browse_disabled_title">Duyệt đã tắt</string>
+    <string name="browse_disabled_message">Cả API RadioBrowser và Radio Registry đều bị tắt trong cài đặt. Bật ít nhất một API để duyệt các đài trực tuyến.</string>
+    <string name="browse_disabled_tip_title">Các đài đã lưu vẫn hoạt động</string>
+    <string name="browse_disabled_tip_message">Vào tab Thư viện để phát các đài bạn đã lưu, hoặc nhập đài từ tệp.</string>
+    <string name="browse_privacy_only_title">Radio riêng tư</string>
+    <string name="browse_privacy_only_message">API RadioBrowser đã tắt. Chỉ hiển thị các đài Tor và I2P.</string>
+    <string name="station_already_in_library">Đài đã có trong thư viện của bạn</string>
 </resources>

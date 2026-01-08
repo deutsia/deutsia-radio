@@ -648,4 +648,28 @@
     <string name="i2p_status_checking">I2P 가용성 확인 중…</string>
     <string name="i2p_status_available">I2P 프록시가 %1$s:%2$d에서 사용 가능</string>
     <string name="i2p_status_unavailable">I2P가 실행되고 있지 않습니다</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">네트워크 및 API</string>
+    <string name="settings_disable_radiobrowser_api">RadioBrowser API 비활성화</string>
+    <string name="settings_disable_radiobrowser_api_description">RadioBrowser에서 클리어넷 방송국 가져오기 중지</string>
+    <string name="settings_disable_radio_registry_api">Radio Registry API 비활성화</string>
+    <string name="settings_disable_radio_registry_api_description">Radio Registry에서 Tor/I2P 방송국 가져오기 중지</string>
+    <string name="settings_disable_cover_art">커버 아트 비활성화</string>
+    <string name="settings_disable_cover_art_description">외부 서버에서 방송국 아트워크 로드 방지</string>
+    <string name="settings_network_api_info">앱은 다음에만 연결됩니다: 클리어넷 방송국용 RadioBrowser API, Tor/I2P 방송국용 Radio Registry API, 커버 아트용 외부 서버, 재생 시 라디오 스트림.</string>
+    <string name="settings_offline_mode_note">두 API 모두 비활성화됨: 탐색 탭에 로컬 라이브러리만 표시됩니다. 저장된 방송국을 재생하고 파일에서 방송국을 가져올 수 있습니다.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">오프라인 모드</string>
+    <string name="browse_offline_mode_message">외부 API가 설정에서 비활성화되어 있습니다. 저장된 방송국에 액세스하려면 라이브러리로 이동하거나 설정에서 API를 활성화하여 온라인 방송국을 탐색하세요.</string>
+    <string name="browse_radiobrowser_disabled">RadioBrowser API 비활성화됨</string>
+    <string name="browse_radioregistry_disabled">프라이버시 방송국 API 비활성화됨</string>
+    <string name="browse_disabled_title">탐색 비활성화됨</string>
+    <string name="browse_disabled_message">RadioBrowser와 Radio Registry API가 모두 설정에서 비활성화되어 있습니다. 온라인 방송국을 탐색하려면 최소 하나의 API를 활성화하세요.</string>
+    <string name="browse_disabled_tip_title">저장된 방송국은 여전히 작동합니다</string>
+    <string name="browse_disabled_tip_message">이미 저장한 방송국을 재생하려면 라이브러리 탭으로 이동하거나 파일에서 방송국을 가져오세요.</string>
+    <string name="browse_privacy_only_title">프라이버시 라디오</string>
+    <string name="browse_privacy_only_message">RadioBrowser API가 비활성화되어 있습니다. Tor 및 I2P 방송국만 표시됩니다.</string>
+    <string name="station_already_in_library">방송국이 이미 라이브러리에 있습니다</string>
 </resources>

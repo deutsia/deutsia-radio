@@ -649,4 +649,28 @@
     <string name="i2p_status_checking">Перевірка доступності I2P…</string>
     <string name="i2p_status_available">Проксі I2P доступний на %1$s:%2$d</string>
     <string name="i2p_status_unavailable">I2P не запущено</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Мережа та API</string>
+    <string name="settings_disable_radiobrowser_api">Вимкнути API RadioBrowser</string>
+    <string name="settings_disable_radiobrowser_api_description">Припинити отримання clearnet-станцій з RadioBrowser</string>
+    <string name="settings_disable_radio_registry_api">Вимкнути API Radio Registry</string>
+    <string name="settings_disable_radio_registry_api_description">Припинити отримання Tor/I2P-станцій з Radio Registry</string>
+    <string name="settings_disable_cover_art">Вимкнути обкладинки</string>
+    <string name="settings_disable_cover_art_description">Заборонити завантаження зображень станцій із зовнішніх серверів</string>
+    <string name="settings_network_api_info">Додаток підключається лише до: API RadioBrowser для clearnet-станцій, API Radio Registry для Tor/I2P-станцій, зовнішніх серверів для обкладинок та радіопотоків під час відтворення.</string>
+    <string name="settings_offline_mode_note">Обидва API вимкнено: вкладка «Огляд» показує лише локальну бібліотеку. Ви можете відтворювати збережені станції та імпортувати станції з файлів.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">Автономний режим</string>
+    <string name="browse_offline_mode_message">Зовнішні API вимкнено в налаштуваннях. Перейдіть до Бібліотеки для доступу до збережених станцій або увімкніть API в Налаштуваннях для перегляду онлайн-станцій.</string>
+    <string name="browse_radiobrowser_disabled">API RadioBrowser вимкнено</string>
+    <string name="browse_radioregistry_disabled">API станцій конфіденційності вимкнено</string>
+    <string name="browse_disabled_title">Огляд вимкнено</string>
+    <string name="browse_disabled_message">API RadioBrowser та Radio Registry вимкнено в налаштуваннях. Увімкніть хоча б один API для перегляду онлайн-станцій.</string>
+    <string name="browse_disabled_tip_title">Збережені станції все ще працюють</string>
+    <string name="browse_disabled_tip_message">Перейдіть на вкладку «Бібліотека» для відтворення вже збережених станцій або імпортуйте станції з файлу.</string>
+    <string name="browse_privacy_only_title">Приватне радіо</string>
+    <string name="browse_privacy_only_message">API RadioBrowser вимкнено. Відображаються лише Tor та I2P станції.</string>
+    <string name="station_already_in_library">Станція вже у вашій бібліотеці</string>
 </resources>

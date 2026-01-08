@@ -648,4 +648,28 @@
     <string name="i2p_status_checking">جارٍ التحقق من توفر I2P…</string>
     <string name="i2p_status_available">وكيل I2P متاح على %1$s:%2$d</string>
     <string name="i2p_status_unavailable">I2P لا يعمل</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">الشبكة والواجهة البرمجية</string>
+    <string name="settings_disable_radiobrowser_api">تعطيل واجهة RadioBrowser</string>
+    <string name="settings_disable_radiobrowser_api_description">إيقاف جلب محطات الإنترنت العادي من RadioBrowser</string>
+    <string name="settings_disable_radio_registry_api">تعطيل واجهة Radio Registry</string>
+    <string name="settings_disable_radio_registry_api_description">إيقاف جلب محطات Tor/I2P من Radio Registry</string>
+    <string name="settings_disable_cover_art">تعطيل صور الغلاف</string>
+    <string name="settings_disable_cover_art_description">منع تحميل صور المحطات من الخوادم الخارجية</string>
+    <string name="settings_network_api_info">يتصل التطبيق فقط بـ: واجهة RadioBrowser لمحطات الإنترنت العادي، وواجهة Radio Registry لمحطات Tor/I2P، والخوادم الخارجية لصور الغلاف، والبث المباشر عند التشغيل.</string>
+    <string name="settings_offline_mode_note">كلتا الواجهتين معطلتان: يعرض تبويب التصفح المكتبة المحلية فقط. يمكنك الاستمرار في تشغيل المحطات المحفوظة واستيراد محطات من الملفات.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">وضع عدم الاتصال</string>
+    <string name="browse_offline_mode_message">الواجهات الخارجية معطلة في الإعدادات. انتقل إلى مكتبتك للوصول إلى المحطات المحفوظة، أو قم بتفعيل الواجهات في الإعدادات لتصفح المحطات عبر الإنترنت.</string>
+    <string name="browse_radiobrowser_disabled">واجهة RadioBrowser معطلة</string>
+    <string name="browse_radioregistry_disabled">واجهة محطات الخصوصية معطلة</string>
+    <string name="browse_disabled_title">التصفح معطل</string>
+    <string name="browse_disabled_message">كلتا واجهتي RadioBrowser وRadio Registry معطلتان في الإعدادات. قم بتفعيل واجهة واحدة على الأقل لتصفح المحطات عبر الإنترنت.</string>
+    <string name="browse_disabled_tip_title">محطاتك المحفوظة تعمل</string>
+    <string name="browse_disabled_tip_message">انتقل إلى تبويب المكتبة لتشغيل المحطات التي حفظتها، أو استورد محطات من ملف.</string>
+    <string name="browse_privacy_only_title">راديو الخصوصية</string>
+    <string name="browse_privacy_only_message">واجهة RadioBrowser معطلة. يتم عرض محطات Tor وI2P فقط.</string>
+    <string name="station_already_in_library">المحطة موجودة بالفعل في مكتبتك</string>
 </resources>

@@ -649,4 +649,28 @@
     <string name="i2p_status_checking">در حال بررسی دسترسی I2P…</string>
     <string name="i2p_status_available">پروکسی I2P در %1$s:%2$d موجود است</string>
     <string name="i2p_status_unavailable">I2P در حال اجرا نیست</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">شبکه و API</string>
+    <string name="settings_disable_radiobrowser_api">غیرفعال کردن API رادیو براوزر</string>
+    <string name="settings_disable_radiobrowser_api_description">توقف دریافت ایستگاه‌های کلیرنت از رادیو براوزر</string>
+    <string name="settings_disable_radio_registry_api">غیرفعال کردن API رجیستری رادیو</string>
+    <string name="settings_disable_radio_registry_api_description">توقف دریافت ایستگاه‌های Tor/I2P از رجیستری رادیو</string>
+    <string name="settings_disable_cover_art">غیرفعال کردن تصویر جلد</string>
+    <string name="settings_disable_cover_art_description">جلوگیری از بارگذاری تصاویر ایستگاه از سرورهای خارجی</string>
+    <string name="settings_network_api_info">برنامه فقط به این موارد متصل می‌شود: API رادیو براوزر برای ایستگاه‌های کلیرنت، API رجیستری رادیو برای ایستگاه‌های Tor/I2P، سرورهای خارجی برای تصاویر جلد، و پخش رادیو در هنگام پخش.</string>
+    <string name="settings_offline_mode_note">هر دو API غیرفعال: زبانه مرور فقط کتابخانه محلی را نشان می‌دهد. می‌توانید همچنان ایستگاه‌های ذخیره شده را پخش کنید و ایستگاه‌ها را از فایل‌ها وارد کنید.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">حالت آفلاین</string>
+    <string name="browse_offline_mode_message">APIهای خارجی در تنظیمات غیرفعال هستند. به کتابخانه خود بروید تا به ایستگاه‌های ذخیره شده دسترسی پیدا کنید، یا APIها را در تنظیمات فعال کنید تا ایستگاه‌های آنلاین را مرور کنید.</string>
+    <string name="browse_radiobrowser_disabled">API رادیو براوزر غیرفعال است</string>
+    <string name="browse_radioregistry_disabled">API ایستگاه‌های حریم خصوصی غیرفعال است</string>
+    <string name="browse_disabled_title">مرور غیرفعال است</string>
+    <string name="browse_disabled_message">هر دو API رادیو براوزر و رجیستری رادیو در تنظیمات غیرفعال هستند. حداقل یک API را فعال کنید تا ایستگاه‌های آنلاین را مرور کنید.</string>
+    <string name="browse_disabled_tip_title">ایستگاه‌های ذخیره شده شما همچنان کار می‌کنند</string>
+    <string name="browse_disabled_tip_message">به زبانه کتابخانه بروید تا ایستگاه‌هایی که قبلاً ذخیره کرده‌اید را پخش کنید، یا ایستگاه‌ها را از یک فایل وارد کنید.</string>
+    <string name="browse_privacy_only_title">رادیو حریم خصوصی</string>
+    <string name="browse_privacy_only_message">API رادیو براوزر غیرفعال است. فقط ایستگاه‌های Tor و I2P نمایش داده می‌شوند.</string>
+    <string name="station_already_in_library">ایستگاه از قبل در کتابخانه شما موجود است</string>
 </resources>

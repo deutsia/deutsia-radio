@@ -648,4 +648,28 @@
     <string name="i2p_status_checking">Verifica disponibilità I2P…</string>
     <string name="i2p_status_available">Proxy I2P disponibile su %1$s:%2$d</string>
     <string name="i2p_status_unavailable">I2P non è in esecuzione</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">Rete e API</string>
+    <string name="settings_disable_radiobrowser_api">Disabilita API RadioBrowser</string>
+    <string name="settings_disable_radiobrowser_api_description">Interrompi il recupero delle stazioni clearnet da RadioBrowser</string>
+    <string name="settings_disable_radio_registry_api">Disabilita API Radio Registry</string>
+    <string name="settings_disable_radio_registry_api_description">Interrompi il recupero delle stazioni Tor/I2P da Radio Registry</string>
+    <string name="settings_disable_cover_art">Disabilita copertine</string>
+    <string name="settings_disable_cover_art_description">Impedisci il caricamento delle immagini delle stazioni da server esterni</string>
+    <string name="settings_network_api_info">L\'app si connette solo a: API RadioBrowser per stazioni clearnet, API Radio Registry per stazioni Tor/I2P, server esterni per copertine e streaming radio durante la riproduzione.</string>
+    <string name="settings_offline_mode_note">Entrambe le API disabilitate: la scheda Sfoglia mostra solo la libreria locale. Puoi comunque riprodurre stazioni salvate e importare stazioni da file.</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">Modalità offline</string>
+    <string name="browse_offline_mode_message">Le API esterne sono disabilitate nelle impostazioni. Vai alla tua Libreria per accedere alle stazioni salvate, o abilita le API nelle Impostazioni per sfogliare le stazioni online.</string>
+    <string name="browse_radiobrowser_disabled">API RadioBrowser disabilitata</string>
+    <string name="browse_radioregistry_disabled">API stazioni privacy disabilitata</string>
+    <string name="browse_disabled_title">Sfoglia disabilitato</string>
+    <string name="browse_disabled_message">Sia RadioBrowser che Radio Registry API sono disabilitate nelle impostazioni. Abilita almeno un\'API per sfogliare le stazioni online.</string>
+    <string name="browse_disabled_tip_title">Le tue stazioni salvate funzionano ancora</string>
+    <string name="browse_disabled_tip_message">Vai alla scheda Libreria per riprodurre le stazioni che hai già salvato, o importa stazioni da un file.</string>
+    <string name="browse_privacy_only_title">Radio Privacy</string>
+    <string name="browse_privacy_only_message">L\'API RadioBrowser è disabilitata. Vengono mostrate solo le stazioni Tor e I2P.</string>
+    <string name="station_already_in_library">La stazione è già nella tua libreria</string>
 </resources>

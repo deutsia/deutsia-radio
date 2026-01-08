@@ -648,4 +648,28 @@
     <string name="i2p_status_checking">I2Pの可用性を確認中…</string>
     <string name="i2p_status_available">I2Pプロキシが%1$s:%2$dで利用可能</string>
     <string name="i2p_status_unavailable">I2Pが実行されていません</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">ネットワークとAPI</string>
+    <string name="settings_disable_radiobrowser_api">RadioBrowser APIを無効にする</string>
+    <string name="settings_disable_radiobrowser_api_description">RadioBrowserからクリアネットステーションの取得を停止</string>
+    <string name="settings_disable_radio_registry_api">Radio Registry APIを無効にする</string>
+    <string name="settings_disable_radio_registry_api_description">Radio RegistryからTor/I2Pステーションの取得を停止</string>
+    <string name="settings_disable_cover_art">カバーアートを無効にする</string>
+    <string name="settings_disable_cover_art_description">外部サーバーからのステーションアートワークの読み込みを防止</string>
+    <string name="settings_network_api_info">アプリは次にのみ接続します: クリアネットステーション用のRadioBrowser API、Tor/I2Pステーション用のRadio Registry API、カバーアート用の外部サーバー、再生時のラジオストリーム。</string>
+    <string name="settings_offline_mode_note">両方のAPIが無効: 参照タブはローカルライブラリのみを表示します。保存されたステーションの再生やファイルからのステーションのインポートは引き続き可能です。</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">オフラインモード</string>
+    <string name="browse_offline_mode_message">外部APIは設定で無効になっています。保存されたステーションにアクセスするにはライブラリに移動するか、オンラインステーションを参照するには設定でAPIを有効にしてください。</string>
+    <string name="browse_radiobrowser_disabled">RadioBrowser APIが無効</string>
+    <string name="browse_radioregistry_disabled">プライバシーステーションAPIが無効</string>
+    <string name="browse_disabled_title">参照が無効</string>
+    <string name="browse_disabled_message">RadioBrowserとRadio Registryの両方のAPIが設定で無効になっています。オンラインステーションを参照するには、少なくとも1つのAPIを有効にしてください。</string>
+    <string name="browse_disabled_tip_title">保存されたステーションは引き続き動作します</string>
+    <string name="browse_disabled_tip_message">既に保存したステーションを再生するにはライブラリタブに移動するか、ファイルからステーションをインポートしてください。</string>
+    <string name="browse_privacy_only_title">プライバシーラジオ</string>
+    <string name="browse_privacy_only_message">RadioBrowser APIが無効です。TorとI2Pステーションのみを表示しています。</string>
+    <string name="station_already_in_library">ステーションは既にライブラリにあります</string>
 </resources>

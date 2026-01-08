@@ -649,4 +649,28 @@
     <string name="i2p_status_checking">正在检查 I2P 可用性…</string>
     <string name="i2p_status_available">I2P 代理可用于 %1$s:%2$d</string>
     <string name="i2p_status_unavailable">I2P 未运行</string>
+
+    <!-- Settings - Network & API -->
+    <string name="settings_network_api">网络和 API</string>
+    <string name="settings_disable_radiobrowser_api">禁用 RadioBrowser API</string>
+    <string name="settings_disable_radiobrowser_api_description">停止从 RadioBrowser 获取明网电台</string>
+    <string name="settings_disable_radio_registry_api">禁用 Radio Registry API</string>
+    <string name="settings_disable_radio_registry_api_description">停止从 Radio Registry 获取 Tor/I2P 电台</string>
+    <string name="settings_disable_cover_art">禁用封面图片</string>
+    <string name="settings_disable_cover_art_description">阻止从外部服务器加载电台图片</string>
+    <string name="settings_network_api_info">应用仅连接到：用于明网电台的 RadioBrowser API、用于 Tor/I2P 电台的 Radio Registry API、用于封面的外部服务器以及播放时的广播流。</string>
+    <string name="settings_offline_mode_note">两个 API 均已禁用：浏览标签页仅显示本地库。您仍可以播放已保存的电台并从文件导入电台。</string>
+
+    <!-- Browse - Offline Mode -->
+    <string name="browse_offline_mode_title">离线模式</string>
+    <string name="browse_offline_mode_message">外部 API 已在设置中禁用。前往您的媒体库访问已保存的电台，或在设置中启用 API 以浏览在线电台。</string>
+    <string name="browse_radiobrowser_disabled">RadioBrowser API 已禁用</string>
+    <string name="browse_radioregistry_disabled">隐私电台 API 已禁用</string>
+    <string name="browse_disabled_title">浏览已禁用</string>
+    <string name="browse_disabled_message">RadioBrowser 和 Radio Registry API 均已在设置中禁用。请启用至少一个 API 以浏览在线电台。</string>
+    <string name="browse_disabled_tip_title">您保存的电台仍然有效</string>
+    <string name="browse_disabled_tip_message">前往媒体库标签页播放已保存的电台，或从文件导入电台。</string>
+    <string name="browse_privacy_only_title">隐私广播</string>
+    <string name="browse_privacy_only_message">RadioBrowser API 已禁用。仅显示 Tor 和 I2P 电台。</string>
+    <string name="station_already_in_library">电台已在您的媒体库中</string>
 </resources>
