@@ -40,6 +40,7 @@ import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserResult
 import com.opensource.i2pradio.data.radiobrowser.RadioBrowserStation
+import com.opensource.i2pradio.data.radiobrowser.TagInfo
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryStation
 import com.opensource.i2pradio.ui.RadioViewModel
 import kotlinx.coroutines.launch
@@ -724,7 +725,12 @@ class BrowseStationsFragment : Fragment() {
             showGenreFilterDialog()
         }
         genreFilterChip.setOnCloseIconClickListener {
-            viewModel.clearTagFilter()
+            // Clear the appropriate filter based on current mode
+            if (viewModel.isInPrivacyMode()) {
+                viewModel.clearRegistryGenreFilter()
+            } else {
+                viewModel.clearTagFilter()
+            }
             genreFilterChip.visibility = View.GONE
         }
 
@@ -848,6 +854,32 @@ class BrowseStationsFragment : Fragment() {
                 languageFilterChip.visibility = View.VISIBLE
             } else {
                 languageFilterChip.visibility = View.GONE
+            }
+        }
+
+        // Observe privacy mode for context-aware filtering
+        viewModel.privacyStationMode.observe(viewLifecycleOwner) { mode ->
+            val isPrivacyMode = mode != PrivacyStationMode.NONE
+            // Hide country and language filters in privacy mode (not applicable)
+            if (isPrivacyMode) {
+                countryFilterChip.visibility = View.GONE
+                languageFilterChip.visibility = View.GONE
+                // Update search hint for privacy stations
+                resultsSearchInput.hint = getString(R.string.search_privacy_stations)
+            } else {
+                // Restore normal search hint
+                resultsSearchInput.hint = getString(R.string.search_radio_browser)
+            }
+        }
+
+        // Observe selected registry genre for privacy station filtering
+        viewModel.selectedRegistryGenre.observe(viewLifecycleOwner) { genre ->
+            if (genre != null && viewModel.isInPrivacyMode()) {
+                genreFilterChip.text = genre
+                genreFilterChip.visibility = View.VISIBLE
+            } else if (!viewModel.isInPrivacyMode() && viewModel.selectedTag.value == null) {
+                // Only hide if we're not in privacy mode and no regular tag is selected
+                genreFilterChip.visibility = View.GONE
             }
         }
 
@@ -985,6 +1017,8 @@ class BrowseStationsFragment : Fragment() {
         viewModel.filterByCountry(null)
         viewModel.filterByTag(null)
         viewModel.filterByLanguage(null)
+        // Reset privacy mode when returning to discovery
+        viewModel.resetPrivacyMode()
         currentResultsTitle = ""
 
         // Refresh discovery data (force refresh to get fresh content)
@@ -1456,6 +1490,12 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun showGenreFilterDialog() {
+        // Check if we're in privacy mode - use Radio Registry genres instead
+        if (viewModel.isInPrivacyMode()) {
+            showRegistryGenreFilterDialog()
+            return
+        }
+
         val tags = viewModel.tags.value ?: return
         if (tags.isEmpty()) {
             if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
@@ -1488,6 +1528,180 @@ class BrowseStationsFragment : Fragment() {
             .create()
 
         dialog.show()
+    }
+
+    /**
+     * Show genre filter dialog for privacy stations (Tor/I2P).
+     * Uses Radio Registry genres instead of RadioBrowser tags.
+     */
+    private fun showRegistryGenreFilterDialog() {
+        val genres = viewModel.registryGenres.value ?: return
+        if (genres.isEmpty()) {
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), R.string.loading_genres, Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        val currentGenre = viewModel.selectedRegistryGenre.value
+        var tempSelectedGenreIndex: Int? = if (currentGenre == null) {
+            null
+        } else {
+            genres.indexOf(currentGenre).takeIf { it >= 0 }
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.select_genre)
+            .setView(createRegistryGenreSearchView(genres, tempSelectedGenreIndex) { selectedIndex ->
+                tempSelectedGenreIndex = selectedIndex
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                if (tempSelectedGenreIndex == null) {
+                    viewModel.clearRegistryGenreFilter()
+                } else {
+                    viewModel.filterByRegistryGenre(genres[tempSelectedGenreIndex!!])
+                }
+            }
+            .create()
+
+        dialog.show()
+    }
+
+    /**
+     * Create a searchable view for Radio Registry genres.
+     */
+    private fun createRegistryGenreSearchView(
+        genres: List<String>,
+        selectedIndex: Int?,
+        onGenreSelected: (Int?) -> Unit
+    ): View {
+        val context = requireContext()
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 8, 0, 0)
+        }
+
+        val searchInput = TextInputEditText(context).apply {
+            hint = getString(R.string.search_genres)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+
+        val searchLayout = TextInputLayout(context).apply {
+            boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_FILLED
+            isHintEnabled = true
+            endIconMode = TextInputLayout.END_ICON_CLEAR_TEXT
+            setStartIconDrawable(R.drawable.ic_search)
+            addView(searchInput)
+        }
+
+        container.addView(searchLayout, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            setMargins(24, 0, 24, 8)
+        })
+
+        val divider = View(context).apply {
+            val dividerColor = com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOutlineVariant
+            )
+            setBackgroundColor(dividerColor)
+        }
+        container.addView(divider, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            1
+        ))
+
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+            val maxHeight = (400 * resources.displayMetrics.density).toInt()
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                maxHeight
+            )
+            clipToPadding = false
+            setPadding(0, 8, 0, 0)
+        }
+
+        var filteredGenres = genres.toList()
+        val adapter = RegistryGenreAdapter(filteredGenres, selectedIndex, onGenreSelected)
+        recyclerView.adapter = adapter
+
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString() ?: ""
+                filteredGenres = if (query.isEmpty()) {
+                    genres
+                } else {
+                    genres.filter { it.contains(query, ignoreCase = true) }
+                }
+                adapter.updateGenres(filteredGenres)
+            }
+        })
+
+        container.addView(recyclerView)
+        return container
+    }
+
+    /**
+     * Adapter for Radio Registry genres in the filter dialog.
+     */
+    private inner class RegistryGenreAdapter(
+        private var genres: List<String>,
+        private var selectedIndex: Int?,
+        private val onGenreSelected: (Int?) -> Unit
+    ) : RecyclerView.Adapter<RegistryGenreAdapter.ViewHolder>() {
+
+        inner class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val textView = TextView(parent.context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setPadding(48, 32, 48, 32)
+                textSize = 16f
+                setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+            }
+            return ViewHolder(textView)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val genre = genres[position]
+            holder.textView.text = genre
+
+            // Highlight selected genre
+            val isSelected = selectedIndex != null && genres.indexOf(genre) == selectedIndex
+            if (isSelected) {
+                holder.textView.setBackgroundColor(
+                    ContextCompat.getColor(requireContext(), R.color.chip_selected_background)
+                )
+            } else {
+                holder.textView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            }
+
+            holder.textView.setOnClickListener {
+                val oldIndex = selectedIndex
+                selectedIndex = if (selectedIndex == position) null else position
+                onGenreSelected(selectedIndex)
+
+                // Refresh the items
+                if (oldIndex != null) notifyItemChanged(oldIndex)
+                notifyItemChanged(position)
+            }
+        }
+
+        override fun getItemCount() = genres.size
+
+        fun updateGenres(newGenres: List<String>) {
+            genres = newGenres
+            notifyDataSetChanged()
+        }
     }
 
     private fun showLanguageFilterDialog() {

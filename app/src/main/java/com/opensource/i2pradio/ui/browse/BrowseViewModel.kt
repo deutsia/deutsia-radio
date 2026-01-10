@@ -23,6 +23,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 /**
+ * Represents which type of stations are currently being viewed.
+ * Used to determine which API to use for search/filtering.
+ */
+enum class PrivacyStationMode {
+    NONE,  // Viewing clearnet stations (RadioBrowser API)
+    TOR,   // Viewing Tor stations (Radio Registry API)
+    I2P    // Viewing I2P stations (Radio Registry API)
+}
+
+/**
  * ViewModel for the Browse Stations feature.
  * Manages UI state for searching and browsing RadioBrowser stations.
  */
@@ -71,9 +81,21 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     private val _countries = MutableLiveData<List<CountryInfo>>(emptyList())
     val countries: LiveData<List<CountryInfo>> = _countries
 
-    // Tags list (for filter dropdown)
+    // Tags list (for filter dropdown) - RadioBrowser tags
     private val _tags = MutableLiveData<List<TagInfo>>(emptyList())
     val tags: LiveData<List<TagInfo>> = _tags
+
+    // Radio Registry genres (for privacy station filtering)
+    private val _registryGenres = MutableLiveData<List<String>>(emptyList())
+    val registryGenres: LiveData<List<String>> = _registryGenres
+
+    // Selected Radio Registry genre for filtering privacy stations
+    private val _selectedRegistryGenre = MutableLiveData<String?>(null)
+    val selectedRegistryGenre: LiveData<String?> = _selectedRegistryGenre
+
+    // Current privacy station mode (TOR, I2P, or NONE for clearnet)
+    private val _privacyStationMode = MutableLiveData(PrivacyStationMode.NONE)
+    val privacyStationMode: LiveData<PrivacyStationMode> = _privacyStationMode
 
     // Languages list (for filter dropdown)
     private val _languages = MutableLiveData<List<LanguageInfo>>(emptyList())
@@ -186,6 +208,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         loadCountries()
         loadTags()
         loadLanguages()
+        loadRegistryGenres()
         loadDiscoveryData()
         loadPrivacyRadioData()
     }
@@ -367,15 +390,27 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Load all Tor stations from the API for results mode
+     * Load all Tor stations from the API for results mode.
+     * Sets privacy mode to TOR so search and filters use Radio Registry API.
      */
     fun loadApiTorStations() {
         _currentCategory.value = BrowseCategory.ALL_STATIONS
+        _privacyStationMode.value = PrivacyStationMode.TOR
+        // Clear RadioBrowser filters when switching to privacy mode
+        _selectedTag.value = null
+        _selectedCountry.value = null
+        _selectedLanguage.value = null
         currentOffset = 0
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                when (val result = registryRepository.getTorStations(limit = 100)) {
+                val genre = _selectedRegistryGenre.value
+                val result = if (genre != null) {
+                    registryRepository.getStationsByGenre(genre, network = "tor")
+                } else {
+                    registryRepository.getTorStations(limit = 100)
+                }
+                when (result) {
                     is RadioRegistryResult.Success -> {
                         val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
                         _stations.postValue(browserStations)
@@ -396,15 +431,27 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Load all I2P stations from the API for results mode
+     * Load all I2P stations from the API for results mode.
+     * Sets privacy mode to I2P so search and filters use Radio Registry API.
      */
     fun loadApiI2pStations() {
         _currentCategory.value = BrowseCategory.ALL_STATIONS
+        _privacyStationMode.value = PrivacyStationMode.I2P
+        // Clear RadioBrowser filters when switching to privacy mode
+        _selectedTag.value = null
+        _selectedCountry.value = null
+        _selectedLanguage.value = null
         currentOffset = 0
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                when (val result = registryRepository.getI2pStations(limit = 100)) {
+                val genre = _selectedRegistryGenre.value
+                val result = if (genre != null) {
+                    registryRepository.getStationsByGenre(genre, network = "i2p")
+                } else {
+                    registryRepository.getI2pStations(limit = 100)
+                }
+                when (result) {
                     is RadioRegistryResult.Success -> {
                         val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
                         _stations.postValue(browserStations)
@@ -425,6 +472,50 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Check if currently viewing privacy stations (Tor or I2P)
+     */
+    fun isInPrivacyMode(): Boolean {
+        return _privacyStationMode.value != PrivacyStationMode.NONE
+    }
+
+    /**
+     * Get the network type for the current privacy mode ("tor", "i2p", or null)
+     */
+    private fun getPrivacyNetworkType(): String? {
+        return when (_privacyStationMode.value) {
+            PrivacyStationMode.TOR -> "tor"
+            PrivacyStationMode.I2P -> "i2p"
+            else -> null
+        }
+    }
+
+    /**
+     * Filter privacy stations by Radio Registry genre
+     */
+    fun filterByRegistryGenre(genre: String?) {
+        _selectedRegistryGenre.value = genre
+        // Reload stations with the new genre filter
+        when (_privacyStationMode.value) {
+            PrivacyStationMode.TOR -> loadApiTorStations()
+            PrivacyStationMode.I2P -> loadApiI2pStations()
+            else -> {} // Should not happen in privacy mode
+        }
+    }
+
+    /**
+     * Clear the Radio Registry genre filter
+     */
+    fun clearRegistryGenreFilter() {
+        _selectedRegistryGenre.value = null
+        // Reload stations without genre filter
+        when (_privacyStationMode.value) {
+            PrivacyStationMode.TOR -> loadApiTorStations()
+            PrivacyStationMode.I2P -> loadApiI2pStations()
+            else -> {}
+        }
+    }
+
+    /**
      * Convert a RadioRegistryStation to a playable RadioStation
      */
     fun getPlayableStation(station: RadioRegistryStation) = station.toRadioStation()
@@ -434,6 +525,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun loadTopVoted() {
         _currentCategory.value = BrowseCategory.TOP_VOTED
+        // Reset privacy mode - these are clearnet stations
+        resetPrivacyMode()
         currentOffset = 0
         _stations.value = emptyList()
         // Clear the temporary memory when switching tabs
@@ -446,6 +539,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun loadTopClicked() {
         _currentCategory.value = BrowseCategory.TOP_CLICKED
+        // Reset privacy mode - these are clearnet stations
+        resetPrivacyMode()
         currentOffset = 0
         _stations.value = emptyList()
         fetchStations()
@@ -456,6 +551,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun loadRandom() {
         _currentCategory.value = BrowseCategory.RANDOM
+        // Reset privacy mode - these are clearnet stations
+        resetPrivacyMode()
         currentOffset = 0
         _stations.value = emptyList()
         fetchStations()
@@ -466,6 +563,8 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun loadHistory() {
         _currentCategory.value = BrowseCategory.HISTORY
+        // Reset privacy mode - these are clearnet stations
+        resetPrivacyMode()
         currentOffset = 0
         _stations.value = emptyList()
         fetchStations()
@@ -475,12 +574,25 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      * Load all stations based on current filter (no ranking applied).
      * This is useful when filters like "Jazz" return few results with ranked categories
      * because it fetches ALL stations matching the filter directly from the API.
+     * Also resets privacy mode to NONE (clearnet browsing).
      */
     fun loadAllStations() {
         _currentCategory.value = BrowseCategory.ALL_STATIONS
+        // Reset privacy mode - we're now browsing clearnet stations
+        _privacyStationMode.value = PrivacyStationMode.NONE
+        _selectedRegistryGenre.value = null
         currentOffset = 0
         _stations.value = emptyList()
         fetchStations()
+    }
+
+    /**
+     * Reset privacy mode to NONE (clearnet browsing).
+     * Called when switching back to discovery mode or browsing clearnet stations.
+     */
+    fun resetPrivacyMode() {
+        _privacyStationMode.value = PrivacyStationMode.NONE
+        _selectedRegistryGenre.value = null
     }
 
     /**
@@ -514,7 +626,9 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * Search stations by name
+     * Search stations by name.
+     * Context-aware: uses Radio Registry API when in privacy mode (Tor/I2P),
+     * RadioBrowser API otherwise.
      * This now preserves active filters (tag, country, language) and combines them with search
      */
     fun search(query: String) {
@@ -523,10 +637,59 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
         currentOffset = 0
         _stations.value = emptyList()
         if (query.isNotBlank()) {
-            fetchStations()
+            // Check if we're in privacy mode - use Radio Registry search instead
+            if (isInPrivacyMode()) {
+                searchPrivacyStations(query)
+            } else {
+                fetchStations()
+            }
+        } else if (isInPrivacyMode()) {
+            // If search is cleared in privacy mode, reload the privacy stations
+            when (_privacyStationMode.value) {
+                PrivacyStationMode.TOR -> loadApiTorStations()
+                PrivacyStationMode.I2P -> loadApiI2pStations()
+                else -> {}
+            }
         } else if (hasActiveFilters()) {
             // If search is cleared but filters are active, show filtered results
             restoreFilteredView()
+        }
+    }
+
+    /**
+     * Search privacy stations (Tor/I2P) using Radio Registry API
+     */
+    private fun searchPrivacyStations(query: String) {
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val network = getPrivacyNetworkType()
+                val genre = _selectedRegistryGenre.value
+
+                val result = registryRepository.searchStations(
+                    query = query,
+                    network = network,
+                    genre = genre,
+                    limit = 100
+                )
+
+                when (result) {
+                    is RadioRegistryResult.Success -> {
+                        val browserStations = result.data.map { RadioBrowserStation.fromRegistryStation(it) }
+                        _stations.postValue(browserStations)
+                        _hasMoreResults.postValue(false)
+                        _isLoading.postValue(false)
+                    }
+                    is RadioRegistryResult.Error -> {
+                        _errorMessage.postValue("Search failed: ${result.message}")
+                        _isLoading.postValue(false)
+                    }
+                    is RadioRegistryResult.Loading -> {}
+                }
+            } catch (e: Exception) {
+                _errorMessage.postValue("Search failed: ${e.message}")
+                _isLoading.postValue(false)
+            }
         }
     }
 
@@ -917,6 +1080,25 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
                     // Silently fail - tags are optional
                 }
                 is RadioBrowserResult.Loading -> {}
+            }
+        }
+    }
+
+    /**
+     * Load Radio Registry genres for privacy station filtering
+     */
+    private fun loadRegistryGenres() {
+        viewModelScope.launch {
+            when (val result = registryRepository.getGenres()) {
+                is RadioRegistryResult.Success -> {
+                    // Sort alphabetically
+                    _registryGenres.value = result.data.sortedBy { it.lowercase() }
+                }
+                is RadioRegistryResult.Error -> {
+                    // Silently fail - genres are optional
+                    android.util.Log.d("BrowseViewModel", "Failed to load registry genres: ${result.message}")
+                }
+                is RadioRegistryResult.Loading -> {}
             }
         }
     }

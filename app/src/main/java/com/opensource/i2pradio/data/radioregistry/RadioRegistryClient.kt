@@ -317,6 +317,45 @@ class RadioRegistryClient(private val context: Context) {
     }
 
     /**
+     * Search stations by name with optional network and genre filters.
+     * Uses client-side filtering on the name field since the API doesn't support name search.
+     *
+     * @param query Search query to match against station names
+     * @param network Filter by network: "tor" or "i2p" (null for all)
+     * @param genre Filter by genre
+     * @param limit Maximum number of results to return
+     */
+    suspend fun searchStations(
+        query: String,
+        network: String? = null,
+        genre: String? = null,
+        limit: Int = DEFAULT_LIMIT
+    ): RadioRegistryResult<List<RadioRegistryStation>> {
+        // Fetch all stations matching network and genre filters
+        val result = getStations(
+            network = network,
+            genre = genre,
+            onlineOnly = true,
+            limit = MAX_LIMIT  // Get more to filter client-side
+        )
+
+        return when (result) {
+            is RadioRegistryResult.Success -> {
+                val queryLower = query.lowercase().trim()
+                val filtered = result.data.stations.filter { station ->
+                    // Match against name, description, and genre
+                    station.name.lowercase().contains(queryLower) ||
+                    station.description?.lowercase()?.contains(queryLower) == true ||
+                    station.genre?.lowercase()?.contains(queryLower) == true
+                }.take(limit)
+                RadioRegistryResult.Success(filtered)
+            }
+            is RadioRegistryResult.Error -> result
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
+        }
+    }
+
+    /**
      * Check API health
      */
     suspend fun checkHealth(): RadioRegistryResult<Boolean> {

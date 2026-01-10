@@ -86,6 +86,7 @@
     <!-- Browse/Discover Stations -->
     <string name="tab_browse">Browse</string>
     <string name="search_radio_browser">Search thousands of stations…</string>
+    <string name="search_privacy_stations">Search privacy stations…</string>
     <string name="browse_top_voted">Top Voted</string>
     <string name="browse_popular">Popular</string>
     <string name="browse_random">Random</string>

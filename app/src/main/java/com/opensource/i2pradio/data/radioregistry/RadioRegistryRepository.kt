@@ -135,6 +135,24 @@ class RadioRegistryRepository(private val context: Context) {
     }
 
     /**
+     * Search stations by name with optional network and genre filters
+     *
+     * @param query Search query to match against station names
+     * @param network Filter by network: "tor" or "i2p" (null for all)
+     * @param genre Filter by genre
+     * @param limit Maximum number of results to return
+     */
+    suspend fun searchStations(
+        query: String,
+        network: String? = null,
+        genre: String? = null,
+        limit: Int = 50
+    ): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Searching stations: query='$query', network=$network, genre=$genre")
+        return client.searchStations(query, network, genre, limit)
+    }
+
+    /**
      * Check if Force Tor mode is blocking requests
      */
     fun isTorRequiredButNotConnected(): Boolean {
