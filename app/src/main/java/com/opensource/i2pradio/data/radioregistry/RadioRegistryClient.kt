@@ -343,9 +343,8 @@ class RadioRegistryClient(private val context: Context) {
             is RadioRegistryResult.Success -> {
                 val queryLower = query.lowercase().trim()
                 val filtered = result.data.stations.filter { station ->
-                    // Match against name, description, and genre
+                    // Match against name and genre
                     station.name.lowercase().contains(queryLower) ||
-                    station.description?.lowercase()?.contains(queryLower) == true ||
                     station.genre?.lowercase()?.contains(queryLower) == true
                 }.take(limit)
                 RadioRegistryResult.Success(filtered)

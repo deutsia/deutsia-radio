@@ -1666,7 +1666,11 @@ class BrowseStationsFragment : Fragment() {
                 )
                 setPadding(48, 32, 48, 32)
                 textSize = 16f
-                setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+                // Use Material theme attribute for text color
+                setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                    this,
+                    com.google.android.material.R.attr.colorOnSurface
+                ))
             }
             return ViewHolder(textView)
         }
@@ -1675,11 +1679,14 @@ class BrowseStationsFragment : Fragment() {
             val genre = genres[position]
             holder.textView.text = genre
 
-            // Highlight selected genre
+            // Highlight selected genre using Material theme attribute
             val isSelected = selectedIndex != null && genres.indexOf(genre) == selectedIndex
             if (isSelected) {
                 holder.textView.setBackgroundColor(
-                    ContextCompat.getColor(requireContext(), R.color.chip_selected_background)
+                    com.google.android.material.color.MaterialColors.getColor(
+                        holder.textView,
+                        com.google.android.material.R.attr.colorSecondaryContainer
+                    )
                 )
             } else {
                 holder.textView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
