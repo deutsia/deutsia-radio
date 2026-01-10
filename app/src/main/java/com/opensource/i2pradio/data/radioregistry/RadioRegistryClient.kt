@@ -304,14 +304,38 @@ class RadioRegistryClient(private val context: Context) {
      */
     suspend fun getGenres(): RadioRegistryResult<List<String>> {
         return executeRequest("/genres") { body ->
-            val jsonArray = JSONArray(body)
             val genres = mutableListOf<String>()
-            for (i in 0 until jsonArray.length()) {
-                val genre = jsonArray.optString(i, "")
-                if (genre.isNotEmpty()) {
-                    genres.add(genre)
+
+            // Try parsing as JSON object first (wrapped response like {"genres": [...]})
+            try {
+                val json = JSONObject(body)
+                val jsonArray = json.optJSONArray("genres")
+                if (jsonArray != null) {
+                    for (i in 0 until jsonArray.length()) {
+                        val genre = jsonArray.optString(i, "")
+                        if (genre.isNotEmpty()) {
+                            genres.add(genre)
+                        }
+                    }
+                    return@executeRequest genres
                 }
+            } catch (e: Exception) {
+                // Not a JSON object, try as plain array
             }
+
+            // Fall back to plain JSON array
+            try {
+                val jsonArray = JSONArray(body)
+                for (i in 0 until jsonArray.length()) {
+                    val genre = jsonArray.optString(i, "")
+                    if (genre.isNotEmpty()) {
+                        genres.add(genre)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to parse genres response: ${e.message}")
+            }
+
             genres
         }
     }
