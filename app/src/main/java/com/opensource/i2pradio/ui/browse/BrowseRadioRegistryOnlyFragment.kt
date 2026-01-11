@@ -633,18 +633,24 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                     RadioRegistryStation(
                         id = station.stationuuid,
                         name = station.name,
-                        streamUrl = station.url_resolved ?: station.url,
-                        homepage = station.homepage,
-                        favicon = station.favicon,
-                        genre = station.tags,
-                        codec = station.codec,
-                        bitrate = station.bitrate,
-                        language = station.language,
+                        streamUrl = station.urlResolved.takeIf { it.isNotEmpty() } ?: station.url,
+                        homepage = station.homepage.takeIf { it.isNotEmpty() },
+                        faviconUrl = station.favicon.takeIf { it.isNotEmpty() },
+                        genre = station.tags.takeIf { it.isNotEmpty() },
+                        codec = station.codec.takeIf { it.isNotEmpty() },
+                        bitrate = station.bitrate.takeIf { it > 0 },
+                        language = station.language.takeIf { it.isNotEmpty() },
                         network = if (station.url.contains(".onion")) "tor" else if (station.url.contains(".i2p")) "i2p" else "unknown",
-                        country = station.country,
-                        countryCode = station.countrycode,
-                        isOnline = true,
-                        lastChecked = null
+                        country = station.country.takeIf { it.isNotEmpty() },
+                        countryCode = station.countrycode.takeIf { it.isNotEmpty() },
+                        isOnline = station.lastcheckok,
+                        lastCheckTime = null,
+                        status = "approved",
+                        checkCount = 0,
+                        checkOkCount = 0,
+                        submittedAt = null,
+                        createdAt = null,
+                        updatedAt = null
                     )
                 }
                 resultsAdapter.submitList(registryStations)
