@@ -1108,12 +1108,13 @@ class BrowseStationsFragment : Fragment() {
 
     /**
      * Show category menu for privacy stations.
-     * Only shows "All Stations" which reloads privacy stations without filters.
+     * Shows "All Stations" which loads all privacy stations (Tor + I2P).
      */
     private fun showPrivacyCategoryMenu() {
-        val networkName = when (viewModel.privacyStationMode.value) {
+        val currentNetwork = when (viewModel.privacyStationMode.value) {
             PrivacyStationMode.TOR -> getString(R.string.browse_tor_stations)
             PrivacyStationMode.I2P -> getString(R.string.browse_i2p_stations)
+            PrivacyStationMode.ALL_PRIVACY -> getString(R.string.browse_all_stations)
             else -> getString(R.string.browse_all_stations)
         }
 
@@ -1122,14 +1123,14 @@ class BrowseStationsFragment : Fragment() {
         )
 
         AlertDialog.Builder(requireContext())
-            .setTitle(networkName)
+            .setTitle(currentNetwork)
             .setItems(categories) { _, which ->
                 clearSearch()
                 when (which) {
                     0 -> {
-                        currentResultsTitle = networkName
-                        // Clear genre filter and reload privacy stations
-                        viewModel.clearRegistryGenreFilter()
+                        currentResultsTitle = getString(R.string.browse_all_stations)
+                        // Load all privacy stations (both Tor and I2P)
+                        viewModel.loadAllPrivacyStations()
                     }
                 }
                 updateCategoryChip()
