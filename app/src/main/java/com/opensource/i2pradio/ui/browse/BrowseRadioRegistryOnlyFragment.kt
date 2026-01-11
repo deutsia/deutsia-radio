@@ -358,8 +358,8 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 clearSearch()
                 when (which) {
                     0 -> {
-                        resultsTitle.text = getString(R.string.browse_all_stations)
-                        categoryFilterChip.text = getString(R.string.browse_all_stations)
+                        currentResultsTitle = getString(R.string.browse_all_stations)
+                        updateCategoryChip()
                         viewModel.loadAllPrivacyStations()
                     }
                 }
