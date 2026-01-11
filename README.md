@@ -21,7 +21,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.6.2** Added API and cover art disable options, security tests, and UX/UI improvements
+- **New Release: v1.6.3** Added search and genre filtering for Tor/I2P stations, updated translations
 
 ---
 
@@ -29,11 +29,10 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 - **Multinet Support** - Clearnet, I2P (.i2p), and Tor (.onion)
 - **Force Tor Modes** - Proxy-or-fail enforcement with instant leak prevention
 - **50,000+ Stations** - Access RadioBrowser API or add custom streams
-- **Material You** - Dynamic theming along with 6 color schemes
+- **Material You** - Dynamic theming along with 6 color schemes and Dark/Light mode
 - **Stream Recording** - Record across multiple stations
 - **App Lock** - Secure your listening with biometric/PIN protection and optional database encrpytion 
 - **17 Languages** - Multilingual interface support
-- **Light/Dark/System** - Adaptive theme modes
 - **Bundled Darknet Stations** Add pre-curated i2p/tor station lists to local library
 - **Add any station** Support for Tor, Clearnet, I2P and per-station level custom proxy stations
 - **Full DNS Protection** - No DNS leaks to ISP/System DNS in Force Tor/Proxy modes, backed by 47 unit and integration tests

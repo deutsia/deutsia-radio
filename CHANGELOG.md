@@ -2,6 +2,24 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.6.3]
+
+### Added
+- **Updated Privacy station genre filter**: Genre filtering for Tor/I2P stations now properly uses Radio Registry's genre list
+- **Updated Radio Registry-only browse mode**: Full search and filter UI when Radio Browser API is disabled
+- **Updated Translations**
+
+### Fixed
+- **"All Stations" in privacy mode**: Now correctly loads all privacy stations instead of switching to clearnet
+- **Privacy mode refresh**: Refresh action now stays in privacy mode when viewing Tor/I2P stations
+
+### UI/UX Improvements
+- Unified search and filter UI across all browse modes for consistent experience
+- Added debounced search input with "Searching..." indicator for privacy stations
+- Added results count display in privacy station browse mode
+
+
+
 ## [1.6.2]
 
 ### Added
