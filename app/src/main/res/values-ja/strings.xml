@@ -72,6 +72,7 @@
     
     <string name="tab_browse">閲覧</string>
     <string name="search_radio_browser">数千のステーションを検索…</string>
+    <string name="search_privacy_stations">プライバシーステーション検索…</string>
     <string name="browse_top_voted">最も投票されたステーション</string>
     <string name="browse_popular">人気</string>
     <string name="browse_random">ランダム</string>

@@ -72,6 +72,7 @@
     
     <string name="tab_browse">Göz At</string>
     <string name="search_radio_browser">Binlerce istasyon ara…</string>
+    <string name="search_privacy_stations">Gizlilik istasyonlarını ara…</string>
     <string name="browse_top_voted">En Çok Oylanan</string>
     <string name="browse_popular">Popüler</string>
     <string name="browse_random">Rastgele</string>

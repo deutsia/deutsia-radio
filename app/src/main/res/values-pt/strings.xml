@@ -72,6 +72,7 @@
     
     <string name="tab_browse">Explorar</string>
     <string name="search_radio_browser">Pesquisar milhares de estações…</string>
+    <string name="search_privacy_stations">Pesquisar estações de privacidade…</string>
     <string name="browse_top_voted">Mais votadas</string>
     <string name="browse_popular">Populares</string>
     <string name="browse_random">Aleatórias</string>

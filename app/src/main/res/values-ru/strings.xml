@@ -72,6 +72,7 @@
     
     <string name="tab_browse">Обзор</string>
     <string name="search_radio_browser">Поиск среди тысяч станций…</string>
+    <string name="search_privacy_stations">Поиск станций приватности…</string>
     <string name="browse_top_voted">Самые популярные</string>
     <string name="browse_popular">Популярные</string>
     <string name="browse_random">Случайные</string>

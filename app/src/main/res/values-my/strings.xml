@@ -72,6 +72,7 @@
     
     <string name="tab_browse">ရှာဖွေရန်</string>
     <string name="search_radio_browser">စတေးရှင်းထောင်ပေါင်းများစွာကို ရှာပါ…</string>
+    <string name="search_privacy_stations">ကိုယ်ရေးကိုယ်တာ ဘေးကင်းရေးစခန်းများကို ရှာဖွေရန်…</string>
     <string name="browse_top_voted">အများဆုံး မဲရသော</string>
     <string name="browse_popular">လူကြိုက်များသော</string>
     <string name="browse_random">ကျပန်း</string>

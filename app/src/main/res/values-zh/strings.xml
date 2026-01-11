@@ -72,6 +72,7 @@
     
     <string name="tab_browse">浏览</string>
     <string name="search_radio_browser">搜索数千个电台…</string>
+    <string name="search_privacy_stations">搜索隐私电台…</string>
     <string name="browse_top_voted">最多投票</string>
     <string name="browse_popular">热门</string>
     <string name="browse_random">随机</string>

@@ -72,6 +72,7 @@
     
     <string name="tab_browse">مرور</string>
     <string name="search_radio_browser">جستجو در هزاران ایستگاه…</string>
+    <string name="search_privacy_stations">جستجوی ایستگاه‌های حریم خصوصی…</string>
     <string name="browse_top_voted">پررأی‌ترین</string>
     <string name="browse_popular">محبوب</string>
     <string name="browse_random">تصادفی</string>
