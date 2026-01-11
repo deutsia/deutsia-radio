@@ -1061,6 +1061,12 @@ class BrowseStationsFragment : Fragment() {
     }
 
     private fun showCategoryMenu() {
+        // Check if we're in privacy mode - show different options
+        if (viewModel.isInPrivacyMode()) {
+            showPrivacyCategoryMenu()
+            return
+        }
+
         val categories = arrayOf(
             getString(R.string.browse_all_stations),
             getString(R.string.browse_top_voted),
@@ -1093,6 +1099,37 @@ class BrowseStationsFragment : Fragment() {
                     4 -> {
                         currentResultsTitle = getString(R.string.browse_history)
                         viewModel.loadHistory()
+                    }
+                }
+                updateCategoryChip()
+            }
+            .show()
+    }
+
+    /**
+     * Show category menu for privacy stations.
+     * Only shows "All Stations" which reloads privacy stations without filters.
+     */
+    private fun showPrivacyCategoryMenu() {
+        val networkName = when (viewModel.privacyStationMode.value) {
+            PrivacyStationMode.TOR -> getString(R.string.browse_tor_stations)
+            PrivacyStationMode.I2P -> getString(R.string.browse_i2p_stations)
+            else -> getString(R.string.browse_all_stations)
+        }
+
+        val categories = arrayOf(
+            getString(R.string.browse_all_stations)
+        )
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(networkName)
+            .setItems(categories) { _, which ->
+                clearSearch()
+                when (which) {
+                    0 -> {
+                        currentResultsTitle = networkName
+                        // Clear genre filter and reload privacy stations
+                        viewModel.clearRegistryGenreFilter()
                     }
                 }
                 updateCategoryChip()
