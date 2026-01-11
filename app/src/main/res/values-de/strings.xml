@@ -72,6 +72,7 @@
     
     <string name="tab_browse">Entdecken</string>
     <string name="search_radio_browser">Tausende von Sendern durchsuchen…</string>
+    <string name="search_privacy_stations">Datenschutzstationen durchsuchen…</string>
     <string name="browse_top_voted">Am besten bewertet</string>
     <string name="browse_popular">Beliebt</string>
     <string name="browse_random">Zufällig</string>

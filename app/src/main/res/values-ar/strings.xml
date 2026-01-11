@@ -72,6 +72,7 @@
     
     <string name="tab_browse">تصفح</string>
     <string name="search_radio_browser">البحث عن آلاف المحطات…</string>
+    <string name="search_privacy_stations">البحث في محطات الخصوصية…</string>
     <string name="browse_top_voted">الأكثر تصويتاً</string>
     <string name="browse_popular">شائعة</string>
     <string name="browse_random">عشوائية</string>

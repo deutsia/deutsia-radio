@@ -72,6 +72,7 @@
     
     <string name="tab_browse">ब्राउज़ करें</string>
     <string name="search_radio_browser">हजारों स्टेशनों को खोजें…</string>
+    <string name="search_privacy_stations">गोपनीयता स्टेशन खोजें…</string>
     <string name="browse_top_voted">सबसे अधिक वोट वाले</string>
     <string name="browse_popular">लोकप्रिय</string>
     <string name="browse_random">यादृच्छिक</string>

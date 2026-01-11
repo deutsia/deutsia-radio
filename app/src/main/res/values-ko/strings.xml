@@ -72,6 +72,7 @@
     
     <string name="tab_browse">탐색</string>
     <string name="search_radio_browser">수천 개의 방송국 검색…</string>
+    <string name="search_privacy_stations">프라이버시 스테이션 검색…</string>
     <string name="browse_top_voted">최다 투표</string>
     <string name="browse_popular">인기</string>
     <string name="browse_random">랜덤</string>

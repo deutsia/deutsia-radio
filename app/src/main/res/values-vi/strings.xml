@@ -72,6 +72,7 @@
     
     <string name="tab_browse">Duyệt</string>
     <string name="search_radio_browser">Tìm kiếm hàng nghìn trạm…</string>
+    <string name="search_privacy_stations">Tìm kiếm đài riêng tư…</string>
     <string name="browse_top_voted">Nhiều bình chọn nhất</string>
     <string name="browse_popular">Phổ biến</string>
     <string name="browse_random">Ngẫu nhiên</string>
