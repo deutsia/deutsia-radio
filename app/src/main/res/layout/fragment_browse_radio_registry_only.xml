@@ -199,116 +199,148 @@
         android:orientation="vertical"
         android:visibility="gone">
 
-        <!-- Header with back button and title -->
+        <!-- Search Bar (Active State) - Same as BrowseStationsFragment -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:padding="12dp">
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp">
 
+            <!-- Back button to return to discovery -->
             <ImageButton
                 android:id="@+id/btnBackToDiscovery"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_arrow_back"
                 android:contentDescription="@string/back"
+                android:src="@drawable/ic_arrow_back"
                 app:tint="?attr/colorOnSurface" />
 
-            <TextView
-                android:id="@+id/resultsTitle"
+            <!-- Active search field -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/resultsSearchInputLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="12dp">
+
+                    <EditText
+                        android:id="@+id/resultsSearchInput"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="@string/search_privacy_stations"
+                        android:textColorHint="?attr/colorOnSurfaceVariant"
+                        android:textColor="?attr/colorOnSurface"
+                        android:inputType="text"
+                        android:imeOptions="actionSearch"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnClearSearch"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/button_clear"
+                        android:src="@drawable/ic_close"
+                        android:visibility="gone"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
-        <!-- Search Bar -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/resultsSearchLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:layout_marginTop="4dp"
-            android:hint="@string/search_privacy_stations"
-            app:boxBackgroundMode="filled"
-            app:boxCornerRadiusBottomEnd="28dp"
-            app:boxCornerRadiusBottomStart="28dp"
-            app:boxCornerRadiusTopEnd="28dp"
-            app:boxCornerRadiusTopStart="28dp"
-            app:endIconMode="clear_text"
-            app:hintEnabled="false"
-            app:startIconDrawable="@drawable/ic_search">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/resultsSearchInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/search_privacy_stations"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1"
-                android:paddingVertical="14dp" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Filter Chips -->
+        <!-- Filter Chips Bar -->
         <HorizontalScrollView
+            android:id="@+id/filtersBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:clipToPadding="false"
             android:paddingHorizontal="12dp"
-            android:scrollbars="none">
+            android:paddingBottom="6dp"
+            android:scrollbars="none"
+            android:overScrollMode="never">
 
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/filterChipGroup"
+                android:id="@+id/activeFiltersChipGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:singleLine="true">
 
-                <!-- Category Chip (All Stations / Tor / I2P) -->
+                <!-- Category chip (Tor / I2P / All) -->
                 <com.google.android.material.chip.Chip
                     android:id="@+id/categoryFilterChip"
-                    style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checkable="false"
                     android:text="@string/browse_all_stations"
-                    app:checkedIconVisible="false"
-                    app:chipIcon="@drawable/ic_arrow_drop_down"
-                    app:chipIconVisible="true" />
+                    app:closeIconVisible="false"
+                    style="@style/Widget.Material3.Chip.Filter" />
 
-                <!-- Genre Filter Chip -->
+                <!-- Genre filter chip -->
                 <com.google.android.material.chip.Chip
                     android:id="@+id/genreFilterChip"
-                    style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checkable="false"
                     android:text="@string/filter_genre"
                     android:visibility="gone"
-                    app:checkedIconVisible="false"
-                    app:closeIconVisible="true" />
+                    app:closeIconVisible="true"
+                    style="@style/Widget.Material3.Chip.Filter" />
 
-                <!-- Add Filter Chip -->
+                <!-- Add filter button -->
                 <com.google.android.material.chip.Chip
                     android:id="@+id/addFilterChip"
-                    style="@style/Widget.Material3.Chip.Assist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/add_filter"
                     app:chipIcon="@drawable/ic_add"
-                    app:chipIconVisible="true" />
+                    app:chipIconVisible="true"
+                    app:chipIconTint="?attr/colorOnSurfaceVariant"
+                    style="@style/Widget.Material3.Chip.Assist" />
 
             </com.google.android.material.chip.ChipGroup>
-
         </HorizontalScrollView>
+
+        <!-- Results Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:id="@+id/resultsCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/browse_results_count"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <!-- SwipeRefresh with RecyclerView -->
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

@@ -14,7 +14,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -55,19 +58,18 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     // Results mode views
     private lateinit var resultsContainer: LinearLayout
-    private lateinit var resultsTitle: TextView
-    private lateinit var btnBackToDiscovery: View
-    private lateinit var resultsRecyclerView: RecyclerView
-    private lateinit var swipeRefresh: SwipeRefreshLayout
-    private lateinit var loadingContainer: FrameLayout
-    private lateinit var emptyStateContainer: LinearLayout
-
-    // Search and filter views
-    private lateinit var resultsSearchLayout: TextInputLayout
-    private lateinit var resultsSearchInput: TextInputEditText
+    private lateinit var btnBackToDiscovery: ImageButton
+    private lateinit var resultsSearchInputLayout: MaterialCardView
+    private lateinit var resultsSearchInput: EditText
+    private lateinit var btnClearSearch: ImageButton
     private lateinit var categoryFilterChip: Chip
     private lateinit var genreFilterChip: Chip
     private lateinit var addFilterChip: Chip
+    private lateinit var resultsCount: TextView
+    private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var resultsRecyclerView: RecyclerView
+    private lateinit var loadingContainer: FrameLayout
+    private lateinit var emptyStateContainer: LinearLayout
 
     // Adapters
     private lateinit var torStationsAdapter: PrivacyRadioCarouselAdapter
@@ -80,6 +82,13 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     private var isInResultsMode = false
     private var currentStationType: StationType = StationType.TOR
+    private var currentResultsTitle = ""
+
+    // Search debounce
+    private var searchDebounceRunnable: Runnable? = null
+    private val searchDebounceDelay = 800L
+    private var isSearchPending = false
+    private var isManualSearchClear = false
 
     // Miniplayer spacing for dynamic bottom padding
     private var miniplayerSpacing = 0
@@ -131,19 +140,18 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
         // Results views
         resultsContainer = view.findViewById(R.id.resultsContainer)
-        resultsTitle = view.findViewById(R.id.resultsTitle)
         btnBackToDiscovery = view.findViewById(R.id.btnBackToDiscovery)
-        resultsRecyclerView = view.findViewById(R.id.resultsRecyclerView)
-        swipeRefresh = view.findViewById(R.id.swipeRefresh)
-        loadingContainer = view.findViewById(R.id.loadingContainer)
-        emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
-
-        // Search and filter views
-        resultsSearchLayout = view.findViewById(R.id.resultsSearchLayout)
+        resultsSearchInputLayout = view.findViewById(R.id.resultsSearchInputLayout)
         resultsSearchInput = view.findViewById(R.id.resultsSearchInput)
+        btnClearSearch = view.findViewById(R.id.btnClearSearch)
         categoryFilterChip = view.findViewById(R.id.categoryFilterChip)
         genreFilterChip = view.findViewById(R.id.genreFilterChip)
         addFilterChip = view.findViewById(R.id.addFilterChip)
+        resultsCount = view.findViewById(R.id.resultsCount)
+        swipeRefresh = view.findViewById(R.id.swipeRefresh)
+        resultsRecyclerView = view.findViewById(R.id.resultsRecyclerView)
+        loadingContainer = view.findViewById(R.id.loadingContainer)
+        emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
     }
 
     private fun setupAdapters() {
@@ -241,11 +249,56 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     }
 
     private fun setupSearchAndFilters() {
-        // Search input handling
+        // Search input handling with debounce (same as BrowseStationsFragment)
+        resultsSearchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                // Show/hide clear button based on text content
+                btnClearSearch.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+                searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+
+                val query = s?.toString()?.trim() ?: ""
+                // Show "Searching..." indicator when typing (2+ chars)
+                if (query.length >= 2) {
+                    isSearchPending = true
+                    resultsCount.text = getString(R.string.searching)
+                }
+
+                searchDebounceRunnable = Runnable {
+                    isSearchPending = false
+                    if (query.length >= 2) {
+                        currentResultsTitle = "\"$query\""
+                        viewModel.search(query)
+                        updateCategoryChip()
+                    } else if (query.isEmpty() && !isManualSearchClear) {
+                        // Reset to current mode when search is cleared
+                        currentResultsTitle = when (currentStationType) {
+                            StationType.TOR -> getString(R.string.browse_tor_stations)
+                            StationType.I2P -> getString(R.string.browse_i2p_stations)
+                        }
+                        viewModel.search("")
+                        updateCategoryChip()
+                    }
+                    isManualSearchClear = false
+                }
+                resultsSearchInput.postDelayed(searchDebounceRunnable!!, searchDebounceDelay)
+            }
+        })
+
         resultsSearchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = resultsSearchInput.text?.toString() ?: ""
-                viewModel.search(query)
+                // Cancel pending debounce when user presses Enter
+                searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+                isSearchPending = false
+
+                val query = resultsSearchInput.text?.toString()?.trim() ?: ""
+                if (query.isNotEmpty()) {
+                    currentResultsTitle = "\"$query\""
+                    viewModel.search(query)
+                    updateCategoryChip()
+                }
                 hideKeyboard()
                 true
             } else {
@@ -253,17 +306,11 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
             }
         }
 
-        resultsSearchInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val query = s?.toString() ?: ""
-                if (query.isEmpty()) {
-                    // Clear search - reload current view
-                    viewModel.search("")
-                }
-            }
-        })
+        // Clear button click handler
+        btnClearSearch.setOnClickListener {
+            clearSearch()
+            resultsSearchInput.requestFocus()
+        }
 
         // Category chip - shows current category and allows switching
         categoryFilterChip.setOnClickListener {
@@ -283,6 +330,14 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         addFilterChip.setOnClickListener {
             showAddFilterMenu()
         }
+    }
+
+    private fun updateCategoryChip() {
+        categoryFilterChip.text = currentResultsTitle.ifEmpty { getString(R.string.browse_all_stations) }
+    }
+
+    private fun updateResultsCount(count: Int) {
+        resultsCount.text = getString(R.string.browse_results_format, count)
     }
 
     private fun showCategoryMenu() {
@@ -510,8 +565,15 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     }
 
     private fun clearSearch() {
+        searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+        isManualSearchClear = true
         resultsSearchInput.setText("")
-        hideKeyboard()
+        btnClearSearch.visibility = View.GONE
+    }
+
+    private fun showKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(resultsSearchInput, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun hideKeyboard() {
@@ -563,18 +625,17 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
         when (stationType) {
             StationType.TOR -> {
-                resultsTitle.text = getString(R.string.browse_tor_stations)
-                categoryFilterChip.text = getString(R.string.browse_tor_stations)
+                currentResultsTitle = getString(R.string.browse_tor_stations)
                 // Load from API with privacy mode set
                 viewModel.loadApiTorStations()
             }
             StationType.I2P -> {
-                resultsTitle.text = getString(R.string.browse_i2p_stations)
-                categoryFilterChip.text = getString(R.string.browse_i2p_stations)
+                currentResultsTitle = getString(R.string.browse_i2p_stations)
                 // Load from API with privacy mode set
                 viewModel.loadApiI2pStations()
             }
         }
+        updateCategoryChip()
     }
 
     private fun switchToDiscoveryMode() {
@@ -586,6 +647,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         viewModel.resetPrivacyMode()
         clearSearch()
         genreFilterChip.visibility = View.GONE
+        currentResultsTitle = ""
     }
 
     private fun updateEmptyState(isEmpty: Boolean) {
@@ -655,6 +717,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 }
                 resultsAdapter.submitList(registryStations)
                 updateEmptyState(registryStations.isEmpty())
+                updateResultsCount(registryStations.size)
                 swipeRefresh.isRefreshing = false
             }
         }
@@ -848,6 +911,8 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Clean up search debounce
+        searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
         // Clean up skeleton adapters
         (torStationsRecyclerView.adapter as? SkeletonCarouselAdapter)?.stopAllShimmers()
         (i2pStationsRecyclerView.adapter as? SkeletonCarouselAdapter)?.stopAllShimmers()
