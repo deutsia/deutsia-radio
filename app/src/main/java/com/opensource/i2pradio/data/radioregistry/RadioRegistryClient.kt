@@ -304,15 +304,77 @@ class RadioRegistryClient(private val context: Context) {
      */
     suspend fun getGenres(): RadioRegistryResult<List<String>> {
         return executeRequest("/genres") { body ->
-            val jsonArray = JSONArray(body)
             val genres = mutableListOf<String>()
-            for (i in 0 until jsonArray.length()) {
-                val genre = jsonArray.optString(i, "")
-                if (genre.isNotEmpty()) {
-                    genres.add(genre)
+
+            // Try parsing as JSON object first (wrapped response like {"genres": [...]})
+            try {
+                val json = JSONObject(body)
+                val jsonArray = json.optJSONArray("genres")
+                if (jsonArray != null) {
+                    for (i in 0 until jsonArray.length()) {
+                        val genre = jsonArray.optString(i, "")
+                        if (genre.isNotEmpty()) {
+                            genres.add(genre)
+                        }
+                    }
+                    return@executeRequest genres
                 }
+            } catch (e: Exception) {
+                // Not a JSON object, try as plain array
             }
+
+            // Fall back to plain JSON array
+            try {
+                val jsonArray = JSONArray(body)
+                for (i in 0 until jsonArray.length()) {
+                    val genre = jsonArray.optString(i, "")
+                    if (genre.isNotEmpty()) {
+                        genres.add(genre)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to parse genres response: ${e.message}")
+            }
+
             genres
+        }
+    }
+
+    /**
+     * Search stations by name with optional network and genre filters.
+     * Uses client-side filtering on the name field since the API doesn't support name search.
+     *
+     * @param query Search query to match against station names
+     * @param network Filter by network: "tor" or "i2p" (null for all)
+     * @param genre Filter by genre
+     * @param limit Maximum number of results to return
+     */
+    suspend fun searchStations(
+        query: String,
+        network: String? = null,
+        genre: String? = null,
+        limit: Int = DEFAULT_LIMIT
+    ): RadioRegistryResult<List<RadioRegistryStation>> {
+        // Fetch all stations matching network and genre filters
+        val result = getStations(
+            network = network,
+            genre = genre,
+            onlineOnly = true,
+            limit = MAX_LIMIT  // Get more to filter client-side
+        )
+
+        return when (result) {
+            is RadioRegistryResult.Success -> {
+                val queryLower = query.lowercase().trim()
+                val filtered = result.data.stations.filter { station ->
+                    // Match against name and genre
+                    station.name.lowercase().contains(queryLower) ||
+                    station.genre?.lowercase()?.contains(queryLower) == true
+                }.take(limit)
+                RadioRegistryResult.Success(filtered)
+            }
+            is RadioRegistryResult.Error -> result
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
         }
     }
 

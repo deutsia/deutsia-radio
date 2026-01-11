@@ -6,11 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -23,6 +29,10 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.chip.Chip
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
@@ -48,10 +58,16 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     // Results mode views
     private lateinit var resultsContainer: LinearLayout
-    private lateinit var resultsTitle: TextView
-    private lateinit var btnBackToDiscovery: View
-    private lateinit var resultsRecyclerView: RecyclerView
+    private lateinit var btnBackToDiscovery: ImageButton
+    private lateinit var resultsSearchInputLayout: MaterialCardView
+    private lateinit var resultsSearchInput: EditText
+    private lateinit var btnClearSearch: ImageButton
+    private lateinit var categoryFilterChip: Chip
+    private lateinit var genreFilterChip: Chip
+    private lateinit var addFilterChip: Chip
+    private lateinit var resultsCount: TextView
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var resultsRecyclerView: RecyclerView
     private lateinit var loadingContainer: FrameLayout
     private lateinit var emptyStateContainer: LinearLayout
 
@@ -66,6 +82,13 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     private var isInResultsMode = false
     private var currentStationType: StationType = StationType.TOR
+    private var currentResultsTitle = ""
+
+    // Search debounce
+    private var searchDebounceRunnable: Runnable? = null
+    private val searchDebounceDelay = 800L
+    private var isSearchPending = false
+    private var isManualSearchClear = false
 
     // Miniplayer spacing for dynamic bottom padding
     private var miniplayerSpacing = 0
@@ -95,6 +118,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         findViews(view)
         setupAdapters()
         setupResultsMode()
+        setupSearchAndFilters()
         setupSharedViews()
         observeViewModel()
 
@@ -116,10 +140,16 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
         // Results views
         resultsContainer = view.findViewById(R.id.resultsContainer)
-        resultsTitle = view.findViewById(R.id.resultsTitle)
         btnBackToDiscovery = view.findViewById(R.id.btnBackToDiscovery)
-        resultsRecyclerView = view.findViewById(R.id.resultsRecyclerView)
+        resultsSearchInputLayout = view.findViewById(R.id.resultsSearchInputLayout)
+        resultsSearchInput = view.findViewById(R.id.resultsSearchInput)
+        btnClearSearch = view.findViewById(R.id.btnClearSearch)
+        categoryFilterChip = view.findViewById(R.id.categoryFilterChip)
+        genreFilterChip = view.findViewById(R.id.genreFilterChip)
+        addFilterChip = view.findViewById(R.id.addFilterChip)
+        resultsCount = view.findViewById(R.id.resultsCount)
         swipeRefresh = view.findViewById(R.id.swipeRefresh)
+        resultsRecyclerView = view.findViewById(R.id.resultsRecyclerView)
         loadingContainer = view.findViewById(R.id.loadingContainer)
         emptyStateContainer = view.findViewById(R.id.emptyStateContainer)
     }
@@ -214,11 +244,341 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         }
 
         swipeRefresh.setOnRefreshListener {
-            when (currentStationType) {
-                StationType.TOR -> viewModel.loadApiTorStations()
-                StationType.I2P -> viewModel.loadApiI2pStations()
+            viewModel.refresh()
+        }
+    }
+
+    private fun setupSearchAndFilters() {
+        // Search input handling with debounce (same as BrowseStationsFragment)
+        resultsSearchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                // Show/hide clear button based on text content
+                btnClearSearch.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+                searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+
+                val query = s?.toString()?.trim() ?: ""
+                // Show "Searching..." indicator when typing (2+ chars)
+                if (query.length >= 2) {
+                    isSearchPending = true
+                    resultsCount.text = getString(R.string.searching)
+                }
+
+                searchDebounceRunnable = Runnable {
+                    isSearchPending = false
+                    if (query.length >= 2) {
+                        currentResultsTitle = "\"$query\""
+                        viewModel.search(query)
+                        updateCategoryChip()
+                    } else if (query.isEmpty() && !isManualSearchClear) {
+                        // Reset to current mode when search is cleared
+                        currentResultsTitle = when (currentStationType) {
+                            StationType.TOR -> getString(R.string.browse_tor_stations)
+                            StationType.I2P -> getString(R.string.browse_i2p_stations)
+                        }
+                        viewModel.search("")
+                        updateCategoryChip()
+                    }
+                    isManualSearchClear = false
+                }
+                resultsSearchInput.postDelayed(searchDebounceRunnable!!, searchDebounceDelay)
+            }
+        })
+
+        resultsSearchInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                // Cancel pending debounce when user presses Enter
+                searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+                isSearchPending = false
+
+                val query = resultsSearchInput.text?.toString()?.trim() ?: ""
+                if (query.isNotEmpty()) {
+                    currentResultsTitle = "\"$query\""
+                    viewModel.search(query)
+                    updateCategoryChip()
+                }
+                hideKeyboard()
+                true
+            } else {
+                false
             }
         }
+
+        // Clear button click handler
+        btnClearSearch.setOnClickListener {
+            clearSearch()
+            resultsSearchInput.requestFocus()
+        }
+
+        // Category chip - shows current category and allows switching
+        categoryFilterChip.setOnClickListener {
+            showCategoryMenu()
+        }
+
+        // Genre filter chip
+        genreFilterChip.setOnClickListener {
+            showGenreFilterDialog()
+        }
+        genreFilterChip.setOnCloseIconClickListener {
+            viewModel.clearRegistryGenreFilter()
+            genreFilterChip.visibility = View.GONE
+        }
+
+        // Add filter chip
+        addFilterChip.setOnClickListener {
+            showAddFilterMenu()
+        }
+    }
+
+    private fun updateCategoryChip() {
+        categoryFilterChip.text = currentResultsTitle.ifEmpty { getString(R.string.browse_all_stations) }
+    }
+
+    private fun updateResultsCount(count: Int) {
+        resultsCount.text = getString(R.string.browse_results_format, count)
+    }
+
+    private fun showCategoryMenu() {
+        val currentNetwork = when (viewModel.privacyStationMode.value) {
+            PrivacyStationMode.TOR -> getString(R.string.browse_tor_stations)
+            PrivacyStationMode.I2P -> getString(R.string.browse_i2p_stations)
+            PrivacyStationMode.ALL_PRIVACY -> getString(R.string.browse_all_stations)
+            else -> getString(R.string.browse_all_stations)
+        }
+
+        val categories = arrayOf(
+            getString(R.string.browse_all_stations)
+        )
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(currentNetwork)
+            .setItems(categories) { _, which ->
+                clearSearch()
+                when (which) {
+                    0 -> {
+                        currentResultsTitle = getString(R.string.browse_all_stations)
+                        updateCategoryChip()
+                        viewModel.loadAllPrivacyStations()
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun showAddFilterMenu() {
+        val filters = mutableListOf<String>()
+        val actions = mutableListOf<() -> Unit>()
+
+        // Only genre filter for privacy stations
+        if (viewModel.selectedRegistryGenre.value == null) {
+            filters.add(getString(R.string.filter_genre))
+            actions.add { showGenreFilterDialog() }
+        }
+
+        if (filters.isEmpty()) {
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), getString(R.string.all_filters_applied), Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.add_filter)
+            .setItems(filters.toTypedArray()) { _, which ->
+                actions[which]()
+            }
+            .show()
+    }
+
+    private fun showGenreFilterDialog() {
+        val genres = viewModel.registryGenres.value ?: return
+        if (genres.isEmpty()) {
+            if (!com.opensource.i2pradio.ui.PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(requireContext(), R.string.loading_genres, Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        val currentGenre = viewModel.selectedRegistryGenre.value
+        var tempSelectedGenreIndex: Int? = if (currentGenre == null) {
+            null
+        } else {
+            genres.indexOf(currentGenre).takeIf { it >= 0 }
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(R.string.select_genre)
+            .setView(createGenreSearchView(genres, tempSelectedGenreIndex) { selectedIndex ->
+                tempSelectedGenreIndex = selectedIndex
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                if (tempSelectedGenreIndex == null) {
+                    viewModel.clearRegistryGenreFilter()
+                    genreFilterChip.visibility = View.GONE
+                } else {
+                    val selectedGenre = genres[tempSelectedGenreIndex!!]
+                    viewModel.filterByRegistryGenre(selectedGenre)
+                    genreFilterChip.text = selectedGenre
+                    genreFilterChip.visibility = View.VISIBLE
+                }
+            }
+            .create()
+
+        dialog.show()
+    }
+
+    private fun createGenreSearchView(
+        genres: List<String>,
+        selectedIndex: Int?,
+        onGenreSelected: (Int?) -> Unit
+    ): View {
+        val context = requireContext()
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 8, 0, 0)
+        }
+
+        val searchInput = TextInputEditText(context).apply {
+            hint = getString(R.string.search_genres)
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+
+        val searchLayout = TextInputLayout(context).apply {
+            boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_FILLED
+            isHintEnabled = true
+            endIconMode = TextInputLayout.END_ICON_CLEAR_TEXT
+            setStartIconDrawable(R.drawable.ic_search)
+            addView(searchInput)
+        }
+
+        container.addView(searchLayout, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            setMargins(24, 0, 24, 8)
+        })
+
+        val divider = View(context).apply {
+            val dividerColor = com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOutlineVariant
+            )
+            setBackgroundColor(dividerColor)
+        }
+        container.addView(divider, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            1
+        ))
+
+        val recyclerView = RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context)
+            val maxHeight = (400 * resources.displayMetrics.density).toInt()
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                maxHeight
+            )
+            clipToPadding = false
+            setPadding(0, 8, 0, 0)
+        }
+
+        var filteredGenres = genres.toList()
+        val adapter = GenreAdapter(filteredGenres, selectedIndex, onGenreSelected)
+        recyclerView.adapter = adapter
+
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString() ?: ""
+                filteredGenres = if (query.isEmpty()) {
+                    genres
+                } else {
+                    genres.filter { it.contains(query, ignoreCase = true) }
+                }
+                adapter.updateGenres(filteredGenres)
+            }
+        })
+
+        container.addView(recyclerView)
+        return container
+    }
+
+    private inner class GenreAdapter(
+        private var genres: List<String>,
+        private var selectedIndex: Int?,
+        private val onGenreSelected: (Int?) -> Unit
+    ) : RecyclerView.Adapter<GenreAdapter.ViewHolder>() {
+
+        inner class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val textView = TextView(parent.context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setPadding(48, 32, 48, 32)
+                textSize = 16f
+                setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                    this,
+                    com.google.android.material.R.attr.colorOnSurface
+                ))
+            }
+            return ViewHolder(textView)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val genre = genres[position]
+            holder.textView.text = genre
+
+            val isSelected = selectedIndex != null && genres.indexOf(genre) == selectedIndex
+            if (isSelected) {
+                holder.textView.setBackgroundColor(
+                    com.google.android.material.color.MaterialColors.getColor(
+                        holder.textView,
+                        com.google.android.material.R.attr.colorSecondaryContainer
+                    )
+                )
+            } else {
+                holder.textView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            }
+
+            holder.textView.setOnClickListener {
+                val oldIndex = selectedIndex
+                selectedIndex = if (selectedIndex == position) null else position
+                onGenreSelected(selectedIndex)
+
+                if (oldIndex != null) notifyItemChanged(oldIndex)
+                notifyItemChanged(position)
+            }
+        }
+
+        override fun getItemCount() = genres.size
+
+        fun updateGenres(newGenres: List<String>) {
+            genres = newGenres
+            notifyDataSetChanged()
+        }
+    }
+
+    private fun clearSearch() {
+        searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
+        isManualSearchClear = true
+        resultsSearchInput.setText("")
+        btnClearSearch.visibility = View.GONE
+    }
+
+    private fun showKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(resultsSearchInput, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(resultsSearchInput.windowToken, 0)
     }
 
     private fun setupSharedViews() {
@@ -259,27 +619,35 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
         discoveryContainer.visibility = View.GONE
         resultsContainer.visibility = View.VISIBLE
 
+        // Clear search and filters
+        clearSearch()
+        genreFilterChip.visibility = View.GONE
+
         when (stationType) {
             StationType.TOR -> {
-                resultsTitle.text = getString(R.string.browse_tor_stations)
-                // Use the already loaded stations
-                val stations = viewModel.privacyTorStations.value ?: emptyList()
-                resultsAdapter.submitList(stations)
-                updateEmptyState(stations.isEmpty())
+                currentResultsTitle = getString(R.string.browse_tor_stations)
+                // Load from API with privacy mode set
+                viewModel.loadApiTorStations()
             }
             StationType.I2P -> {
-                resultsTitle.text = getString(R.string.browse_i2p_stations)
-                val stations = viewModel.privacyI2pStations.value ?: emptyList()
-                resultsAdapter.submitList(stations)
-                updateEmptyState(stations.isEmpty())
+                currentResultsTitle = getString(R.string.browse_i2p_stations)
+                // Load from API with privacy mode set
+                viewModel.loadApiI2pStations()
             }
         }
+        updateCategoryChip()
     }
 
     private fun switchToDiscoveryMode() {
         isInResultsMode = false
         resultsContainer.visibility = View.GONE
         discoveryContainer.visibility = View.VISIBLE
+
+        // Reset privacy mode and filters
+        viewModel.resetPrivacyMode()
+        clearSearch()
+        genreFilterChip.visibility = View.GONE
+        currentResultsTitle = ""
     }
 
     private fun updateEmptyState(isEmpty: Boolean) {
@@ -293,7 +661,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        // Observe Privacy Radio stations
+        // Observe Privacy Radio stations for discovery carousels
         viewModel.privacyTorStations.observe(viewLifecycleOwner) { stations ->
             if (stations.isNotEmpty()) {
                 val currentAdapter = torStationsRecyclerView.adapter
@@ -304,13 +672,6 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 setupCarouselTouchHandling(torStationsRecyclerView)
             }
             torStationsAdapter.submitList(stations)
-
-            // Update results if in results mode showing Tor stations
-            if (isInResultsMode && currentStationType == StationType.TOR) {
-                resultsAdapter.submitList(stations)
-                updateEmptyState(stations.isEmpty())
-                swipeRefresh.isRefreshing = false
-            }
         }
 
         viewModel.privacyI2pStations.observe(viewLifecycleOwner) { stations ->
@@ -323,11 +684,40 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 setupCarouselTouchHandling(i2pStationsRecyclerView)
             }
             i2pStationsAdapter.submitList(stations)
+        }
 
-            // Update results if in results mode showing I2P stations
-            if (isInResultsMode && currentStationType == StationType.I2P) {
-                resultsAdapter.submitList(stations)
-                updateEmptyState(stations.isEmpty())
+        // Observe stations for results mode (search/filter results)
+        viewModel.stations.observe(viewLifecycleOwner) { browserStations ->
+            if (isInResultsMode && viewModel.isInPrivacyMode()) {
+                // Convert RadioBrowserStation back to RadioRegistryStation for the adapter
+                val registryStations = browserStations.mapNotNull { station ->
+                    // Create a RadioRegistryStation from the browser station
+                    RadioRegistryStation(
+                        id = station.stationuuid,
+                        name = station.name,
+                        streamUrl = station.urlResolved.takeIf { it.isNotEmpty() } ?: station.url,
+                        homepage = station.homepage.takeIf { it.isNotEmpty() },
+                        faviconUrl = station.favicon.takeIf { it.isNotEmpty() },
+                        genre = station.tags.takeIf { it.isNotEmpty() },
+                        codec = station.codec.takeIf { it.isNotEmpty() },
+                        bitrate = station.bitrate.takeIf { it > 0 },
+                        language = station.language.takeIf { it.isNotEmpty() },
+                        network = if (station.url.contains(".onion")) "tor" else if (station.url.contains(".i2p")) "i2p" else "unknown",
+                        country = station.country.takeIf { it.isNotEmpty() },
+                        countryCode = station.countrycode.takeIf { it.isNotEmpty() },
+                        isOnline = station.lastcheckok,
+                        lastCheckTime = null,
+                        status = "approved",
+                        checkCount = 0,
+                        checkOkCount = 0,
+                        submittedAt = null,
+                        createdAt = null,
+                        updatedAt = null
+                    )
+                }
+                resultsAdapter.submitList(registryStations)
+                updateEmptyState(registryStations.isEmpty())
+                updateResultsCount(registryStations.size)
                 swipeRefresh.isRefreshing = false
             }
         }
@@ -340,6 +730,16 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                     loadingContainer.visibility = View.GONE
                 }
                 swipeRefresh.isRefreshing = isLoading && resultsAdapter.itemCount > 0
+            }
+        }
+
+        // Observe selected registry genre to update chip
+        viewModel.selectedRegistryGenre.observe(viewLifecycleOwner) { genre ->
+            if (genre != null) {
+                genreFilterChip.text = genre
+                genreFilterChip.visibility = View.VISIBLE
+            } else {
+                genreFilterChip.visibility = View.GONE
             }
         }
 
@@ -511,6 +911,8 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Clean up search debounce
+        searchDebounceRunnable?.let { resultsSearchInput.removeCallbacks(it) }
         // Clean up skeleton adapters
         (torStationsRecyclerView.adapter as? SkeletonCarouselAdapter)?.stopAllShimmers()
         (i2pStationsRecyclerView.adapter as? SkeletonCarouselAdapter)?.stopAllShimmers()
