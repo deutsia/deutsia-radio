@@ -1237,16 +1237,29 @@ class BrowseStationsFragment : Fragment() {
     private fun showAddFilterMenu() {
         val filters = mutableListOf<String>()
         val actions = mutableListOf<() -> Unit>()
+        val isPrivacyMode = viewModel.isInPrivacyMode()
 
-        if (viewModel.selectedCountry.value == null) {
+        // Country filter - only for clearnet stations
+        if (!isPrivacyMode && viewModel.selectedCountry.value == null) {
             filters.add(getString(R.string.filter_country))
             actions.add { showCountryFilterDialog() }
         }
-        if (viewModel.selectedTag.value == null) {
-            filters.add(getString(R.string.filter_genre))
-            actions.add { showGenreFilterDialog() }
+
+        // Genre filter - use registry genre check for privacy mode
+        if (isPrivacyMode) {
+            if (viewModel.selectedRegistryGenre.value == null) {
+                filters.add(getString(R.string.filter_genre))
+                actions.add { showGenreFilterDialog() }
+            }
+        } else {
+            if (viewModel.selectedTag.value == null) {
+                filters.add(getString(R.string.filter_genre))
+                actions.add { showGenreFilterDialog() }
+            }
         }
-        if (viewModel.selectedLanguage.value == null) {
+
+        // Language filter - only for clearnet stations
+        if (!isPrivacyMode && viewModel.selectedLanguage.value == null) {
             filters.add(getString(R.string.filter_language))
             actions.add { showLanguageFilterDialog() }
         }
