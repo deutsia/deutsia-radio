@@ -17,10 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402c6e5f1a6e8bb1575cef # v0.28.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -29,7 +30,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@df409f7d9260372bd5f19e5b04e83cb3c43714ae # v3.27.9
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
