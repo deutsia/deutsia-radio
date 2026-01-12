@@ -100,7 +100,7 @@ APK output: `app/build/outputs/apk/debug/`
 
 ## Submit Stations
 
-You can submit darknet stations (I2P/Tor) via the [Radio Registry API](https://www.api.deutsia.com).
+You can submit darknet stations (I2P/Tor) via the [Radio Registry API](https://api.deutsia.com).
 
 Please note that you **cannot** submit clearnet stations here, even if they are part of a darknet website. If the stream source is not `.i2p` or `.onion`, please submit it to the [RadioBrowser database](https://www.radio-browser.info/add) instead.
 
