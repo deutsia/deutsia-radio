@@ -64,7 +64,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var metadataText: TextView
     private lateinit var streamInfoText: TextView
     private lateinit var likeButton: MaterialButton
-    private lateinit var addToLibraryButton: MaterialButton
+    private var addToLibraryButton: MaterialButton? = null
     private lateinit var playPauseButton: FloatingActionButton
     private lateinit var recordButton: FloatingActionButton
     private lateinit var volumeButton: FloatingActionButton
@@ -416,23 +416,23 @@ class NowPlayingFragment : Fragment() {
         }
 
         // Add to Library button click handler - uses shared logic with station list
-        addToLibraryButton.setOnClickListener {
+        addToLibraryButton?.setOnClickListener {
             viewModel.getCurrentStation()?.let { station ->
                 // Animate the button with scale effect
-                addToLibraryButton.animate()
-                    .scaleX(0.85f)
-                    .scaleY(0.85f)
-                    .setDuration(80)
-                    .setInterpolator(DecelerateInterpolator())
-                    .withEndAction {
-                        addToLibraryButton.animate()
-                            .scaleX(1f)
-                            .scaleY(1f)
-                            .setDuration(150)
-                            .setInterpolator(OvershootInterpolator(2f))
-                            .start()
+                addToLibraryButton?.animate()
+                    ?.scaleX(0.85f)
+                    ?.scaleY(0.85f)
+                    ?.setDuration(80)
+                    ?.setInterpolator(DecelerateInterpolator())
+                    ?.withEndAction {
+                        addToLibraryButton?.animate()
+                            ?.scaleX(1f)
+                            ?.scaleY(1f)
+                            ?.setDuration(150)
+                            ?.setInterpolator(OvershootInterpolator(2f))
+                            ?.start()
                     }
-                    .start()
+                    ?.start()
 
                 lifecycleScope.launch(Dispatchers.IO) {
                     // Check if this is a global radio (has radioBrowserUuid)
@@ -609,12 +609,12 @@ class NowPlayingFragment : Fragment() {
                             if (!viewsInitialized) return@withContext
                             updateAddToLibraryButton(stationInfo != null)
                             // Show/hide the button - only show for global radios
-                            addToLibraryButton.visibility = View.VISIBLE
+                            addToLibraryButton?.visibility = View.VISIBLE
                         }
                     }
                 } else {
                     // For user stations, hide the add button (already in library)
-                    addToLibraryButton.visibility = View.GONE
+                    addToLibraryButton?.visibility = View.GONE
                 }
 
                 // Reset metadata and stream info for new station
@@ -1092,7 +1092,7 @@ class NowPlayingFragment : Fragment() {
      * Uses same icon pattern as BrowseStationsAdapter action button.
      */
     private fun updateAddToLibraryButton(isSaved: Boolean) {
-        addToLibraryButton.setIconResource(if (isSaved) R.drawable.ic_check else R.drawable.ic_add)
+        addToLibraryButton?.setIconResource(if (isSaved) R.drawable.ic_check else R.drawable.ic_add)
     }
 
     private fun updateStreamInfo(bitrate: Int, codec: String) {
