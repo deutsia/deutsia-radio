@@ -64,7 +64,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var metadataText: TextView
     private lateinit var streamInfoText: TextView
     private lateinit var likeButton: MaterialButton
-    private lateinit var addToLibraryButton: MaterialButton
+    private var addToLibraryButton: MaterialButton? = null
     private lateinit var playPauseButton: FloatingActionButton
     private lateinit var recordButton: FloatingActionButton
     private lateinit var volumeButton: FloatingActionButton
@@ -163,6 +163,9 @@ class NowPlayingFragment : Fragment() {
     private var isBuffering: Boolean = false
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
+
+    // Flag to track if views are initialized and valid (set in onCreateView, cleared in onDestroyView)
+    private var viewsInitialized = false
 
     // Broadcast receiver for metadata, stream info, playback state, recording updates, cover art, and time updates
     private val metadataReceiver = object : BroadcastReceiver() {
@@ -358,6 +361,8 @@ class NowPlayingFragment : Fragment() {
                         )
 
                         withContext(Dispatchers.Main) {
+                            // Check if views are still valid after async operation
+                            if (!viewsInitialized) return@withContext
                             // Update UI
                             viewModel.updateCurrentStationLikeState(result.isLiked)
                             updateLikeButton(result.isLiked)
@@ -373,6 +378,8 @@ class NowPlayingFragment : Fragment() {
                         repository.toggleLike(station.id)
                         val updatedStation = repository.getStationById(station.id)
                         withContext(Dispatchers.Main) {
+                            // Check if views are still valid after async operation
+                            if (!viewsInitialized) return@withContext
                             updatedStation?.let {
                                 viewModel.updateCurrentStationLikeState(it.isLiked)
                                 updateLikeButton(it.isLiked)
@@ -409,23 +416,23 @@ class NowPlayingFragment : Fragment() {
         }
 
         // Add to Library button click handler - uses shared logic with station list
-        addToLibraryButton.setOnClickListener {
+        addToLibraryButton?.setOnClickListener {
             viewModel.getCurrentStation()?.let { station ->
                 // Animate the button with scale effect
-                addToLibraryButton.animate()
-                    .scaleX(0.85f)
-                    .scaleY(0.85f)
-                    .setDuration(80)
-                    .setInterpolator(DecelerateInterpolator())
-                    .withEndAction {
-                        addToLibraryButton.animate()
-                            .scaleX(1f)
-                            .scaleY(1f)
-                            .setDuration(150)
-                            .setInterpolator(OvershootInterpolator(2f))
-                            .start()
+                addToLibraryButton?.animate()
+                    ?.scaleX(0.85f)
+                    ?.scaleY(0.85f)
+                    ?.setDuration(80)
+                    ?.setInterpolator(DecelerateInterpolator())
+                    ?.withEndAction {
+                        addToLibraryButton?.animate()
+                            ?.scaleX(1f)
+                            ?.scaleY(1f)
+                            ?.setDuration(150)
+                            ?.setInterpolator(OvershootInterpolator(2f))
+                            ?.start()
                     }
-                    .start()
+                    ?.start()
 
                 lifecycleScope.launch(Dispatchers.IO) {
                     // Check if this is a global radio (has radioBrowserUuid)
@@ -437,6 +444,8 @@ class NowPlayingFragment : Fragment() {
                         )
 
                         withContext(Dispatchers.Main) {
+                            // Check if views are still valid after async operation
+                            if (!viewsInitialized) return@withContext
                             // Update UI
                             updateAddToLibraryButton(result.isSaved)
                             // Also update like button since station may have been removed
@@ -453,6 +462,8 @@ class NowPlayingFragment : Fragment() {
                         // For user stations, they're always in the library, so we just toggle visibility
                         // This case shouldn't really happen for user stations as they're always local
                         withContext(Dispatchers.Main) {
+                            // Check if views are still valid after async operation
+                            if (!viewsInitialized) return@withContext
                             if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
                                 Toast.makeText(
                                     requireContext(),
@@ -594,14 +605,16 @@ class NowPlayingFragment : Fragment() {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val stationInfo = radioBrowserRepository.getStationInfoByUuid(station.radioBrowserUuid)
                         withContext(Dispatchers.Main) {
+                            // Check if views are still valid after async operation
+                            if (!viewsInitialized) return@withContext
                             updateAddToLibraryButton(stationInfo != null)
                             // Show/hide the button - only show for global radios
-                            addToLibraryButton.visibility = View.VISIBLE
+                            addToLibraryButton?.visibility = View.VISIBLE
                         }
                     }
                 } else {
                     // For user stations, hide the add button (already in library)
-                    addToLibraryButton.visibility = View.GONE
+                    addToLibraryButton?.visibility = View.GONE
                 }
 
                 // Reset metadata and stream info for new station
@@ -731,6 +744,9 @@ class NowPlayingFragment : Fragment() {
         viewModel.recordingState.observe(viewLifecycleOwner) { state ->
             updateRecordingUI(state)
         }
+
+        // Mark views as initialized - must be last before returning
+        viewsInitialized = true
 
         return view
     }
@@ -1004,6 +1020,8 @@ class NowPlayingFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        // Mark views as invalid immediately to prevent async callbacks from accessing destroyed views
+        viewsInitialized = false
         super.onDestroyView()
         recordingHandler.removeCallbacks(recordingUpdateRunnable)
         recordingDot?.clearAnimation()
@@ -1074,7 +1092,7 @@ class NowPlayingFragment : Fragment() {
      * Uses same icon pattern as BrowseStationsAdapter action button.
      */
     private fun updateAddToLibraryButton(isSaved: Boolean) {
-        addToLibraryButton.setIconResource(if (isSaved) R.drawable.ic_check else R.drawable.ic_add)
+        addToLibraryButton?.setIconResource(if (isSaved) R.drawable.ic_check else R.drawable.ic_add)
     }
 
     private fun updateStreamInfo(bitrate: Int, codec: String) {
