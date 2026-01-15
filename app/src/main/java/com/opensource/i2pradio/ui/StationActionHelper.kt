@@ -261,7 +261,11 @@ object StationActionHelper {
             clicktrend = 0,
             sslError = false,
             geoLat = null,
-            geoLong = null
+            geoLong = null,
+            useProxy = station.useProxy,
+            proxyType = station.proxyType,
+            proxyHost = station.proxyHost,
+            proxyPort = station.proxyPort
         )
     }
 
