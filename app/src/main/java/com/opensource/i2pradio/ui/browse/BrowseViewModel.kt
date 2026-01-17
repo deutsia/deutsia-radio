@@ -1392,6 +1392,7 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
      * This checks ALL displayed stations including:
      * - Results list stations
      * - All carousel stations (USA, Germany, Spanish, French, Trending, Top Voted, Popular, New)
+     * - Privacy Radio carousel stations (Tor and I2P)
      */
     fun refreshLikedAndSavedUuids() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -1410,6 +1411,14 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             _topVotedPreviewStations.value?.let { allDisplayedStations.addAll(it) }
             _popularStations.value?.let { allDisplayedStations.addAll(it) }
             _newStations.value?.let { allDisplayedStations.addAll(it) }
+
+            // Privacy Radio carousel stations (convert to RadioBrowserStation to check UUID)
+            _privacyTorStations.value?.let { stations ->
+                allDisplayedStations.addAll(stations.map { RadioBrowserStation.fromRegistryStation(it) })
+            }
+            _privacyI2pStations.value?.let { stations ->
+                allDisplayedStations.addAll(stations.map { RadioBrowserStation.fromRegistryStation(it) })
+            }
 
             if (allDisplayedStations.isNotEmpty()) {
                 // Deduplicate by UUID before checking (same station may appear in multiple carousels)
