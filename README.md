@@ -8,7 +8,6 @@
 [![Tests](https://github.com/deutsia/deutsia-radio/actions/workflows/test.yml/badge.svg)](https://github.com/deutsia/deutsia-radio/actions/workflows/test.yml)
 [![Trivy](https://github.com/deutsia/deutsia-radio/actions/workflows/trivy.yml/badge.svg)](https://github.com/deutsia/deutsia-radio/actions/workflows/trivy.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/deutsia/deutsia-radio/badge)](https://securityscorecards.dev/viewer/?uri=github.com/deutsia/deutsia-radio)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11729/badge)](https://www.bestpractices.dev/projects/11729)
 
 Privacy-focused, censorship-resistant multinet radio player with Material You.
 
@@ -27,7 +26,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.6.3** Added search and genre filtering for Tor/I2P stations, updated translations
+- **New Release: v1.6.3** Added search and genre filtering for Tor/I2P stations, updated translations, bug fixes and UI improvements
 
 ---
 
