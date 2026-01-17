@@ -1363,52 +1363,57 @@ class BrowseStationsFragment : Fragment() {
     private fun playStation(station: RadioBrowserStation) {
         lifecycleScope.launch {
             repository.addToBrowseHistory(station)
-        }
 
-        val radioStation = repository.convertToRadioStation(station)
-        radioViewModel.setCurrentStation(radioStation)
-        radioViewModel.setBuffering(true)
+            // Use suspend function to check database for existing liked status
+            val radioStation = repository.convertToRadioStationWithLikeStatus(station)
+            radioViewModel.setCurrentStation(radioStation)
+            radioViewModel.setBuffering(true)
 
-        val intent = Intent(requireContext(), RadioService::class.java).apply {
-            action = RadioService.ACTION_PLAY
-            putExtra("stream_url", radioStation.streamUrl)
-            putExtra("station_name", radioStation.name)
-            putExtra("proxy_host", radioStation.proxyHost)
-            putExtra("proxy_port", radioStation.proxyPort)
-            putExtra("proxy_type", radioStation.proxyType)
-            putExtra("cover_art_uri", radioStation.coverArtUri)
-            putExtra("custom_proxy_protocol", "HTTP")
-            putExtra("proxy_username", "")
-            putExtra("proxy_password", "")
-            putExtra("proxy_auth_type", "NONE")
-            putExtra("proxy_connection_timeout", 30)
+            val intent = Intent(requireContext(), RadioService::class.java).apply {
+                action = RadioService.ACTION_PLAY
+                putExtra("stream_url", radioStation.streamUrl)
+                putExtra("station_name", radioStation.name)
+                putExtra("proxy_host", radioStation.proxyHost)
+                putExtra("proxy_port", radioStation.proxyPort)
+                putExtra("proxy_type", radioStation.proxyType)
+                putExtra("cover_art_uri", radioStation.coverArtUri)
+                putExtra("custom_proxy_protocol", "HTTP")
+                putExtra("proxy_username", "")
+                putExtra("proxy_password", "")
+                putExtra("proxy_auth_type", "NONE")
+                putExtra("proxy_connection_timeout", 30)
+            }
+            ContextCompat.startForegroundService(requireContext(), intent)
         }
-        ContextCompat.startForegroundService(requireContext(), intent)
     }
 
     /**
      * Play a privacy radio station (from Radio Registry API)
      */
     private fun playPrivacyStation(station: RadioRegistryStation) {
-        val radioStation = viewModel.getPlayableStation(station)
-        radioViewModel.setCurrentStation(radioStation)
-        radioViewModel.setBuffering(true)
+        lifecycleScope.launch {
+            // Convert to RadioBrowserStation to use shared like status checking
+            val browserStation = RadioBrowserStation.fromRegistryStation(station)
+            val radioStation = repository.convertToRadioStationWithLikeStatus(browserStation)
+            radioViewModel.setCurrentStation(radioStation)
+            radioViewModel.setBuffering(true)
 
-        val intent = Intent(requireContext(), RadioService::class.java).apply {
-            action = RadioService.ACTION_PLAY
-            putExtra("stream_url", radioStation.streamUrl)
-            putExtra("station_name", radioStation.name)
-            putExtra("proxy_host", radioStation.proxyHost)
-            putExtra("proxy_port", radioStation.proxyPort)
-            putExtra("proxy_type", radioStation.proxyType)
-            putExtra("cover_art_uri", radioStation.coverArtUri)
-            putExtra("custom_proxy_protocol", "HTTP")
-            putExtra("proxy_username", "")
-            putExtra("proxy_password", "")
-            putExtra("proxy_auth_type", "NONE")
-            putExtra("proxy_connection_timeout", 30)
+            val intent = Intent(requireContext(), RadioService::class.java).apply {
+                action = RadioService.ACTION_PLAY
+                putExtra("stream_url", radioStation.streamUrl)
+                putExtra("station_name", radioStation.name)
+                putExtra("proxy_host", radioStation.proxyHost)
+                putExtra("proxy_port", radioStation.proxyPort)
+                putExtra("proxy_type", radioStation.proxyType)
+                putExtra("cover_art_uri", radioStation.coverArtUri)
+                putExtra("custom_proxy_protocol", "HTTP")
+                putExtra("proxy_username", "")
+                putExtra("proxy_password", "")
+                putExtra("proxy_auth_type", "NONE")
+                putExtra("proxy_connection_timeout", 30)
+            }
+            ContextCompat.startForegroundService(requireContext(), intent)
         }
-        ContextCompat.startForegroundService(requireContext(), intent)
     }
 
     /**

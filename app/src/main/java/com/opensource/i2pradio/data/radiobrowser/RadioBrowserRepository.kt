@@ -269,6 +269,46 @@ class RadioBrowserRepository(context: Context) {
     }
 
     /**
+     * Convert a RadioBrowserStation to the app's RadioStation format,
+     * checking the database first to preserve existing liked status.
+     * Use this when playing a station to ensure the mini player shows correct liked state.
+     */
+    suspend fun convertToRadioStationWithLikeStatus(
+        station: RadioBrowserStation,
+        asUserStation: Boolean = false
+    ): RadioStation {
+        return withContext(Dispatchers.IO) {
+            // Check if station already exists in database
+            val existingStation = radioDao.getStationByRadioBrowserUuid(station.stationuuid)
+            val isLiked = existingStation?.isLiked ?: false
+
+            val now = System.currentTimeMillis()
+            RadioStation(
+                name = station.name,
+                streamUrl = station.getStreamUrl(),
+                genre = station.getPrimaryGenre(),
+                coverArtUri = station.favicon.takeIf { it.isNotEmpty() },
+                source = if (asUserStation) StationSource.USER.name else StationSource.RADIOBROWSER.name,
+                radioBrowserUuid = station.stationuuid,
+                cachedAt = now,
+                lastVerified = if (station.lastcheckok) now else 0L,
+                bitrate = station.bitrate,
+                codec = station.codec,
+                country = station.country,
+                countryCode = station.countrycode,
+                homepage = station.homepage,
+                addedTimestamp = now,
+                isLiked = isLiked,
+                // Use proxy settings from the station (for Tor/I2P curated stations)
+                useProxy = station.useProxy,
+                proxyType = station.proxyType,
+                proxyHost = station.proxyHost,
+                proxyPort = station.proxyPort
+            )
+        }
+    }
+
+    /**
      * Cache a list of stations from RadioBrowser (for offline browsing)
      */
     suspend fun cacheStations(stations: List<RadioBrowserStation>) {
