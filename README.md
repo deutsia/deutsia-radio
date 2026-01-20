@@ -31,14 +31,13 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Features
-- **Multinet Support** - Clearnet, I2P (.i2p), and Tor (.onion) with custom [Darknet API](http://api.deutsia.com)  providing Tor/I2P stations
+- **Multinet Support** - Clearnet, I2P (.i2p), and Tor (.onion) with custom [Darknet API](http://api.deutsia.com) providing Tor/I2P stations
 - **Force Tor Modes** - Proxy-or-fail enforcement with instant leak prevention
 - **50,000+ Stations** - Access RadioBrowser API or add custom streams
 - **Material You** - Dynamic theming along with 6 color schemes and Dark/Light mode
 - **Stream Recording** - Record across multiple stations
 - **App Lock** - Secure your listening with biometric/PIN protection and optional database encrpytion 
 - **17 Languages** - Multilingual interface support
-- **Bundled Darknet Stations** Add pre-curated i2p/tor station lists to local library
 - **Add any station** Support for Tor, Clearnet, I2P and per-station level custom proxy stations
 - **Full DNS Protection** - No DNS leaks to ISP/System DNS in Force Tor/Proxy modes, backed by 47 unit and integration tests
 - **Disable API connections** - Completely disable API connections + external cover art and utilize the app with only your local library
