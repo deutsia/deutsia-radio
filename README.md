@@ -31,7 +31,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Features
-- **Multinet Support** - Clearnet, I2P (.i2p), and Tor (.onion)
+- **Multinet Support** - Clearnet, I2P (.i2p), and Tor (.onion) with custom [Darknet API](http://api.deutsia.com)  providing Tor/I2P stations
 - **Force Tor Modes** - Proxy-or-fail enforcement with instant leak prevention
 - **50,000+ Stations** - Access RadioBrowser API or add custom streams
 - **Material You** - Dynamic theming along with 6 color schemes and Dark/Light mode
@@ -73,6 +73,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 **Custom Proxies**
 - Support for Digest and Basic auth
 - Support for SOCKS4, SOCKS5, HTTP, and HTTPS proxies
+- Force modes for maximum privacy
 
 ---
 
@@ -88,6 +89,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 - ExoPlayer (Media3) for audio
 - OkHttp with SOCKS/HTTP proxy support
 - Coil for proxy-aware image loading
+- Room + SQLCipher for encrypted database
 
 ---
 
@@ -126,7 +128,7 @@ Please note that you **cannot** submit clearnet stations here, even if they are 
 - [I2P Project](https://geti2p.net/) - Anonymous networking on Android
 - Built with [Claude Code](https://github.com/anthropics/claude-code)
 - [SQLCipher](https://www.zetetic.net/sqlcipher/) - Database encryption
-- [Tor/I2P Station API](http://api.deutsia.com) - Tor/I2P API, may be open-sourced in the future
+- [Tor/I2P Station API](http://api.deutsia.com) - Tor/I2P API, open-sourced [here](https://github.com/deutsia/Radio-Registry-API)
 ---
 
 ## License
