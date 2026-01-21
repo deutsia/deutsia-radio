@@ -1,0 +1,13 @@
+A radio player that streams from clearnet, Tor (.onion), and I2P (.i2p) networks.
+
+Features:
+* 50,000+ stations via RadioBrowser API
+* Tor/I2P stations via Radio Registry API
+* SOCKS4/5 and HTTP/HTTPS proxy support
+* Optional database encryption (AES-256)
+* Biometric/PIN app lock
+* Stream recording
+* Material You theming with 6 color schemes
+* 17 languages supported
+
+No tracking or analytics. All data stays on device.
