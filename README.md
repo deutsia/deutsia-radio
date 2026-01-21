@@ -83,6 +83,26 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 
 ---
 
+## Installation
+
+Download the latest APK from the [Releases](https://github.com/deutsia/deutsia-radio/releases) page. A universal APK is provided that works on all supported devices (Android 7.0+).
+
+You can also use [Obtainium](https://github.com/ImranR98/Obtainium) to keep the app updated automatically.
+
+### Verifying the release (optional)
+
+Releases are signed with [Sigstore](https://www.sigstore.dev/). To verify:
+
+```bash
+# Replace version number with the release you downloaded
+cosign verify-blob \
+  --bundle deutsia-radio-v1.6.3.apk.sigstore \
+  --certificate-identity-regexp 'github.com/deutsia/.*' \
+  --certificate-oidc-issuer https://github.com/login/oauth \
+  deutsia-radio-v1.6.3.apk
+```
+---
+
 ## Tech Stack
 - Kotlin + Material Design 3
 - ExoPlayer (Media3) for audio
