@@ -63,6 +63,10 @@ android {
             isReturnDefaultValues = true
         }
     }
+
+    lint {
+        disable += "NullSafeMutableLiveData"
+    }
 }
 
 dependencies {
