@@ -29,7 +29,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Metadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.common.Tracks
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
@@ -173,7 +172,6 @@ class RadioService : Service() {
     private var currentArtist: String? = null
     private var currentTitle: String? = null
     private var currentBitrate: Int = 0
-    private var currentSampleRate: Int = 0
     private var currentCodec: String? = null
 
     private var playbackStartTimeMillis: Long = 0L
@@ -1763,25 +1761,6 @@ class RadioService : Service() {
                         }
                     }
 
-                    override fun onTracksChanged(tracks: Tracks) {
-                        // Detect sample rate changes mid-stream which cause "watery" audio
-                        player?.audioFormat?.let { format ->
-                            val newSampleRate = format.sampleRate.takeIf { it != Format.NO_VALUE } ?: 0
-                            if (currentSampleRate != 0 && newSampleRate != 0 && newSampleRate != currentSampleRate) {
-                                android.util.Log.w("RadioService", "Sample rate changed: ${currentSampleRate}Hz -> ${newSampleRate}Hz - resetting decoder")
-                                currentSampleRate = newSampleRate
-                                // Seek to live edge to force decoder reinitialization
-                                player?.let { p ->
-                                    if (p.isCurrentMediaItemLive) {
-                                        p.seekToDefaultPosition()
-                                    }
-                                }
-                            } else if (currentSampleRate == 0 && newSampleRate != 0) {
-                                currentSampleRate = newSampleRate
-                            }
-                        }
-                    }
-
                     override fun onMetadata(metadata: Metadata) {
                         // Extract ICY metadata (artist/track info)
                         for (i in 0 until metadata.length()) {
@@ -1873,7 +1852,6 @@ class RadioService : Service() {
         currentArtist = null
         currentTitle = null
         currentBitrate = 0
-        currentSampleRate = 0
         currentCodec = null
 
         // Broadcast audio session close before releasing player
