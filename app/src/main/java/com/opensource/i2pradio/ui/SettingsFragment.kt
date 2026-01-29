@@ -627,7 +627,6 @@ class SettingsFragment : Fragment() {
         val slider = dialogView.findViewById<Slider>(R.id.sleepTimerSlider)
         val sliderMinLabel = dialogView.findViewById<TextView>(R.id.sliderMinLabel)
         val sliderMaxLabel = dialogView.findViewById<TextView>(R.id.sliderMaxLabel)
-        val precisionModeHint = dialogView.findViewById<TextView>(R.id.precisionModeHint)
 
         // Preset buttons - Row 1: Minutes
         val preset10min = dialogView.findViewById<MaterialButton>(R.id.preset10min)
@@ -663,14 +662,9 @@ class SettingsFragment : Fragment() {
             slider.valueTo = maxVal.toFloat()
             slider.value = actualValue.toFloat()
 
-            // Update labels and hint
+            // Update labels to show zoomed range
             sliderMinLabel.text = SleepTimerUtils.formatDuration(minVal)
             sliderMaxLabel.text = SleepTimerUtils.formatDuration(maxVal)
-            precisionModeHint.text = getString(R.string.settings_sleep_timer_precision_active)
-            val typedValue = android.util.TypedValue()
-            requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorPrimary, typedValue, true)
-            precisionModeHint.setTextColor(typedValue.data)
-            precisionModeHint.alpha = 1f
         }
 
         fun exitPrecisionMode() {
@@ -683,14 +677,9 @@ class SettingsFragment : Fragment() {
             slider.valueTo = 720f
             slider.value = actualValue.toFloat()
 
-            // Restore labels and hint
+            // Restore labels
             sliderMinLabel.text = getString(R.string.settings_sleep_timer_min)
             sliderMaxLabel.text = getString(R.string.settings_sleep_timer_max)
-            precisionModeHint.text = getString(R.string.settings_sleep_timer_precision_hint)
-            val typedValue = android.util.TypedValue()
-            requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurfaceVariant, typedValue, true)
-            precisionModeHint.setTextColor(typedValue.data)
-            precisionModeHint.alpha = 0.7f
         }
 
         // Initialize UI state
