@@ -1497,12 +1497,15 @@ class BrowseStationsFragment : Fragment() {
 
             radioViewModel.getCurrentStation()?.let { currentStation ->
                 if (currentStation.radioBrowserUuid == station.stationuuid) {
-                    radioViewModel.updateCurrentStationLikeState(updatedStation?.isLiked ?: false)
+                    // Use !wasLiked instead of querying database to avoid race condition
+                    // (the database operation in viewModel.toggleLike is async)
+                    radioViewModel.updateCurrentStationLikeState(!wasLiked)
                 }
             }
 
             val broadcastIntent = Intent(MainActivity.BROADCAST_LIKE_STATE_CHANGED).apply {
-                putExtra(MainActivity.EXTRA_IS_LIKED, updatedStation?.isLiked ?: false)
+                // Use !wasLiked to get the new state after toggle
+                putExtra(MainActivity.EXTRA_IS_LIKED, !wasLiked)
                 putExtra(MainActivity.EXTRA_STATION_ID, updatedStation?.id ?: -1L)
                 putExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID, station.stationuuid)
             }
