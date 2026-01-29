@@ -116,7 +116,8 @@ class MiniPlayerView @JvmOverloads constructor(
      */
     fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
-            coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
+            // Start with centerInside for placeholder, switch to centerCrop only on successful load
+            coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
             // Use privacy loader for Tor/I2P stations to route cover art through Tor
             val isPrivacyStation = currentStation?.getProxyTypeEnum().let {
                 it == ProxyType.TOR || it == ProxyType.I2P
@@ -129,12 +130,16 @@ class MiniPlayerView @JvmOverloads constructor(
                 placeholder(R.drawable.ic_radio)
                 error(R.drawable.ic_radio)
                 listener(
+                    onStart = {
+                        // Ensure centerInside during placeholder phase
+                        coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    },
                     onSuccess = { _, _ ->
-                        // Real bitmap loaded - ensure centerCrop for best appearance
+                        // Real bitmap loaded - use centerCrop for best appearance
                         coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
                     },
                     onError = { _, _ ->
-                        // Error loading - use centerInside for vector placeholder
+                        // Error loading - keep centerInside for vector placeholder
                         coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     }
                 )
@@ -210,7 +215,8 @@ class MiniPlayerView @JvmOverloads constructor(
         // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
         // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
         if (station.coverArtUri != null) {
-            coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
+            // Start with centerInside for placeholder, switch to centerCrop only on successful load
+            coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
             val isPrivacyStation = station.getProxyTypeEnum().let {
                 it == ProxyType.TOR || it == ProxyType.I2P
             }
@@ -219,12 +225,16 @@ class MiniPlayerView @JvmOverloads constructor(
                 placeholder(R.drawable.ic_radio)
                 error(R.drawable.ic_radio)
                 listener(
+                    onStart = {
+                        // Ensure centerInside during placeholder phase
+                        coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    },
                     onSuccess = { _, _ ->
-                        // Real bitmap loaded - ensure centerCrop for best appearance
+                        // Real bitmap loaded - use centerCrop for best appearance
                         coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
                     },
                     onError = { _, _ ->
-                        // Error loading - use centerInside for vector placeholder
+                        // Error loading - keep centerInside for vector placeholder
                         coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     }
                 )
