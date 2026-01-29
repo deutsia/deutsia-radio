@@ -625,13 +625,73 @@ class SettingsFragment : Fragment() {
         val sleepTimerSwitch = dialogView.findViewById<MaterialSwitch>(R.id.sleepTimerSwitch)
         val durationText = dialogView.findViewById<TextView>(R.id.sleepTimerDurationText)
         val slider = dialogView.findViewById<Slider>(R.id.sleepTimerSlider)
+        val sliderMinLabel = dialogView.findViewById<TextView>(R.id.sliderMinLabel)
+        val sliderMaxLabel = dialogView.findViewById<TextView>(R.id.sliderMaxLabel)
+        val precisionModeHint = dialogView.findViewById<TextView>(R.id.precisionModeHint)
+
+        // Preset buttons - Row 1: Minutes
+        val preset10min = dialogView.findViewById<MaterialButton>(R.id.preset10min)
         val preset15min = dialogView.findViewById<MaterialButton>(R.id.preset15min)
         val preset30min = dialogView.findViewById<MaterialButton>(R.id.preset30min)
+        val preset45min = dialogView.findViewById<MaterialButton>(R.id.preset45min)
+        // Row 2: Hours
         val preset1hour = dialogView.findViewById<MaterialButton>(R.id.preset1hour)
         val preset2hours = dialogView.findViewById<MaterialButton>(R.id.preset2hours)
+        val preset3hours = dialogView.findViewById<MaterialButton>(R.id.preset3hours)
+        val preset4hours = dialogView.findViewById<MaterialButton>(R.id.preset4hours)
 
         val currentMinutes = PreferencesHelper.getSleepTimerMinutes(requireContext())
         val isEnabled = currentMinutes > 0
+
+        // Precision mode state
+        var isPrecisionMode = false
+        var actualValue = if (isEnabled) currentMinutes else 30
+        val precisionRange = 15 // ±15 minutes in precision mode
+        val handler = Handler(Looper.getMainLooper())
+        var precisionModeRunnable: Runnable? = null
+
+        fun enterPrecisionMode() {
+            if (isPrecisionMode) return
+            isPrecisionMode = true
+            actualValue = slider.value.toInt()
+
+            // Calculate precision range centered on current value
+            val minVal = (actualValue - precisionRange).coerceAtLeast(1)
+            val maxVal = (actualValue + precisionRange).coerceAtMost(720)
+
+            slider.valueFrom = minVal.toFloat()
+            slider.valueTo = maxVal.toFloat()
+            slider.value = actualValue.toFloat()
+
+            // Update labels and hint
+            sliderMinLabel.text = SleepTimerUtils.formatDuration(minVal)
+            sliderMaxLabel.text = SleepTimerUtils.formatDuration(maxVal)
+            precisionModeHint.text = getString(R.string.settings_sleep_timer_precision_active)
+            val typedValue = android.util.TypedValue()
+            requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorPrimary, typedValue, true)
+            precisionModeHint.setTextColor(typedValue.data)
+            precisionModeHint.alpha = 1f
+        }
+
+        fun exitPrecisionMode() {
+            if (!isPrecisionMode) return
+            isPrecisionMode = false
+            actualValue = slider.value.toInt()
+
+            // Restore full range
+            slider.valueFrom = 1f
+            slider.valueTo = 720f
+            slider.value = actualValue.toFloat()
+
+            // Restore labels and hint
+            sliderMinLabel.text = getString(R.string.settings_sleep_timer_min)
+            sliderMaxLabel.text = getString(R.string.settings_sleep_timer_max)
+            precisionModeHint.text = getString(R.string.settings_sleep_timer_precision_hint)
+            val typedValue = android.util.TypedValue()
+            requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurfaceVariant, typedValue, true)
+            precisionModeHint.setTextColor(typedValue.data)
+            precisionModeHint.alpha = 0.7f
+        }
 
         // Initialize UI state
         sleepTimerSwitch.isChecked = isEnabled
@@ -645,6 +705,21 @@ class SettingsFragment : Fragment() {
             durationText.text = SleepTimerUtils.formatDuration(value.toInt())
         }
 
+        // Precision mode: detect long press on slider
+        slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(s: Slider) {
+                // Start timer for precision mode
+                precisionModeRunnable = Runnable { enterPrecisionMode() }
+                handler.postDelayed(precisionModeRunnable!!, 500)
+            }
+
+            override fun onStopTrackingTouch(s: Slider) {
+                // Cancel precision mode timer and exit precision mode
+                precisionModeRunnable?.let { handler.removeCallbacks(it) }
+                exitPrecisionMode()
+            }
+        })
+
         // Toggle switch enables/disables slider
         sleepTimerSwitch.setOnCheckedChangeListener { _, isChecked ->
             slider.isEnabled = isChecked
@@ -656,23 +731,23 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        // Preset button click handlers
-        preset15min.setOnClickListener {
+        // Helper to set slider value and enable switch
+        fun setPresetValue(minutes: Int) {
             sleepTimerSwitch.isChecked = true
-            slider.value = 15f
+            if (isPrecisionMode) exitPrecisionMode()
+            slider.value = minutes.toFloat()
         }
-        preset30min.setOnClickListener {
-            sleepTimerSwitch.isChecked = true
-            slider.value = 30f
-        }
-        preset1hour.setOnClickListener {
-            sleepTimerSwitch.isChecked = true
-            slider.value = 60f
-        }
-        preset2hours.setOnClickListener {
-            sleepTimerSwitch.isChecked = true
-            slider.value = 120f
-        }
+
+        // Preset button click handlers - Row 1: Minutes
+        preset10min.setOnClickListener { setPresetValue(10) }
+        preset15min.setOnClickListener { setPresetValue(15) }
+        preset30min.setOnClickListener { setPresetValue(30) }
+        preset45min.setOnClickListener { setPresetValue(45) }
+        // Row 2: Hours
+        preset1hour.setOnClickListener { setPresetValue(60) }
+        preset2hours.setOnClickListener { setPresetValue(120) }
+        preset3hours.setOnClickListener { setPresetValue(180) }
+        preset4hours.setOnClickListener { setPresetValue(240) }
 
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.settings_sleep_timer))

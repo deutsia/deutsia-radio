@@ -265,6 +265,8 @@
     <string name="settings_sleep_timer_min">1 min</string>
     <string name="settings_sleep_timer_max">12 hours</string>
     <string name="settings_sleep_timer_presets">Quick presets</string>
+    <string name="settings_sleep_timer_precision_hint">Hold slider to enter precision mode</string>
+    <string name="settings_sleep_timer_precision_active">Precision mode: ±15 min range</string>
     <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
     <string name="settings_recording_directory">Recording Directory</string>
     <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
