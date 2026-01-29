@@ -1402,9 +1402,9 @@ class SettingsFragment : Fragment() {
     private fun updateStationCounts() {
         val context = context ?: return
         lifecycleScope.launch(Dispatchers.IO) {
-            // Fetch counts directly from API (online stations only to match import dialog)
+            // Fetch counts using bulk download endpoint (all stations including dead)
             val i2pCount = try {
-                when (val result = registryRepository.getI2pStations(onlineOnly = true, limit = 200)) {
+                when (val result = registryRepository.downloadAllI2pStations()) {
                     is RadioRegistryResult.Success -> result.data.size
                     else -> 0
                 }
@@ -1413,7 +1413,7 @@ class SettingsFragment : Fragment() {
             }
 
             val torCount = try {
-                when (val result = registryRepository.getTorStations(onlineOnly = true, limit = 200)) {
+                when (val result = registryRepository.downloadAllTorStations()) {
                     is RadioRegistryResult.Success -> result.data.size
                     else -> 0
                 }

@@ -403,8 +403,9 @@ class RadioRegistryClient(private val context: Context) {
         return executeRequest("/download/all") { body ->
             val stations = mutableListOf<RadioRegistryStation>()
 
-            // The bulk download endpoint returns a JSON array directly
-            val jsonArray = JSONArray(body)
+            // The bulk download endpoint returns {"stations": [...]}
+            val json = JSONObject(body)
+            val jsonArray = json.optJSONArray("stations") ?: JSONArray()
             for (i in 0 until jsonArray.length()) {
                 try {
                     val station = RadioRegistryStation.fromJson(jsonArray.getJSONObject(i))
