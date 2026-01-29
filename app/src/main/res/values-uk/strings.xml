@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45 хвилин</string>
     <string name="settings_sleep_timer_60min">60 хвилин</string>
     <string name="settings_sleep_timer_90min">90 хвилин</string>
+    <string name="settings_sleep_timer_enable">Увімкнути таймер сну</string>
+    <string name="settings_sleep_timer_min">1 хв</string>
+    <string name="settings_sleep_timer_max">12 годин</string>
+    <string name="settings_sleep_timer_presets">Швидкі налаштування</string>
+    <string name="settings_sleep_timer_precision_hint">Утримуйте повзунок для збільшення</string>
     <string name="settings_equalizer_description">Налаштування частотних смуг та ефектів</string>
     <string name="settings_recording_directory">Каталог записів</string>
     <string name="settings_recording_directory_default">За замовчуванням (Music/deutsia_radio)</string>

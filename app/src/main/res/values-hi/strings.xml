@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45 मिनट</string>
     <string name="settings_sleep_timer_60min">60 मिनट</string>
     <string name="settings_sleep_timer_90min">90 मिनट</string>
+    <string name="settings_sleep_timer_enable">स्लीप टाइमर सक्षम करें</string>
+    <string name="settings_sleep_timer_min">1 मिनट</string>
+    <string name="settings_sleep_timer_max">12 घंटे</string>
+    <string name="settings_sleep_timer_presets">त्वरित प्रीसेट</string>
+    <string name="settings_sleep_timer_precision_hint">ज़ूम करने के लिए स्लाइडर को दबाए रखें</string>
     <string name="settings_equalizer_description">ऑडियो फ़्रीक्वेंसी बैंड और प्रभाव समायोजित करें</string>
     <string name="settings_recording_directory">रिकॉर्डिंग निर्देशिका</string>
     <string name="settings_recording_directory_default">डिफ़ॉल्ट (संगीत/deutsia_radio)</string>
