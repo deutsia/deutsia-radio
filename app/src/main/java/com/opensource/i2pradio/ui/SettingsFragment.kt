@@ -33,6 +33,7 @@ import androidx.fragment.app.activityViewModels
 import android.widget.LinearLayout
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputEditText
 import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
@@ -45,6 +46,7 @@ import com.opensource.i2pradio.data.radioregistry.RadioRegistryRepository
 import com.opensource.i2pradio.data.radioregistry.RadioRegistryResult
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
+import com.opensource.i2pradio.util.SleepTimerUtils
 import com.opensource.i2pradio.util.StationImportExport
 import com.opensource.i2pradio.utils.BiometricAuthManager
 import com.opensource.i2pradio.utils.DigestAuthenticator
@@ -612,43 +614,150 @@ class SettingsFragment : Fragment() {
         val minutes = PreferencesHelper.getSleepTimerMinutes(requireContext())
         button.text = when (minutes) {
             0 -> getString(R.string.button_off)
-            else -> "$minutes min"
+            else -> SleepTimerUtils.formatDuration(minutes)
         }
     }
 
     private fun showSleepTimerDialog(button: MaterialButton) {
-        val options = arrayOf(
-            getString(R.string.settings_sleep_timer_off),
-            getString(R.string.settings_sleep_timer_15min),
-            getString(R.string.settings_sleep_timer_30min),
-            getString(R.string.settings_sleep_timer_45min),
-            getString(R.string.settings_sleep_timer_60min),
-            getString(R.string.settings_sleep_timer_90min)
-        )
-        val values = intArrayOf(0, 15, 30, 45, 60, 90)
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_sleep_timer, null)
+
+        val sleepTimerSwitch = dialogView.findViewById<MaterialSwitch>(R.id.sleepTimerSwitch)
+        val durationText = dialogView.findViewById<TextView>(R.id.sleepTimerDurationText)
+        val slider = dialogView.findViewById<Slider>(R.id.sleepTimerSlider)
+        val sliderMinLabel = dialogView.findViewById<TextView>(R.id.sliderMinLabel)
+        val sliderMaxLabel = dialogView.findViewById<TextView>(R.id.sliderMaxLabel)
+
+        // Preset buttons - Row 1: Minutes
+        val preset10min = dialogView.findViewById<MaterialButton>(R.id.preset10min)
+        val preset15min = dialogView.findViewById<MaterialButton>(R.id.preset15min)
+        val preset30min = dialogView.findViewById<MaterialButton>(R.id.preset30min)
+        val preset45min = dialogView.findViewById<MaterialButton>(R.id.preset45min)
+        // Row 2: Hours
+        val preset1hour = dialogView.findViewById<MaterialButton>(R.id.preset1hour)
+        val preset2hours = dialogView.findViewById<MaterialButton>(R.id.preset2hours)
+        val preset3hours = dialogView.findViewById<MaterialButton>(R.id.preset3hours)
+        val preset4hours = dialogView.findViewById<MaterialButton>(R.id.preset4hours)
+
         val currentMinutes = PreferencesHelper.getSleepTimerMinutes(requireContext())
-        val selectedIndex = values.indexOf(currentMinutes).coerceAtLeast(0)
+        val isEnabled = currentMinutes > 0
+
+        // Precision mode state
+        var isPrecisionMode = false
+        var actualValue = if (isEnabled) currentMinutes else 30
+        val precisionRange = 15 // ±15 minutes in precision mode
+        val handler = Handler(Looper.getMainLooper())
+        var precisionModeRunnable: Runnable? = null
+
+        fun enterPrecisionMode() {
+            if (isPrecisionMode) return
+            isPrecisionMode = true
+            actualValue = slider.value.toInt()
+
+            // Calculate precision range centered on current value
+            val minVal = (actualValue - precisionRange).coerceAtLeast(1)
+            val maxVal = (actualValue + precisionRange).coerceAtMost(720)
+
+            slider.valueFrom = minVal.toFloat()
+            slider.valueTo = maxVal.toFloat()
+            slider.value = actualValue.toFloat()
+
+            // Update labels to show zoomed range
+            sliderMinLabel.text = SleepTimerUtils.formatDuration(minVal)
+            sliderMaxLabel.text = SleepTimerUtils.formatDuration(maxVal)
+        }
+
+        fun exitPrecisionMode() {
+            if (!isPrecisionMode) return
+            isPrecisionMode = false
+            actualValue = slider.value.toInt()
+
+            // Restore full range
+            slider.valueFrom = 1f
+            slider.valueTo = 720f
+            slider.value = actualValue.toFloat()
+
+            // Restore labels
+            sliderMinLabel.text = getString(R.string.settings_sleep_timer_min)
+            sliderMaxLabel.text = getString(R.string.settings_sleep_timer_max)
+        }
+
+        // Initialize UI state
+        sleepTimerSwitch.isChecked = isEnabled
+        slider.isEnabled = isEnabled
+        slider.value = if (isEnabled) currentMinutes.toFloat().coerceIn(1f, 720f) else 30f
+        durationText.text = if (isEnabled) SleepTimerUtils.formatDuration(currentMinutes) else getString(R.string.button_off)
+        durationText.alpha = if (isEnabled) 1f else 0.5f
+
+        // Update duration text when slider changes
+        slider.addOnChangeListener { _, value, _ ->
+            durationText.text = SleepTimerUtils.formatDuration(value.toInt())
+        }
+
+        // Precision mode: detect long press on slider
+        slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(s: Slider) {
+                // Start timer for precision mode
+                precisionModeRunnable = Runnable { enterPrecisionMode() }
+                handler.postDelayed(precisionModeRunnable!!, 500)
+            }
+
+            override fun onStopTrackingTouch(s: Slider) {
+                // Cancel precision mode timer and exit precision mode
+                precisionModeRunnable?.let { handler.removeCallbacks(it) }
+                exitPrecisionMode()
+            }
+        })
+
+        // Toggle switch enables/disables slider
+        sleepTimerSwitch.setOnCheckedChangeListener { _, isChecked ->
+            slider.isEnabled = isChecked
+            durationText.alpha = if (isChecked) 1f else 0.5f
+            if (isChecked) {
+                durationText.text = SleepTimerUtils.formatDuration(slider.value.toInt())
+            } else {
+                durationText.text = getString(R.string.button_off)
+            }
+        }
+
+        // Helper to set slider value and enable switch
+        fun setPresetValue(minutes: Int) {
+            sleepTimerSwitch.isChecked = true
+            if (isPrecisionMode) exitPrecisionMode()
+            slider.value = minutes.toFloat()
+        }
+
+        // Preset button click handlers - Row 1: Minutes
+        preset10min.setOnClickListener { setPresetValue(10) }
+        preset15min.setOnClickListener { setPresetValue(15) }
+        preset30min.setOnClickListener { setPresetValue(30) }
+        preset45min.setOnClickListener { setPresetValue(45) }
+        // Row 2: Hours
+        preset1hour.setOnClickListener { setPresetValue(60) }
+        preset2hours.setOnClickListener { setPresetValue(120) }
+        preset3hours.setOnClickListener { setPresetValue(180) }
+        preset4hours.setOnClickListener { setPresetValue(240) }
 
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.settings_sleep_timer))
-            .setSingleChoiceItems(options, selectedIndex) { dialog, which ->
-                val minutes = values[which]
+            .setView(dialogView)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val minutes = if (sleepTimerSwitch.isChecked) slider.value.toInt() else 0
                 PreferencesHelper.setSleepTimerMinutes(requireContext(), minutes)
                 updateSleepTimerButtonText(button)
 
                 // Send intent to RadioService to set/cancel sleep timer
-                val intent = Intent(requireContext(), com.opensource.i2pradio.RadioService::class.java).apply {
+                val intent = Intent(requireContext(), RadioService::class.java).apply {
                     action = if (minutes > 0) {
-                        com.opensource.i2pradio.RadioService.ACTION_SET_SLEEP_TIMER
+                        RadioService.ACTION_SET_SLEEP_TIMER
                     } else {
-                        com.opensource.i2pradio.RadioService.ACTION_CANCEL_SLEEP_TIMER
+                        RadioService.ACTION_CANCEL_SLEEP_TIMER
                     }
                     putExtra("minutes", minutes)
                 }
                 requireContext().startService(intent)
-
-                dialog.dismiss()
             }
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
