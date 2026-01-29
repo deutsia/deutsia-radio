@@ -259,6 +259,25 @@ class NowPlayingFragment : Fragment() {
                         }
                     }
                 }
+                MainActivity.BROADCAST_LIKE_STATE_CHANGED -> {
+                    // Handle like state changes from station list or mini player
+                    val isLiked = intent.getBooleanExtra(MainActivity.EXTRA_IS_LIKED, false)
+                    val stationId = intent.getLongExtra(MainActivity.EXTRA_STATION_ID, -1L)
+                    val radioBrowserUuid = intent.getStringExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID)
+
+                    // Update the like button if this is the currently playing station
+                    viewModel.getCurrentStation()?.let { currentStation ->
+                        val isCurrentStation = if (!radioBrowserUuid.isNullOrEmpty() && !currentStation.radioBrowserUuid.isNullOrEmpty()) {
+                            currentStation.radioBrowserUuid == radioBrowserUuid
+                        } else {
+                            currentStation.id == stationId
+                        }
+
+                        if (isCurrentStation && viewsInitialized) {
+                            updateLikeButton(isLiked)
+                        }
+                    }
+                }
             }
         }
     }
@@ -332,7 +351,7 @@ class NowPlayingFragment : Fragment() {
         val serviceIntent = Intent(requireContext(), RadioService::class.java)
         requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-        // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, time, and errors
+        // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, time, errors, and like state changes
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_METADATA_CHANGED)
             addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
@@ -342,6 +361,7 @@ class NowPlayingFragment : Fragment() {
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
             addAction(RadioService.BROADCAST_PLAYBACK_TIME_UPDATE)
             addAction(RadioService.BROADCAST_STREAM_ERROR)
+            addAction(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
         }
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
 
