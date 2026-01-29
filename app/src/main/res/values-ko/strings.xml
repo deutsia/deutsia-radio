@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45분</string>
     <string name="settings_sleep_timer_60min">60분</string>
     <string name="settings_sleep_timer_90min">90분</string>
+    <string name="settings_sleep_timer_enable">취침 타이머 활성화</string>
+    <string name="settings_sleep_timer_min">1분</string>
+    <string name="settings_sleep_timer_max">12시간</string>
+    <string name="settings_sleep_timer_presets">빠른 프리셋</string>
+    <string name="settings_sleep_timer_precision_hint">확대하려면 슬라이더를 길게 누르세요</string>
     <string name="settings_equalizer_description">오디오 주파수 대역 및 효과 조정</string>
     <string name="settings_recording_directory">녹음 디렉토리</string>
     <string name="settings_recording_directory_default">기본값 (Music/deutsia_radio)</string>

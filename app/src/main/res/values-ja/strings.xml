@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45分</string>
     <string name="settings_sleep_timer_60min">60分</string>
     <string name="settings_sleep_timer_90min">90分</string>
+    <string name="settings_sleep_timer_enable">スリープタイマーを有効化</string>
+    <string name="settings_sleep_timer_min">1分</string>
+    <string name="settings_sleep_timer_max">12時間</string>
+    <string name="settings_sleep_timer_presets">クイックプリセット</string>
+    <string name="settings_sleep_timer_precision_hint">拡大するにはスライダーを長押し</string>
     <string name="settings_equalizer_description">オーディオ周波数帯とエフェクトを調整</string>
     <string name="settings_recording_directory">録音ディレクトリ</string>
     <string name="settings_recording_directory_default">デフォルト（Music/deutsia_radio）</string>
