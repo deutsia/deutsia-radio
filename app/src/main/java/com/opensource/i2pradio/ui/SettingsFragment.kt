@@ -1400,42 +1400,9 @@ class SettingsFragment : Fragment() {
     // ==================== Import/Export Functions ====================
 
     private fun updateStationCounts() {
-        val context = context ?: return
-        lifecycleScope.launch(Dispatchers.IO) {
-            // Fetch counts directly from API (online stations only to match import dialog)
-            val i2pCount = try {
-                when (val result = registryRepository.getI2pStations(onlineOnly = true, limit = 200)) {
-                    is RadioRegistryResult.Success -> result.data.size
-                    else -> 0
-                }
-            } catch (e: Exception) {
-                0
-            }
-
-            val torCount = try {
-                when (val result = registryRepository.getTorStations(onlineOnly = true, limit = 200)) {
-                    is RadioRegistryResult.Success -> result.data.size
-                    else -> 0
-                }
-            } catch (e: Exception) {
-                0
-            }
-
-            withContext(Dispatchers.Main) {
-                if (!isAdded) return@withContext
-                // Show count if available, otherwise show generic description
-                if (i2pCount > 0) {
-                    i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_description, i2pCount)
-                } else {
-                    i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_description_generic)
-                }
-                if (torCount > 0) {
-                    torStationsDescription?.text = getString(R.string.settings_add_tor_stations_description, torCount)
-                } else {
-                    torStationsDescription?.text = getString(R.string.settings_add_tor_stations_description_generic)
-                }
-            }
-        }
+        // Use static descriptions without fetching counts
+        i2pStationsDescription?.text = getString(R.string.settings_add_i2p_stations_description_generic)
+        torStationsDescription?.text = getString(R.string.settings_add_tor_stations_description_generic)
     }
 
     private fun showImportDialog() {
@@ -1474,11 +1441,11 @@ class SettingsFragment : Fragment() {
         pendingImportStations = null
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // Fetch stations from API
+            // Fetch all stations from API (using bulk download endpoint including dead stations)
             val apiResult = try {
                 when (type) {
-                    "tor" -> registryRepository.getTorStations(onlineOnly = true, limit = 200)
-                    "i2p" -> registryRepository.getI2pStations(onlineOnly = true, limit = 200)
+                    "tor" -> registryRepository.downloadAllTorStations()
+                    "i2p" -> registryRepository.downloadAllI2pStations()
                     else -> null
                 }
             } catch (e: Exception) {
