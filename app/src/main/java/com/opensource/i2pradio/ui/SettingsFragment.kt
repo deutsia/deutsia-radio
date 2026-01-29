@@ -1474,11 +1474,11 @@ class SettingsFragment : Fragment() {
         pendingImportStations = null
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // Fetch all active stations from API (using bulk download endpoint for better coverage)
+            // Fetch all stations from API (using bulk download endpoint including dead stations)
             val apiResult = try {
                 when (type) {
-                    "tor" -> registryRepository.downloadActiveTorStations()
-                    "i2p" -> registryRepository.downloadActiveI2pStations()
+                    "tor" -> registryRepository.downloadAllTorStations()
+                    "i2p" -> registryRepository.downloadAllI2pStations()
                     else -> null
                 }
             } catch (e: Exception) {

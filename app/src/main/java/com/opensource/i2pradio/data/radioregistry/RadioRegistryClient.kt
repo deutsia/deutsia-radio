@@ -389,18 +389,18 @@ class RadioRegistryClient(private val context: Context) {
     }
 
     /**
-     * Download all active stations (excludes dead/unapproved stations).
-     * Uses the bulk download endpoint for better coverage than online-only filtering.
+     * Download all stations (including dead stations).
+     * Uses the bulk download endpoint for complete station list.
      *
      * @param network Optional network filter: "tor" or "i2p" (applied client-side after download)
-     * @return List of active RadioRegistryStations
+     * @return List of all RadioRegistryStations
      */
-    suspend fun downloadActiveStations(
+    suspend fun downloadAllStations(
         network: String? = null
     ): RadioRegistryResult<List<RadioRegistryStation>> {
-        Log.d(TAG, "Downloading active stations from bulk endpoint (network filter: $network)")
+        Log.d(TAG, "Downloading all stations from bulk endpoint (network filter: $network)")
 
-        return executeRequest("/download/active") { body ->
+        return executeRequest("/download/all") { body ->
             val stations = mutableListOf<RadioRegistryStation>()
 
             // The bulk download endpoint returns a JSON array directly
@@ -424,7 +424,7 @@ class RadioRegistryClient(private val context: Context) {
                 }
             }
 
-            Log.d(TAG, "Downloaded ${stations.size} active stations" +
+            Log.d(TAG, "Downloaded ${stations.size} stations" +
                     (network?.let { " (filtered to $it)" } ?: ""))
             stations
         }

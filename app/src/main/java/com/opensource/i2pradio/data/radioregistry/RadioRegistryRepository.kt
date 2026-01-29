@@ -160,22 +160,20 @@ class RadioRegistryRepository(private val context: Context) {
     }
 
     /**
-     * Download all active Tor stations using the bulk download endpoint.
-     * Returns all active stations (excludes dead), not just currently online ones.
-     * This is preferred for importing stations as it provides better coverage.
+     * Download all Tor stations using the bulk download endpoint.
+     * Returns all stations including dead ones for complete coverage.
      */
-    suspend fun downloadActiveTorStations(): RadioRegistryResult<List<RadioRegistryStation>> {
-        Log.d(TAG, "Downloading active Tor stations from bulk endpoint")
+    suspend fun downloadAllTorStations(): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Downloading all Tor stations from bulk endpoint")
 
-        return when (val result = client.downloadActiveStations(network = "tor")) {
+        return when (val result = client.downloadAllStations(network = "tor")) {
             is RadioRegistryResult.Success -> {
-                // Additional client-side validation
                 val stations = result.data.filter { it.isTorStation }
-                Log.d(TAG, "Downloaded ${stations.size} active Tor stations")
+                Log.d(TAG, "Downloaded ${stations.size} Tor stations")
                 RadioRegistryResult.Success(stations)
             }
             is RadioRegistryResult.Error -> {
-                Log.e(TAG, "Failed to download active Tor stations: ${result.message}")
+                Log.e(TAG, "Failed to download Tor stations: ${result.message}")
                 result
             }
             is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
@@ -183,22 +181,20 @@ class RadioRegistryRepository(private val context: Context) {
     }
 
     /**
-     * Download all active I2P stations using the bulk download endpoint.
-     * Returns all active stations (excludes dead), not just currently online ones.
-     * This is preferred for importing stations as it provides better coverage.
+     * Download all I2P stations using the bulk download endpoint.
+     * Returns all stations including dead ones for complete coverage.
      */
-    suspend fun downloadActiveI2pStations(): RadioRegistryResult<List<RadioRegistryStation>> {
-        Log.d(TAG, "Downloading active I2P stations from bulk endpoint")
+    suspend fun downloadAllI2pStations(): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Downloading all I2P stations from bulk endpoint")
 
-        return when (val result = client.downloadActiveStations(network = "i2p")) {
+        return when (val result = client.downloadAllStations(network = "i2p")) {
             is RadioRegistryResult.Success -> {
-                // Additional client-side validation
                 val stations = result.data.filter { it.isI2pStation }
-                Log.d(TAG, "Downloaded ${stations.size} active I2P stations")
+                Log.d(TAG, "Downloaded ${stations.size} I2P stations")
                 RadioRegistryResult.Success(stations)
             }
             is RadioRegistryResult.Error -> {
-                Log.e(TAG, "Failed to download active I2P stations: ${result.message}")
+                Log.e(TAG, "Failed to download I2P stations: ${result.message}")
                 result
             }
             is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
