@@ -158,4 +158,50 @@ class RadioRegistryRepository(private val context: Context) {
     fun isTorRequiredButNotConnected(): Boolean {
         return client.isTorRequiredButNotConnected()
     }
+
+    /**
+     * Download all active Tor stations using the bulk download endpoint.
+     * Returns all active stations (excludes dead), not just currently online ones.
+     * This is preferred for importing stations as it provides better coverage.
+     */
+    suspend fun downloadActiveTorStations(): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Downloading active Tor stations from bulk endpoint")
+
+        return when (val result = client.downloadActiveStations(network = "tor")) {
+            is RadioRegistryResult.Success -> {
+                // Additional client-side validation
+                val stations = result.data.filter { it.isTorStation }
+                Log.d(TAG, "Downloaded ${stations.size} active Tor stations")
+                RadioRegistryResult.Success(stations)
+            }
+            is RadioRegistryResult.Error -> {
+                Log.e(TAG, "Failed to download active Tor stations: ${result.message}")
+                result
+            }
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
+        }
+    }
+
+    /**
+     * Download all active I2P stations using the bulk download endpoint.
+     * Returns all active stations (excludes dead), not just currently online ones.
+     * This is preferred for importing stations as it provides better coverage.
+     */
+    suspend fun downloadActiveI2pStations(): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Downloading active I2P stations from bulk endpoint")
+
+        return when (val result = client.downloadActiveStations(network = "i2p")) {
+            is RadioRegistryResult.Success -> {
+                // Additional client-side validation
+                val stations = result.data.filter { it.isI2pStation }
+                Log.d(TAG, "Downloaded ${stations.size} active I2P stations")
+                RadioRegistryResult.Success(stations)
+            }
+            is RadioRegistryResult.Error -> {
+                Log.e(TAG, "Failed to download active I2P stations: ${result.message}")
+                result
+            }
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
+        }
+    }
 }

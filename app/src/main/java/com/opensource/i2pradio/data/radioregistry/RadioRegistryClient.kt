@@ -389,6 +389,48 @@ class RadioRegistryClient(private val context: Context) {
     }
 
     /**
+     * Download all active stations (excludes dead/unapproved stations).
+     * Uses the bulk download endpoint for better coverage than online-only filtering.
+     *
+     * @param network Optional network filter: "tor" or "i2p" (applied client-side after download)
+     * @return List of active RadioRegistryStations
+     */
+    suspend fun downloadActiveStations(
+        network: String? = null
+    ): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Downloading active stations from bulk endpoint (network filter: $network)")
+
+        return executeRequest("/download/active") { body ->
+            val stations = mutableListOf<RadioRegistryStation>()
+
+            // The bulk download endpoint returns a JSON array directly
+            val jsonArray = JSONArray(body)
+            for (i in 0 until jsonArray.length()) {
+                try {
+                    val station = RadioRegistryStation.fromJson(jsonArray.getJSONObject(i))
+                    if (station.name.isNotEmpty() && station.streamUrl.isNotEmpty()) {
+                        // Apply network filter if specified
+                        val matchesNetwork = when (network?.lowercase()) {
+                            "tor" -> station.isTorStation
+                            "i2p" -> station.isI2pStation
+                            else -> true
+                        }
+                        if (matchesNetwork) {
+                            stations.add(station)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Skipping malformed station entry at index $i: ${e.message}")
+                }
+            }
+
+            Log.d(TAG, "Downloaded ${stations.size} active stations" +
+                    (network?.let { " (filtered to $it)" } ?: ""))
+            stations
+        }
+    }
+
+    /**
      * Check if Force Tor is enabled but Tor is not connected
      */
     fun isTorRequiredButNotConnected(): Boolean {
