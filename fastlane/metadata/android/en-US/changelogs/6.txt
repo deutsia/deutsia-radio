@@ -1,5 +1,0 @@
-* Added database encryption support
-* Added biometric/PIN app lock
-* Improved proxy handling for Tor and I2P
-* Material You dynamic theming
-* Bug fixes and performance improvements
