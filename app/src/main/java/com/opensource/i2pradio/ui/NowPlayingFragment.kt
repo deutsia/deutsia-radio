@@ -259,6 +259,25 @@ class NowPlayingFragment : Fragment() {
                         }
                     }
                 }
+                MainActivity.BROADCAST_LIKE_STATE_CHANGED -> {
+                    // Handle like state changes from station list or mini player
+                    val isLiked = intent.getBooleanExtra(MainActivity.EXTRA_IS_LIKED, false)
+                    val stationId = intent.getLongExtra(MainActivity.EXTRA_STATION_ID, -1L)
+                    val radioBrowserUuid = intent.getStringExtra(MainActivity.EXTRA_RADIO_BROWSER_UUID)
+
+                    // Update the like button if this is the currently playing station
+                    viewModel.getCurrentStation()?.let { currentStation ->
+                        val isCurrentStation = if (!radioBrowserUuid.isNullOrEmpty() && !currentStation.radioBrowserUuid.isNullOrEmpty()) {
+                            currentStation.radioBrowserUuid == radioBrowserUuid
+                        } else {
+                            currentStation.id == stationId
+                        }
+
+                        if (isCurrentStation && viewsInitialized) {
+                            updateLikeButton(isLiked)
+                        }
+                    }
+                }
             }
         }
     }
@@ -332,7 +351,7 @@ class NowPlayingFragment : Fragment() {
         val serviceIntent = Intent(requireContext(), RadioService::class.java)
         requireContext().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
-        // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, time, and errors
+        // Register broadcast receiver for metadata, stream info, playback state, recording updates, cover art, time, errors, and like state changes
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_METADATA_CHANGED)
             addAction(RadioService.BROADCAST_STREAM_INFO_CHANGED)
@@ -342,6 +361,7 @@ class NowPlayingFragment : Fragment() {
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
             addAction(RadioService.BROADCAST_PLAYBACK_TIME_UPDATE)
             addAction(RadioService.BROADCAST_STREAM_ERROR)
+            addAction(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
         }
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
 
@@ -627,8 +647,8 @@ class NowPlayingFragment : Fragment() {
                 // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
                 // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
                 if (station.coverArtUri != null) {
-                    // Set scaleType early to prevent sizing issues during Material You theme changes
-                    coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
+                    // Start with centerInside for placeholder, switch to centerCrop only on successful load
+                    coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     val isPrivacyStation = station.getProxyTypeEnum().let {
                         it == ProxyType.TOR || it == ProxyType.I2P
                     }
@@ -638,12 +658,16 @@ class NowPlayingFragment : Fragment() {
                         placeholder(R.drawable.ic_radio)
                         error(R.drawable.ic_radio)
                         listener(
+                            onStart = {
+                                // Ensure centerInside during placeholder phase
+                                coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                            },
                             onSuccess = { _, _ ->
-                                // Real bitmap loaded - ensure centerCrop for best appearance
+                                // Real bitmap loaded - use centerCrop for best appearance
                                 coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
                             },
                             onError = { _, _ ->
-                                // Error loading - use centerInside for vector placeholder
+                                // Error loading - keep centerInside for vector placeholder
                                 coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
                             }
                         )
@@ -1113,6 +1137,8 @@ class NowPlayingFragment : Fragment() {
      */
     private fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
+            // Start with centerInside for placeholder, switch to centerCrop only on successful load
+            coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
             // Check if current station is a privacy station (Tor/I2P)
             val isPrivacyStation = viewModel.currentStation.value?.getProxyTypeEnum().let {
                 it == ProxyType.TOR || it == ProxyType.I2P
@@ -1125,10 +1151,16 @@ class NowPlayingFragment : Fragment() {
                 placeholder(R.drawable.ic_radio)
                 error(R.drawable.ic_radio)
                 listener(
+                    onStart = {
+                        // Ensure centerInside during placeholder phase
+                        coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    },
                     onSuccess = { _, _ ->
+                        // Real bitmap loaded - use centerCrop for best appearance
                         coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
                     },
                     onError = { _, _ ->
+                        // Error loading - keep centerInside for vector placeholder
                         coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
                     }
                 )

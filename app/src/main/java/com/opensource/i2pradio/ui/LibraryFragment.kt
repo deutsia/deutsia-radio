@@ -642,7 +642,15 @@ class LibraryFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 updatedStation?.let {
                     // Update current station's like state in ViewModel if it matches
-                    if (viewModel.getCurrentStation()?.id == it.id) {
+                    // Check by radioBrowserUuid first (for global radios that may have id=0 when playing from Browse),
+                    // then fall back to ID comparison
+                    val currentStation = viewModel.getCurrentStation()
+                    val isCurrentStation = if (!currentStation?.radioBrowserUuid.isNullOrEmpty() && !it.radioBrowserUuid.isNullOrEmpty()) {
+                        currentStation.radioBrowserUuid == it.radioBrowserUuid
+                    } else {
+                        currentStation?.id == it.id
+                    }
+                    if (isCurrentStation) {
                         viewModel.updateCurrentStationLikeState(it.isLiked)
                     }
 

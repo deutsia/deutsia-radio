@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45分钟</string>
     <string name="settings_sleep_timer_60min">60分钟</string>
     <string name="settings_sleep_timer_90min">90分钟</string>
+    <string name="settings_sleep_timer_enable">启用睡眠定时器</string>
+    <string name="settings_sleep_timer_min">1 分钟</string>
+    <string name="settings_sleep_timer_max">12 小时</string>
+    <string name="settings_sleep_timer_presets">快速预设</string>
+    <string name="settings_sleep_timer_precision_hint">长按滑块以放大</string>
     <string name="settings_equalizer_description">调整音频频段和效果</string>
     <string name="settings_recording_directory">录制目录</string>
     <string name="settings_recording_directory_default">默认（Music/deutsia_radio）</string>

@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45 phút</string>
     <string name="settings_sleep_timer_60min">60 phút</string>
     <string name="settings_sleep_timer_90min">90 phút</string>
+    <string name="settings_sleep_timer_enable">Bật hẹn giờ ngủ</string>
+    <string name="settings_sleep_timer_min">1 phút</string>
+    <string name="settings_sleep_timer_max">12 giờ</string>
+    <string name="settings_sleep_timer_presets">Cài đặt nhanh</string>
+    <string name="settings_sleep_timer_precision_hint">Giữ thanh trượt để phóng to</string>
     <string name="settings_equalizer_description">Điều chỉnh dải tần âm thanh và hiệu ứng</string>
     <string name="settings_recording_directory">Thư mục ghi</string>
     <string name="settings_recording_directory_default">Mặc định (Music/deutsia_radio)</string>

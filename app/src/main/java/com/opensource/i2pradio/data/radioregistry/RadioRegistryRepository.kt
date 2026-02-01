@@ -158,4 +158,46 @@ class RadioRegistryRepository(private val context: Context) {
     fun isTorRequiredButNotConnected(): Boolean {
         return client.isTorRequiredButNotConnected()
     }
+
+    /**
+     * Download all Tor stations using the bulk download endpoint.
+     * Returns all stations including dead ones for complete coverage.
+     */
+    suspend fun downloadAllTorStations(): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Downloading all Tor stations from bulk endpoint")
+
+        return when (val result = client.downloadAllStations(network = "tor")) {
+            is RadioRegistryResult.Success -> {
+                val stations = result.data.filter { it.isTorStation }
+                Log.d(TAG, "Downloaded ${stations.size} Tor stations")
+                RadioRegistryResult.Success(stations)
+            }
+            is RadioRegistryResult.Error -> {
+                Log.e(TAG, "Failed to download Tor stations: ${result.message}")
+                result
+            }
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
+        }
+    }
+
+    /**
+     * Download all I2P stations using the bulk download endpoint.
+     * Returns all stations including dead ones for complete coverage.
+     */
+    suspend fun downloadAllI2pStations(): RadioRegistryResult<List<RadioRegistryStation>> {
+        Log.d(TAG, "Downloading all I2P stations from bulk endpoint")
+
+        return when (val result = client.downloadAllStations(network = "i2p")) {
+            is RadioRegistryResult.Success -> {
+                val stations = result.data.filter { it.isI2pStation }
+                Log.d(TAG, "Downloaded ${stations.size} I2P stations")
+                RadioRegistryResult.Success(stations)
+            }
+            is RadioRegistryResult.Error -> {
+                Log.e(TAG, "Failed to download I2P stations: ${result.message}")
+                result
+            }
+            is RadioRegistryResult.Loading -> RadioRegistryResult.Loading
+        }
+    }
 }

@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45 dakika</string>
     <string name="settings_sleep_timer_60min">60 dakika</string>
     <string name="settings_sleep_timer_90min">90 dakika</string>
+    <string name="settings_sleep_timer_enable">Uyku Zamanlayıcısını Etkinleştir</string>
+    <string name="settings_sleep_timer_min">1 dk</string>
+    <string name="settings_sleep_timer_max">12 saat</string>
+    <string name="settings_sleep_timer_presets">Hızlı ön ayarlar</string>
+    <string name="settings_sleep_timer_precision_hint">Yakınlaştırmak için kaydırıcıyı basılı tutun</string>
     <string name="settings_equalizer_description">Ses frekans bantlarını ve efektleri ayarla</string>
     <string name="settings_recording_directory">Kayıt Dizini</string>
     <string name="settings_recording_directory_default">Varsayılan (Music/deutsia_radio)</string>

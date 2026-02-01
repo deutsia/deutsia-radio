@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45 minutos</string>
     <string name="settings_sleep_timer_60min">60 minutos</string>
     <string name="settings_sleep_timer_90min">90 minutos</string>
+    <string name="settings_sleep_timer_enable">Ativar temporizador de sono</string>
+    <string name="settings_sleep_timer_min">1 min</string>
+    <string name="settings_sleep_timer_max">12 horas</string>
+    <string name="settings_sleep_timer_presets">Predefinições rápidas</string>
+    <string name="settings_sleep_timer_precision_hint">Segure o controle para ampliar</string>
     <string name="settings_equalizer_description">Ajustar bandas de frequência de áudio e efeitos</string>
     <string name="settings_recording_directory">Diretório de gravação</string>
     <string name="settings_recording_directory_default">Padrão (Music/deutsia_radio)</string>

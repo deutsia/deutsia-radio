@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">45 دقيقة</string>
     <string name="settings_sleep_timer_60min">60 دقيقة</string>
     <string name="settings_sleep_timer_90min">90 دقيقة</string>
+    <string name="settings_sleep_timer_enable">تفعيل مؤقت النوم</string>
+    <string name="settings_sleep_timer_min">1 دقيقة</string>
+    <string name="settings_sleep_timer_max">12 ساعة</string>
+    <string name="settings_sleep_timer_presets">إعدادات سريعة</string>
+    <string name="settings_sleep_timer_precision_hint">اضغط مطولاً على شريط التمرير للتكبير</string>
     <string name="settings_equalizer_description">ضبط نطاقات تردد الصوت والتأثيرات</string>
     <string name="settings_recording_directory">دليل التسجيل</string>
     <string name="settings_recording_directory_default">افتراضي (Music/deutsia_radio)</string>
