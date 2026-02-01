@@ -86,6 +86,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
     // Navigation for tabs
     implementation("androidx.navigation:navigation-fragment-ktx:2.9.6")
     implementation("androidx.navigation:navigation-ui-ktx:2.9.6")
@@ -94,6 +95,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")  // IMPORTANT: Room annotation processor
+
     // Coil for image loading
     implementation("io.coil-kt:coil:2.5.0")
 
@@ -108,10 +110,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
     implementation("androidx.media:media:1.7.0")
 
-    // Material 3
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.media:media:1.7.0")
-
     // Security - EncryptedSharedPreferences for secure password storage
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
@@ -123,10 +121,7 @@ dependencies {
     implementation("androidx.sqlite:sqlite-ktx:2.4.0")
 
     // Test dependencies
-    testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.14.7")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
