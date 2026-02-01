@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">۴۵ دقیقه</string>
     <string name="settings_sleep_timer_60min">۶۰ دقیقه</string>
     <string name="settings_sleep_timer_90min">۹۰ دقیقه</string>
+    <string name="settings_sleep_timer_enable">فعال کردن تایمر خواب</string>
+    <string name="settings_sleep_timer_min">۱ دقیقه</string>
+    <string name="settings_sleep_timer_max">۱۲ ساعت</string>
+    <string name="settings_sleep_timer_presets">تنظیمات سریع</string>
+    <string name="settings_sleep_timer_precision_hint">نوار لغزنده را نگه دارید تا بزرگنمایی شود</string>
     <string name="settings_equalizer_description">تنظیم باندهای فرکانس صدا و جلوه‌ها</string>
     <string name="settings_recording_directory">پوشه ضبط</string>
     <string name="settings_recording_directory_default">پیش‌فرض (Music/deutsia_radio)</string>

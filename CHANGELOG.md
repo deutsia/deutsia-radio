@@ -2,6 +2,19 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.6.4]
+
+### Improved
+- **Sleep timer slider UI**: New slider-based sleep timer with preset options (5, 10, 15, 30, 45, 60 minutes) 
+### Changed
+- **Import stations API**: Import now downloads all stations (including offline/dead) via bulk download endpoint, instead of just online stations
+### Fixed
+- **Like button race condition**: Fixed sync issues between station list, mini player, and now playing screen where like status could become inconsistent
+- **Cover art sizing**: Fixed radio icon shrinking occasionally in now playing screen and miniplayer cover art views
+
+### Localization
+- Added sleep timer translations to all 16 languages
+
 ## [1.6.3]
 
 ### Added
@@ -17,7 +30,6 @@ All notable changes to deutsia radio will be documented in this file.
 - Unified search and filter UI across all browse modes for consistent experience
 - Added debounced search input with "Searching..." indicator for privacy stations
 - Added results count display in privacy station browse mode
-
 
 
 ## [1.6.2]

@@ -238,6 +238,11 @@
     <string name="settings_sleep_timer_45min">၄၅ မိနစ်</string>
     <string name="settings_sleep_timer_60min">၆၀ မိနစ်</string>
     <string name="settings_sleep_timer_90min">၉၀ မိနစ်</string>
+    <string name="settings_sleep_timer_enable">အိပ်စက်ချိန်သတ်မှတ်ခြင်း ဖွင့်ပါ</string>
+    <string name="settings_sleep_timer_min">၁ မိနစ်</string>
+    <string name="settings_sleep_timer_max">၁၂ နာရီ</string>
+    <string name="settings_sleep_timer_presets">အမြန်ကြိုတင်သတ်မှတ်မှုများ</string>
+    <string name="settings_sleep_timer_precision_hint">ချဲ့ရန် slider ကို ဖိထားပါ</string>
     <string name="settings_equalizer_description">အသံ ကြိမ်နှုန်း ဘန်းများနှင့် အကျိုးသက်ရောက်မှုများကို ညှိပါ</string>
     <string name="settings_recording_directory">ရိုက်ကူးမှု ဖိုင်တွဲ</string>
     <string name="settings_recording_directory_default">မူလ (Music/deutsia_radio)</string>

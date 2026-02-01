@@ -26,7 +26,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.6.3** Added search and genre filtering for Tor/I2P stations, updated translations, bug fixes and UI improvements
+- **New Release: v1.6.4** Numerous bug fixes and UI improvements
 
 ---
 
