@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.opensource.i2pradio"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.opensource.i2pradio"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 10604
         versionName = "1.6.4"
     }
