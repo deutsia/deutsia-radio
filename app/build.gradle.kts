@@ -92,9 +92,9 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.9.6")
 
     // Room for saving radios
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")  // IMPORTANT: Room annotation processor
+    implementation("androidx.room:room-runtime:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4")
+    kapt("androidx.room:room-compiler:2.8.4")  // IMPORTANT: Room annotation processor
 
     // Coil for image loading
     implementation("io.coil-kt:coil:2.5.0")
