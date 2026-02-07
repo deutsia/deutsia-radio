@@ -11,6 +11,8 @@ All notable changes to deutsia radio will be documented in this file.
 ### Fixed
 - **Like button race condition**: Fixed sync issues between station list, mini player, and now playing screen where like status could become inconsistent
 - **Cover art sizing**: Fixed radio icon shrinking occasionally in now playing screen and miniplayer cover art views
+### Added
+- **Clearnet over Tor fallback for Radio Registry API in force Tor mode**: Since Tor uptime is not 100%, added a clearnet-over-tor fallback. This means it will call the .onion, if that fails, it will use the clearnet api, but everything is accessed over Tor. Previously there was no fallback, if the .onion failed to load, no stations loaded. 
 
 ### Localization
 - Added sleep timer translations to all 16 languages
