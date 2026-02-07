@@ -122,6 +122,8 @@ cd deutsia-radio
 
 APK output: `app/build/outputs/apk/debug/`
 
+Note: Java 21 (LTS) is required to build this project. Java 25+ is not yet supported by the Gradle/Kotlin toolchain. Set JAVA_HOME=/usr/lib/jvm/java-21-openjdk before building.
+
 ---
 
 ## Submit Stations
