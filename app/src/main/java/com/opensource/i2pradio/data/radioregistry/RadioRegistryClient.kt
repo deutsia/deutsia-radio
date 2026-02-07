@@ -2,11 +2,13 @@ package com.opensource.i2pradio.data.radioregistry
 
 import android.content.Context
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Dns
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
@@ -28,8 +30,10 @@ class RadioRegistryClient(private val context: Context) {
         private const val TAG = "RadioRegistryClient"
 
         // API Base URLs
-        private const val CLEARNET_BASE_URL = "https://api.deutsia.com"
-        private const val TOR_BASE_URL = "http://ccq2dfnskeccxmojoo2kwk23oyynf2fvczdfcpapdmek36waqnjhpvid.onion"
+        @VisibleForTesting
+        internal const val CLEARNET_BASE_URL = "https://api.deutsia.com"
+        @VisibleForTesting
+        internal const val TOR_BASE_URL = "http://ccq2dfnskeccxmojoo2kwk23oyynf2fvczdfcpapdmek36waqnjhpvid.onion"
 
         // Timeouts
         private const val CONNECT_TIMEOUT_SECONDS = 15L
@@ -43,6 +47,14 @@ class RadioRegistryClient(private val context: Context) {
         // Default pagination
         private const val DEFAULT_LIMIT = 50
         private const val MAX_LIMIT = 200
+
+        /**
+         * Application interceptor for testing. When set, added to all OkHttpClients
+         * built by this class. Allows tests to short-circuit network requests and
+         * verify fallback behavior without a real SOCKS5 proxy or network.
+         */
+        @VisibleForTesting
+        internal var testInterceptor: Interceptor? = null
 
         /**
          * Custom DNS resolver for SOCKS5 proxy to prevent DNS leaks.
@@ -59,11 +71,14 @@ class RadioRegistryClient(private val context: Context) {
     /**
      * Build an OkHttpClient respecting Force Tor and Force Custom Proxy settings.
      *
+     * @param useTorClearnetFallback If true, use the clearnet URL routed through Tor instead
+     *        of the .onion URL. Used as a fallback when the .onion mirror is unavailable.
      * @return OkHttpClient configured with appropriate proxy, or null if Force Tor is enabled
      *         but Tor is not available (to prevent IP leaks)
      */
-    private fun buildHttpClient(): Pair<OkHttpClient?, String> {
+    private fun buildHttpClient(useTorClearnetFallback: Boolean = false): Pair<OkHttpClient?, String> {
         val builder = OkHttpClient.Builder()
+        testInterceptor?.let { builder.addInterceptor(it) }
 
         val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
         val forceTorAll = PreferencesHelper.isForceTorAll(context)
@@ -73,7 +88,8 @@ class RadioRegistryClient(private val context: Context) {
         val torConnected = TorManager.isConnected()
 
         Log.d(TAG, "Building HTTP client - ForceTorAll: $forceTorAll, ForceTorExceptI2P: $forceTorExceptI2P, " +
-                "ForceCustomProxy: $forceCustomProxy, TorEnabled: $torEnabled, TorConnected: $torConnected")
+                "ForceCustomProxy: $forceCustomProxy, TorEnabled: $torEnabled, TorConnected: $torConnected" +
+                if (useTorClearnetFallback) ", using clearnet fallback over Tor" else "")
 
         // Priority 1: Force Tor mode
         if (torEnabled && (forceTorAll || forceTorExceptI2P)) {
@@ -91,8 +107,13 @@ class RadioRegistryClient(private val context: Context) {
                 builder.dns(SOCKS5_DNS)
                 builder.connectTimeout(CONNECT_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
                 builder.readTimeout(READ_TIMEOUT_PROXY_SECONDS, TimeUnit.SECONDS)
-                // Use the Tor onion service for maximum privacy
-                return Pair(builder.build(), TOR_BASE_URL)
+                val baseUrl = if (useTorClearnetFallback) {
+                    Log.d(TAG, "Using clearnet URL as fallback (still routed through Tor)")
+                    CLEARNET_BASE_URL
+                } else {
+                    TOR_BASE_URL
+                }
+                return Pair(builder.build(), baseUrl)
             } else {
                 Log.e(TAG, "BLOCKING Radio Registry API request: Force Tor enabled but Tor proxy port invalid")
                 return Pair(null, CLEARNET_BASE_URL)
@@ -161,7 +182,62 @@ class RadioRegistryClient(private val context: Context) {
     }
 
     /**
-     * Execute an API request
+     * Execute an API request with a single URL/client configuration.
+     *
+     * @return the result, or null if a fallback retry should be attempted
+     */
+    private fun <T> executeSingleRequest(
+        client: OkHttpClient,
+        baseUrl: String,
+        endpoint: String,
+        parser: (String) -> T
+    ): RadioRegistryResult<T>? {
+        val url = "$baseUrl/api$endpoint"
+        Log.d(TAG, "API Request: $url")
+
+        val request = Request.Builder()
+            .url(url)
+            .header("User-Agent", USER_AGENT)
+            .header("Accept", "application/json")
+            .get()
+            .build()
+
+        val response = client.newCall(request).execute()
+
+        if (!response.isSuccessful) {
+            Log.w(TAG, "API request failed with code: ${response.code}")
+            response.close()
+            return null
+        }
+
+        val body = response.body?.string()
+        response.close()
+
+        if (body.isNullOrEmpty()) {
+            Log.w(TAG, "Empty response body")
+            return null
+        }
+
+        return RadioRegistryResult.Success(parser(body))
+    }
+
+    /**
+     * Check if Force Tor mode is currently active (used to determine
+     * whether .onion-to-clearnet fallback is applicable).
+     */
+    private fun isForceTorActive(): Boolean {
+        val torEnabled = PreferencesHelper.isEmbeddedTorEnabled(context)
+        val forceTorAll = PreferencesHelper.isForceTorAll(context)
+        val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(context)
+        return torEnabled && (forceTorAll || forceTorExceptI2P)
+    }
+
+    /**
+     * Execute an API request.
+     *
+     * In Force Tor mode, if the .onion URL fails, automatically retries using
+     * the clearnet URL routed through Tor. This provides resilience against
+     * .onion mirror downtime while still keeping all traffic over Tor.
      */
     private suspend fun <T> executeRequest(
         endpoint: String,
@@ -186,36 +262,48 @@ class RadioRegistryClient(private val context: Context) {
                     )
                 }
 
-                val url = "$baseUrl/api$endpoint"
-                Log.d(TAG, "API Request: $url")
-
-                val request = Request.Builder()
-                    .url(url)
-                    .header("User-Agent", USER_AGENT)
-                    .header("Accept", "application/json")
-                    .get()
-                    .build()
-
-                val response = client.newCall(request).execute()
-
-                if (!response.isSuccessful) {
-                    Log.w(TAG, "API request failed with code: ${response.code}")
-                    response.close()
-                    return@withContext RadioRegistryResult.Error("HTTP ${response.code}")
+                val result = executeSingleRequest(client, baseUrl, endpoint, parser)
+                if (result != null) {
+                    return@withContext result
                 }
 
-                val body = response.body?.string()
-                response.close()
-
-                if (body.isNullOrEmpty()) {
-                    Log.w(TAG, "Empty response body")
-                    return@withContext RadioRegistryResult.Error("Empty response")
+                // If we were using the .onion URL and it failed, fall back to clearnet over Tor
+                if (baseUrl == TOR_BASE_URL && isForceTorActive()) {
+                    Log.w(TAG, "Onion service request failed, falling back to clearnet URL over Tor")
+                    val (fallbackClient, fallbackUrl) = buildHttpClient(useTorClearnetFallback = true)
+                    if (fallbackClient != null) {
+                        val fallbackResult = executeSingleRequest(fallbackClient, fallbackUrl, endpoint, parser)
+                        if (fallbackResult != null) {
+                            return@withContext fallbackResult
+                        }
+                    }
+                    return@withContext RadioRegistryResult.Error(
+                        "Both onion service and clearnet-over-Tor failed for Radio Registry API"
+                    )
                 }
 
-                val result = parser(body)
-                RadioRegistryResult.Success(result)
+                RadioRegistryResult.Error("API request failed")
 
             } catch (e: Exception) {
+                // If the .onion request threw an exception, try clearnet fallback over Tor
+                if (isForceTorActive()) {
+                    Log.w(TAG, "Onion service request threw exception (${e.message}), " +
+                            "falling back to clearnet URL over Tor")
+                    try {
+                        val (fallbackClient, fallbackUrl) = buildHttpClient(useTorClearnetFallback = true)
+                        if (fallbackClient != null) {
+                            val fallbackResult = executeSingleRequest(fallbackClient, fallbackUrl, endpoint, parser)
+                            if (fallbackResult != null) {
+                                return@withContext fallbackResult
+                            }
+                        }
+                    } catch (fallbackEx: Exception) {
+                        Log.e(TAG, "Clearnet-over-Tor fallback also failed: ${fallbackEx.message}")
+                    }
+                    return@withContext RadioRegistryResult.Error(
+                        "Both onion service and clearnet-over-Tor failed: ${e.message}", e
+                    )
+                }
                 Log.e(TAG, "API request failed: ${e.message}")
                 RadioRegistryResult.Error(e.message ?: "Unknown error", e)
             }
