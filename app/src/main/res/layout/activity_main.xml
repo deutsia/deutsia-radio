@@ -10,7 +10,8 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:fitsSystemWindows="true"
+        android:background="?attr/colorPrimary"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -18,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="@string/app_name"
-            app:titleTextColor="?attr/colorOnSurface">
+            app:titleTextColor="?attr/colorOnPrimary">
 
             <!-- Tor Status Indicator in Toolbar -->
             <com.opensource.i2pradio.ui.TorStatusView
@@ -46,9 +47,9 @@
             app:tabMode="fixed"
             app:tabGravity="fill"
             app:tabIndicatorFullWidth="false"
-            app:tabIndicatorColor="?attr/colorPrimary"
-            app:tabSelectedTextColor="?attr/colorPrimary"
-            app:tabTextColor="?attr/colorOnSurfaceVariant" />
+            app:tabIndicatorColor="?attr/colorOnPrimary"
+            app:tabSelectedTextColor="?attr/colorOnPrimary"
+            app:tabTextColor="?attr/colorOnPrimary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
