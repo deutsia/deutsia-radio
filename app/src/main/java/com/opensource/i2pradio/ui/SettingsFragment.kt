@@ -1939,7 +1939,7 @@ class SettingsFragment : Fragment() {
             getString(R.string.default_protocol_socks4),
             getString(R.string.default_protocol_socks5)
         )
-        val protocolAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, protocols)
+        val protocolAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_text, protocols)
         protocolInput.setAdapter(protocolAdapter)
 
         val authTypes = arrayOf(
@@ -1947,7 +1947,7 @@ class SettingsFragment : Fragment() {
             getString(R.string.default_auth_basic),
             getString(R.string.default_auth_digest)
         )
-        val authTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, authTypes)
+        val authTypeAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_text, authTypes)
         authTypeInput.setAdapter(authTypeAdapter)
 
         // Load current settings

@@ -132,13 +132,13 @@ class AddEditRadioDialog : DialogFragment() {
             getString(R.string.genre_world),
             getString(R.string.genre_other)
         )
-        val genreAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, genres)
+        val genreAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_text, genres)
         genreInput.setAdapter(genreAdapter)
         genreInput.setText(getString(R.string.genre_other), false)
 
         // Setup proxy type dropdown
         val proxyTypes = arrayOf(getString(R.string.default_proxy_none), getString(R.string.default_proxy_i2p), getString(R.string.default_proxy_tor), getString(R.string.default_proxy_custom))
-        val proxyTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, proxyTypes)
+        val proxyTypeAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_text, proxyTypes)
         proxyTypeInput.setAdapter(proxyTypeAdapter)
         proxyTypeInput.setText(getString(R.string.default_proxy_none), false)
 
@@ -158,7 +158,7 @@ class AddEditRadioDialog : DialogFragment() {
             getString(R.string.default_protocol_socks4),
             getString(R.string.default_protocol_socks5)
         )
-        val protocolAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, protocols)
+        val protocolAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_text, protocols)
         customProxyProtocolInput?.setAdapter(protocolAdapter)
         customProxyProtocolInput?.setText(getString(R.string.default_protocol_http), false)
 
@@ -168,7 +168,7 @@ class AddEditRadioDialog : DialogFragment() {
             getString(R.string.default_auth_basic),
             getString(R.string.default_auth_digest)
         )
-        val authTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, authTypes)
+        val authTypeAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_text, authTypes)
         proxyAuthTypeInput?.setAdapter(authTypeAdapter)
         proxyAuthTypeInput?.setText(getString(R.string.default_proxy_none), false)
 

@@ -1224,7 +1224,7 @@ class BrowseStationsFragment : Fragment() {
 
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
                 val view = LayoutInflater.from(parent.context).inflate(
-                    android.R.layout.simple_list_item_1, parent, false
+                    R.layout.item_list_text, parent, false
                 )
                 return ViewHolder(view)
             }

@@ -418,11 +418,6 @@ class LibraryFragment : Fragment() {
                 null
             }
 
-            // Create custom dialog with search functionality
-            val dialogView = LayoutInflater.from(requireContext()).inflate(
-                android.R.layout.select_dialog_singlechoice, null
-            )
-
             val dialog = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.filter_by_genre))
                 .setView(createGenreSearchView(combinedGenres, currentIndex) { selectedGenre ->
