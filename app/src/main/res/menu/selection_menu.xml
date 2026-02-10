@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_select_all"
-        android:title="Select All"
+        android:title="@string/button_select_all"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_delete"
-        android:title="Delete"
+        android:title="@string/button_delete"
         app:showAsAction="ifRoom" />
 </menu>

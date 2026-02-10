@@ -1,6 +1,6 @@
 package com.opensource.i2pradio.ui
 
-import android.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,11 +19,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
-import android.widget.CheckBox
+import com.google.android.material.checkbox.MaterialCheckBox
 import android.widget.ImageView
 import android.widget.Toast
 import android.widget.LinearLayout
-import android.widget.PopupMenu
+import androidx.appcompat.widget.PopupMenu
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -365,7 +365,7 @@ class LibraryFragment : Fragment() {
         )
         val currentIndex = currentSortOrder.ordinal
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_sort_stations))
             .setSingleChoiceItems(sortOptions, currentIndex) { dialog, which ->
                 currentSortOrder = SortOrder.entries[which]
@@ -418,12 +418,7 @@ class LibraryFragment : Fragment() {
                 null
             }
 
-            // Create custom dialog with search functionality
-            val dialogView = LayoutInflater.from(requireContext()).inflate(
-                android.R.layout.select_dialog_singlechoice, null
-            )
-
-            val dialog = AlertDialog.Builder(requireContext())
+            val dialog = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.filter_by_genre))
                 .setView(createGenreSearchView(combinedGenres, currentIndex) { selectedGenre ->
                     // Store the temporary selection but don't apply yet
@@ -793,7 +788,7 @@ class LibraryFragment : Fragment() {
             return
         }
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_delete_stations))
             .setMessage(getString(if (selectedCount > 1) R.string.delete_stations_message_plural else R.string.delete_stations_message_single, selectedCount))
             .setPositiveButton(getString(R.string.button_delete)) { _, _ ->
@@ -916,7 +911,7 @@ class RadioStationAdapter(
         private val genreText: TextView = itemView.findViewById(R.id.genreText)
         private val menuButton: MaterialButton = itemView.findViewById(R.id.menuButton)
         private val likeButton: MaterialButton = itemView.findViewById(R.id.likeButton)
-        private val selectionCheckBox: CheckBox = itemView.findViewById(R.id.selectionCheckBox)
+        private val selectionCheckBox: MaterialCheckBox = itemView.findViewById(R.id.selectionCheckBox)
         private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioStation) {

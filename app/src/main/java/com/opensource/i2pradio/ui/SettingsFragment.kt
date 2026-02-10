@@ -25,7 +25,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -738,7 +738,7 @@ class SettingsFragment : Fragment() {
         preset3hours.setOnClickListener { setPresetValue(180) }
         preset4hours.setOnClickListener { setPresetValue(240) }
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.settings_sleep_timer))
             .setView(dialogView)
             .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -1212,7 +1212,7 @@ class SettingsFragment : Fragment() {
             options.add(1, getString(R.string.settings_recording_directory_clear))
         }
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.settings_recording_directory))
             .setItems(options.toTypedArray()) { dialog, which ->
                 when {
@@ -1264,7 +1264,7 @@ class SettingsFragment : Fragment() {
             else -> 0
         }
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.settings_theme))
             .setSingleChoiceItems(themes, selectedIndex) { dialog, which ->
                 val newMode = when (which) {
@@ -1311,7 +1311,7 @@ class SettingsFragment : Fragment() {
         }
         val selectedIndex = schemeValues.indexOf(currentScheme).coerceAtLeast(0)
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.settings_color_scheme))
             .setSingleChoiceItems(schemes, selectedIndex) { dialog, which ->
                 val newScheme = schemeValues[which]
@@ -1377,7 +1377,7 @@ class SettingsFragment : Fragment() {
         val currentLanguage = PreferencesHelper.getAppLanguage(requireContext())
         val selectedIndex = languageCodes.indexOf(currentLanguage).coerceAtLeast(0)
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.language_choose))
             .setSingleChoiceItems(languages, selectedIndex) { dialog, which ->
                 val newLanguage = languageCodes[which]
@@ -1406,7 +1406,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showImportDialog() {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_import_stations))
             .setMessage(getString(R.string.import_message))
             .setPositiveButton(getString(R.string.button_select_file)) { _, _ ->
@@ -1473,7 +1473,7 @@ class SettingsFragment : Fragment() {
                         // Cache stations for the import step
                         pendingImportStations = stations
 
-                        AlertDialog.Builder(context)
+                        MaterialAlertDialogBuilder(context)
                             .setTitle(getString(R.string.import_curated_title, networkName))
                             .setMessage(getString(R.string.import_curated_message, stations.size, networkName))
                             .setPositiveButton(getString(R.string.button_import)) { _, _ ->
@@ -1524,7 +1524,7 @@ class SettingsFragment : Fragment() {
         val formats = StationImportExport.FileFormat.values()
         val formatNames = formats.map { it.displayName }.toTypedArray()
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_export_stations_title))
             .setItems(formatNames) { _, which ->
                 val format = formats[which]
@@ -1553,7 +1553,7 @@ class SettingsFragment : Fragment() {
                         } else {
                             getString(R.string.no_stations_found_in_list, "file")
                         }
-                        AlertDialog.Builder(requireContext())
+                        MaterialAlertDialogBuilder(requireContext())
                             .setTitle(getString(R.string.dialog_import_failed))
                             .setMessage(errorMsg)
                             .setPositiveButton(android.R.string.ok, null)
@@ -1576,7 +1576,7 @@ class SettingsFragment : Fragment() {
                         append(getString(R.string.import_confirmation))
                     }
 
-                    AlertDialog.Builder(requireContext())
+                    MaterialAlertDialogBuilder(requireContext())
                         .setTitle(getString(R.string.dialog_import_stations))
                         .setMessage(message)
                         .setPositiveButton(getString(R.string.button_import)) { _, _ ->
@@ -1890,7 +1890,7 @@ class SettingsFragment : Fragment() {
         updateBandwidthDisplay()
 
         resetBandwidthButton?.setOnClickListener {
-            AlertDialog.Builder(requireContext())
+            MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.dialog_reset_session_bandwidth))
                 .setMessage(getString(R.string.reset_bandwidth_message))
                 .setPositiveButton(getString(R.string.button_reset)) { _, _ ->
@@ -1939,7 +1939,7 @@ class SettingsFragment : Fragment() {
             getString(R.string.default_protocol_socks4),
             getString(R.string.default_protocol_socks5)
         )
-        val protocolAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, protocols)
+        val protocolAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_text, protocols)
         protocolInput.setAdapter(protocolAdapter)
 
         val authTypes = arrayOf(
@@ -1947,7 +1947,7 @@ class SettingsFragment : Fragment() {
             getString(R.string.default_auth_basic),
             getString(R.string.default_auth_digest)
         )
-        val authTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, authTypes)
+        val authTypeAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_text, authTypes)
         authTypeInput.setAdapter(authTypeAdapter)
 
         // Load current settings
@@ -2007,7 +2007,7 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_configure_global_proxy))
             .setView(dialogView)
             .setPositiveButton(getString(R.string.button_save)) { _, _ ->
@@ -2426,7 +2426,7 @@ class SettingsFragment : Fragment() {
             addView(confirmLayout)
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.auth_dialog_title)
             .setView(dialogView)
             .setPositiveButton(R.string.auth_dialog_set) { _, _ ->
@@ -2508,7 +2508,7 @@ class SettingsFragment : Fragment() {
             addView(confirmLayout)
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.auth_dialog_change_title)
             .setMessage(R.string.auth_dialog_change_message)
             .setView(dialogView)
@@ -2538,7 +2538,7 @@ class SettingsFragment : Fragment() {
                         // If database encryption is enabled, re-key the database with new password
                         if (com.opensource.i2pradio.utils.DatabaseEncryptionManager.isDatabaseEncryptionEnabled(requireContext())) {
                             // Show progress dialog for re-keying
-                            val progressDialog = AlertDialog.Builder(requireContext())
+                            val progressDialog = MaterialAlertDialogBuilder(requireContext())
                                 .setMessage(R.string.auth_rekeying_database)
                                 .setCancelable(false)
                                 .create()
@@ -2614,7 +2614,7 @@ class SettingsFragment : Fragment() {
                 // Check if app password is set before allowing encryption
                 if (!com.opensource.i2pradio.utils.BiometricAuthManager.hasPassword(requireContext())) {
                     // Show dialog explaining password requirement
-                    AlertDialog.Builder(requireContext())
+                    MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.settings_database_encryption_password_required_title)
                         .setMessage(R.string.settings_database_encryption_password_required_message)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -2789,7 +2789,7 @@ class SettingsFragment : Fragment() {
             addView(passwordLayout)
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.auth_enter_password_to_encrypt)
             .setMessage(R.string.auth_password_for_encryption)
             .setView(dialogView)
@@ -2807,7 +2807,7 @@ class SettingsFragment : Fragment() {
                 }
 
                 // Show progress dialog
-                val progressDialog = AlertDialog.Builder(requireContext())
+                val progressDialog = MaterialAlertDialogBuilder(requireContext())
                     .setMessage(R.string.auth_encrypting_database)
                     .setCancelable(false)
                     .create()
@@ -2892,7 +2892,7 @@ class SettingsFragment : Fragment() {
             addView(passwordLayout)
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.auth_enter_password_to_decrypt)
             .setMessage(R.string.auth_password_for_decryption)
             .setView(dialogView)
@@ -2910,7 +2910,7 @@ class SettingsFragment : Fragment() {
                 }
 
                 // Show progress dialog
-                val progressDialog = AlertDialog.Builder(requireContext())
+                val progressDialog = MaterialAlertDialogBuilder(requireContext())
                     .setMessage(R.string.auth_decrypting_database)
                     .setCancelable(false)
                     .create()

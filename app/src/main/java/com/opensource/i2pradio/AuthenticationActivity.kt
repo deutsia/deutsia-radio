@@ -3,7 +3,7 @@ package com.opensource.i2pradio
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.ProgressBar
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +29,7 @@ class AuthenticationActivity : AppCompatActivity() {
     private lateinit var errorText: TextView
     private lateinit var unlockButton: MaterialButton
     private lateinit var biometricButton: MaterialButton
-    private var progressBar: ProgressBar? = null
+    private var progressBar: LinearProgressIndicator? = null
     private var isVerifying = false  // Prevent multiple verification attempts
 
     override fun onCreate(savedInstanceState: Bundle?) {
