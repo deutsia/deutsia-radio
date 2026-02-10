@@ -366,10 +366,13 @@
                     android:layout_height="match_parent"
                     android:visibility="gone">
 
-                    <ProgressBar
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:layout_gravity="center" />
+                        android:layout_gravity="center"
+                        android:indeterminate="true"
+                        app:indicatorSize="48dp"
+                        app:trackThickness="4dp" />
 
                 </FrameLayout>
 
