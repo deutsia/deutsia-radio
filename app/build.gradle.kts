@@ -100,7 +100,7 @@ dependencies {
     implementation("io.coil-kt:coil:2.5.0")
 
     // ViewPager2 for tabs
-    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
 
     // SwipeRefreshLayout for pull-to-refresh
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
