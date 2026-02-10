@@ -97,7 +97,8 @@ class AddEditRadioDialog : DialogFragment() {
         // Check if embedded Tor is enabled
         val isEmbeddedTorEnabled = PreferencesHelper.isEmbeddedTorEnabled(requireContext())
 
-        // Setup genre dropdown - expanded list sorted alphabetically
+        // Setup genre dropdown with autocomplete - users can type custom genres or pick from list
+        genreInput.threshold = 1
         val genres = arrayOf(
             getString(R.string.genre_alternative),
             getString(R.string.genre_ambient),
