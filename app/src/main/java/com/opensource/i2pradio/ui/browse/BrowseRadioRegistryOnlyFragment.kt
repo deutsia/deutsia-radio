@@ -508,55 +508,57 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
 
     private inner class GenreAdapter(
         private var genres: List<String>,
-        private var selectedIndex: Int?,
+        private val initialSelectedIndex: Int?,
         private val onGenreSelected: (Int?) -> Unit
     ) : RecyclerView.Adapter<GenreAdapter.ViewHolder>() {
 
-        inner class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
+        private var selectedPosition: Int = -1
+        private val originalGenres = genres
+
+        init {
+            selectedPosition = initialSelectedIndex ?: -1
+        }
+
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val textView: TextView? = view.findViewById(android.R.id.text1)
+            val radioButton: android.widget.RadioButton? = view.findViewById(R.id.radio_button)
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val textView = TextView(parent.context).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                setPadding(48, 32, 48, 32)
-                textSize = 16f
-                setTextColor(com.google.android.material.color.MaterialColors.getColor(
-                    this,
-                    com.google.android.material.R.attr.colorOnSurface
-                ))
-            }
-            return ViewHolder(textView)
+            val view = LayoutInflater.from(parent.context).inflate(
+                R.layout.item_genre_choice, parent, false
+            )
+            return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val genre = genres[position]
-            holder.textView.text = genre
+            if (position >= itemCount) return
 
-            val isSelected = selectedIndex != null && genres.indexOf(genre) == selectedIndex
-            if (isSelected) {
-                holder.textView.setBackgroundColor(
-                    com.google.android.material.color.MaterialColors.getColor(
-                        holder.textView,
-                        com.google.android.material.R.attr.colorSecondaryContainer
-                    )
-                )
+            if (position == 0) {
+                holder.textView?.text = getString(R.string.filter_all_genres)
+                holder.radioButton?.isChecked = selectedPosition == -1
+
+                holder.itemView.setOnClickListener {
+                    selectedPosition = -1
+                    notifyDataSetChanged()
+                    onGenreSelected(null)
+                }
             } else {
-                holder.textView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            }
+                val genre = genres[position - 1]
+                holder.textView?.text = genre
 
-            holder.textView.setOnClickListener {
-                val oldIndex = selectedIndex
-                selectedIndex = if (selectedIndex == position) null else position
-                onGenreSelected(selectedIndex)
+                val originalIndex = originalGenres.indexOf(genre)
+                holder.radioButton?.isChecked = selectedPosition == originalIndex
 
-                if (oldIndex != null) notifyItemChanged(oldIndex)
-                notifyItemChanged(position)
+                holder.itemView.setOnClickListener {
+                    selectedPosition = originalIndex
+                    notifyDataSetChanged()
+                    onGenreSelected(originalIndex)
+                }
             }
         }
 
-        override fun getItemCount() = genres.size
+        override fun getItemCount() = genres.size + 1
 
         fun updateGenres(newGenres: List<String>) {
             genres = newGenres
