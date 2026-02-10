@@ -23,7 +23,8 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import android.widget.ImageView
 import android.widget.Toast
 import android.widget.LinearLayout
-import androidx.appcompat.widget.PopupMenu
+import android.graphics.drawable.ColorDrawable
+import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -679,26 +680,32 @@ class LibraryFragment : Fragment() {
     }
 
     private fun showStationMenu(station: RadioStation, anchor: View) {
-        val popup = PopupMenu(requireContext(), anchor)
-        popup.menuInflater.inflate(R.menu.station_menu, popup.menu)
+        val popupView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.popup_station_menu, null)
 
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_edit -> {
-                    val dialog = AddEditRadioDialog.newInstance(station)
-                    dialog.show(parentFragmentManager, "AddEditRadioDialog")
-                    true
-                }
-                R.id.action_delete -> {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        repository.deleteStation(station)
-                    }
-                    true
-                }
-                else -> false
+        val popupWindow = PopupWindow(
+            popupView,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            true
+        )
+        popupWindow.elevation = 8f
+        popupWindow.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        popupView.findViewById<View>(R.id.menuItemEdit).setOnClickListener {
+            popupWindow.dismiss()
+            val dialog = AddEditRadioDialog.newInstance(station)
+            dialog.show(parentFragmentManager, "AddEditRadioDialog")
+        }
+
+        popupView.findViewById<View>(R.id.menuItemDelete).setOnClickListener {
+            popupWindow.dismiss()
+            lifecycleScope.launch(Dispatchers.IO) {
+                repository.deleteStation(station)
             }
         }
-        popup.show()
+
+        popupWindow.showAsDropDown(anchor, 0, -anchor.height)
     }
 
     /**
