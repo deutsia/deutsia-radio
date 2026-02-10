@@ -108,7 +108,7 @@ data class RadioRegistryStation(
      * Get the genre string with network indicator suffix
      */
     fun getGenreWithNetwork(): String {
-        val genreText = genre ?: "Other"
+        val genreText = getPrimaryGenre()
         val networkIndicator = if (isTorStation) "Tor" else if (isI2pStation) "I2P" else null
         return if (networkIndicator != null && genreText.isNotEmpty() && genreText != "Other") {
             "$genreText · $networkIndicator"
@@ -120,9 +120,18 @@ data class RadioRegistryStation(
     }
 
     /**
-     * Get the primary genre (without network indicator)
+     * Get the primary genre (without network indicator).
+     * Strips network tags (I2P, Tor) from the genre string since the API
+     * may include them as a prefix (e.g., "I2P,Electronic").
      */
-    fun getPrimaryGenre(): String = genre ?: "Other"
+    fun getPrimaryGenre(): String {
+        val genreText = genre ?: return "Other"
+        val networkTags = setOf("i2p", "tor")
+        val parts = genreText.split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() && it.lowercase() !in networkTags }
+        return parts.firstOrNull() ?: "Other"
+    }
 
     /**
      * Get network indicator (Tor or I2P)

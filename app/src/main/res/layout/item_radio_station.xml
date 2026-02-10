@@ -32,7 +32,7 @@
             tools:src="@drawable/ic_radio" />
 
         <!-- Selection Checkbox (overlays cover art in selection mode) -->
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/selectionCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

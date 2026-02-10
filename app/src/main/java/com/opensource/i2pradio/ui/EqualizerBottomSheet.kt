@@ -93,7 +93,7 @@ class EqualizerBottomSheet(
 
         val adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
+            R.layout.item_dropdown_text,
             presets
         )
         presetDropdown.setAdapter(adapter)

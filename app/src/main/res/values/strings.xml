@@ -160,6 +160,8 @@
     <string name="dialog_sort_stations">Sort Stations</string>
     <string name="dialog_delete_stations">Delete stations</string>
     <string name="button_save">Save</string>
+    <string name="button_edit">Edit</string>
+    <string name="button_select_all">Select All</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_import">Import</string>
     <string name="button_export">Export</string>
