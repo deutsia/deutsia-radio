@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.fragment.app.DialogFragment
 import coil.load
 import com.opensource.i2pradio.util.loadSecure
@@ -286,7 +286,7 @@ class AddEditRadioDialog : DialogFragment() {
             }
         }
 
-        return AlertDialog.Builder(requireContext())
+        return MaterialAlertDialogBuilder(requireContext())
             .setTitle(if (stationId == -1L) getString(R.string.dialog_add_station) else getString(R.string.dialog_edit_station))
             .setView(view)
             .setPositiveButton(getString(R.string.button_save)) { _, _ ->

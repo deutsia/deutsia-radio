@@ -1,6 +1,6 @@
 package com.opensource.i2pradio.ui.browse
 
-import android.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -352,7 +352,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
             getString(R.string.browse_all_stations)
         )
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(currentNetwork)
             .setItems(categories) { _, which ->
                 clearSearch()
@@ -384,7 +384,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
             return
         }
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_filter)
             .setItems(filters.toTypedArray()) { _, which ->
                 actions[which]()
@@ -408,7 +408,7 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
             genres.indexOf(currentGenre).takeIf { it >= 0 }
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.select_genre)
             .setView(createGenreSearchView(genres, tempSelectedGenreIndex) { selectedIndex ->
                 tempSelectedGenreIndex = selectedIndex

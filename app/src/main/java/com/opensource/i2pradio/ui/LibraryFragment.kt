@@ -1,6 +1,6 @@
 package com.opensource.i2pradio.ui
 
-import android.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -365,7 +365,7 @@ class LibraryFragment : Fragment() {
         )
         val currentIndex = currentSortOrder.ordinal
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_sort_stations))
             .setSingleChoiceItems(sortOptions, currentIndex) { dialog, which ->
                 currentSortOrder = SortOrder.entries[which]
@@ -423,7 +423,7 @@ class LibraryFragment : Fragment() {
                 android.R.layout.select_dialog_singlechoice, null
             )
 
-            val dialog = AlertDialog.Builder(requireContext())
+            val dialog = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.filter_by_genre))
                 .setView(createGenreSearchView(combinedGenres, currentIndex) { selectedGenre ->
                     // Store the temporary selection but don't apply yet
@@ -793,7 +793,7 @@ class LibraryFragment : Fragment() {
             return
         }
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_delete_stations))
             .setMessage(getString(if (selectedCount > 1) R.string.delete_stations_message_plural else R.string.delete_stations_message_single, selectedCount))
             .setPositiveButton(getString(R.string.button_delete)) { _, _ ->

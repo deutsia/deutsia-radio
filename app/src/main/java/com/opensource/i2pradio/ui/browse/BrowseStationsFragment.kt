@@ -1,6 +1,6 @@
 package com.opensource.i2pradio.ui.browse
 
-import android.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -1075,7 +1075,7 @@ class BrowseStationsFragment : Fragment() {
             getString(R.string.browse_history)
         )
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.browse_top_voted)
             .setItems(categories) { _, which ->
                 clearSearch()
@@ -1122,7 +1122,7 @@ class BrowseStationsFragment : Fragment() {
             getString(R.string.browse_all_stations)
         )
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(currentNetwork)
             .setItems(categories) { _, which ->
                 clearSearch()
@@ -1203,7 +1203,7 @@ class BrowseStationsFragment : Fragment() {
         var filteredTags = tags.toList()
 
         // Create the dialog first so we can dismiss it in the adapter
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.browse_by_genre)
             .setView(container)
             .setNegativeButton(android.R.string.cancel, null)
@@ -1309,7 +1309,7 @@ class BrowseStationsFragment : Fragment() {
             return
         }
 
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_filter)
             .setItems(filters.toTypedArray()) { _, which ->
                 actions[which]()
@@ -1529,7 +1529,7 @@ class BrowseStationsFragment : Fragment() {
             countries.indexOf(currentCountry).takeIf { it >= 0 }
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.select_country)
             .setView(createCountrySearchView(countries, tempSelectedCountryIndex) { selectedIndex ->
                 tempSelectedCountryIndex = selectedIndex
@@ -1570,7 +1570,7 @@ class BrowseStationsFragment : Fragment() {
             tags.indexOf(currentTag).takeIf { it >= 0 }
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.select_genre)
             .setView(createTagSearchView(tags, tempSelectedTagIndex) { selectedIndex ->
                 tempSelectedTagIndex = selectedIndex
@@ -1609,7 +1609,7 @@ class BrowseStationsFragment : Fragment() {
             genres.indexOf(currentGenre).takeIf { it >= 0 }
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.select_genre)
             .setView(createRegistryGenreSearchView(genres, tempSelectedGenreIndex) { selectedIndex ->
                 tempSelectedGenreIndex = selectedIndex
@@ -1786,7 +1786,7 @@ class BrowseStationsFragment : Fragment() {
             languages.indexOf(currentLanguage).takeIf { it >= 0 }
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.select_language)
             .setView(createLanguageSearchView(languages, tempSelectedLanguageIndex) { selectedIndex ->
                 tempSelectedLanguageIndex = selectedIndex
