@@ -647,8 +647,8 @@ class NowPlayingFragment : Fragment() {
                 // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
                 // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
                 if (station.coverArtUri != null) {
-                    // Start with centerInside for placeholder, switch to centerCrop only on successful load
-                    coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
+                    coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                     val isPrivacyStation = station.getProxyTypeEnum().let {
                         it == ProxyType.TOR || it == ProxyType.I2P
                     }
@@ -659,16 +659,16 @@ class NowPlayingFragment : Fragment() {
                         error(R.drawable.ic_radio)
                         listener(
                             onStart = {
-                                // Ensure centerInside during placeholder phase
-                                coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                                // Ensure fitCenter during placeholder phase so vector icon fills container
+                                coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                             },
                             onSuccess = { _, _ ->
                                 // Real bitmap loaded - use centerCrop for best appearance
                                 coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
                             },
                             onError = { _, _ ->
-                                // Error loading - keep centerInside for vector placeholder
-                                coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                                // Error loading - use fitCenter so vector placeholder fills container
+                                coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                             }
                         )
                     }
@@ -678,8 +678,8 @@ class NowPlayingFragment : Fragment() {
                         coverArt.loadSecure(station.coverArtUri, imageLoadBuilder)
                     }
                 } else {
-                    // No cover art - use centerInside for vector placeholder and force reload
-                    coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    // No cover art - use fitCenter so vector placeholder fills container
+                    coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                     // Force reload to get fresh drawable with current theme colors (Material You)
                     coverArt.setImageDrawable(null)
                     coverArt.load(R.drawable.ic_radio) {
@@ -1137,8 +1137,8 @@ class NowPlayingFragment : Fragment() {
      */
     private fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
-            // Start with centerInside for placeholder, switch to centerCrop only on successful load
-            coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
+            coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
             // Check if current station is a privacy station (Tor/I2P)
             val isPrivacyStation = viewModel.currentStation.value?.getProxyTypeEnum().let {
                 it == ProxyType.TOR || it == ProxyType.I2P
@@ -1152,16 +1152,16 @@ class NowPlayingFragment : Fragment() {
                 error(R.drawable.ic_radio)
                 listener(
                     onStart = {
-                        // Ensure centerInside during placeholder phase
-                        coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        // Ensure fitCenter during placeholder phase so vector icon fills container
+                        coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                     },
                     onSuccess = { _, _ ->
                         // Real bitmap loaded - use centerCrop for best appearance
                         coverArt.scaleType = ImageView.ScaleType.CENTER_CROP
                     },
                     onError = { _, _ ->
-                        // Error loading - keep centerInside for vector placeholder
-                        coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        // Error loading - use fitCenter so vector placeholder fills container
+                        coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                     }
                 )
             }
@@ -1171,7 +1171,7 @@ class NowPlayingFragment : Fragment() {
                 coverArt.loadSecure(coverArtUri, imageLoadBuilder)
             }
         } else {
-            coverArt.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
             coverArt.load(R.drawable.ic_radio) {
                 crossfade(true)
             }
