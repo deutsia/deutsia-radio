@@ -126,6 +126,62 @@ Note: Java 21 (LTS) is required to build this project. Java 25+ is not yet suppo
 
 ---
 
+## FAQ
+
+**Do I need Tor or I2P to use this app?**
+
+No. Clearnet works on its own and gives you access to 50,000+ stations via the RadioBrowser API, like a normal radio app. Tor and I2P are completely optional for users who want privacy or access to darknet stations.
+
+**How do I remain private/anonymous while using this app?**
+
+By default, the app connects directly from your IP address. To stay anonymous, you need to enable a Force mode in settings. There are several options depending on your setup:
+
+- **Force Tor All** — Routes all traffic (streams, API calls, cover art) through Tor. Nothing touches the internet directly. If Tor disconnects, all traffic is blocked — there are no clearnet fallbacks. Try it yourself by disconnecting from Invizible Pro midstream while playing a clearnet station - the connection will not continue playing any more than what's left in the buffer.  
+- **Force Tor Except I2P** — Routes clearnet traffic through Tor, but sends I2P traffic through the I2P HTTP proxy instead. This avoids the unnecessary latency of routing I2P over Tor.
+- **Force Custom Proxy** — Routes all traffic through a proxy you configure (SOCKS4, SOCKS5, HTTP, or HTTPS). Useful if you run your own proxy or use a provider other than InviZible Pro.
+- **Force Custom Proxy Except Tor/I2P** — Routes clearnet traffic through your custom proxy, while Tor and I2P stations use their native proxies.
+
+For maximum privacy:
+1. Enable a Force mode (Tor or Custom Proxy)
+2. Disable the RadioBrowser API in settings if you don't need clearnet stations
+3. Disable cover art loading if you want to eliminate all image requests
+4. Enable database encryption to protect your local data at rest
+5. Run a VPN in the background alongside InviZible Pro's proxy mode for an extra layer of protection — useful if you don't fully trust the app or any of the APIs it connects to. Radio stations are low bandwidth, so most quality VPNs will still handle Tor and even I2P stations without issue.
+
+All Force modes are fail-safe — if the proxy goes down, traffic is blocked, not leaked. This includes full DNS leak prevention — in Force modes, all DNS queries are resolved through the proxy rather than your system/ISP DNS. The app includes 47+ tests verifying no DNS leaks occur in any Force mode.
+
+**Is there a darknet website to download this app?**
+Yes. You can download anonymously via the I2P site:
+`http://deutsiampy3y6z2gceje5llbi4vakzj67wamyjdqlzv2tines25q.b32.i2p/`
+
+There is no clearnet or Tor mirror for the website. If you need to download over Tor, go to the [GitHub Releases](https://github.com/deutsia/deutsia-radio/releases) page using Tor Browser.
+
+**Do clearnet stations block Tor in Force Tor mode?**
+Sometimes, but rarely. The vast majority of clearnet stations do not block Tor.
+
+**How do I import my stations from another app?**
+Go to Settings and use the import option. Supported formats are CSV, JSON, M3U, and PLS.
+
+**Why is cleartext traffic enabled in the manifest?**
+I2P (`.i2p`) and Tor (`.onion`) sites use `http://` rather than `https://`. Cleartext traffic must be enabled for these domains to work.
+
+**What data does this app collect?**
+None. All data (stations, history, settings, favorites) is stored locally on your device. There is no cloud sync, no analytics, and no telemetry. You can optionally encrypt all local data with SQLCipher.
+
+**Does cover art load through my proxy?**
+Yes. When a Force mode is enabled, station artwork is routed through the same proxy pipeline as streams, with full DNS leak prevention. If the proxy disconnects, image loading is blocked rather than falling back to a direct connection.
+
+**Can I use a different proxy instead of InviZible Pro?**
+Yes. Any SOCKS5 proxy that routes through Tor will work. You can also configure a custom proxy (SOCKS4, SOCKS5, HTTP, or HTTPS) with optional authentication in the app's proxy settings.
+
+**Does enabling Tor (non force mode) hide my IP?**
+Not inherently. Without enabling a force mode, all clearnet traffic (streams, cover art) will be loaded from your direct IP. 
+
+**Does cover art load through my proxy?**
+Yes. Station artwork is loaded through the same proxy pipeline as streams across all three networks (clearnet, I2P, and Tor). In Force modes, all image requests include full DNS leak prevention — DNS is resolved through the proxy, not your system resolver. If the proxy disconnects, image loading is blocked rather than falling back to a direct connection. You can also disable cover art entirely in settings to eliminate all image requests.
+
+---
+
 ## Submit Stations
 
 You can submit darknet stations (I2P/Tor) via the [Radio Registry API](https://api.deutsia.com).
