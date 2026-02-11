@@ -2,6 +2,21 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.6.5]
+
+### Added
+- **Custom genre tagging**: You can now type custom genres in the Add/Edit Radio Station dialog instead of being limited to the preset list
+- **Clearnet over Tor fallback for Radio Registry API in force Tor mode**: Since Tor uptime is not 100%, added a clearnet-over-tor fallback. This means it will call the .onion, if that fails, it will use the clearnet API, but everything is accessed over Tor. Previously there was no fallback — if the .onion failed to load, no stations loaded
+
+### Fixed
+- **Cover art scaling**: Fixed placeholder cover art icon appearing small in mini player and now playing screen
+- **Genre display**: Fixed radio registry browse showing network prefix in genre labels
+
+### UI/UX Improvements
+- Migrated dialogs, popups, layouts, and widgets from default Android/AppCompat to Material 3 design
+- Genre filter dialogs now use radio button selection
+
+
 ## [1.6.4]
 
 ### Improved
@@ -11,8 +26,6 @@ All notable changes to deutsia radio will be documented in this file.
 ### Fixed
 - **Like button race condition**: Fixed sync issues between station list, mini player, and now playing screen where like status could become inconsistent
 - **Cover art sizing**: Fixed radio icon shrinking occasionally in now playing screen and miniplayer cover art views
-### Added
-- **Clearnet over Tor fallback for Radio Registry API in force Tor mode**: Since Tor uptime is not 100%, added a clearnet-over-tor fallback. This means it will call the .onion, if that fails, it will use the clearnet api, but everything is accessed over Tor. Previously there was no fallback, if the .onion failed to load, no stations loaded. 
 
 ### Localization
 - Added sleep timer translations to all 16 languages
