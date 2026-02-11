@@ -116,8 +116,8 @@ class MiniPlayerView @JvmOverloads constructor(
      */
     fun updateCoverArt(coverArtUri: String?) {
         if (coverArtUri != null) {
-            // Start with centerInside for placeholder, switch to centerCrop only on successful load
-            coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
+            coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
             // Use privacy loader for Tor/I2P stations to route cover art through Tor
             val isPrivacyStation = currentStation?.getProxyTypeEnum().let {
                 it == ProxyType.TOR || it == ProxyType.I2P
@@ -131,16 +131,16 @@ class MiniPlayerView @JvmOverloads constructor(
                 error(R.drawable.ic_radio)
                 listener(
                     onStart = {
-                        // Ensure centerInside during placeholder phase
-                        coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        // Ensure fitCenter during placeholder phase so vector icon fills container
+                        coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
                     },
                     onSuccess = { _, _ ->
                         // Real bitmap loaded - use centerCrop for best appearance
                         coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
                     },
                     onError = { _, _ ->
-                        // Error loading - keep centerInside for vector placeholder
-                        coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        // Error loading - use fitCenter so vector placeholder fills container
+                        coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
                     }
                 )
             }
@@ -150,8 +150,8 @@ class MiniPlayerView @JvmOverloads constructor(
                 coverImage.loadSecure(coverArtUri, imageLoadBuilder)
             }
         } else {
-            // No cover art - use centerInside for vector placeholder
-            coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            // No cover art - use fitCenter so vector placeholder fills container
+            coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
             // Force reload to get fresh drawable with current theme colors (Material You)
             coverImage.setImageDrawable(null)
             coverImage.load(R.drawable.ic_radio) {
@@ -215,8 +215,8 @@ class MiniPlayerView @JvmOverloads constructor(
         // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
         // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
         if (station.coverArtUri != null) {
-            // Start with centerInside for placeholder, switch to centerCrop only on successful load
-            coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
+            coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
             val isPrivacyStation = station.getProxyTypeEnum().let {
                 it == ProxyType.TOR || it == ProxyType.I2P
             }
@@ -226,16 +226,16 @@ class MiniPlayerView @JvmOverloads constructor(
                 error(R.drawable.ic_radio)
                 listener(
                     onStart = {
-                        // Ensure centerInside during placeholder phase
-                        coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        // Ensure fitCenter during placeholder phase so vector icon fills container
+                        coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
                     },
                     onSuccess = { _, _ ->
                         // Real bitmap loaded - use centerCrop for best appearance
                         coverImage.scaleType = ImageView.ScaleType.CENTER_CROP
                     },
                     onError = { _, _ ->
-                        // Error loading - keep centerInside for vector placeholder
-                        coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                        // Error loading - use fitCenter so vector placeholder fills container
+                        coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
                     }
                 )
             }
@@ -245,8 +245,8 @@ class MiniPlayerView @JvmOverloads constructor(
                 coverImage.loadSecure(station.coverArtUri, imageLoadBuilder)
             }
         } else {
-            // No cover art - use centerInside for vector placeholder
-            coverImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            // No cover art - use fitCenter so vector placeholder fills container
+            coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
             // Explicitly clear any cached/loading state and set default drawable
             // Force reload to get fresh drawable with current theme colors (Material You)
             coverImage.setImageDrawable(null)
