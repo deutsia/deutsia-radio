@@ -98,7 +98,7 @@ Releases are signed with [Sigstore](https://www.sigstore.dev/). To verify, downl
 cd ~/Downloads
 cosign verify-blob \
   --bundle deutsia-radio-v1.6.5.apk.sigstore \
-  --certificate-identity-regexp 'github.com/deutsia/.*' \
+  --certificate-identity siewargottlichschon@gmail.com \
   --certificate-oidc-issuer https://github.com/login/oauth \
   deutsia-radio-v1.6.5.apk
 ```
