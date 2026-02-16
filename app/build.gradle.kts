@@ -103,7 +103,7 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 
     // SwipeRefreshLayout for pull-to-refresh
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
