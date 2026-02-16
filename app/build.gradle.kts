@@ -15,8 +15,8 @@ android {
         applicationId = "com.opensource.i2pradio"
         minSdk = 24
         targetSdk = 34
-        versionCode = 10604
-        versionName = "1.6.4"
+        versionCode = 10605
+        versionName = "1.6.5"
     }
 
     // Load keystore properties
