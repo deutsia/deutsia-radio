@@ -167,6 +167,10 @@ Go to Settings and use the import option. Supported formats are CSV, JSON, M3U, 
 **Why is cleartext traffic enabled in the manifest?**
 I2P (`.i2p`) and Tor (`.onion`) sites use `http://` rather than `https://`. Cleartext traffic must be enabled for these domains to work.
 
+**Why doesn't SOCKS4 fully protect my privacy like SOCKS5 and others?**
+
+SOCKS4 does not support remote DNS resolution. When using Force Custom Proxy with a SOCKS4 proxy, DNS queries are resolved locally through your system/ISP DNS, which can leak the domains you're connecting to. SOCKS5 resolves DNS through the proxy itself, preventing these leaks. If DNS privacy matters to you, use SOCKS5, http, or https instead of SOCKS4 for your custom proxy. The app will show a warning when you select SOCKS4 as a reminder.
+
 **What data does this app collect?**
 None. All data (proxy passwords, stations, history, settings, favorites) is stored locally on your device. There is no cloud sync, no analytics, and no telemetry. You can optionally encrypt all local data with SQLCipher.
 
