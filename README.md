@@ -91,15 +91,16 @@ You can also use [Obtainium](https://github.com/ImranR98/Obtainium) to keep the 
 
 ### Verifying the release (optional)
 
-Releases are signed with [Sigstore](https://www.sigstore.dev/). To verify:
+Releases are signed with [Sigstore](https://www.sigstore.dev/). To verify, download both the `.apk` and `.apk.sigstore` files from the same release, then run from the directory containing the downloaded files:
 
 ```bash
 # Replace version number with the release you downloaded
+cd ~/Downloads
 cosign verify-blob \
-  --bundle deutsia-radio-v1.6.3.apk.sigstore \
-  --certificate-identity-regexp 'github.com/deutsia/.*' \
+  --bundle deutsia-radio-v1.6.5.apk.sigstore \
+  --certificate-identity siewargottlichschon@gmail.com \
   --certificate-oidc-issuer https://github.com/login/oauth \
-  deutsia-radio-v1.6.3.apk
+  deutsia-radio-v1.6.5.apk
 ```
 ---
 
