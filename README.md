@@ -159,7 +159,7 @@ All Force modes are fail-safe - if the proxy goes down, traffic is blocked, not 
 Yes. You can download anonymously via the I2P site:
 `http://deutsiampy3y6z2gceje5llbi4vakzj67wamyjdqlzv2tines25q.b32.i2p/`
 
-There is no clearnet or Tor mirror for the website. If you need to download over Tor, go to the [GitHub Releases](https://github.com/deutsia/deutsia-radio/releases) page using Tor Browser.
+There is no Tor mirror for the website. If you need to download over Tor, go to the [GitHub Releases](https://github.com/deutsia/deutsia-radio/releases) or [app website](https://app.deutsia.com) page using Tor Browser.
 
 **Do clearnet stations block Tor in Force Tor mode?**
 Sometimes, but rarely. The vast majority of clearnet stations do not block Tor.
