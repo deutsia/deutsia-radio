@@ -1544,7 +1544,7 @@ class RadioService : Service() {
                 ProxyType.CUSTOM -> {
                     android.util.Log.d("RadioService", "ROUTING: Traffic will go through CUSTOM $effectiveCustomProxyProtocol proxy")
                     if (effectiveProxyUsername.isNotEmpty()) {
-                        android.util.Log.d("RadioService", "CUSTOM PROXY: Using authentication (username: $effectiveProxyUsername, auth type: $effectiveProxyAuthType)")
+                        android.util.Log.d("RadioService", "CUSTOM PROXY: Using authentication (username: [REDACTED], auth type: $effectiveProxyAuthType)")
                     }
                 }
                 ProxyType.NONE -> android.util.Log.w("RadioService", "ROUTING: DIRECT CONNECTION - No proxy! (potential leak if unintended)")
@@ -1606,7 +1606,7 @@ class RadioService : Service() {
 
                     // Add proxy authentication if custom proxy with credentials
                     if (effectiveProxyType == ProxyType.CUSTOM && effectiveProxyUsername.isNotEmpty() && effectiveProxyPassword.isNotEmpty()) {
-                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy (user: $effectiveProxyUsername, auth type: $effectiveProxyAuthType)")
+                        android.util.Log.d("RadioService", "Adding proxy authentication for custom proxy (user: [REDACTED], auth type: $effectiveProxyAuthType)")
                         builder.proxyAuthenticator { route, response ->
                             android.util.Log.d("RadioService", "Proxy authentication challenge received (${response.code})")
 

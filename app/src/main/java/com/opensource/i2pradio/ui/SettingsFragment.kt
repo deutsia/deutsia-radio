@@ -2111,7 +2111,9 @@ class SettingsFragment : Fragment() {
     ): TestResult {
         android.util.Log.d("ProxyTest", "===== PROXY CONNECTION TEST START =====")
         android.util.Log.d("ProxyTest", "Proxy: $protocol://$host:$port")
-        android.util.Log.d("ProxyTest", "Auth: ${if (username.isNotEmpty()) "enabled (user: $username, type: $authType)" else "disabled"}")
+          //redact usernames in logs
+        android.util.Log.d("ProxyTest", "Auth: ${if (username.isNotEmpty()) "enabled (user: [REDACTED], type: $authType)" else "disabled"}")
+
 
         return try {
             // Create OkHttp client with proxy configuration
