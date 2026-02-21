@@ -14,7 +14,9 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 [ar](https://app.deutsia.com/ar/) | [de](https://app.deutsia.com/de/) | [es](https://app.deutsia.com/es/) | [fa](https://app.deutsia.com/fa/) | [fr](https://app.deutsia.com/fr/) | [hi](https://app.deutsia.com/hi/) | [it](https://app.deutsia.com/it/) | [ja](https://app.deutsia.com/ja/) | [ko](https://app.deutsia.com/ko/) | [my](https://app.deutsia.com/my/) | [pt](https://app.deutsia.com/pt/) | [ru](https://app.deutsia.com/ru/) | [tr](https://app.deutsia.com/tr/) | [uk](https://app.deutsia.com/uk/) | [vi](https://app.deutsia.com/vi/) | [zh](https://app.deutsia.com/zh/)
 
 [<img src="https://img.shields.io/badge/Get_it_on_GitHub-181717?style=for-the-badge&logo=github" alt="Get it on GitHub" height="55">](https://github.com/deutsia/deutsia-radio/releases/latest) &nbsp; [<img src="https://img.shields.io/badge/Get_it_on_Obtainium-181717?style=for-the-badge&labelColor=181717&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHZpZXdCb3g9Ii0wLjE5IDIwLjMyIDUxMi41OSA0NzEuMDkiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0zMC4zOTQgLTU0LjY4KSI+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iNzguMTIxIiB4Mj0iMTgzLjkwNSIgeTE9IjU4MC44ODIiIHkyPSI0NTguOTM3IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDIuODM0NiAwIDAgLTIuODM0NiAtNTEuMzI0IDE3NjUuMDY0KSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzliNThkYyIvPjxzdG9wIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzMyMWM5MiIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJiIiB4MT0iNzguMzkxIiB4Mj0iMTgzLjY0NiIgeTE9IjU4MC41NzEiIHkyPSI0NTkuMjM2IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDIuODM0NiAwIDAgLTIuODM0NiAtNTEuMzI0IDE3NjUuMDY0KSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3R5bGU9InN0b3AtY29sb3I6IzliNThkYyIvPjxzdG9wIG9mZnNldD0iMSIgc3R5bGU9InN0b3AtY29sb3I6IzMyMWM5MiIvPjwvbGluZWFyR3JhZGllbnQ+PHBhdGggZD0iTTM4MC4xIDU0Mi42Yy02LjUtMy40LTQ0LjMtMjQuNC0yMjEuNC0xMjIuNy00OS4zLTI3LjQtOTYuOC01My43LTEwNS41LTU4LjUtMTkuOC0xMC45LTIyLjgtMTMuNi0yMi44LTIwLjEgMC0zLjQgNy45LTI1LjQgMjYuNC03My41IDE0LjUtMzcuNyAyNy40LTcwLjggMjguNS03My41IDIuNy02LjEgNy0xMS4zIDExLjItMTMuNSAzLjktMiAxMDIuNC0zOCAxMDcuNS0zOS4yIDUuNC0xLjMgMTAuMSAxLjIgMTIuOSA3LjEgMS4zIDIuOCA2LjggMTcuMiAxMi4yIDMyLjFzMTMuNCAzNi44IDE3LjkgNDguOGMxMC4xIDI3LjUgMTAuNSAzMS40IDMuNSAzNS41LTEuOSAxLjEtMTQuMSA1LjktMjcuMSAxMC42cy0yNS40IDkuNi0yNy42IDEwLjljLTUgMi45LTUuNyA3LjQtMS44IDExIDEuNiAxLjQgMjYuNiAxNS43IDU1LjYgMzEuNyA4MS4yIDQ0LjggNzYuNyA0Mi43IDgyLjEgMzYuOSAyLjctMi45IDUxLjEtMTI2LjIgNTMuOS0xMzcuMiAxLjItNC43IDEuMS01LjMtMS41LTcuNC0zLjUtMi44LTMtMi45LTM0LjggOC4zLTMxLjYgMTEuMi0zNC42IDExLjQtMzguOCAzLjEtMi4yLTQuNC0zNi4yLTk3LjgtMzguMy0xMDUuMy0xLjQtNC45LjMtOS41IDQuNC0xMi4yIDEuNy0xLjEgMjYuNS0xMC42IDU1LTIxLjEgNDIuNC0xNS42IDUzLjEtMTkuMSA1OC43LTE5LjIgNy4xLS4xIDggLjQgMTM4LjQgNzIuNSA5IDUgMTMuOSAxMC4zIDEzLjkgMTUuMSAwIDEuOS0zMi4zIDg3LjctNzEuOCAxOTAuNS01NS43IDE0NS4xLTcyLjUgMTg3LjYtNzUgMTg5LjgtNC4zIDMuOS03LjcgMy43LTE1LjctLjV6IiBzdHlsZT0iZmlsbDp1cmwoI2EpO3N0cm9rZTp1cmwoI2IpO3N0cm9rZS13aWR0aDouMzk0O3N0cm9rZS1taXRlcmxpbWl0OjExLjMzODYiLz48L2c+PC9zdmc+" alt="Get it on Obtainium" height="44">](https://github.com/ImranR98/Obtainium)
+<br>
 
+[<img src="https://raw.githubusercontent.com/zapstore/zapstore/master/assets/images/badge.png" alt="Get it on Zapstore" height="55">](https://zapstore.dev/apps/naddr1qqtkxmmd9ehhqetwwdhh2unrv5hxjvnswfskg6t0qgsrrtsvcg6q8cwwhuea7cnyfelpfh5m9zncns8sza8a0pjylt6cazcrqsqqqlstmp6eny)
 ---
 
 </div>
@@ -91,7 +93,9 @@ Download the latest APK from the [Releases](https://github.com/deutsia/deutsia-r
 
 You can also use [Obtainium](https://github.com/ImranR98/Obtainium) to keep the app updated automatically.
 
-### Verifying the release (optional)
+> **Security note:** [Obtainium](https://github.com/ImranR98/Obtainium) with [App Verifier](https://github.com/soupslurpr/AppVerifier) is the most secure way to download and verify the app, as it pulls directly from GitHub releases with Sigstore verification. [Zapstore](https://zapstore.dev) offers a more convenient install experience with Nostr-based trust verification.
+
+### Verifying the release 
 
 Releases are signed with [Sigstore](https://www.sigstore.dev/). To verify, download both the `.apk` and `.apk.sigstore` files from the same release, then run from the directory containing the downloaded files:
 
@@ -103,6 +107,12 @@ cosign verify-blob \
   --certificate-identity siewargottlichschon@gmail.com \
   --certificate-oidc-issuer https://github.com/login/oauth \
   deutsia-radio-v1.6.5.apk
+```
+### Verifying from Zapstore
+
+If you downloaded from Zapstore, you can verify the release was published by the correct developer. The app's Nostr public key is:
+```
+npub1xxhqes35q0sua0enma3xgnn7zn0fk29838q0q96067ryf7h4369sq0f29n
 ```
 ---
 
