@@ -614,6 +614,7 @@
     <string name="recording_error_connection_refused">Connection refused</string>
     <string name="recording_error_io">I/O error: %s</string>
     <string name="recording_error_generic">Error: %s</string>
+    <string name="recording_error_hls_playlist">Unable to fetch HLS playlist</string>
 
     <!-- Custom Proxy Messages -->
     <string name="custom_proxy_not_configured_notification">Custom proxy not configured</string>
