@@ -95,7 +95,7 @@ Download the latest APK from the [Releases](https://github.com/deutsia/deutsia-r
 
 You can also use [Obtainium](https://github.com/ImranR98/Obtainium) to keep the app updated automatically.
 
-> **Security note:** [Obtainium](https://github.com/ImranR98/Obtainium) with [App Verifier](https://github.com/soupslurpr/AppVerifier) is the most secure way to download and verify the app, as it pulls directly from GitHub releases with Sigstore verification. [Zapstore](https://zapstore.dev) offers a more convenient install experience with Nostr-based trust verification.
+> **Security note:** [Obtainium](https://github.com/ImranR98/Obtainium) with [App Verifier](https://github.com/soupslurpr/AppVerifier) is the most secure way to download and verify the app, as it pulls directly from GitHub releases with Sigstore verification.
 
 ### Verifying the release 
 
@@ -190,7 +190,7 @@ SOCKS4 does not support remote DNS resolution. When using Force Custom Proxy wit
 None. All data (proxy passwords, stations, history, settings, favorites) is stored locally on your device. There is no cloud sync, no analytics, and no telemetry. You can optionally encrypt all local data with SQLCipher.
 
 **Does cover art load through my proxy?**
-Yes. When a Force mode is enabled, station artwork is routed through the same proxy pipeline as streams, with full DNS leak prevention. If the proxy disconnects, image loading is blocked rather than falling back to a direct connection.
+Yes - when a Force mode is enabled (and only then); station artwork is routed through the same proxy pipeline as streams, with full DNS leak prevention. If the proxy disconnects, image loading is blocked rather than falling back to a direct connection.
 
 **Can I use a different proxy instead of InviZible Pro?**
 Yes. Any SOCKS5 proxy that routes through Tor will work. You can also configure a custom proxy (SOCKS4, SOCKS5, HTTP, or HTTPS) with optional authentication in the app's proxy settings.
