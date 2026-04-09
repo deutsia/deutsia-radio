@@ -361,12 +361,15 @@ class HlsRecorder(
         }
 
         fun mimeTypeForExtension(extension: String): String {
+            // MediaStore's Audio collection rejects anything that doesn't start
+            // with "audio/", so use audio/mp2t for TS (non-standard but
+            // prefix-compliant) instead of the conventional video/mp2t.
             return when (extension.lowercase()) {
-                "ts" -> "video/mp2t"
+                "ts" -> "audio/mp2t"
                 "aac" -> "audio/aac"
                 "mp3" -> "audio/mpeg"
                 "m4s", "mp4", "m4a" -> "audio/mp4"
-                else -> "video/mp2t"
+                else -> "audio/mp2t"
             }
         }
     }
