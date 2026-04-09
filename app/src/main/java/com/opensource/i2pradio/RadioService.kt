@@ -707,15 +707,30 @@ class RadioService : Service() {
                         return@Thread
                     }
                 } else if (finalUseMediaStore) {
+                    // HLS recordings (MPEG-TS containers) can't be inserted into
+                    // MediaStore.Audio because MediaProvider's audio MIME
+                    // allowlist doesn't include mp2t. Route HLS recordings
+                    // through MediaStore.Downloads instead, which accepts any
+                    // MIME type. Progressive audio still goes to Music/.
+                    val collectionUri = if (finalIsHls) {
+                        MediaStore.Downloads.EXTERNAL_CONTENT_URI
+                    } else {
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                    }
+                    val relativePath = if (finalIsHls) {
+                        "Download/deutsia_radio"
+                    } else {
+                        "Music/deutsia radio"
+                    }
                     val contentValues = ContentValues().apply {
-                        put(MediaStore.Audio.Media.DISPLAY_NAME, finalFileName)
-                        put(MediaStore.Audio.Media.MIME_TYPE, finalMimeType)
-                        put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/deutsia radio")
-                        put(MediaStore.Audio.Media.IS_PENDING, 1)
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, finalFileName)
+                        put(MediaStore.MediaColumns.MIME_TYPE, finalMimeType)
+                        put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
+                        put(MediaStore.MediaColumns.IS_PENDING, 1)
                     }
 
                     val resolver = contentResolver
-                    mediaStoreUri = resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
+                    mediaStoreUri = resolver.insert(collectionUri, contentValues)
 
                     if (mediaStoreUri == null) {
                         android.util.Log.e("RadioService", "Failed to create MediaStore entry")
@@ -727,7 +742,7 @@ class RadioService : Service() {
                     }
 
                     recordingMediaStoreUri = mediaStoreUri
-                    filePath = "Music/deutsia_radio/$finalFileName"
+                    filePath = "$relativePath/$finalFileName"
                     android.util.Log.d("RadioService", "Recording stream connected, writing to MediaStore: $filePath (URI: $mediaStoreUri)")
 
                     val rawOutputStream = resolver.openOutputStream(mediaStoreUri)
