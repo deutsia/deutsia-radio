@@ -32,6 +32,8 @@ import androidx.media3.common.Player
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.metadata.icy.IcyInfo
 import coil.request.ImageRequest
@@ -1183,6 +1185,15 @@ class RadioService : Service() {
         }
     }
 
+    private fun isHlsStream(streamUrl: String): Boolean {
+        val path = try {
+            Uri.parse(streamUrl).path?.lowercase() ?: ""
+        } catch (e: Exception) {
+            streamUrl.substringBefore('?').lowercase()
+        }
+        return path.endsWith(".m3u8") || path.contains(".m3u8")
+    }
+
     private fun switchRecordingStream(
         newStreamUrl: String,
         newProxyHost: String,
@@ -1680,8 +1691,13 @@ class RadioService : Service() {
                 .setAudioAttributes(audioAttributes, true)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
-                val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(streamUrl))
+                val mediaSource: MediaSource = if (isHlsStream(streamUrl)) {
+                    HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(MediaItem.fromUri(streamUrl))
+                } else {
+                    ProgressiveMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(MediaItem.fromUri(streamUrl))
+                }
 
                 setMediaSource(mediaSource)
                 prepare()
