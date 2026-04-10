@@ -325,21 +325,20 @@
 
     </LinearLayout>
 
-    <!-- Recording Indicator - positioned on toolbar row, left of add to library button -->
+    <!-- Recording Indicator - vertically centered with toolbar buttons, anchored to always-visible likeButton -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordingIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:visibility="gone"
         app:cardBackgroundColor="?attr/colorErrorContainer"
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
         app:strokeWidth="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/addToLibraryButton"
-        app:layout_constraintBottom_toBottomOf="@id/addToLibraryButton">
+        app:layout_constraintTop_toTopOf="@id/likeButton"
+        app:layout_constraintEnd_toStartOf="@id/likeButton"
+        app:layout_constraintBottom_toBottomOf="@id/likeButton">
 
         <LinearLayout
             android:layout_width="wrap_content"

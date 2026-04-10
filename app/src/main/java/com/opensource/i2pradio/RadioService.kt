@@ -32,6 +32,7 @@ import androidx.media3.common.Player
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
@@ -520,21 +521,28 @@ class RadioService : Service() {
         currentStationName = stationName
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val isHls = isHlsStream(streamUrl)
-        val format = if (isHls) "ts" else detectStreamFormat(streamUrl)
+        val isDash = isDashStream(streamUrl)
+        val format = when {
+            isHls -> "ts"
+            isDash -> "m4a"
+            else -> detectStreamFormat(streamUrl)
+        }
         val sanitizedName = stationName.replace(Regex("[^a-zA-Z0-9\\s]"), "").replace(Regex("\\s+"), "_")
         val fileName = "${sanitizedName}_$timestamp.$format"
 
-        android.util.Log.d("RadioService", "Starting recording for: $stationName, URL: $streamUrl (HLS=$isHls)")
+        android.util.Log.d("RadioService", "Starting recording for: $stationName, URL: $streamUrl (HLS=$isHls, DASH=$isDash)")
 
-        val mimeType = if (isHls) {
-            HlsRecorder.mimeTypeForExtension(format)
-        } else when (format) {
-            "ogg" -> "audio/ogg"
-            "opus" -> "audio/opus"
-            "aac" -> "audio/aac"
-            "flac" -> "audio/flac"
-            "m4a" -> "audio/mp4"
-            else -> "audio/mpeg"
+        val mimeType = when {
+            isHls -> HlsRecorder.mimeTypeForExtension(format)
+            isDash -> DashRecorder.mimeTypeForExtension()
+            else -> when (format) {
+                "ogg" -> "audio/ogg"
+                "opus" -> "audio/opus"
+                "aac" -> "audio/aac"
+                "flac" -> "audio/flac"
+                "m4a" -> "audio/mp4"
+                else -> "audio/mpeg"
+            }
         }
 
         val customDirUri = PreferencesHelper.getRecordingDirectoryUri(this)
@@ -562,7 +570,7 @@ class RadioService : Service() {
         isRecordingActive.set(true)
         isRecording = true
 
-        val initialCall: Call? = if (!isHls) {
+        val initialCall: Call? = if (!isHls && !isDash) {
             val recordingClient = buildRecordingHttpClient()
             val request = Request.Builder()
                 .url(streamUrl)
@@ -586,6 +594,7 @@ class RadioService : Service() {
         val finalCustomDirUri = customDirUri
         val finalFormat = format
         val finalIsHls = isHls
+        val finalIsDash = isDash
 
         recordingThread = Thread({
             var response: Response? = null
@@ -601,10 +610,14 @@ class RadioService : Service() {
             var connectionRetries = 0
             val maxConnectionRetries = 3
 
-            try {
-                android.util.Log.d("RadioService", "Recording thread started, connecting to: $finalStreamUrl (HLS=$finalIsHls)")
+            // These may be updated for HLS streams after format detection
+            var actualFileName = finalFileName
+            var actualMimeType = finalMimeType
 
-                if (!finalIsHls) {
+            try {
+                android.util.Log.d("RadioService", "Recording thread started, connecting to: $finalStreamUrl (HLS=$finalIsHls, DASH=$finalIsDash)")
+
+                if (!finalIsHls && !finalIsDash) {
                     val call = initialCall!!
                     while (connectionRetries < maxConnectionRetries && isRecordingActive.get()) {
                         try {
@@ -661,6 +674,54 @@ class RadioService : Service() {
                     }
                 }
 
+                // Pre-detect fMP4/CMAF format for HLS streams before creating output file
+                if (finalIsHls && isRecordingActive.get()) {
+                    try {
+                        val detectClient = buildRecordingHttpClient()
+                        val detectRequest = Request.Builder()
+                            .url(finalStreamUrl)
+                            .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+                            .build()
+                        val detectCall = detectClient.newCall(detectRequest)
+                        val playlistText = detectCall.execute().use { r ->
+                            if (r.isSuccessful) r.body?.string() else null
+                        }
+                        if (playlistText != null) {
+                            var parsed = HlsRecorder.parsePlaylist(playlistText)
+                            // If master playlist, fetch the best variant's media playlist
+                            if (parsed.isMaster) {
+                                val variant = parsed.variants.maxByOrNull { it.bandwidth }
+                                if (variant != null) {
+                                    val mediaUrl = HlsRecorder.resolveUrl(finalStreamUrl, variant.uri)
+                                    val mediaRequest = Request.Builder()
+                                        .url(mediaUrl)
+                                        .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+                                        .build()
+                                    val mediaText = detectClient.newCall(mediaRequest).execute().use { r ->
+                                        if (r.isSuccessful) r.body?.string() else null
+                                    }
+                                    if (mediaText != null) {
+                                        parsed = HlsRecorder.parsePlaylist(mediaText)
+                                    }
+                                }
+                            }
+                            // Detect fMP4/CMAF by init segment or segment extension
+                            val isFmp4 = parsed.initSegmentUri != null ||
+                                parsed.segments.firstOrNull()?.let { seg ->
+                                    val ext = HlsRecorder.detectSegmentExtension(seg)
+                                    ext == "m4s" || ext == "mp4" || ext == "m4a"
+                                } == true
+                            if (isFmp4) {
+                                actualFileName = finalFileName.replace(".ts", ".m4a")
+                                actualMimeType = "audio/mp4"
+                                android.util.Log.d("RadioService", "HLS stream uses fMP4/CMAF, recording as: $actualFileName")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.w("RadioService", "HLS format detection failed, defaulting to .ts: ${e.message}")
+                    }
+                }
+
                 if (finalUseCustomDir && finalCustomDirUri != null) {
                     try {
                         val treeUri = Uri.parse(finalCustomDirUri)
@@ -674,7 +735,7 @@ class RadioService : Service() {
                             return@Thread
                         }
 
-                        val newFile = docFile.createFile(finalMimeType, finalFileName.substringBeforeLast("."))
+                        val newFile = docFile.createFile(actualMimeType, actualFileName.substringBeforeLast("."))
                         if (newFile == null) {
                             android.util.Log.e("RadioService", "Failed to create file in custom directory")
                             handler.post {
@@ -684,7 +745,7 @@ class RadioService : Service() {
                             return@Thread
                         }
 
-                        filePath = newFile.name ?: finalFileName
+                        filePath = newFile.name ?: actualFileName
                         android.util.Log.d("RadioService", "Recording stream connected, writing to custom dir: $filePath")
 
                         val rawOutputStream = contentResolver.openOutputStream(newFile.uri)
@@ -710,22 +771,23 @@ class RadioService : Service() {
                 } else if (finalUseMediaStore) {
                     // HLS recordings (MPEG-TS containers) can't be inserted into
                     // MediaStore.Audio because MediaProvider's audio MIME
-                    // allowlist doesn't include mp2t. Route HLS recordings
+                    // allowlist doesn't include mp2t. Route HLS/DASH recordings
                     // through MediaStore.Downloads instead, which accepts any
                     // MIME type. Progressive audio still goes to Music/.
-                    val collectionUri = if (finalIsHls) {
+                    val useDownloadsStore = finalIsHls || finalIsDash
+                    val collectionUri = if (useDownloadsStore) {
                         MediaStore.Downloads.EXTERNAL_CONTENT_URI
                     } else {
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
                     }
-                    val relativePath = if (finalIsHls) {
+                    val relativePath = if (useDownloadsStore) {
                         "Download/deutsia_radio"
                     } else {
                         "Music/deutsia radio"
                     }
                     val contentValues = ContentValues().apply {
-                        put(MediaStore.MediaColumns.DISPLAY_NAME, finalFileName)
-                        put(MediaStore.MediaColumns.MIME_TYPE, finalMimeType)
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, actualFileName)
+                        put(MediaStore.MediaColumns.MIME_TYPE, actualMimeType)
                         put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
                         put(MediaStore.MediaColumns.IS_PENDING, 1)
                     }
@@ -743,7 +805,7 @@ class RadioService : Service() {
                     }
 
                     recordingMediaStoreUri = mediaStoreUri
-                    filePath = "$relativePath/$finalFileName"
+                    filePath = "$relativePath/$actualFileName"
                     android.util.Log.d("RadioService", "Recording stream connected, writing to MediaStore: $filePath (URI: $mediaStoreUri)")
 
                     val rawOutputStream = resolver.openOutputStream(mediaStoreUri)
@@ -759,7 +821,7 @@ class RadioService : Service() {
 
                     outputStream = BufferedOutputStream(rawOutputStream, 64 * 1024)
                 } else {
-                    file = File(finalRecordingsDir!!, finalFileName)
+                    file = File(finalRecordingsDir!!, actualFileName)
                     recordingFile = file
                     filePath = file!!.absolutePath
                     android.util.Log.d("RadioService", "Recording stream connected, writing to: $filePath")
@@ -796,6 +858,34 @@ class RadioService : Service() {
                     }
                     totalBytesWritten = result.bytesWritten
                     android.util.Log.d("RadioService", "HLS recording finished: ${totalBytesWritten / 1024}KB (ext=${result.segmentExtension}, normal=${result.completedNormally})")
+                    if (!result.completedNormally && result.bytesWritten == 0L && isRecordingActive.get()) {
+                        handler.post {
+                            broadcastRecordingError(getString(R.string.recording_error_hls_playlist))
+                        }
+                    }
+                } else if (finalIsDash) {
+                    val dashOutput = outputStream!!
+                    val dashRecorder = DashRecorder(
+                        httpClientProvider = { buildRecordingHttpClient() },
+                        isActive = isRecordingActive,
+                        switchRequested = switchStreamRequested,
+                        newStreamUrlProvider = {
+                            val url = pendingRecordingStreamUrl
+                            pendingRecordingStreamUrl = null
+                            url
+                        },
+                        activeCallSetter = { c -> recordingCall = c },
+                    )
+                    val result = dashRecorder.record(finalStreamUrl, dashOutput) { bytes ->
+                        totalBytesWritten = bytes
+                        val now = System.currentTimeMillis()
+                        if (now - lastLogTime >= logInterval) {
+                            android.util.Log.d("RadioService", "Recording: ${totalBytesWritten / 1024}KB written to ${filePath ?: file?.name ?: "unknown"} (DASH)")
+                            lastLogTime = now
+                        }
+                    }
+                    totalBytesWritten = result.bytesWritten
+                    android.util.Log.d("RadioService", "DASH recording finished: ${totalBytesWritten / 1024}KB (ext=${result.segmentExtension}, normal=${result.completedNormally})")
                     if (!result.completedNormally && result.bytesWritten == 0L && isRecordingActive.get()) {
                         handler.post {
                             broadcastRecordingError(getString(R.string.recording_error_hls_playlist))
@@ -1248,6 +1338,15 @@ class RadioService : Service() {
             streamUrl.substringBefore('?').lowercase()
         }
         return path.endsWith(".m3u8") || path.contains(".m3u8")
+    }
+
+    private fun isDashStream(streamUrl: String): Boolean {
+        val path = try {
+            Uri.parse(streamUrl).path?.lowercase() ?: ""
+        } catch (e: Exception) {
+            streamUrl.substringBefore('?').lowercase()
+        }
+        return path.endsWith(".mpd") || path.contains(".mpd")
     }
 
     private fun switchRecordingStream(
@@ -1747,12 +1846,19 @@ class RadioService : Service() {
                 .setAudioAttributes(audioAttributes, true)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
-                val mediaSource: MediaSource = if (isHlsStream(streamUrl)) {
-                    HlsMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(MediaItem.fromUri(streamUrl))
-                } else {
-                    ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(MediaItem.fromUri(streamUrl))
+                val mediaSource: MediaSource = when {
+                    isHlsStream(streamUrl) -> {
+                        HlsMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(MediaItem.fromUri(streamUrl))
+                    }
+                    isDashStream(streamUrl) -> {
+                        DashMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(MediaItem.fromUri(streamUrl))
+                    }
+                    else -> {
+                        ProgressiveMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(MediaItem.fromUri(streamUrl))
+                    }
                 }
 
                 setMediaSource(mediaSource)

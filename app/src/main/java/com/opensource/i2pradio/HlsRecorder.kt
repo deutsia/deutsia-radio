@@ -39,6 +39,7 @@ class HlsRecorder(
         val targetDurationSec: Double,
         val mediaSequence: Long,
         val hasEndList: Boolean,
+        val initSegmentUri: String? = null,
     )
 
     data class RecordResult(
@@ -65,6 +66,7 @@ class HlsRecorder(
         val flushInterval = 64 * 1024L
         var consecutivePlaylistFailures = 0
         val maxConsecutivePlaylistFailures = 5
+        var initSegmentWritten = false
 
         try {
             while (isActive.get() && !Thread.currentThread().isInterrupted) {
@@ -76,6 +78,7 @@ class HlsRecorder(
                         client = httpClientProvider()
                         downloadedSegmentKeys.clear()
                         consecutivePlaylistFailures = 0
+                        initSegmentWritten = false
                     }
                 }
 
@@ -112,6 +115,22 @@ class HlsRecorder(
                 } else {
                     mediaPlaylistUrl = currentUrl
                     mediaPlaylist = parsed
+                }
+
+                // Download fMP4/CMAF init segment if present (#EXT-X-MAP)
+                if (mediaPlaylist.initSegmentUri != null && !initSegmentWritten) {
+                    val initUrl = resolveUrl(mediaPlaylistUrl, mediaPlaylist.initSegmentUri)
+                    try {
+                        val initBuffer = ByteArrayOutputStream()
+                        val initBytes = downloadSegment(client, initUrl, initBuffer)
+                        initBuffer.writeTo(outputStream)
+                        totalBytesWritten += initBytes
+                        initSegmentWritten = true
+                        android.util.Log.d(TAG, "Downloaded fMP4/CMAF init segment: $initBytes bytes")
+                        onProgress(totalBytesWritten)
+                    } catch (e: IOException) {
+                        android.util.Log.w(TAG, "Init segment download failed: ${e.message}")
+                    }
                 }
 
                 var segmentIndex = mediaPlaylist.mediaSequence
@@ -287,6 +306,7 @@ class HlsRecorder(
             var mediaSequence = 0L
             var hasEndList = false
             var pendingBandwidth: Long? = null
+            var initSegmentUri: String? = null
 
             for (raw in lines) {
                 val line = raw.trim()
@@ -305,6 +325,11 @@ class HlsRecorder(
                     }
                     line.startsWith("#EXT-X-ENDLIST") -> {
                         hasEndList = true
+                    }
+                    line.startsWith("#EXT-X-MAP:") -> {
+                        // fMP4/CMAF init segment - extract URI from #EXT-X-MAP:URI="..."
+                        val uriMatch = Regex("""URI="([^"]+)"""").find(line)
+                        initSegmentUri = uriMatch?.groupValues?.get(1)
                     }
                     line.startsWith("#") -> {
                         // Other tags - ignored
@@ -327,6 +352,7 @@ class HlsRecorder(
                 targetDurationSec = targetDuration,
                 mediaSequence = mediaSequence,
                 hasEndList = hasEndList,
+                initSegmentUri = initSegmentUri,
             )
         }
 
