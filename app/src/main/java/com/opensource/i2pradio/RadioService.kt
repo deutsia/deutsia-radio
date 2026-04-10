@@ -610,6 +610,10 @@ class RadioService : Service() {
             var connectionRetries = 0
             val maxConnectionRetries = 3
 
+            // These may be updated for HLS streams after format detection
+            var actualFileName = finalFileName
+            var actualMimeType = finalMimeType
+
             try {
                 android.util.Log.d("RadioService", "Recording thread started, connecting to: $finalStreamUrl (HLS=$finalIsHls, DASH=$finalIsDash)")
 
@@ -670,6 +674,54 @@ class RadioService : Service() {
                     }
                 }
 
+                // Pre-detect fMP4/CMAF format for HLS streams before creating output file
+                if (finalIsHls && isRecordingActive.get()) {
+                    try {
+                        val detectClient = buildRecordingHttpClient()
+                        val detectRequest = Request.Builder()
+                            .url(finalStreamUrl)
+                            .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+                            .build()
+                        val detectCall = detectClient.newCall(detectRequest)
+                        val playlistText = detectCall.execute().use { r ->
+                            if (r.isSuccessful) r.body?.string() else null
+                        }
+                        if (playlistText != null) {
+                            var parsed = HlsRecorder.parsePlaylist(playlistText)
+                            // If master playlist, fetch the best variant's media playlist
+                            if (parsed.isMaster) {
+                                val variant = parsed.variants.maxByOrNull { it.bandwidth }
+                                if (variant != null) {
+                                    val mediaUrl = HlsRecorder.resolveUrl(finalStreamUrl, variant.uri)
+                                    val mediaRequest = Request.Builder()
+                                        .url(mediaUrl)
+                                        .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+                                        .build()
+                                    val mediaText = detectClient.newCall(mediaRequest).execute().use { r ->
+                                        if (r.isSuccessful) r.body?.string() else null
+                                    }
+                                    if (mediaText != null) {
+                                        parsed = HlsRecorder.parsePlaylist(mediaText)
+                                    }
+                                }
+                            }
+                            // Detect fMP4/CMAF by init segment or segment extension
+                            val isFmp4 = parsed.initSegmentUri != null ||
+                                parsed.segments.firstOrNull()?.let { seg ->
+                                    val ext = HlsRecorder.detectSegmentExtension(seg)
+                                    ext == "m4s" || ext == "mp4" || ext == "m4a"
+                                } == true
+                            if (isFmp4) {
+                                actualFileName = finalFileName.replace(".ts", ".m4a")
+                                actualMimeType = "audio/mp4"
+                                android.util.Log.d("RadioService", "HLS stream uses fMP4/CMAF, recording as: $actualFileName")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.w("RadioService", "HLS format detection failed, defaulting to .ts: ${e.message}")
+                    }
+                }
+
                 if (finalUseCustomDir && finalCustomDirUri != null) {
                     try {
                         val treeUri = Uri.parse(finalCustomDirUri)
@@ -683,7 +735,7 @@ class RadioService : Service() {
                             return@Thread
                         }
 
-                        val newFile = docFile.createFile(finalMimeType, finalFileName.substringBeforeLast("."))
+                        val newFile = docFile.createFile(actualMimeType, actualFileName.substringBeforeLast("."))
                         if (newFile == null) {
                             android.util.Log.e("RadioService", "Failed to create file in custom directory")
                             handler.post {
@@ -693,7 +745,7 @@ class RadioService : Service() {
                             return@Thread
                         }
 
-                        filePath = newFile.name ?: finalFileName
+                        filePath = newFile.name ?: actualFileName
                         android.util.Log.d("RadioService", "Recording stream connected, writing to custom dir: $filePath")
 
                         val rawOutputStream = contentResolver.openOutputStream(newFile.uri)
@@ -734,8 +786,8 @@ class RadioService : Service() {
                         "Music/deutsia radio"
                     }
                     val contentValues = ContentValues().apply {
-                        put(MediaStore.MediaColumns.DISPLAY_NAME, finalFileName)
-                        put(MediaStore.MediaColumns.MIME_TYPE, finalMimeType)
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, actualFileName)
+                        put(MediaStore.MediaColumns.MIME_TYPE, actualMimeType)
                         put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
                         put(MediaStore.MediaColumns.IS_PENDING, 1)
                     }
@@ -753,7 +805,7 @@ class RadioService : Service() {
                     }
 
                     recordingMediaStoreUri = mediaStoreUri
-                    filePath = "$relativePath/$finalFileName"
+                    filePath = "$relativePath/$actualFileName"
                     android.util.Log.d("RadioService", "Recording stream connected, writing to MediaStore: $filePath (URI: $mediaStoreUri)")
 
                     val rawOutputStream = resolver.openOutputStream(mediaStoreUri)
@@ -769,7 +821,7 @@ class RadioService : Service() {
 
                     outputStream = BufferedOutputStream(rawOutputStream, 64 * 1024)
                 } else {
-                    file = File(finalRecordingsDir!!, finalFileName)
+                    file = File(finalRecordingsDir!!, actualFileName)
                     recordingFile = file
                     filePath = file!!.absolutePath
                     android.util.Log.d("RadioService", "Recording stream connected, writing to: $filePath")
