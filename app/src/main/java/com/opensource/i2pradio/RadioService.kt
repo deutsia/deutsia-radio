@@ -314,7 +314,7 @@ class RadioService : Service() {
         mediaSession?.setPlaybackState(playbackStateBuilder.build())
     }
 
-    private fun updateMediaMetadata(stationName: String, coverArtUri: String?) {
+    private fun updateMediaMetadata(stationName: String, coverArtUri: String?, isPrivacyStation: Boolean = false) {
         val metadataBuilder = MediaMetadataCompat.Builder()
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
             .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, stationName)
@@ -329,7 +329,7 @@ class RadioService : Service() {
                         .allowHardware(false)
                         .build()
 
-                    val result = SecureImageLoader.execute(this@RadioService, request)
+                    val result = SecureImageLoader.execute(this@RadioService, request, isPrivacyStation)
                     if (result is SuccessResult) {
                         val bitmap = (result.drawable as? BitmapDrawable)?.bitmap
                         if (bitmap != null) {
@@ -424,7 +424,7 @@ class RadioService : Service() {
                 startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connecting)))
                 broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
                 activateMediaSession()
-                updateMediaMetadata(stationName, coverArtUri)
+                updateMediaMetadata(stationName, coverArtUri, proxyType == ProxyType.TOR || proxyType == ProxyType.I2P)
                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
 
                 playStream(streamUrl, proxyHost, proxyPort, proxyType, customProxyProtocol, proxyUsername, proxyPassword, proxyAuthType, proxyConnectionTimeout)
@@ -2119,7 +2119,7 @@ class RadioService : Service() {
         android.util.Log.d("RadioService", "Broadcast cover art changed: $coverArtUri")
 
         // Also update the media session with new cover art
-        updateMediaMetadata(currentStationName, coverArtUri)
+        updateMediaMetadata(currentStationName, coverArtUri, currentProxyType == ProxyType.TOR || currentProxyType == ProxyType.I2P)
     }
 
     /**
