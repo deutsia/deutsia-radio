@@ -4,6 +4,7 @@ import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.BufferedOutputStream
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.URI
 import java.util.concurrent.atomic.AtomicBoolean
@@ -131,9 +132,12 @@ class HlsRecorder(
 
                     val segmentUrl = resolveUrl(mediaPlaylistUrl, segmentUri)
                     try {
-                        val bytes = downloadSegment(client, segmentUrl, outputStream)
+                        val segmentBuffer = ByteArrayOutputStream()
+                        val bytes = downloadSegment(client, segmentUrl, segmentBuffer)
+                        segmentBuffer.writeTo(outputStream)
                         totalBytesWritten += bytes
                         newSegmentsDownloaded++
+                        downloadedSegmentKeys.add(key)
                         onProgress(totalBytesWritten)
 
                         if (totalBytesWritten - lastFlushBytes >= flushInterval) {
@@ -149,8 +153,6 @@ class HlsRecorder(
                             android.util.Log.w(TAG, "Segment download failed: ${e.message}")
                         }
                     }
-
-                    downloadedSegmentKeys.add(key)
                     if (downloadedSegmentKeys.size > MAX_DEDUP_CACHE_SIZE) {
                         val iter = downloadedSegmentKeys.iterator()
                         val toRemove = downloadedSegmentKeys.size - MAX_DEDUP_CACHE_SIZE
@@ -226,7 +228,7 @@ class HlsRecorder(
     private fun downloadSegment(
         client: OkHttpClient,
         url: String,
-        outputStream: BufferedOutputStream,
+        outputStream: java.io.OutputStream,
     ): Long {
         val request = Request.Builder()
             .url(url)
