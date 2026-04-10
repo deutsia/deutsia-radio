@@ -394,13 +394,49 @@ object TorManager {
         // Check if any InviZible variant is installed
         val installedPackage = getInstalledInviZiblePackage(context)
         if (installedPackage == null) {
-            Log.w(TAG, "No InviZible app is installed")
-            // CRITICAL: Clear port state when transitioning to INVIZIBLE_NOT_INSTALLED
-            _socksPort = -1
-            _httpPort = -1
-            _errorMessage = "InviZible is not installed. Please install InviZible Pro or Lite to use Tor."
-            notifyStateChange(TorState.INVIZIBLE_NOT_INSTALLED)
-            onComplete?.invoke(false)
+            Log.w(TAG, "No InviZible app is installed, checking for external Tor proxy...")
+            // No InviZible installed, but a proxy might be running from another source (Orbot, etc.)
+            // Check port 9050 before giving up
+            _errorMessage = null
+
+            socketCheckThread?.let { thread ->
+                if (thread.isAlive) thread.interrupt()
+            }
+            socketCheckThread = Thread {
+                if (isShuttingDown) return@Thread
+                try {
+                    val socket = java.net.Socket()
+                    socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_TOR_SOCKS_PORT), 2000)
+                    socket.close()
+                    if (isShuttingDown) return@Thread
+
+                    _socksPort = DEFAULT_TOR_SOCKS_PORT
+                    _httpPort = DEFAULT_TOR_HTTP_PORT
+                    _socksHost = "127.0.0.1"
+
+                    Handler(Looper.getMainLooper()).post {
+                        if (!isShuttingDown) {
+                            Log.d(TAG, "External Tor proxy found at 127.0.0.1:$DEFAULT_TOR_SOCKS_PORT")
+                            notifyStateChange(TorState.CONNECTED)
+                            onComplete?.invoke(true)
+                        }
+                    }
+                } catch (e: InterruptedException) {
+                    onComplete?.invoke(false)
+                } catch (e: Exception) {
+                    if (isShuttingDown) return@Thread
+                    Handler(Looper.getMainLooper()).post {
+                        if (!isShuttingDown) {
+                            _socksPort = -1
+                            _httpPort = -1
+                            _errorMessage = "InviZible is not installed. Please install InviZible Pro or Lite to use Tor."
+                            notifyStateChange(TorState.INVIZIBLE_NOT_INSTALLED)
+                            onComplete?.invoke(false)
+                        }
+                    }
+                }
+            }
+            socketCheckThread?.start()
             return
         }
 

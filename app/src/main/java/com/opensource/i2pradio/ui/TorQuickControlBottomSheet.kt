@@ -81,6 +81,9 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
 
         // Update UI with current state
         updateUI(TorManager.state)
+
+        // Trigger a fresh proxy check for instant detection of external Tor proxies
+        context?.let { TorManager.requestTorStatus(it) }
     }
 
     override fun onResume() {
