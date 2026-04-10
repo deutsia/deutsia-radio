@@ -322,6 +322,7 @@ class RadioService : Service() {
             .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "deutsia radio")
 
         if (!coverArtUri.isNullOrEmpty()) {
+            mediaSession?.setMetadata(metadataBuilder.build())
             serviceScope.launch(Dispatchers.IO) {
                 try {
                     val request = ImageRequest.Builder(this@RadioService)
