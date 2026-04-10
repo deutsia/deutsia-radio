@@ -303,9 +303,7 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = getString(R.string.tor_control_button_install_lite)
-        secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = true
+        secondaryActionButton.visibility = View.GONE
     }
 
     /**
@@ -377,10 +375,6 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
                 PreferencesHelper.setEmbeddedTorEnabled(requireContext(), false)
                 TorService.stop(requireContext())
             }
-            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
-                // Install InviZible Lite
-                openInviZibleInStore(lite = true)
-            }
             else -> {
                 // Open installed InviZible app
                 openInviZibleApp()
@@ -406,8 +400,8 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun openInviZibleInStore(lite: Boolean = false) {
-        TorManager.openInviZibleInstallPage(requireContext(), lite)
+    private fun openInviZibleInStore() {
+        TorManager.openInviZibleInstallPage(requireContext())
     }
 
     companion object {
