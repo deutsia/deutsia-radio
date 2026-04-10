@@ -110,15 +110,14 @@ object SecureImageLoader {
         return loader
     }
 
-    /**
-     * Execute an image request with proxy-aware loading.
-     * Automatically determines if proxy should be used based on URI scheme.
-     */
-    suspend fun execute(context: Context, request: ImageRequest): ImageResult {
-        val loader = getImageLoader(context)
+    // add cover art disabled check and privacy loader selection to execute()
+    suspend fun execute(context: Context, request: ImageRequest, isPrivacyStation: Boolean = false): ImageResult {
+        if (isCoverArtDisabled(context) && isRemoteUrl(request.data?.toString())) {
+            return coil.request.ErrorResult(null, request, Throwable("Cover art disabled"))
+        }
+        val loader = if (isPrivacyStation) getPrivacyImageLoader(context) else getImageLoader(context)
         return loader.execute(request)
     }
-
     /**
      * Check if a URI should be loaded through proxy.
      * Local content (file://, content://) should bypass proxy.
