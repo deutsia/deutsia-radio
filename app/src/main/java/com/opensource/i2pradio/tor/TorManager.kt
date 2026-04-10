@@ -31,10 +31,18 @@ import java.util.concurrent.CopyOnWriteArrayList
 object TorManager {
     private const val TAG = "TorManager"
 
-    // InviZible Pro package identifiers
-    private const val INVIZIBLE_PACKAGE_NAME = "pan.alexander.tordnscrypt.gp"
-    private const val INVIZIBLE_MARKET_URI = "https://play.google.com/store/apps/details?id=$INVIZIBLE_PACKAGE_NAME"
-    private const val INVIZIBLE_FDROID_URI = "https://f-droid.org/packages/pan.alexander.tordnscrypt/"
+    // InviZible package identifiers (checked in priority order)
+    private const val INVIZIBLE_PRO_GP_PACKAGE = "pan.alexander.tordnscrypt.gp"
+    private const val INVIZIBLE_PRO_FDROID_PACKAGE = "pan.alexander.tordnscrypt"
+    private const val INVIZIBLE_LITE_PACKAGE = "pan.alexander.tordnscrypt.lite"
+    private val INVIZIBLE_PACKAGES = listOf(
+        INVIZIBLE_PRO_GP_PACKAGE,
+        INVIZIBLE_PRO_FDROID_PACKAGE,
+        INVIZIBLE_LITE_PACKAGE
+    )
+    private const val INVIZIBLE_PRO_MARKET_URI = "https://play.google.com/store/apps/details?id=$INVIZIBLE_PRO_GP_PACKAGE"
+    private const val INVIZIBLE_LITE_MARKET_URI = "https://play.google.com/store/apps/details?id=$INVIZIBLE_LITE_PACKAGE"
+    private const val INVIZIBLE_FDROID_URI = "https://f-droid.org/packages/$INVIZIBLE_PRO_FDROID_PACKAGE/"
 
     // Tor Intent actions (standard Tor control protocol, works with InviZible Pro)
     private const val ACTION_START_TOR = "org.torproject.android.intent.action.START"
@@ -60,6 +68,9 @@ object TorManager {
 
     // Connection health check interval (30 seconds)
     private const val HEALTH_CHECK_INTERVAL = 30_000L
+
+    // Proxy discovery interval (check every 3 seconds when not connected)
+    private const val PROXY_DISCOVERY_INTERVAL = 3_000L
 
     // Connection state
     enum class TorState {
@@ -103,7 +114,11 @@ object TorManager {
     // Thread tracking for proper cleanup to prevent memory leaks
     @Volatile private var healthCheckThread: Thread? = null
     @Volatile private var socketCheckThread: Thread? = null
+    @Volatile private var discoveryThread: Thread? = null
     @Volatile private var isShuttingDown = false
+
+    // Proxy discovery for periodic port checks when not connected
+    private var proxyDiscoveryRunnable: Runnable? = null
 
     fun addStateListener(listener: (TorState) -> Unit, notifyImmediately: Boolean = true) {
         stateListeners.add(listener)
@@ -121,12 +136,19 @@ object TorManager {
         val oldState = _state
         _state = newState
 
-        // Track connection start time
+        // Track connection start time and manage polling lifecycle
         if (newState == TorState.CONNECTED && oldState != TorState.CONNECTED) {
             _connectionStartTime = System.currentTimeMillis()
+            stopProxyDiscovery()
             startHealthCheck()
         } else if (newState != TorState.CONNECTED) {
             stopHealthCheck()
+            // Start proxy discovery when not connected (except during active connection attempt)
+            if (newState != TorState.STARTING) {
+                startProxyDiscovery()
+            } else {
+                stopProxyDiscovery()
+            }
         }
 
         stateListeners.forEach { it(newState) }
@@ -199,7 +221,7 @@ object TorManager {
                 Handler(Looper.getMainLooper()).post {
                     if (_state == TorState.CONNECTED && !isShuttingDown) {
                         Log.w(TAG, "Connection health check failed: ${e.message}")
-                        _errorMessage = "Tor connection lost. Please check InviZible Pro."
+                        _errorMessage = "Tor connection lost. Please check InviZible."
                         notifyStateChange(TorState.ERROR)
                     }
                 }
@@ -209,35 +231,147 @@ object TorManager {
     }
 
     /**
-     * Check if InviZible Pro is installed on the device.
+     * Start periodic proxy discovery - checks port 9050 every few seconds
+     * to detect when a Tor proxy becomes available (from any source).
+     */
+    private fun startProxyDiscovery() {
+        if (isShuttingDown) return
+        stopProxyDiscovery()
+        proxyDiscoveryRunnable = object : Runnable {
+            override fun run() {
+                if (_state != TorState.CONNECTED && !isShuttingDown) {
+                    checkProxyAvailability()
+                    healthCheckHandler.postDelayed(this, PROXY_DISCOVERY_INTERVAL)
+                }
+            }
+        }
+        healthCheckHandler.postDelayed(proxyDiscoveryRunnable!!, PROXY_DISCOVERY_INTERVAL)
+    }
+
+    private fun stopProxyDiscovery() {
+        proxyDiscoveryRunnable?.let { healthCheckHandler.removeCallbacks(it) }
+        proxyDiscoveryRunnable = null
+        discoveryThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+            }
+        }
+        discoveryThread = null
+    }
+
+    /**
+     * Single proxy availability check used by the discovery polling.
+     */
+    private fun checkProxyAvailability() {
+        discoveryThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+            }
+        }
+        discoveryThread = Thread {
+            if (isShuttingDown) return@Thread
+            try {
+                val socket = java.net.Socket()
+                socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_TOR_SOCKS_PORT), 1000)
+                socket.close()
+                if (isShuttingDown) return@Thread
+
+                Handler(Looper.getMainLooper()).post {
+                    if (_state != TorState.CONNECTED && !isShuttingDown) {
+                        _socksPort = DEFAULT_TOR_SOCKS_PORT
+                        _httpPort = DEFAULT_TOR_HTTP_PORT
+                        _socksHost = "127.0.0.1"
+                        Log.d(TAG, "Proxy discovery found Tor at 127.0.0.1:$DEFAULT_TOR_SOCKS_PORT")
+                        notifyStateChange(TorState.CONNECTED)
+                    }
+                }
+            } catch (e: InterruptedException) {
+                // Normal during cleanup
+            } catch (e: Exception) {
+                // Proxy not available yet, keep checking
+            }
+        }
+        discoveryThread?.start()
+    }
+
+    /**
+     * Check if any InviZible variant (Pro or Lite) is installed on the device.
      */
     fun isInviZibleInstalled(context: Context): Boolean {
-        return try {
-            context.packageManager.getPackageInfo(INVIZIBLE_PACKAGE_NAME, 0)
-            true
-        } catch (e: PackageManager.NameNotFoundException) {
-            false
+        return INVIZIBLE_PACKAGES.any { pkg ->
+            try {
+                context.packageManager.getPackageInfo(pkg, 0)
+                true
+            } catch (e: PackageManager.NameNotFoundException) {
+                false
+            }
         }
     }
 
     /**
-     * Open the app store to install InviZible Pro.
+     * Get the first installed InviZible package name, or null if none installed.
      */
-    fun openInviZibleInstallPage(context: Context) {
+    fun getInstalledInviZiblePackage(context: Context): String? {
+        return INVIZIBLE_PACKAGES.firstOrNull { pkg ->
+            try {
+                context.packageManager.getPackageInfo(pkg, 0)
+                true
+            } catch (e: PackageManager.NameNotFoundException) {
+                false
+            }
+        }
+    }
+
+    /**
+     * Get a display name for an InviZible package.
+     */
+    fun getInviZibleDisplayName(packageName: String): String {
+        return when (packageName) {
+            INVIZIBLE_PRO_GP_PACKAGE, INVIZIBLE_PRO_FDROID_PACKAGE -> "InviZible Pro"
+            INVIZIBLE_LITE_PACKAGE -> "InviZible Lite"
+            else -> "InviZible"
+        }
+    }
+
+    /**
+     * Open the app store to install InviZible Pro or Lite.
+     */
+    fun openInviZibleInstallPage(context: Context, lite: Boolean = false) {
+        val marketUri = if (lite) INVIZIBLE_LITE_MARKET_URI else INVIZIBLE_PRO_MARKET_URI
         try {
-            // Try Google Play first
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(INVIZIBLE_MARKET_URI))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(marketUri))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         } catch (e: Exception) {
-            // Fall back to F-Droid web page
+            // Fall back to F-Droid web page (Pro only)
             try {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(INVIZIBLE_FDROID_URI))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
             } catch (e2: Exception) {
-                Log.e(TAG, "Failed to open InviZible Pro install page", e2)
+                Log.e(TAG, "Failed to open InviZible install page", e2)
             }
+        }
+    }
+
+    /**
+     * Open the installed InviZible app directly.
+     * Returns true if the app was opened successfully.
+     */
+    fun openInviZibleApp(context: Context): Boolean {
+        val installedPackage = getInstalledInviZiblePackage(context) ?: return false
+        return try {
+            val intent = context.packageManager.getLaunchIntentForPackage(installedPackage)
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to open InviZible app", e)
+            false
         }
     }
 
@@ -257,41 +391,78 @@ object TorManager {
         // Reset shutdown flag when starting
         isShuttingDown = false
 
-        // Check if InviZible Pro is installed
-        if (!isInviZibleInstalled(context)) {
-            Log.w(TAG, "InviZible Pro is not installed")
-            // CRITICAL: Clear port state when transitioning to INVIZIBLE_NOT_INSTALLED
-            _socksPort = -1
-            _httpPort = -1
-            _errorMessage = "InviZible Pro is not installed. Please install InviZible Pro to use Tor."
-            notifyStateChange(TorState.INVIZIBLE_NOT_INSTALLED)
-            onComplete?.invoke(false)
+        // Check if any InviZible variant is installed
+        val installedPackage = getInstalledInviZiblePackage(context)
+        if (installedPackage == null) {
+            Log.w(TAG, "No InviZible app is installed, checking for external Tor proxy...")
+            // No InviZible installed, but a proxy might be running from another source (Orbot, etc.)
+            // Check port 9050 before giving up
+            _errorMessage = null
+
+            socketCheckThread?.let { thread ->
+                if (thread.isAlive) thread.interrupt()
+            }
+            socketCheckThread = Thread {
+                if (isShuttingDown) return@Thread
+                try {
+                    val socket = java.net.Socket()
+                    socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_TOR_SOCKS_PORT), 2000)
+                    socket.close()
+                    if (isShuttingDown) return@Thread
+
+                    _socksPort = DEFAULT_TOR_SOCKS_PORT
+                    _httpPort = DEFAULT_TOR_HTTP_PORT
+                    _socksHost = "127.0.0.1"
+
+                    Handler(Looper.getMainLooper()).post {
+                        if (!isShuttingDown) {
+                            Log.d(TAG, "External Tor proxy found at 127.0.0.1:$DEFAULT_TOR_SOCKS_PORT")
+                            notifyStateChange(TorState.CONNECTED)
+                            onComplete?.invoke(true)
+                        }
+                    }
+                } catch (e: InterruptedException) {
+                    onComplete?.invoke(false)
+                } catch (e: Exception) {
+                    if (isShuttingDown) return@Thread
+                    Handler(Looper.getMainLooper()).post {
+                        if (!isShuttingDown) {
+                            _socksPort = -1
+                            _httpPort = -1
+                            _errorMessage = "InviZible is not installed. Please install InviZible Pro or Lite to use Tor."
+                            notifyStateChange(TorState.INVIZIBLE_NOT_INSTALLED)
+                            onComplete?.invoke(false)
+                        }
+                    }
+                }
+            }
+            socketCheckThread?.start()
             return
         }
 
         notifyStateChange(TorState.STARTING)
         _errorMessage = null
 
-        // Register receiver for InviZible Pro status updates
+        // Register receiver for InviZible status updates
         registerInviZibleStatusReceiver(context, onComplete)
 
-        // Send intent to start InviZible Pro
+        // Send intent to start the installed InviZible variant
         try {
             val intent = Intent(ACTION_START_TOR)
-            intent.setPackage(INVIZIBLE_PACKAGE_NAME)
+            intent.setPackage(installedPackage)
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
             context.sendBroadcast(intent)
-            Log.d(TAG, "Sent start request to InviZible Pro")
+            Log.d(TAG, "Sent start request to ${getInviZibleDisplayName(installedPackage)}")
 
-            // Also try to launch InviZible Pro activity if broadcast doesn't work
+            // Also try to launch InviZible activity if broadcast doesn't work
             try {
-                val launchIntent = context.packageManager.getLaunchIntentForPackage(INVIZIBLE_PACKAGE_NAME)
+                val launchIntent = context.packageManager.getLaunchIntentForPackage(installedPackage)
                 if (launchIntent != null) {
                     launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     context.startActivity(launchIntent)
                 }
             } catch (e: Exception) {
-                Log.d(TAG, "Could not launch InviZible Pro activity (this is OK)", e)
+                Log.d(TAG, "Could not launch InviZible activity (this is OK)", e)
             }
 
             // Set a timeout to check if InviZible Pro responded
@@ -359,7 +530,7 @@ object TorManager {
                 android.os.Handler(android.os.Looper.getMainLooper()).post {
                     if (!isShuttingDown) {
                         Log.w(TAG, "InviZible Pro SOCKS port not accessible: ${e.message}")
-                        _errorMessage = "Please open InviZible Pro and start Tor in proxy mode"
+                        _errorMessage = "Please open InviZible and start Tor in proxy mode"
                         notifyStateChange(TorState.ERROR)
                         onComplete?.invoke(false)
                     }
@@ -443,6 +614,7 @@ object TorManager {
         isShuttingDown = true
 
         stopHealthCheck()
+        stopProxyDiscovery()
 
         // Interrupt any running socket check thread
         socketCheckThread?.let { thread ->
@@ -471,23 +643,82 @@ object TorManager {
      * UI components handle rapid state transitions via debouncing.
      */
     fun initialize(context: Context) {
-        // Register receiver first (even if InviZible Pro check fails, the socket check will run)
+        // Register receiver first (even if InviZible check fails, the socket check will run)
         registerInviZibleStatusReceiver(context, null)
 
-        // Request current status from InviZible Pro - this includes a socket check
-        // which provides INSTANT leak detection (socket check completes in ~1-100ms)
-        requestTorStatus(context)
+        // Reset shutdown flag
+        isShuttingDown = false
 
-        // Only mark as not installed if BOTH the package check fails AND
-        // we're currently in a non-connected state. This prevents false positives
-        // during activity recreation when PackageManager might be slow to respond
-        // but Tor is actually running.
-        if (!isInviZibleInstalled(context) && _state != TorState.CONNECTED) {
-            // CRITICAL: Clear port state when transitioning to INVIZIBLE_NOT_INSTALLED
-            // to prevent UI showing leak warnings while ports are still set
-            _socksPort = -1
-            _httpPort = -1
-            notifyStateChange(TorState.INVIZIBLE_NOT_INSTALLED)
+        // Socket check is the source of truth for proxy detection.
+        // Check the proxy port FIRST, then determine state based on the result.
+        // This ensures instant detection of any running Tor proxy (InviZible, Orbot, etc.)
+        // without requiring an app restart.
+        checkProxyAndSetInitialState(context)
+    }
+
+    /**
+     * Check if a Tor SOCKS proxy is running, then set the appropriate initial state.
+     * This defers the InviZible install check until AFTER the socket check completes,
+     * preventing the race condition where INVIZIBLE_NOT_INSTALLED was set before
+     * the async socket check could detect a running proxy.
+     */
+    private fun checkProxyAndSetInitialState(context: Context) {
+        socketCheckThread?.let { thread ->
+            if (thread.isAlive) {
+                thread.interrupt()
+            }
+        }
+
+        socketCheckThread = Thread {
+            if (isShuttingDown) return@Thread
+            try {
+                val socket = java.net.Socket()
+                socket.connect(java.net.InetSocketAddress("127.0.0.1", DEFAULT_TOR_SOCKS_PORT), 1000)
+                socket.close()
+                if (isShuttingDown) return@Thread
+
+                // Proxy is running - mark as connected regardless of which app provides it
+                Handler(Looper.getMainLooper()).post {
+                    if (!isShuttingDown) {
+                        _socksPort = DEFAULT_TOR_SOCKS_PORT
+                        _httpPort = DEFAULT_TOR_HTTP_PORT
+                        _socksHost = "127.0.0.1"
+                        Log.d(TAG, "Tor proxy detected at 127.0.0.1:$DEFAULT_TOR_SOCKS_PORT during init")
+                        notifyStateChange(TorState.CONNECTED)
+                    }
+                }
+            } catch (e: InterruptedException) {
+                Log.d(TAG, "Initial proxy check interrupted (normal during cleanup)")
+            } catch (e: Exception) {
+                if (isShuttingDown) return@Thread
+
+                // No proxy running - check if InviZible is installed to determine state
+                Handler(Looper.getMainLooper()).post {
+                    if (!isShuttingDown && _state != TorState.CONNECTED) {
+                        if (!isInviZibleInstalled(context)) {
+                            _socksPort = -1
+                            _httpPort = -1
+                            notifyStateChange(TorState.INVIZIBLE_NOT_INSTALLED)
+                        } else {
+                            // InviZible installed but Tor not running yet
+                            notifyStateChange(TorState.STOPPED)
+                        }
+                    }
+                }
+            }
+        }
+        socketCheckThread?.start()
+
+        // Also request status via broadcast (backup for broadcast-based detection)
+        try {
+            getInstalledInviZiblePackage(context)?.let { pkg ->
+                val intent = Intent(ACTION_STATUS)
+                intent.setPackage(pkg)
+                context.sendBroadcast(intent)
+                Log.d(TAG, "Requested status from ${getInviZibleDisplayName(pkg)}")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to request InviZible status", e)
         }
     }
 
@@ -496,13 +727,16 @@ object TorManager {
      * InviZible Pro will respond with a STATUS broadcast.
      */
     fun requestTorStatus(context: Context) {
+        // Send status request to whichever InviZible variant is installed
         try {
-            val intent = Intent(ACTION_STATUS)
-            intent.setPackage(INVIZIBLE_PACKAGE_NAME)
-            context.sendBroadcast(intent)
-            Log.d(TAG, "Requested InviZible Pro status")
+            getInstalledInviZiblePackage(context)?.let { pkg ->
+                val intent = Intent(ACTION_STATUS)
+                intent.setPackage(pkg)
+                context.sendBroadcast(intent)
+                Log.d(TAG, "Requested status from ${getInviZibleDisplayName(pkg)}")
+            }
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to request InviZible Pro status", e)
+            Log.w(TAG, "Failed to request InviZible status", e)
         }
 
         // Also check the socket as a fallback - this is the most reliable way to detect Tor status
@@ -565,7 +799,7 @@ object TorManager {
             TorState.STARTING -> "Connecting to Tor network..."
             TorState.CONNECTED -> "Connected via Tor"
             TorState.ERROR -> _errorMessage ?: "Connection error"
-            TorState.INVIZIBLE_NOT_INSTALLED -> "InviZible Pro app required"
+            TorState.INVIZIBLE_NOT_INSTALLED -> "InviZible app required"
         }
     }
 
@@ -580,7 +814,7 @@ object TorManager {
             TorState.STARTING -> "Establishing connection..."
             TorState.ERROR -> _errorMessage ?: "Unknown error occurred"
             TorState.STOPPED -> "Tap to connect"
-            TorState.INVIZIBLE_NOT_INSTALLED -> "Install InviZible Pro from Play Store or F-Droid"
+            TorState.INVIZIBLE_NOT_INSTALLED -> "Install InviZible from Play Store or F-Droid"
         }
     }
 

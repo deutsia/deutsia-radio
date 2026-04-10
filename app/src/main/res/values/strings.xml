@@ -374,7 +374,9 @@
     <string name="tor_control_button_cancel">Cancel</string>
     <string name="tor_control_button_retry">Retry Connection</string>
     <string name="tor_control_button_install">Install InviZible Pro</string>
+    <string name="tor_control_button_install_lite">Install InviZible Lite</string>
     <string name="tor_control_button_open_invizible">Open InviZible Pro</string>
+    <string name="tor_control_button_open_app">Open %s</string>
 
     <!-- Add/Edit Radio Dialog -->
     <string name="add_edit_tor_info">Using embedded Tor - no proxy config needed</string>
