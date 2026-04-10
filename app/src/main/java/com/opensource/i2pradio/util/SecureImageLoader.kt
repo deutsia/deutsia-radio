@@ -7,6 +7,7 @@ import coil.load
 import coil.request.Disposable
 import coil.request.ImageRequest
 import coil.request.ImageResult
+import com.opensource.i2pradio.R
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import okhttp3.Dns
@@ -431,13 +432,13 @@ fun ImageView.loadSecure(
     // Check if cover art is disabled for remote URLs
     // Local files (file://, content://) are ALWAYS allowed even when cover art is disabled
     if (SecureImageLoader.isCoverArtDisabled(context) && SecureImageLoader.isRemoteUrl(data?.toString())) {
-        android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping remote image: $data")
-        // Return a no-op disposable, image will show placeholder/default
-        return object : Disposable {
-            override val job: kotlinx.coroutines.Deferred<coil.request.ImageResult>
-                get() = kotlinx.coroutines.CompletableDeferred<coil.request.ImageResult>().apply { cancel() }
-            override val isDisposed: Boolean get() = true
-            override fun dispose() {}
+        android.util.Log.d("SecureImageLoader", "Cover art disabled - showing default icon instead of: $data")
+        // Show the default radio icon instead of leaving the image view empty
+        this.scaleType = ImageView.ScaleType.FIT_CENTER
+        return this.load(R.drawable.ic_radio) {
+            crossfade(true)
+            memoryCachePolicy(coil.request.CachePolicy.DISABLED)
+            diskCachePolicy(coil.request.CachePolicy.DISABLED)
         }
     }
 
@@ -475,13 +476,13 @@ fun ImageView.loadSecurePrivacy(
     // Check if cover art is disabled for remote URLs
     // Local files (file://, content://) are ALWAYS allowed even when cover art is disabled
     if (SecureImageLoader.isCoverArtDisabled(context) && SecureImageLoader.isRemoteUrl(data?.toString())) {
-        android.util.Log.d("SecureImageLoader", "Cover art disabled - skipping privacy image: $data")
-        // Return a no-op disposable, image will show placeholder/default
-        return object : Disposable {
-            override val job: kotlinx.coroutines.Deferred<coil.request.ImageResult>
-                get() = kotlinx.coroutines.CompletableDeferred<coil.request.ImageResult>().apply { cancel() }
-            override val isDisposed: Boolean get() = true
-            override fun dispose() {}
+        android.util.Log.d("SecureImageLoader", "Cover art disabled - showing default icon instead of privacy image: $data")
+        // Show the default radio icon instead of leaving the image view empty
+        this.scaleType = ImageView.ScaleType.FIT_CENTER
+        return this.load(R.drawable.ic_radio) {
+            crossfade(true)
+            memoryCachePolicy(coil.request.CachePolicy.DISABLED)
+            diskCachePolicy(coil.request.CachePolicy.DISABLED)
         }
     }
 
