@@ -7,6 +7,9 @@ import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.URI
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -19,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * - SegmentTemplate with $Number$ and $Time$ substitution.
  * - SegmentTemplate with SegmentTimeline.
  * - Initialization segments (init templates).
+ * - Live segment number calculation from availabilityStartTime.
  * - Mid-recording stream switching via [switchRequested] / [newStreamUrlProvider].
  * - Cooperative cancellation via [isActive].
  *
@@ -44,6 +48,7 @@ class DashRecorder(
         val mediaTemplate: String?,
         val startNumber: Long,
         val timescale: Long,
+        val duration: Long,
         val timelineEntries: List<TimelineEntry>,
     )
 
@@ -57,6 +62,7 @@ class DashRecorder(
         val isDynamic: Boolean,
         val minUpdatePeriodSec: Double,
         val mediaPresentationDurationSec: Double,
+        val availabilityStartTimeMs: Long,
         val baseUrl: String?,
         val representation: Representation?,
         val segmentTemplate: SegmentTemplateInfo?,
@@ -142,8 +148,20 @@ class DashRecorder(
                     }
                 }
 
+                // Calculate correct segment number for live streams
                 if (currentSegmentNumber < 0) {
-                    currentSegmentNumber = template.startNumber
+                    if (parsed.isDynamic && template.duration > 0) {
+                        // For live DASH, calculate segment number from wall clock time
+                        val nowMs = System.currentTimeMillis()
+                        val elapsedSec = (nowMs - parsed.availabilityStartTimeMs) / 1000.0
+                        val segDurationSec = template.duration.toDouble() / template.timescale.toDouble()
+                        val liveSegment = (elapsedSec / segDurationSec).toLong() + template.startNumber
+                        // Start a few segments behind the live edge for safety
+                        currentSegmentNumber = (liveSegment - 3).coerceAtLeast(template.startNumber)
+                        android.util.Log.d(TAG, "Live DASH: calculated segment number $currentSegmentNumber (live edge ~$liveSegment, segDur=${segDurationSec}s)")
+                    } else {
+                        currentSegmentNumber = template.startNumber
+                    }
                 }
 
                 // Download media segments
@@ -374,6 +392,10 @@ class DashRecorder(
             val mediaDuration = Regex("""mediaPresentationDuration="PT([^"]+)"""", RegexOption.IGNORE_CASE)
                 .find(xml)?.let { parseDuration(it.groupValues[1]) } ?: 0.0
 
+            // Parse availabilityStartTime for live segment number calculation
+            val availabilityStartTimeMs = Regex("""availabilityStartTime="([^"]+)"""", RegexOption.IGNORE_CASE)
+                .find(xml)?.let { parseIso8601ToMs(it.groupValues[1]) } ?: 0L
+
             // Extract BaseURL at MPD level
             val mpdBaseUrl = Regex("""<BaseURL>([^<]+)</BaseURL>""", RegexOption.IGNORE_CASE)
                 .find(xml)?.groupValues?.get(1)
@@ -419,6 +441,7 @@ class DashRecorder(
                 isDynamic = isDynamic,
                 minUpdatePeriodSec = minUpdatePeriod,
                 mediaPresentationDurationSec = mediaDuration,
+                availabilityStartTimeMs = availabilityStartTimeMs,
                 baseUrl = mpdBaseUrl,
                 representation = bestRep,
                 segmentTemplate = bestTemplate,
@@ -469,6 +492,7 @@ class DashRecorder(
             val media = extractAttr(tagAttrs, "media")
             val startNumber = extractAttr(tagAttrs, "startNumber")?.toLongOrNull() ?: 1L
             val timescale = extractAttr(tagAttrs, "timescale")?.toLongOrNull() ?: 1L
+            val duration = extractAttr(tagAttrs, "duration")?.toLongOrNull() ?: 0L
 
             // Parse SegmentTimeline entries
             val timelineEntries = mutableListOf<TimelineEntry>()
@@ -490,6 +514,7 @@ class DashRecorder(
                 mediaTemplate = media,
                 startNumber = startNumber,
                 timescale = timescale,
+                duration = duration,
                 timelineEntries = timelineEntries,
             )
         }
@@ -509,6 +534,29 @@ class DashRecorder(
             if (minutes != null) total += minutes.groupValues[1].toDouble() * 60
             if (seconds != null) total += seconds.groupValues[1].toDouble()
             return if (total > 0) total else 2.0
+        }
+
+        /**
+         * Parse ISO 8601 datetime to milliseconds since epoch.
+         * Handles formats like "1970-01-01T00:00:00Z" and "2024-01-01T00:00:00.000Z".
+         */
+        private fun parseIso8601ToMs(dateStr: String): Long {
+            return try {
+                // Try with milliseconds first
+                val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+                sdf.timeZone = TimeZone.getTimeZone("UTC")
+                sdf.parse(dateStr)?.time ?: 0L
+            } catch (e: Exception) {
+                try {
+                    // Try without milliseconds
+                    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+                    sdf.timeZone = TimeZone.getTimeZone("UTC")
+                    sdf.parse(dateStr)?.time ?: 0L
+                } catch (e2: Exception) {
+                    android.util.Log.w(TAG, "Failed to parse availabilityStartTime: $dateStr")
+                    0L
+                }
+            }
         }
 
         fun mimeTypeForExtension(): String = "audio/mp4"
