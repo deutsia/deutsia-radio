@@ -1,7 +1,5 @@
 package com.opensource.i2pradio.ui
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -142,9 +140,14 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = getString(R.string.tor_control_button_open_invizible)
-        secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = TorManager.isInviZibleInstalled(requireContext())
+        val installedPkg = TorManager.getInstalledInviZiblePackage(requireContext())
+        if (installedPkg != null) {
+            secondaryActionButton.text = getOpenInviZibleButtonText()
+            secondaryActionButton.visibility = View.VISIBLE
+            secondaryActionButton.isEnabled = true
+        } else {
+            secondaryActionButton.visibility = View.GONE
+        }
     }
 
     private fun showConnectingState() {
@@ -229,9 +232,14 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.alpha = if (isForceTorEnabled) 0.5f else 1.0f
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = getString(R.string.tor_control_button_open_invizible)
-        secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = true
+        val installedPkg = TorManager.getInstalledInviZiblePackage(requireContext())
+        if (installedPkg != null) {
+            secondaryActionButton.text = getOpenInviZibleButtonText()
+            secondaryActionButton.visibility = View.VISIBLE
+            secondaryActionButton.isEnabled = true
+        } else {
+            secondaryActionButton.visibility = View.GONE
+        }
     }
 
     private fun showErrorState() {
@@ -267,9 +275,14 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = getString(R.string.tor_control_button_open_invizible)
-        secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = TorManager.isInviZibleInstalled(requireContext())
+        val installedPkg = TorManager.getInstalledInviZiblePackage(requireContext())
+        if (installedPkg != null) {
+            secondaryActionButton.text = getOpenInviZibleButtonText()
+            secondaryActionButton.visibility = View.VISIBLE
+            secondaryActionButton.isEnabled = true
+        } else {
+            secondaryActionButton.visibility = View.GONE
+        }
     }
 
     private fun showInviZibleNotInstalledState() {
@@ -287,7 +300,9 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.visibility = View.GONE
+        secondaryActionButton.text = getString(R.string.tor_control_button_install_lite)
+        secondaryActionButton.visibility = View.VISIBLE
+        secondaryActionButton.isEnabled = true
     }
 
     /**
@@ -321,9 +336,14 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
         primaryActionButton.isEnabled = true
         primaryActionButton.visibility = View.VISIBLE
 
-        secondaryActionButton.text = getString(R.string.tor_control_button_open_invizible)
-        secondaryActionButton.visibility = View.VISIBLE
-        secondaryActionButton.isEnabled = TorManager.isInviZibleInstalled(requireContext())
+        val installedPkg = TorManager.getInstalledInviZiblePackage(requireContext())
+        if (installedPkg != null) {
+            secondaryActionButton.text = getOpenInviZibleButtonText()
+            secondaryActionButton.visibility = View.VISIBLE
+            secondaryActionButton.isEnabled = true
+        } else {
+            secondaryActionButton.visibility = View.GONE
+        }
     }
 
     private fun handlePrimaryAction() {
@@ -354,34 +374,37 @@ class TorQuickControlBottomSheet : BottomSheetDialogFragment() {
                 PreferencesHelper.setEmbeddedTorEnabled(requireContext(), false)
                 TorService.stop(requireContext())
             }
+            TorManager.TorState.INVIZIBLE_NOT_INSTALLED -> {
+                // Install InviZible Lite
+                openInviZibleInStore(lite = true)
+            }
             else -> {
-                // Open InviZible Pro app
+                // Open installed InviZible app
                 openInviZibleApp()
             }
         }
     }
 
+    /**
+     * Get the "Open [AppName]" text for the secondary button based on which InviZible variant is installed.
+     */
+    private fun getOpenInviZibleButtonText(): String {
+        val pkg = TorManager.getInstalledInviZiblePackage(requireContext())
+        return if (pkg != null) {
+            getString(R.string.tor_control_button_open_app, TorManager.getInviZibleDisplayName(pkg))
+        } else {
+            getString(R.string.tor_control_button_open_invizible)
+        }
+    }
+
     private fun openInviZibleApp() {
-        try {
-            val intent = requireContext().packageManager.getLaunchIntentForPackage("pan.alexander.tordnscrypt.gp")
-            if (intent != null) {
-                startActivity(intent)
-            } else {
-                openInviZibleInStore()
-            }
-        } catch (e: Exception) {
+        if (!TorManager.openInviZibleApp(requireContext())) {
             openInviZibleInStore()
         }
     }
 
-    private fun openInviZibleInStore() {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=pan.alexander.tordnscrypt.gp"))
-            startActivity(intent)
-        } catch (e: Exception) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/en/packages/pan.alexander.tordnscrypt.stable/"))
-            startActivity(intent)
-        }
+    private fun openInviZibleInStore(lite: Boolean = false) {
+        TorManager.openInviZibleInstallPage(requireContext(), lite)
     }
 
     companion object {
