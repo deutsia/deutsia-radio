@@ -646,7 +646,9 @@ class NowPlayingFragment : Fragment() {
                 // Handle cover art update properly - switch scaleType based on content
                 // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
                 // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
-                if (station.coverArtUri != null) {
+                // When cover art is disabled, always show the default radio icon
+                // instead of attempting to load remote cover art (or leaving it empty).
+                if (station.coverArtUri != null && !PreferencesHelper.isCoverArtDisabled(requireContext())) {
                     // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
                     coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                     val isPrivacyStation = station.getProxyTypeEnum().let {
@@ -678,7 +680,7 @@ class NowPlayingFragment : Fragment() {
                         coverArt.loadSecure(station.coverArtUri, imageLoadBuilder)
                     }
                 } else {
-                    // No cover art - use fitCenter so vector placeholder fills container
+                    // No cover art (or cover art disabled) - use fitCenter so vector placeholder fills container
                     coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                     // Force reload to get fresh drawable with current theme colors (Material You)
                     coverArt.setImageDrawable(null)
@@ -1136,7 +1138,9 @@ class NowPlayingFragment : Fragment() {
      * For privacy stations (Tor/I2P), uses loadSecurePrivacy to route through Tor when available.
      */
     private fun updateCoverArt(coverArtUri: String?) {
-        if (coverArtUri != null) {
+        // When cover art is disabled, always show the default radio icon
+        // instead of attempting to load remote cover art (or leaving it empty).
+        if (coverArtUri != null && !PreferencesHelper.isCoverArtDisabled(requireContext())) {
             // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
             coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
             // Check if current station is a privacy station (Tor/I2P)
@@ -1171,6 +1175,7 @@ class NowPlayingFragment : Fragment() {
                 coverArt.loadSecure(coverArtUri, imageLoadBuilder)
             }
         } else {
+            // No cover art (or cover art disabled) - use fitCenter so vector placeholder fills container
             coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
             coverArt.load(R.drawable.ic_radio) {
                 crossfade(true)
