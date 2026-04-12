@@ -1,0 +1,12 @@
+## What's New
+**HLS Stream Support**
+Stations using HLS (.m3u8) now play and record correctly. This resolves playback issues with stations from the RadioBrowser API.
+**fMP4/CMAF Support**
+Added fMP4/CMAF playback and recording for custom station links.
+**Tor Auto-Detection**
+The app now auto-detects a Tor SOCKS5 proxy (port 9050) from InviZible, Orbot, etc. and routes traffic through it automatically.
+## Security
+Fixed cover art leaking to the lockscreen when disabled in settings.
+## Bug Fixes
+- Metadata updates immediately
+- Default radio icon now shows when cover art is disabled
