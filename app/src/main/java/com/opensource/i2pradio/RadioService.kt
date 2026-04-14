@@ -1978,13 +1978,44 @@ class RadioService : Service() {
 
             if (effective != null) {
                 val (effHost, effPort, effType) = effective
+                val customProtocol = PreferencesHelper.getCustomProxyProtocol(this)
                 val javaProxyType = when (effType) {
                     ProxyType.TOR -> Proxy.Type.SOCKS
                     ProxyType.I2P -> Proxy.Type.HTTP
-                    ProxyType.CUSTOM -> Proxy.Type.HTTP
+                    ProxyType.CUSTOM -> when (customProtocol.uppercase()) {
+                        "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
+                        "HTTP", "HTTPS" -> Proxy.Type.HTTP
+                        else -> Proxy.Type.HTTP
+                    }
                     ProxyType.NONE -> Proxy.Type.DIRECT
                 }
+
                 builder.proxy(Proxy(javaProxyType, InetSocketAddress(effHost, effPort)))
+                if (effType == ProxyType.CUSTOM) {
+                    val username = PreferencesHelper.getCustomProxyUsername(this)
+                    val password = PreferencesHelper.getCustomProxyPassword(this)
+                    val authType = PreferencesHelper.getCustomProxyAuthType(this)
+                    if (username.isNotEmpty() && password.isNotEmpty()) {
+                        builder.proxyAuthenticator { _, response ->
+                            // Avoid infinite auth loops
+                            if (response.request.header("Proxy-Authorization") != null) {
+                                return@proxyAuthenticator null
+                            }
+                            when (authType.uppercase()) {
+                                "DIGEST" -> DigestAuthenticator.authenticate(
+                                    response, username, password
+                                )
+                                else -> {
+                                    val credential = okhttp3.Credentials.basic(username, password)
+                                    response.request.newBuilder()
+                                        .header("Proxy-Authorization", credential)
+                                        .build()
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (javaProxyType == Proxy.Type.SOCKS) {
                     builder.dns(SOCKS5_DNS)
                 }
