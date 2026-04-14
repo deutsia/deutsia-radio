@@ -2,6 +2,26 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.7.1]
+
+### Added
+- **RTSP playback support**: Added support for RTSP streams
+- **Copy now playing metadata**: Long-press the now playing info to copy song/station metadata to clipboard, with a confirmation toast
+- **URL resolution**: Separated URL resolution from format detection 
+### Security
+- **Stricter Force Proxy enforcement**: Added fail-closed safeguards so recording and URL resolution never fall back to a direct connection when Force Tor or Force Custom Proxy is enabled
+- **Resolver ignoring custom proxy**: URL resolver now honors the custom proxy's protocol (SOCKS4/5, HTTP) and authentication credentials instead of falling back to direct
+- **Digest auth hardening**: cnonce is now generated with SecureRandom, and the nonce count (`nc`) is properly incremented per request instead of being hardcoded
+- **DASH DoS cap**: Capped SegmentTimeline `repeatCount` values to prevent a malicious manifest from consuming unbounded memory
+
+### Fixed
+- **HLS detection**: HLS streams are now detected based on content instead of trusting the URL extension, so streams are identified correctly even when the extension is misleading #442
+
+### Localization
+- Translated 15 missing strings across all 16 supported locales
+
+
+
 ## [1.7.0]
 
 ### Added
