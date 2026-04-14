@@ -633,7 +633,13 @@ class RadioService : Service() {
         isRecording = true
 
         val initialCall: Call? = if (!isHls && !isDash) {
-            val recordingClient = buildRecordingHttpClient()
+            val recordingClient = buildRecordingHttpClient() ?: run {
+                android.util.Log.e("RadioService", "Recording refused: proxy requirement not met")
+                isRecordingActive.set(false)
+                isRecording = false
+                broadcastRecordingError(getString(R.string.recording_error_proxy_blocked))
+                return
+            }
             val request = Request.Builder()
                 .url(streamUrl)
                 .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
@@ -643,6 +649,17 @@ class RadioService : Service() {
                 .build()
             recordingClient.newCall(request).also { recordingCall = it }
         } else {
+            // HLS/DASH: the provider-based path handles null internally.
+            // Verify up front so we surface a user-facing error before the
+            // recording thread starts, instead of silently ending with an
+            // empty output file.
+            if (buildRecordingHttpClient() == null) {
+                android.util.Log.e("RadioService", "Recording refused: proxy requirement not met")
+                isRecordingActive.set(false)
+                isRecording = false
+                broadcastRecordingError(getString(R.string.recording_error_proxy_blocked))
+                return
+            }
             recordingCall = null
             null
         }
@@ -763,7 +780,20 @@ class RadioService : Service() {
                 // Pre-detect fMP4/CMAF format for HLS streams before creating output file
                 if (finalIsHls && isRecordingActive.get()) {
                     try {
-                        val detectClient = buildRecordingHttpClient()
+                        // If the required proxy disappeared between
+                        // startRecording's up-front check and now, abort
+                        // here rather than probe over a non-proxied client.
+                        // The provider path downstream also returns null,
+                        // so the recorder would halt either way - fail fast
+                        // with a user-visible error.
+                        val detectClient = buildRecordingHttpClient() ?: run {
+                            android.util.Log.e("RadioService", "HLS format detection aborted: proxy requirement not met")
+                            handler.post {
+                                broadcastRecordingError(getString(R.string.recording_error_proxy_blocked))
+                                cleanupRecording()
+                            }
+                            return@Thread
+                        }
                         val detectRequest = Request.Builder()
                             .url(finalStreamUrl)
                             .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
@@ -1017,6 +1047,14 @@ class RadioService : Service() {
                                         }
 
                                         val newRecordingClient = buildRecordingHttpClient()
+                                        if (newRecordingClient == null) {
+                                            android.util.Log.e("RadioService", "Stream-switch aborted: proxy requirement not met (fail-closed)")
+                                            handler.post {
+                                                broadcastRecordingError(getString(R.string.recording_error_proxy_blocked))
+                                            }
+                                            pendingRecordingStreamUrl = null
+                                            break@outerLoop
+                                        }
                                         val newRequest = Request.Builder()
                                             .url(newStreamUrl)
                                             .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
@@ -1194,13 +1232,50 @@ class RadioService : Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    private fun buildRecordingHttpClient(): OkHttpClient {
+    /**
+     * Build an OkHttp client configured for recording traffic.
+     *
+     * Returns null when the user has a force-proxy mode enabled but the
+     * required proxy isn't currently reachable - we fail CLOSED rather
+     * than silently rebuilding with a direct connection (which would leak
+     * clearnet traffic every time an HLS/DASH segment is fetched, or
+     * whenever the recording thread reconnects). Callers MUST treat null
+     * as a hard abort.
+     */
+    private fun buildRecordingHttpClient(): OkHttpClient? {
         val forceTorAll = PreferencesHelper.isForceTorAll(this)
         val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
         val forceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
         val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(this)
         val isI2PStream = currentProxyType == ProxyType.I2P || currentStreamUrl?.contains(".i2p") == true
         val isTorStream = currentProxyType == ProxyType.TOR || currentStreamUrl?.contains(".onion") == true
+
+        // Fail-closed safeguards BEFORE the routing selection runs.
+        // Each of these short-circuits any code path that would fall
+        // through to Triple("", 0, ProxyType.NONE) - i.e. a direct
+        // connection - while a force-* mode is active.
+        if (forceTorAll && !TorManager.isConnected()) {
+            android.util.Log.e("RadioService", "Recording refused: force-Tor-all enabled but Tor not connected")
+            return null
+        }
+        if (forceTorExceptI2P && !isI2PStream && !TorManager.isConnected()) {
+            android.util.Log.e("RadioService", "Recording refused: force-Tor-except-I2P enabled, non-I2P stream, Tor not connected")
+            return null
+        }
+        if (forceCustomProxy) {
+            val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
+            if (customProxyHost.isEmpty()) {
+                android.util.Log.e("RadioService", "Recording refused: force-custom-proxy enabled but not configured")
+                return null
+            }
+        }
+        if (forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream) {
+            val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
+            if (customProxyHost.isEmpty()) {
+                android.util.Log.e("RadioService", "Recording refused: force-custom-proxy-except-Tor-I2P enabled, clearnet stream, custom proxy not configured")
+                return null
+            }
+        }
 
         android.util.Log.d("RadioService", "===== RECORDING CONNECTION REQUEST =====")
         android.util.Log.d("RadioService", "Recording URL: $currentStreamUrl")
@@ -1803,9 +1878,17 @@ class RadioService : Service() {
 
     /**
      * Resolve a playlist pointer using an OkHttpClient that matches the
-     * station's proxy configuration. Returns [ResolvedStream] with the final
-     * URL and an HLS-detected flag, or null if a pointer was recognised but
-     * couldn't be parsed/fetched.
+     * effective proxy configuration (honouring force-* modes). Returns
+     * [ResolvedStream] with the final URL and an HLS-detected flag, or
+     * null if the pointer couldn't be parsed/fetched.
+     *
+     * Fail-safe is important here: this runs BEFORE playStream's force-*
+     * checks, so if we built a direct client for a clearnet station under
+     * force-Tor-all, the resolver's own fetch would leak before playback
+     * got a chance to refuse. If the required proxy isn't reachable we
+     * return the original URL untouched so that playStream can apply its
+     * proxy gate and surface the correct error (tor-not-connected etc.)
+     * without ever opening a socket from the resolver.
      *
      * Runs on the caller's thread - callers must ensure they're off the
      * main thread when invoking.
@@ -1817,23 +1900,91 @@ class RadioService : Service() {
         proxyType: ProxyType
     ): ResolvedStream? {
         return try {
-            // Build a minimal OkHttp client that matches the station's proxy
-            // setup. We intentionally don't share the playback client here
-            // because that one is built inside playStream() - and resolution
-            // must finish before playStream runs.
+            val forceTorAll = PreferencesHelper.isForceTorAll(this)
+            val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
+            val forceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
+            val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(this)
+            val isI2PStream = proxyType == ProxyType.I2P || streamUrl.contains(".i2p")
+            val isTorStream = proxyType == ProxyType.TOR || streamUrl.contains(".onion")
+
+            // Compute effective proxy the same way playStream and
+            // buildRecordingHttpClient do. If a force-* mode is set but the
+            // required proxy isn't reachable, skip the resolver's network
+            // fetch entirely - return the URL unchanged so playStream can
+            // reject with the correct error message. This prevents any
+            // clearnet leak from the resolver itself.
+            val skipResolution = ResolvedStream(streamUrl, hlsDetected = false)
+            val effective: Triple<String, Int, ProxyType>? = when {
+                forceTorAll -> {
+                    if (!TorManager.isConnected()) {
+                        android.util.Log.w("RadioService", "Resolver skipping: force-Tor-all but Tor not connected - deferring to playStream gate")
+                        return skipResolution
+                    }
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
+                forceTorExceptI2P && isI2PStream ->
+                    Triple(
+                        if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyHost else "127.0.0.1",
+                        if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyPort else 4444,
+                        ProxyType.I2P
+                    )
+                forceTorExceptI2P && !isI2PStream -> {
+                    if (!TorManager.isConnected()) {
+                        android.util.Log.w("RadioService", "Resolver skipping: force-Tor-except-I2P, non-I2P, Tor not connected")
+                        return skipResolution
+                    }
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
+                forceCustomProxy -> {
+                    val customHost = PreferencesHelper.getCustomProxyHost(this)
+                    if (customHost.isEmpty()) {
+                        android.util.Log.w("RadioService", "Resolver skipping: force-custom-proxy not configured")
+                        return skipResolution
+                    }
+                    Triple(customHost, PreferencesHelper.getCustomProxyPort(this), ProxyType.CUSTOM)
+                }
+                forceCustomProxyExceptTorI2P && isI2PStream ->
+                    Triple(
+                        if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyHost else "127.0.0.1",
+                        if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyPort else 4444,
+                        ProxyType.I2P
+                    )
+                forceCustomProxyExceptTorI2P && isTorStream -> {
+                    if (TorManager.isConnected()) {
+                        Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                    } else if (proxyHost.isNotEmpty() && proxyType == ProxyType.TOR) {
+                        Triple(proxyHost, proxyPort, ProxyType.TOR)
+                    } else {
+                        Triple("127.0.0.1", 9050, ProxyType.TOR)
+                    }
+                }
+                forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream -> {
+                    val customHost = PreferencesHelper.getCustomProxyHost(this)
+                    if (customHost.isEmpty()) {
+                        android.util.Log.w("RadioService", "Resolver skipping: force-custom-proxy-except-Tor-I2P, clearnet stream, not configured")
+                        return skipResolution
+                    }
+                    Triple(customHost, PreferencesHelper.getCustomProxyPort(this), ProxyType.CUSTOM)
+                }
+                proxyHost.isNotEmpty() && proxyType != ProxyType.NONE ->
+                    Triple(proxyHost, proxyPort, proxyType)
+                else -> null  // no proxy required, safe to resolve direct
+            }
+
             val builder = OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
 
-            if (proxyHost.isNotEmpty() && proxyType != ProxyType.NONE) {
-                val javaProxyType = when (proxyType) {
+            if (effective != null) {
+                val (effHost, effPort, effType) = effective
+                val javaProxyType = when (effType) {
                     ProxyType.TOR -> Proxy.Type.SOCKS
                     ProxyType.I2P -> Proxy.Type.HTTP
                     ProxyType.CUSTOM -> Proxy.Type.HTTP
                     ProxyType.NONE -> Proxy.Type.DIRECT
                 }
-                builder.proxy(Proxy(javaProxyType, InetSocketAddress(proxyHost, proxyPort)))
+                builder.proxy(Proxy(javaProxyType, InetSocketAddress(effHost, effPort)))
                 if (javaProxyType == Proxy.Type.SOCKS) {
                     builder.dns(SOCKS5_DNS)
                 }

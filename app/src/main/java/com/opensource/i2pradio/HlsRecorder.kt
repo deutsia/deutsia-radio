@@ -24,7 +24,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  * live playlist only appends newly-added segments.
  */
 class HlsRecorder(
-    private val httpClientProvider: () -> OkHttpClient,
+    // Returns null when the caller has fail-closed - e.g. a force-proxy
+    // mode is active but the required proxy isn't reachable. Null MUST
+    // stop the recording loop; it's not a transient failure to retry.
+    private val httpClientProvider: () -> OkHttpClient?,
     private val isActive: AtomicBoolean,
     private val switchRequested: AtomicBoolean,
     private val newStreamUrlProvider: () -> String?,
@@ -59,7 +62,10 @@ class HlsRecorder(
     ): RecordResult {
         var totalBytesWritten = 0L
         var currentUrl = initialUrl
-        var client = httpClientProvider()
+        var client = httpClientProvider() ?: run {
+            android.util.Log.e(TAG, "HLS recording refused: no proxied client available (fail-closed)")
+            return RecordResult(0L, DEFAULT_EXTENSION, false)
+        }
         var segmentExtension: String? = null
         val downloadedSegmentKeys = LinkedHashSet<String>()
         var lastFlushBytes = 0L
@@ -75,7 +81,11 @@ class HlsRecorder(
                     if (newUrl != null && newUrl.isNotEmpty()) {
                         android.util.Log.d(TAG, "Switching HLS recording to: $newUrl")
                         currentUrl = newUrl
-                        client = httpClientProvider()
+                        val newClient = httpClientProvider() ?: run {
+                            android.util.Log.e(TAG, "HLS recording aborted on switch: no proxied client available (fail-closed)")
+                            return RecordResult(totalBytesWritten, segmentExtension ?: DEFAULT_EXTENSION, false)
+                        }
+                        client = newClient
                         downloadedSegmentKeys.clear()
                         consecutivePlaylistFailures = 0
                         initSegmentWritten = false
