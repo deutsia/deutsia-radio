@@ -129,6 +129,11 @@ class MainActivity : AppCompatActivity() {
                             RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED -> getString(R.string.error_custom_proxy_not_configured)
                             RadioService.ERROR_TYPE_MAX_RETRIES -> getString(R.string.error_stream_max_retries)
                             RadioService.ERROR_TYPE_STREAM_FAILED -> getString(R.string.error_stream_failed)
+                            RadioService.ERROR_TYPE_UNSUPPORTED_CODEC -> {
+                                val codecName = intent.getStringExtra(RadioService.EXTRA_UNSUPPORTED_CODEC_NAME) ?: "This"
+                                getString(R.string.error_unsupported_codec, codecName)
+                            }
+                            RadioService.ERROR_TYPE_PLAYLIST_UNREADABLE -> getString(R.string.error_playlist_unreadable)
                             else -> getString(R.string.error_stream_failed)
                         }
                         // Privacy/security errors always show, others respect toast setting

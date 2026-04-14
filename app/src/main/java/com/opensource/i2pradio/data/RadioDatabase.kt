@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.opensource.i2pradio.utils.DatabaseEncryptionManager
 import net.sqlcipher.database.SupportFactory
 
-@Database(entities = [RadioStation::class, BrowseHistory::class], version = 8, exportSchema = false)
+@Database(entities = [RadioStation::class, BrowseHistory::class], version = 9, exportSchema = false)
 abstract class RadioDatabase : RoomDatabase() {
     abstract fun radioDao(): RadioDao
 
@@ -171,6 +171,21 @@ abstract class RadioDatabase : RoomDatabase() {
             }
         }
 
+        // Migration from version 8 to 9: Add hlsHint and codecHint columns
+        // These record authoritative signals from Radio Browser (hls flag and
+        // codec name) so we can pick the right media source and recording
+        // extension without relying on URL extensions alone.
+        private val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN hlsHint INTEGER NOT NULL DEFAULT 0"
+                )
+                database.execSQL(
+                    "ALTER TABLE radio_stations ADD COLUMN codecHint TEXT NOT NULL DEFAULT ''"
+                )
+            }
+        }
+
         /**
          * Set the session password for database encryption
          * Must be called after successful authentication, before accessing database
@@ -235,7 +250,7 @@ abstract class RadioDatabase : RoomDatabase() {
                         RadioDatabase::class.java,
                         "radio_database"
                     )
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
                         .fallbackToDestructiveMigration()  // Handles both upgrades and downgrades if migration not found
 
                     // Apply SQLCipher encryption if enabled

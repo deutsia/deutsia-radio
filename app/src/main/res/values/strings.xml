@@ -653,6 +653,10 @@
     <string name="error_i2p_not_connected">I2P is not running. Start I2P (e.g., InviZible Pro) to play this stream.</string>
     <string name="error_tor_required_for_clearnet">Tor is not connected. Force Tor mode requires Tor for clearnet streams.</string>
     <string name="error_custom_proxy_not_configured">Custom proxy is not configured. Configure it in Settings to play.</string>
+    <string name="error_unsupported_codec">%1$s streams aren\'t supported</string>
+    <string name="error_playlist_unreadable">Couldn\'t read playlist — station may be offline</string>
+    <string name="notification_unsupported_codec">%1$s streams aren\'t supported</string>
+    <string name="notification_playlist_unreadable">Couldn\'t read playlist</string>
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Password changed but failed to re-key database: %s</string>

@@ -786,6 +786,8 @@ class BrowseRadioRegistryOnlyFragment : Fragment() {
                 putExtra("proxy_password", "")
                 putExtra("proxy_auth_type", "NONE")
                 putExtra("proxy_connection_timeout", 30)
+                putExtra("hls_hint", radioStation.hlsHint)
+                putExtra("codec_hint", radioStation.codecHint)
             }
             ContextCompat.startForegroundService(requireContext(), intent)
         }

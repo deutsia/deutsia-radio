@@ -907,6 +907,8 @@ object PreferencesHelper {
                 put("cachedAt", station.cachedAt)
                 put("bitrate", station.bitrate)
                 put("codec", station.codec)
+                put("hlsHint", station.hlsHint)
+                put("codecHint", station.codecHint)
                 put("country", station.country)
                 put("countryCode", station.countryCode)
                 put("homepage", station.homepage)
@@ -957,6 +959,10 @@ object PreferencesHelper {
                 cachedAt = json.getLong("cachedAt"),
                 bitrate = json.getInt("bitrate"),
                 codec = json.getString("codec"),
+                // hlsHint/codecHint may be missing for stations saved before the
+                // v9 migration - default to safe values if absent.
+                hlsHint = json.optBoolean("hlsHint", false),
+                codecHint = json.optString("codecHint", ""),
                 country = json.getString("country"),
                 countryCode = json.getString("countryCode"),
                 homepage = json.getString("homepage"),

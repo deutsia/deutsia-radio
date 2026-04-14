@@ -97,9 +97,12 @@ data class RadioBrowserStation(
                 languagecodes = "",
                 votes = 0,
                 lastchangetime = "",
-                codec = station.codec,
+                // Prefer the explicit codecHint captured from Radio Browser; fall
+                // back to the legacy `codec` display field for stations that
+                // predate the hint columns.
+                codec = station.codecHint.ifEmpty { station.codec },
                 bitrate = station.bitrate,
-                hls = false,
+                hls = station.hlsHint,
                 lastcheckok = true,
                 clickcount = 0,
                 clicktrend = 0,
