@@ -365,6 +365,7 @@ class DashRecorder(
     companion object {
         private const val TAG = "DashRecorder"
         private const val EXTENSION = "m4a"
+        private const val MAX_REPEAT_PER_ENTRY = 10_000
 
         fun resolveUrl(mpdUrl: String, baseUrl: String, path: String): String {
             if (path.startsWith("http://", ignoreCase = true) ||
@@ -514,7 +515,8 @@ class DashRecorder(
                     val sAttrs = sMatch.groupValues[1]
                     val t = extractAttr(sAttrs, "t")?.toLongOrNull()
                     val d = extractAttr(sAttrs, "d")?.toLongOrNull() ?: continue
-                    val r = extractAttr(sAttrs, "r")?.toIntOrNull() ?: 0
+                    val r = (extractAttr(sAttrs, "r")?.toIntOrNull() ?: 0)
+                        .coerceIn(-1, MAX_REPEAT_PER_ENTRY)
                     timelineEntries.add(TimelineEntry(t, d, r))
                 }
             }
