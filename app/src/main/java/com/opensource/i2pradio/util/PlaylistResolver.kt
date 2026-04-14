@@ -73,6 +73,16 @@ object PlaylistResolver {
             return Result.Failed("pointer chain too deep")
         }
 
+        // Non-HTTP schemes can't be probed with OkHttp and never serve a
+        // playlist pointer in the first place - RTSP, MMS, and friends are
+        // always direct transports. Short-circuit before any network work.
+        if (url.startsWith("rtsp://", ignoreCase = true) ||
+            url.startsWith("mms://", ignoreCase = true) ||
+            url.startsWith("rtmp://", ignoreCase = true) ||
+            url.startsWith("rtmps://", ignoreCase = true)) {
+            return Result.Resolved(url)
+        }
+
         val extHint = extensionHint(url)
         // If the URL has a clearly-direct extension, short-circuit and skip
         // the network round-trip. Anything ambiguous (extensionless, .php,
