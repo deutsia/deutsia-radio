@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">ترتيب المحطات</string>
     <string name="dialog_delete_stations">حذف المحطات</string>
     <string name="button_save">حفظ</string>
+    <string name="button_edit">تعديل</string>
+    <string name="button_select_all">تحديد الكل</string>
     <string name="button_cancel">إلغاء</string>
     <string name="button_import">استيراد</string>
     <string name="button_export">تصدير</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">حول</string>
-    <string name="settings_version">الإصدار 1.5</string>
+    <string name="settings_version">الإصدار 1.7</string>
     <string name="settings_view_github">عرض على GitHub</string>
     <string name="settings_donate">تبرع</string>
     <string name="settings_donate_description">إذا ساعدك هذا التطبيق، فكر في التبرع</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">إلغاء</string>
     <string name="tor_control_button_retry">إعادة المحاولة</string>
     <string name="tor_control_button_install">تثبيت InviZible Pro</string>
+    <string name="tor_control_button_install_lite">تثبيت InviZible Lite</string>
     <string name="tor_control_button_open_invizible">فتح InviZible Pro</string>
+    <string name="tor_control_button_open_app">فتح %s</string>
 
     
     <string name="add_edit_tor_info">استخدام Tor المضمن - لا حاجة لتكوين الوكيل</string>
@@ -374,6 +378,7 @@
     <string name="toast_custom_proxy_saved">تم حفظ إعدادات الوكيل المخصص</string>
     <string name="toast_custom_proxy_cleared">تم مسح إعدادات الوكيل المخصص</string>
     <string name="toast_address_copied">تم نسخ العنوان إلى الحافظة</string>
+    <string name="toast_metadata_copied">تم نسخ معلومات الأغنية إلى الحافظة</string>
     <string name="toast_using_default_directory">استخدام الدليل الافتراضي</string>
 
     
@@ -560,6 +565,9 @@
     <string name="recording_error_connection_refused">تم رفض الاتصال</string>
     <string name="recording_error_io">خطأ إدخال/إخراج: %s</string>
     <string name="recording_error_generic">خطأ: %s</string>
+    <string name="recording_error_hls_playlist">تعذر جلب قائمة تشغيل HLS</string>
+    <string name="recording_error_rtsp_unsupported">التسجيل غير مدعوم لبث RTSP</string>
+    <string name="recording_error_proxy_blocked">تم حظر التسجيل: البروكسي المطلوب (Tor/مخصص) غير متاح</string>
 
     
     <string name="custom_proxy_not_configured_notification">البروكسي المخصص غير مهيأ</string>
@@ -601,6 +609,13 @@
     <string name="error_i2p_not_connected">I2P لا يعمل. قم بتشغيل I2P (مثل InviZible Pro) لتشغيل هذا البث.</string>
     <string name="error_tor_required_for_clearnet">Tor غير متصل. وضع إجبار Tor يتطلب Tor للبث العادي.</string>
     <string name="error_custom_proxy_not_configured">البروكسي المخصص غير مهيأ. قم بتهيئته في الإعدادات.</string>
+    <string name="error_unsupported_codec">بث %1$s غير مدعوم</string>
+    <string name="error_playlist_unreadable">تعذر قراءة قائمة التشغيل — قد تكون المحطة غير متصلة</string>
+    <string name="error_station_geoblocked">المحطة محظورة في منطقتك (أو من عقدة الخروج هذه)</string>
+    <string name="error_station_gone">المحطة لم تعد موجودة على هذا الرابط</string>
+    <string name="error_station_auth_required">المحطة تتطلب مصادقة</string>
+    <string name="notification_unsupported_codec">بث %1$s غير مدعوم</string>
+    <string name="notification_playlist_unreadable">تعذر قراءة قائمة التشغيل</string>
 
     
     <string name="cd_add_radio_station">إضافة محطة راديو</string>

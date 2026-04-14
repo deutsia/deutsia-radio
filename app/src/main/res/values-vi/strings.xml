@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">Sắp xếp trạm</string>
     <string name="dialog_delete_stations">Xóa trạm</string>
     <string name="button_save">Lưu</string>
+    <string name="button_edit">Chỉnh sửa</string>
+    <string name="button_select_all">Chọn tất cả</string>
     <string name="button_cancel">Hủy</string>
     <string name="button_import">Nhập</string>
     <string name="button_export">Xuất</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">Giới thiệu</string>
-    <string name="settings_version">Phiên bản 1.5</string>
+    <string name="settings_version">Phiên bản 1.7</string>
     <string name="settings_view_github">Xem trên GitHub</string>
     <string name="settings_donate">Quyên góp</string>
     <string name="settings_donate_description">Nếu ứng dụng này hữu ích cho bạn, hãy xem xét quyên góp</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">Hủy</string>
     <string name="tor_control_button_retry">Thử lại kết nối</string>
     <string name="tor_control_button_install">Cài đặt InviZible Pro</string>
+    <string name="tor_control_button_install_lite">Cài đặt InviZible Lite</string>
     <string name="tor_control_button_open_invizible">Mở InviZible Pro</string>
+    <string name="tor_control_button_open_app">Mở %s</string>
 
 
     
@@ -375,6 +379,7 @@
     <string name="toast_custom_proxy_saved">Đã lưu cài đặt proxy tùy chỉnh</string>
     <string name="toast_custom_proxy_cleared">Đã xóa cài đặt proxy tùy chỉnh</string>
     <string name="toast_address_copied">Đã sao chép địa chỉ vào clipboard</string>
+    <string name="toast_metadata_copied">Đã sao chép thông tin bài hát vào clipboard</string>
     <string name="toast_using_default_directory">Đang sử dụng thư mục mặc định</string>
 
     
@@ -561,6 +566,9 @@
     <string name="recording_error_connection_refused">Kết nối bị từ chối</string>
     <string name="recording_error_io">Lỗi I/O: %s</string>
     <string name="recording_error_generic">Lỗi: %s</string>
+    <string name="recording_error_hls_playlist">Không thể tải danh sách phát HLS</string>
+    <string name="recording_error_rtsp_unsupported">Ghi âm không được hỗ trợ cho luồng RTSP</string>
+    <string name="recording_error_proxy_blocked">Ghi âm bị chặn: proxy bắt buộc (Tor/tùy chỉnh) không khả dụng</string>
 
     
     <string name="custom_proxy_not_configured_notification">Proxy tùy chỉnh chưa được cấu hình</string>
@@ -602,6 +610,13 @@
     <string name="error_i2p_not_connected">I2P chưa chạy. Khởi động I2P (ví dụ: InviZible Pro) để phát luồng này.</string>
     <string name="error_tor_required_for_clearnet">Tor chưa được kết nối. Chế độ bắt buộc Tor yêu cầu Tor cho các luồng clearnet.</string>
     <string name="error_custom_proxy_not_configured">Proxy tùy chỉnh chưa được cấu hình. Cấu hình trong Cài đặt.</string>
+    <string name="error_unsupported_codec">Luồng %1$s không được hỗ trợ</string>
+    <string name="error_playlist_unreadable">Không thể đọc danh sách phát — đài có thể đang ngoại tuyến</string>
+    <string name="error_station_geoblocked">Đài bị chặn tại khu vực của bạn (hoặc từ nút thoát này)</string>
+    <string name="error_station_gone">Đài không còn tồn tại tại URL đó</string>
+    <string name="error_station_auth_required">Đài yêu cầu xác thực</string>
+    <string name="notification_unsupported_codec">Luồng %1$s không được hỗ trợ</string>
+    <string name="notification_playlist_unreadable">Không thể đọc danh sách phát</string>
 
     
     <string name="cd_add_radio_station">Thêm đài radio</string>

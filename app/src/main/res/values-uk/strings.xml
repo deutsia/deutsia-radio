@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">Сортування станцій</string>
     <string name="dialog_delete_stations">Видалити станції</string>
     <string name="button_save">Зберегти</string>
+    <string name="button_edit">Редагувати</string>
+    <string name="button_select_all">Вибрати все</string>
     <string name="button_cancel">Скасувати</string>
     <string name="button_import">Імпорт</string>
     <string name="button_export">Експорт</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">Про програму</string>
-    <string name="settings_version">Версія 1.5</string>
+    <string name="settings_version">Версія 1.7</string>
     <string name="settings_view_github">Переглянути на GitHub</string>
     <string name="settings_donate">Підтримати</string>
     <string name="settings_donate_description">Якщо цей додаток вам допоміг, розгляньте можливість підтримки</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">Скасувати</string>
     <string name="tor_control_button_retry">Повторити підключення</string>
     <string name="tor_control_button_install">Встановити InviZible Pro</string>
+    <string name="tor_control_button_install_lite">Встановити InviZible Lite</string>
     <string name="tor_control_button_open_invizible">Відкрити InviZible Pro</string>
+    <string name="tor_control_button_open_app">Відкрити %s</string>
 
 
     
@@ -375,6 +379,7 @@
     <string name="toast_custom_proxy_saved">Налаштування власного проксі збережено</string>
     <string name="toast_custom_proxy_cleared">Налаштування власного проксі очищено</string>
     <string name="toast_address_copied">Адресу скопійовано в буфер обміну</string>
+    <string name="toast_metadata_copied">Інформацію про пісню скопійовано в буфер обміну</string>
     <string name="toast_using_default_directory">Використовується каталог за замовчуванням</string>
 
     
@@ -561,6 +566,9 @@
     <string name="recording_error_connection_refused">Підключення відхилено</string>
     <string name="recording_error_io">Помилка вводу/виводу: %s</string>
     <string name="recording_error_generic">Помилка: %s</string>
+    <string name="recording_error_hls_playlist">Не вдалося отримати плейлист HLS</string>
+    <string name="recording_error_rtsp_unsupported">Запис не підтримується для потоків RTSP</string>
+    <string name="recording_error_proxy_blocked">Запис заблоковано: потрібний проксі (Tor/користувацький) недоступний</string>
 
     
     <string name="custom_proxy_not_configured_notification">Користувацький проксі не налаштовано</string>
@@ -602,6 +610,13 @@
     <string name="error_i2p_not_connected">I2P не запущено. Запустіть I2P (напр. InviZible Pro) для відтворення цього потоку.</string>
     <string name="error_tor_required_for_clearnet">Tor не підключено. Примусовий режим Tor вимагає Tor для звичайних потоків.</string>
     <string name="error_custom_proxy_not_configured">Користувацький проксі не налаштовано. Налаштуйте його в Налаштуваннях.</string>
+    <string name="error_unsupported_codec">Потоки %1$s не підтримуються</string>
+    <string name="error_playlist_unreadable">Не вдалося прочитати плейлист — станція може бути офлайн</string>
+    <string name="error_station_geoblocked">Станцію заблоковано у вашому регіоні (або з цього вихідного вузла)</string>
+    <string name="error_station_gone">Станція більше не існує за цією URL-адресою</string>
+    <string name="error_station_auth_required">Станція вимагає автентифікації</string>
+    <string name="notification_unsupported_codec">Потоки %1$s не підтримуються</string>
+    <string name="notification_playlist_unreadable">Не вдалося прочитати плейлист</string>
 
     
     <string name="cd_add_radio_station">Додати радіостанцію</string>

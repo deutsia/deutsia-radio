@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">방송국 정렬</string>
     <string name="dialog_delete_stations">방송국 삭제</string>
     <string name="button_save">저장</string>
+    <string name="button_edit">편집</string>
+    <string name="button_select_all">모두 선택</string>
     <string name="button_cancel">취소</string>
     <string name="button_import">가져오기</string>
     <string name="button_export">내보내기</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">정보</string>
-    <string name="settings_version">버전 1.5</string>
+    <string name="settings_version">버전 1.7</string>
     <string name="settings_view_github">GitHub에서 보기</string>
     <string name="settings_donate">기부</string>
     <string name="settings_donate_description">이 앱이 도움이 되었다면 기부를 고려해주세요</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">취소</string>
     <string name="tor_control_button_retry">재연결</string>
     <string name="tor_control_button_install">InviZible Pro 설치</string>
+    <string name="tor_control_button_install_lite">InviZible Lite 설치</string>
     <string name="tor_control_button_open_invizible">InviZible Pro 열기</string>
+    <string name="tor_control_button_open_app">%s 열기</string>
 
     
     <string name="add_edit_tor_info">내장 Tor 사용 - 프록시 구성 불필요</string>
@@ -374,6 +378,7 @@
     <string name="toast_custom_proxy_saved">사용자 지정 프록시 설정 저장됨</string>
     <string name="toast_custom_proxy_cleared">사용자 지정 프록시 설정 지워짐</string>
     <string name="toast_address_copied">주소가 클립보드에 복사됨</string>
+    <string name="toast_metadata_copied">노래 정보가 클립보드에 복사됨</string>
     <string name="toast_using_default_directory">기본 디렉토리 사용 중</string>
 
     
@@ -560,6 +565,9 @@
     <string name="recording_error_connection_refused">연결이 거부되었습니다</string>
     <string name="recording_error_io">I/O 오류: %s</string>
     <string name="recording_error_generic">오류: %s</string>
+    <string name="recording_error_hls_playlist">HLS 재생목록을 가져올 수 없음</string>
+    <string name="recording_error_rtsp_unsupported">RTSP 스트림에는 녹음이 지원되지 않습니다</string>
+    <string name="recording_error_proxy_blocked">녹음 차단됨: 필요한 프록시 (Tor/사용자 지정)를 사용할 수 없음</string>
 
     
     <string name="custom_proxy_not_configured_notification">사용자 지정 프록시가 구성되지 않음</string>
@@ -601,6 +609,13 @@
     <string name="error_i2p_not_connected">I2P가 실행되지 않습니다. 이 스트림을 재생하려면 I2P(예: InviZible Pro)를 시작하세요.</string>
     <string name="error_tor_required_for_clearnet">Tor가 연결되지 않았습니다. Tor 강제 모드에서는 클리어넷 스트림에 Tor가 필요합니다.</string>
     <string name="error_custom_proxy_not_configured">사용자 지정 프록시가 구성되지 않았습니다. 설정에서 구성하세요.</string>
+    <string name="error_unsupported_codec">%1$s 스트림은 지원되지 않습니다</string>
+    <string name="error_playlist_unreadable">재생목록을 읽을 수 없음 — 스테이션이 오프라인일 수 있음</string>
+    <string name="error_station_geoblocked">해당 지역에서 스테이션이 차단됨 (또는 이 출구 노드에서)</string>
+    <string name="error_station_gone">해당 URL에 스테이션이 더 이상 존재하지 않음</string>
+    <string name="error_station_auth_required">스테이션에 인증이 필요함</string>
+    <string name="notification_unsupported_codec">%1$s 스트림은 지원되지 않습니다</string>
+    <string name="notification_playlist_unreadable">재생목록을 읽을 수 없음</string>
 
     
     <string name="cd_add_radio_station">라디오 방송국 추가</string>
