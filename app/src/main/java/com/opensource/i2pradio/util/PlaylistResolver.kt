@@ -36,11 +36,17 @@ object PlaylistResolver {
      * Result of a resolution attempt.
      *
      * - [Resolved]: returned URL is a direct stream (possibly same as input
-     *   if no resolution was needed).
+     *   if no resolution was needed). [hlsDetected] is true when the probe
+     *   saw HLS content (either via Content-Type or body signature), even
+     *   if the URL extension suggested otherwise. Callers should OR this
+     *   with any catalog hlsHint when picking the media source.
      * - [Failed]: URL was a pointer but couldn't be parsed / fetched.
      */
     sealed class Result {
-        data class Resolved(val url: String) : Result()
+        data class Resolved(
+            val url: String,
+            val hlsDetected: Boolean = false
+        ) : Result()
         data class Failed(val reason: String) : Result()
     }
 
@@ -97,19 +103,31 @@ object PlaylistResolver {
                     return Result.Failed("HTTP ${response.code}")
                 }
                 contentType = response.header("Content-Type").orEmpty().lowercase()
-                val format = formatFromExt.takeUnless { it == PointerFormat.NONE }
-                    ?: formatFromContentType(contentType)
-                    ?: return Result.Resolved(url)  // Not a recognised pointer
+
+                // Direct audio content-type (audio/mpeg, audio/aac, audio/ogg,
+                // etc. - NOT the m3u/scpls playlist variants). No need to read
+                // the body at all; it's the actual audio stream.
+                if (isDirectAudioContentType(contentType)) {
+                    return Result.Resolved(url)
+                }
 
                 body = readBoundedBody(response)
                     ?: return Result.Failed("empty playlist body")
 
-                // HLS masquerading as .m3u: if content-type is m3u-ish and body
-                // looks like HLS, DO NOT resolve - downstream code will handle
-                // it via HlsMediaSource once the hls signal is recognised.
-                if (format == PointerFormat.M3U && looksLikeHls(body)) {
-                    return Result.Resolved(url)
+                // Body-level HLS sniff FIRST: this handles the common case
+                // of .pls / .m3u URLs whose servers respond with an HLS
+                // playlist directly (e.g. SR's p2_128.pls). The body is
+                // authoritative - if it starts with #EXTM3U and has segment
+                // / stream directives, it's HLS no matter what the URL
+                // extension or Content-Type said.
+                if (looksLikeHls(body)) {
+                    Log.d(TAG, "HLS body signature on $url - treating as HLS")
+                    return Result.Resolved(url, hlsDetected = true)
                 }
+
+                val format = formatFromExt.takeUnless { it == PointerFormat.NONE }
+                    ?: formatFromContentType(contentType)
+                    ?: return Result.Resolved(url)  // Not a recognised pointer
 
                 val parsed = when (format) {
                     PointerFormat.PLS -> parsePls(body)
@@ -127,6 +145,24 @@ object PlaylistResolver {
             Log.w(TAG, "Playlist fetch failed for $url: ${e.message}")
             return Result.Failed(e.message ?: e.javaClass.simpleName)
         }
+    }
+
+    /**
+     * Whether a Content-Type clearly identifies a direct audio stream (not a
+     * playlist pointer or HLS manifest). Covers common shoutcast / icecast /
+     * HTTP audio content-types. Deliberately excludes the m3u / mpegurl /
+     * x-scpls types - those need body-level sniffing because the same
+     * content-types are used for both pointer playlists and HLS manifests.
+     */
+    private fun isDirectAudioContentType(contentType: String): Boolean {
+        val ct = contentType.substringBefore(';').trim()
+        // Any audio/* that isn't a playlist container or HLS manifest.
+        if (ct.startsWith("audio/") &&
+            !ct.contains("mpegurl") &&
+            !ct.contains("x-scpls")) {
+            return true
+        }
+        return ct == "application/ogg"
     }
 
     // ---------------------------------------------------------------------

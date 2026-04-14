@@ -496,13 +496,15 @@ class RadioService : Service() {
                 // the recording switch machinery - the recording thread reads
                 // from a single direct URL, so pointers wouldn't work there.
                 serviceScope.launch(Dispatchers.IO) {
-                    val resolvedUrl = resolveStreamUrlBlocking(
+                    val resolution = resolveStreamUrlBlocking(
                         newStreamUrl, newProxyHost, newProxyPort, newProxyType
-                    ) ?: newStreamUrl
+                    )
+                    val resolvedUrl = resolution?.url ?: newStreamUrl
+                    val effectiveHlsHint = newHlsHint || (resolution?.hlsDetected == true)
                     handler.post {
                         switchRecordingStream(
                             resolvedUrl, newProxyHost, newProxyPort, newProxyType,
-                            newStationName, newHlsHint, newCodecHint
+                            newStationName, effectiveHlsHint, newCodecHint
                         )
                     }
                 }
@@ -1674,9 +1676,9 @@ class RadioService : Service() {
         codecHint: String
     ) {
         serviceScope.launch(Dispatchers.IO) {
-            val resolved = resolveStreamUrlBlocking(streamUrl, proxyHost, proxyPort, proxyType)
+            val resolution = resolveStreamUrlBlocking(streamUrl, proxyHost, proxyPort, proxyType)
             handler.post {
-                if (resolved == null) {
+                if (resolution == null) {
                     android.util.Log.e("RadioService", "Playlist pointer resolution failed for $streamUrl")
                     isStartingNewStream.set(false)
                     broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
@@ -1687,6 +1689,11 @@ class RadioService : Service() {
                     )
                     return@post
                 }
+                val resolved = resolution.url
+                // OR the catalog hlsHint with what the probe actually saw
+                // on the wire. This fixes URLs whose extension lies (.pls
+                // serving an HLS manifest, .m3u serving #EXTM3U, etc.).
+                val effectiveHlsHint = hlsHint || resolution.hlsDetected
                 if (resolved != streamUrl) {
                     android.util.Log.d("RadioService", "Resolved pointer $streamUrl -> $resolved")
                     // Update currentStreamUrl so recording picks up the direct
@@ -1694,19 +1701,36 @@ class RadioService : Service() {
                     // thread, which expects raw audio bytes).
                     currentStreamUrl = resolved
                 }
+                if (resolution.hlsDetected && !hlsHint) {
+                    android.util.Log.d(
+                        "RadioService",
+                        "Probe detected HLS on $resolved - overriding media source"
+                    )
+                    // Persist so reconnect / recording uses HlsMediaSource too.
+                    currentHlsHint = true
+                }
                 playStream(
                     resolved, proxyHost, proxyPort, proxyType,
                     customProxyProtocol, proxyUsername, proxyPassword,
-                    proxyAuthType, proxyConnectionTimeout, hlsHint, codecHint
+                    proxyAuthType, proxyConnectionTimeout, effectiveHlsHint, codecHint
                 )
             }
         }
     }
 
     /**
+     * Outcome of blocking URL resolution: the final direct URL plus whether
+     * the probe revealed HLS content. [hlsDetected] overrides a missing
+     * catalog hlsHint when the URL extension lied about the real format
+     * (classic case: .pls URLs that serve an HLS manifest directly).
+     */
+    private data class ResolvedStream(val url: String, val hlsDetected: Boolean)
+
+    /**
      * Resolve a playlist pointer using an OkHttpClient that matches the
-     * station's proxy configuration. Returns the final stream URL, or null
-     * if a pointer was recognised but couldn't be parsed/fetched.
+     * station's proxy configuration. Returns [ResolvedStream] with the final
+     * URL and an HLS-detected flag, or null if a pointer was recognised but
+     * couldn't be parsed/fetched.
      *
      * Runs on the caller's thread - callers must ensure they're off the
      * main thread when invoking.
@@ -1716,7 +1740,7 @@ class RadioService : Service() {
         proxyHost: String,
         proxyPort: Int,
         proxyType: ProxyType
-    ): String? {
+    ): ResolvedStream? {
         return try {
             // Build a minimal OkHttp client that matches the station's proxy
             // setup. We intentionally don't share the playback client here
@@ -1742,7 +1766,8 @@ class RadioService : Service() {
 
             val client = builder.build()
             when (val result = com.opensource.i2pradio.util.PlaylistResolver.resolve(streamUrl, client)) {
-                is com.opensource.i2pradio.util.PlaylistResolver.Result.Resolved -> result.url
+                is com.opensource.i2pradio.util.PlaylistResolver.Result.Resolved ->
+                    ResolvedStream(result.url, result.hlsDetected)
                 is com.opensource.i2pradio.util.PlaylistResolver.Result.Failed -> {
                     android.util.Log.w("RadioService", "Playlist resolution failed: ${result.reason}")
                     null
