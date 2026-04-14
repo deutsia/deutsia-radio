@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "description": "RTSP test stations for verifying playback in deutsia radio. Recording is NOT supported for RTSP by design (see docs/rtsp-testing.md). All entries are public test servers - availability varies; import as custom stations and delete the ones that don't connect.",
+  "stations": [
+    {
+      "name": "RTSP Test - rtspstream.com pattern",
+      "streamUrl": "rtsp://rtspstream.com:554/pattern",
+      "genre": "Test",
+      "codec": "AAC",
+      "coverArtUri": "",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
+    },
+    {
+      "name": "RTSP Test - rtspstream.com movie",
+      "streamUrl": "rtsp://rtspstream.com:554/movie",
+      "genre": "Test",
+      "codec": "AAC",
+      "coverArtUri": "",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
+    },
+    {
+      "name": "RTSP Test - Wowza Big Buck Bunny",
+      "streamUrl": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov",
+      "genre": "Test",
+      "codec": "AAC",
+      "coverArtUri": "",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
+    },
+    {
+      "name": "RTSP Test - bigCDN Big Buck Bunny",
+      "streamUrl": "rtsp://mpv.cdn3.bigCDN.com:554/bigCDN/mp4:bigbuckbunnyiphone_400.mp4",
+      "genre": "Test",
+      "codec": "AAC",
+      "coverArtUri": "",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
+    },
+    {
+      "name": "RTSP Test - Big Buck Bunny 175k",
+      "streamUrl": "rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov",
+      "genre": "Test",
+      "codec": "AAC",
+      "coverArtUri": "",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
+    },
+    {
+      "name": "RTSP Test - Hiof Hessdalen",
+      "streamUrl": "rtsp://freja.hiof.no:1935/rtplive/definst/hessdalen03.stream",
+      "genre": "Test",
+      "codec": "AAC",
+      "coverArtUri": "",
+      "useProxy": false,
+      "proxyType": "NONE",
+      "proxyHost": "",
+      "proxyPort": 0
+    }
+  ]
+}
