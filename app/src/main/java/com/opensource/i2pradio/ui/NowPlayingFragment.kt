@@ -3,6 +3,8 @@ package com.opensource.i2pradio.ui
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
@@ -163,11 +165,15 @@ class NowPlayingFragment : Fragment() {
     private var isBuffering: Boolean = false
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
-
-    // Flag to track if views are initialized and valid (set in onCreateView, cleared in onDestroyView)
+    
+        // Flag to track if views are initialized and valid (set in onCreateView, cleared in onDestroyView)
     private var viewsInitialized = false
 
-    // Broadcast receiver for metadata, stream info, playback state, recording updates, cover art, and time updates
+    // metadata for copying
+    private var lastArtist: String? = null
+    private var lastTitle: String? = null
+
+    // Broadcast receiver
     private val metadataReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -176,12 +182,16 @@ class NowPlayingFragment : Fragment() {
                     val title = intent.getStringExtra(RadioService.EXTRA_TITLE)
                     val rawMetadata = intent.getStringExtra(RadioService.EXTRA_METADATA)
 
-                    // Display formatted artist - title if both are present, otherwise raw metadata
+                    lastArtist = artist
+                    lastTitle = title
+
+                    // Display formatted artist
                     val displayText = when {
                         !artist.isNullOrBlank() && !title.isNullOrBlank() -> "$artist — $title"
                         !rawMetadata.isNullOrBlank() -> rawMetadata
                         else -> null
                     }
+
 
                     if (!displayText.isNullOrBlank()) {
                         metadataText.text = displayText
@@ -321,6 +331,33 @@ class NowPlayingFragment : Fragment() {
         stationName = view.findViewById(R.id.nowPlayingStationName)
         genreText = view.findViewById(R.id.nowPlayingGenre)
         metadataText = view.findViewById(R.id.nowPlayingMetadata)
+        metadataText.setOnLongClickListener {
+            val artist = lastArtist?.takeIf { it.isNotBlank() }
+            val title = lastTitle?.takeIf { it.isNotBlank() }
+
+            val text = when {
+                artist != null && title != null -> "$artist - $title"
+                title != null -> title
+                artist != null -> artist
+                else -> metadataText.text?.toString().orEmpty()
+            }
+
+            if (text.isBlank()) {
+                return@setOnLongClickListener false
+            }
+
+            val clipboard = requireContext()
+                .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("Now Playing", text))
+
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.toast_metadata_copied),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            true
+        }
         streamInfoText = view.findViewById(R.id.nowPlayingStreamInfo)
         likeButton = view.findViewById(R.id.likeButton)
         addToLibraryButton = view.findViewById(R.id.addToLibraryButton)
