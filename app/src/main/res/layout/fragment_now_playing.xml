@@ -130,7 +130,7 @@
             tools:text="News • I2P" />
 
         <!-- Metadata with marquee scrolling for long text -->
-        <TextView
+       <TextView
             android:id="@+id/nowPlayingMetadata"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -145,6 +145,8 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:clickable="true"
+            android:longClickable="true"
             android:visibility="gone"
             tools:text="Song Name - Artist - This is a very long metadata text that should scroll"
             tools:visibility="visible" />
