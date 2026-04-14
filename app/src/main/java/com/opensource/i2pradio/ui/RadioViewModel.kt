@@ -101,6 +101,8 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
             putExtra("proxy_host", station.proxyHost ?: "")
             putExtra("proxy_port", station.proxyPort)
             putExtra("proxy_type", station.getProxyTypeEnum().name)
+            putExtra("hls_hint", station.hlsHint)
+            putExtra("codec_hint", station.codecHint)
         }
         getApplication<Application>().startService(intent)
     }

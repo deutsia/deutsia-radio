@@ -618,6 +618,8 @@
     <string name="recording_error_io">I/O error: %s</string>
     <string name="recording_error_generic">Error: %s</string>
     <string name="recording_error_hls_playlist">Unable to fetch HLS playlist</string>
+    <string name="recording_error_rtsp_unsupported">Recording isn\'t supported for RTSP streams</string>
+    <string name="recording_error_proxy_blocked">Recording blocked: required proxy (Tor/custom) is not available</string>
 
     <!-- Custom Proxy Messages -->
     <string name="custom_proxy_not_configured_notification">Custom proxy not configured</string>
@@ -654,6 +656,13 @@
     <string name="error_i2p_not_connected">I2P is not running. Start I2P (e.g., InviZible Pro) to play this stream.</string>
     <string name="error_tor_required_for_clearnet">Tor is not connected. Force Tor mode requires Tor for clearnet streams.</string>
     <string name="error_custom_proxy_not_configured">Custom proxy is not configured. Configure it in Settings to play.</string>
+    <string name="error_unsupported_codec">%1$s streams aren\'t supported</string>
+    <string name="error_playlist_unreadable">Couldn\'t read playlist — station may be offline</string>
+    <string name="error_station_geoblocked">Station blocked in your region (or from this exit node)</string>
+    <string name="error_station_gone">Station no longer exists at that URL</string>
+    <string name="error_station_auth_required">Station requires authentication</string>
+    <string name="notification_unsupported_codec">%1$s streams aren\'t supported</string>
+    <string name="notification_playlist_unreadable">Couldn\'t read playlist</string>
 
     <!-- Database Encryption -->
     <string name="password_change_rekey_failed">Password changed but failed to re-key database: %s</string>

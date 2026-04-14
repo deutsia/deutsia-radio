@@ -29,7 +29,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Selects the highest-bandwidth audio AdaptationSet/Representation.
  */
 class DashRecorder(
-    private val httpClientProvider: () -> OkHttpClient,
+    // Returns null when the caller has fail-closed - e.g. a force-proxy
+    // mode is active but the required proxy isn't reachable. Null MUST
+    // stop the recording loop; it's not a transient failure to retry.
+    private val httpClientProvider: () -> OkHttpClient?,
     private val isActive: AtomicBoolean,
     private val switchRequested: AtomicBoolean,
     private val newStreamUrlProvider: () -> String?,
@@ -81,7 +84,10 @@ class DashRecorder(
     ): RecordResult {
         var totalBytesWritten = 0L
         var currentUrl = initialUrl
-        var client = httpClientProvider()
+        var client = httpClientProvider() ?: run {
+            android.util.Log.e(TAG, "DASH recording refused: no proxied client available (fail-closed)")
+            return RecordResult(0L, EXTENSION, false)
+        }
         var initSegmentWritten = false
         var currentSegmentNumber = -1L
         var currentSegmentTime = 0L
@@ -97,7 +103,11 @@ class DashRecorder(
                     if (newUrl != null && newUrl.isNotEmpty()) {
                         android.util.Log.d(TAG, "Switching DASH recording to: $newUrl")
                         currentUrl = newUrl
-                        client = httpClientProvider()
+                        val newClient = httpClientProvider() ?: run {
+                            android.util.Log.e(TAG, "DASH recording aborted on switch: no proxied client available (fail-closed)")
+                            return RecordResult(totalBytesWritten, EXTENSION, false)
+                        }
+                        client = newClient
                         initSegmentWritten = false
                         currentSegmentNumber = -1L
                         currentSegmentTime = 0L

@@ -396,6 +396,8 @@ class MiniPlayerView @JvmOverloads constructor(
                 putExtra("proxy_port", station.proxyPort)
                 putExtra("proxy_type", proxyType.name)
                 putExtra("cover_art_uri", station.coverArtUri)
+                putExtra("hls_hint", station.hlsHint)
+                putExtra("codec_hint", station.codecHint)
             }
             ContextCompat.startForegroundService(context, intent)
             // Don't update playing state here - wait for service to confirm playback started

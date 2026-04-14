@@ -139,6 +139,11 @@ data class RadioStation(
     val cachedAt: Long = 0L, // When fetched from RadioBrowser
     val bitrate: Int = 0, // Bitrate in kbps (from RadioBrowser)
     val codec: String = "", // Audio codec (from RadioBrowser)
+    // Hints from the source catalog used to pick the right ExoPlayer source
+    // and recording extension without relying on URL extensions alone.
+    // Default values make manually-added stations behave as before.
+    val hlsHint: Boolean = false, // RadioBrowser "hls" flag
+    val codecHint: String = "",   // RadioBrowser "codec" (MP3, AAC, AAC+, OGG, FLAC, MP4, FLV, UNKNOWN, ...)
     val country: String = "", // Country name (from RadioBrowser)
     val countryCode: String = "", // ISO country code (from RadioBrowser)
     val homepage: String = "", // Station homepage URL
