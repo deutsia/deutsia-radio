@@ -114,6 +114,17 @@ object PlaylistResolver {
                 }
                 contentType = response.header("Content-Type").orEmpty().lowercase()
 
+                // If the server returns an HTML page (common with misconfigured
+                // icecast servers whose root URL shows a status page rather
+                // than the stream), there's no audio to play. Fail fast with
+                // a clear reason instead of feeding HTML to ExoPlayer's
+                // extractors, which would just error out a few reconnect
+                // attempts later.
+                if (isHtmlContentType(contentType)) {
+                    Log.w(TAG, "Server returned HTML for $url - not a stream")
+                    return Result.Failed("got HTML (status page?) instead of audio")
+                }
+
                 // Direct audio content-type (audio/mpeg, audio/aac, audio/ogg,
                 // etc. - NOT the m3u/scpls playlist variants). No need to read
                 // the body at all; it's the actual audio stream.
@@ -173,6 +184,17 @@ object PlaylistResolver {
             return true
         }
         return ct == "application/ogg"
+    }
+
+    /**
+     * Whether a Content-Type indicates an HTML document. Used to fail
+     * fast on icecast/shoutcast admin pages that sit at the stream URL
+     * (the server returns the info page instead of audio bytes when a
+     * non-player UA or missing Icy-MetaData header is used).
+     */
+    private fun isHtmlContentType(contentType: String): Boolean {
+        val ct = contentType.substringBefore(';').trim()
+        return ct == "text/html" || ct == "application/xhtml+xml"
     }
 
     // ---------------------------------------------------------------------

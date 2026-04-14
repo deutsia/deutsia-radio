@@ -29,6 +29,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Metadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.datasource.HttpDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
@@ -239,6 +240,12 @@ class RadioService : Service() {
         const val ERROR_TYPE_UNSUPPORTED_CODEC = "unsupported_codec"
         const val ERROR_TYPE_PLAYLIST_UNREADABLE = "playlist_unreadable"
         const val EXTRA_UNSUPPORTED_CODEC_NAME = "unsupported_codec_name"
+        // Distinct error types for specific HTTP response codes. These let
+        // the UI show a targeted message instead of the generic
+        // "reconnect loop" that an opaque STREAM_FAILED would trigger.
+        const val ERROR_TYPE_STATION_GEOBLOCKED = "station_geoblocked"   // 403 / 451
+        const val ERROR_TYPE_STATION_GONE = "station_gone"               // 404 / 410
+        const val ERROR_TYPE_STATION_AUTH_REQUIRED = "station_auth_required"  // 401
 
         /**
          * Custom DNS resolver that forces DNS resolution through SOCKS5 proxy.
@@ -1501,6 +1508,39 @@ class RadioService : Service() {
     }
 
     /**
+     * Inspect a [PlaybackException] for a well-known HTTP status code and
+     * broadcast a targeted error type to the UI. Called on every
+     * onPlayerError so the user gets an accurate toast even during the
+     * reconnect loop (each attempt surfaces the same classification).
+     *
+     * Walks the cause chain because ExoPlayer usually wraps the
+     * InvalidResponseCodeException inside a higher-level PlaybackException.
+     */
+    private fun classifyAndBroadcastHttpError(error: PlaybackException) {
+        var cause: Throwable? = error
+        var httpException: HttpDataSource.InvalidResponseCodeException? = null
+        while (cause != null) {
+            if (cause is HttpDataSource.InvalidResponseCodeException) {
+                httpException = cause
+                break
+            }
+            cause = cause.cause
+        }
+        val responseCode = httpException?.responseCode ?: return
+        val errorType = when (responseCode) {
+            401 -> ERROR_TYPE_STATION_AUTH_REQUIRED
+            403, 451 -> ERROR_TYPE_STATION_GEOBLOCKED
+            404, 410 -> ERROR_TYPE_STATION_GONE
+            else -> return
+        }
+        android.util.Log.w(
+            "RadioService",
+            "HTTP $responseCode on stream - broadcasting $errorType"
+        )
+        broadcastStreamError(errorType)
+    }
+
+    /**
      * Abort playback with a clear "unsupported codec" error. Used for FLV
      * and potentially future codecs we know we can't decode.
      */
@@ -1846,12 +1886,16 @@ class RadioService : Service() {
             val isRtsp = isRtspStream(streamUrl)
 
             // RTSP uses its own transport (RTP over UDP/TCP) and bypasses
-            // OkHttp. Any force-proxy setting implies the user doesn't want
-            // raw traffic leaving the device, so block RTSP entirely under
-            // those modes rather than silently leaking.
-            if (isRtsp && (forceTorAll || forceTorExceptI2P ||
-                    forceCustomProxy || forceCustomProxyExceptTorI2P)) {
-                android.util.Log.e("RadioService", "RTSP blocked under force-proxy mode - RTSP can't be proxied")
+            // OkHttp entirely - proxy settings, including the per-station
+            // proxy, don't apply. Reject rtsp:// whenever the user has
+            // asked for ANY kind of proxying (global force-* modes OR a
+            // per-station proxyType other than NONE) rather than silently
+            // leaking raw RTP to the clearnet.
+            val anyProxyRequired = forceTorAll || forceTorExceptI2P ||
+                forceCustomProxy || forceCustomProxyExceptTorI2P ||
+                proxyType != ProxyType.NONE
+            if (isRtsp && anyProxyRequired) {
+                android.util.Log.e("RadioService", "RTSP blocked: user has proxying configured but RTSP can't be proxied")
                 rejectUnsupportedCodec("RTSP (proxy mode)")
                 return
             }
@@ -2218,8 +2262,10 @@ class RadioService : Service() {
                 val mediaSource: MediaSource = when {
                     useRtsp -> {
                         // RTSP bypasses OkHttp so it doesn't share our proxy /
-                        // bandwidth-tracking pipeline. That's been validated
-                        // up front by the force-proxy checks below.
+                        // bandwidth-tracking pipeline. The gate at the top of
+                        // playStream has already rejected rtsp:// URLs under
+                        // any proxy mode, so reaching here means the user has
+                        // no proxy configured and direct playback is OK.
                         RtspMediaSource.Factory()
                             .createMediaSource(MediaItem.fromUri(streamUrl))
                     }
@@ -2247,6 +2293,12 @@ class RadioService : Service() {
                     override fun onPlayerError(error: PlaybackException) {
                         android.util.Log.e("RadioService", "Playback error: ${error.message}")
                         updatePlaybackState(PlaybackStateCompat.STATE_ERROR)
+                        // Surface distinct errors for well-known HTTP status
+                        // codes so the UI can show something actionable
+                        // (geo-block vs station removed vs auth needed)
+                        // instead of the generic "stream failed" toast a
+                        // reconnect loop eventually yields.
+                        classifyAndBroadcastHttpError(error)
                         scheduleReconnect()
                     }
 
