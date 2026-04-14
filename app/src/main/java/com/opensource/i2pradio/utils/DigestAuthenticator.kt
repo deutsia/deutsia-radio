@@ -3,13 +3,33 @@ package com.opensource.i2pradio.utils
 import okhttp3.Request
 import okhttp3.Response
 import java.security.MessageDigest
+import java.security.SecureRandom
 
 /**
  * Utility class for HTTP Digest Authentication (RFC 2617)
  * Handles the challenge-response mechanism for proxy authentication
  */
 object DigestAuthenticator {
+    private val secureRandom = SecureRandom()
 
+    // Per server nonce request counter. RFC 7616 requires nc to increment for each request that reuses the same server nonce.
+    private var lastServerNonce: String? = null
+    private var currentNc: Int = 0
+
+    @Synchronized
+    private fun nextNc(serverNonce: String): String {
+        if (serverNonce != lastServerNonce) {
+            lastServerNonce = serverNonce
+            currentNc = 1
+        } else {
+            currentNc++
+        }
+        return String.format("%08x", currentNc)
+    }
+
+
+
+    
     /**
      * Creates a Digest authentication header from a 407 Proxy Authentication Required response
      *
@@ -48,8 +68,8 @@ object DigestAuthenticator {
             null
         }
 
-        // Nonce count (always 1 for stateless authentication)
-        val nc = "00000001"
+        // Nonce count
+        val nc = nextNc(nonce)
 
         // Calculate response hash
         val responseHash = calculateResponse(
@@ -165,13 +185,14 @@ object DigestAuthenticator {
     }
 
     /**
-     * Generates a random client nonce
+     * Generate a random nonce
      */
     private fun generateNonce(): String {
-        val timestamp = System.currentTimeMillis()
-        val random = (0..999999).random()
-        return md5Hash("$timestamp:$random", MessageDigest.getInstance("MD5"))
+        val bytes = ByteArray(16)
+        secureRandom.nextBytes(bytes)
+        return bytes.joinToString("") { "%02x".format(it) }
     }
+
 
     /**
      * Builds the Authorization header string
