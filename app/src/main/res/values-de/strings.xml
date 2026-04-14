@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">Sender sortieren</string>
     <string name="dialog_delete_stations">Sender löschen</string>
     <string name="button_save">Speichern</string>
+    <string name="button_edit">Bearbeiten</string>
+    <string name="button_select_all">Alle auswählen</string>
     <string name="button_cancel">Abbrechen</string>
     <string name="button_import">Importieren</string>
     <string name="button_export">Exportieren</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">Über</string>
-    <string name="settings_version">Version 1.5</string>
+    <string name="settings_version">Version 1.7</string>
     <string name="settings_view_github">Auf GitHub ansehen</string>
     <string name="settings_donate">Spenden</string>
     <string name="settings_donate_description">Wenn Ihnen diese App geholfen hat, ziehen Sie eine Spende in Betracht</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">Abbrechen</string>
     <string name="tor_control_button_retry">Verbindung wiederholen</string>
     <string name="tor_control_button_install">InviZible Pro installieren</string>
+    <string name="tor_control_button_install_lite">InviZible Lite installieren</string>
     <string name="tor_control_button_open_invizible">InviZible Pro öffnen</string>
+    <string name="tor_control_button_open_app">%s öffnen</string>
 
 
     
@@ -375,6 +379,7 @@
     <string name="toast_custom_proxy_saved">Benutzerdefinierte Proxy-Einstellungen gespeichert</string>
     <string name="toast_custom_proxy_cleared">Benutzerdefinierte Proxy-Einstellungen gelöscht</string>
     <string name="toast_address_copied">Adresse in Zwischenablage kopiert</string>
+    <string name="toast_metadata_copied">Songinfo in Zwischenablage kopiert</string>
     <string name="toast_using_default_directory">Standardverzeichnis wird verwendet</string>
 
     
@@ -561,6 +566,9 @@
     <string name="recording_error_connection_refused">Verbindung abgelehnt</string>
     <string name="recording_error_io">E/A-Fehler: %s</string>
     <string name="recording_error_generic">Fehler: %s</string>
+    <string name="recording_error_hls_playlist">HLS-Playlist konnte nicht abgerufen werden</string>
+    <string name="recording_error_rtsp_unsupported">Aufnahme wird für RTSP-Streams nicht unterstützt</string>
+    <string name="recording_error_proxy_blocked">Aufnahme blockiert: Benötigter Proxy (Tor/Benutzerdefiniert) nicht verfügbar</string>
 
     
     <string name="custom_proxy_not_configured_notification">Benutzerdefinierter Proxy nicht konfiguriert</string>
@@ -594,6 +602,13 @@
     <string name="error_i2p_not_connected">I2P läuft nicht. Starten Sie I2P (z.B. InviZible Pro), um diesen Stream abzuspielen.</string>
     <string name="error_tor_required_for_clearnet">Tor ist nicht verbunden. Der Tor-Zwangsmodus erfordert Tor für Clearnet-Streams.</string>
     <string name="error_custom_proxy_not_configured">Benutzerdefinierter Proxy nicht konfiguriert. Konfigurieren Sie ihn in den Einstellungen.</string>
+    <string name="error_unsupported_codec">%1$s-Streams werden nicht unterstützt</string>
+    <string name="error_playlist_unreadable">Playlist konnte nicht gelesen werden – Sender möglicherweise offline</string>
+    <string name="error_station_geoblocked">Sender in Ihrer Region blockiert (oder von diesem Exit-Node)</string>
+    <string name="error_station_gone">Sender existiert unter dieser URL nicht mehr</string>
+    <string name="error_station_auth_required">Sender erfordert Authentifizierung</string>
+    <string name="notification_unsupported_codec">%1$s-Streams werden nicht unterstützt</string>
+    <string name="notification_playlist_unreadable">Playlist konnte nicht gelesen werden</string>
 
     
     <string name="password_change_rekey_failed">Passwort geändert, aber Datenbank-Neucodierung fehlgeschlagen: %s</string>

@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">स्टेशन क्रमबद्ध करें</string>
     <string name="dialog_delete_stations">स्टेशन हटाएं</string>
     <string name="button_save">सहेजें</string>
+    <string name="button_edit">संपादित करें</string>
+    <string name="button_select_all">सभी चुनें</string>
     <string name="button_cancel">रद्द करें</string>
     <string name="button_import">आयात करें</string>
     <string name="button_export">निर्यात करें</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">के बारे में</string>
-    <string name="settings_version">संस्करण 1.5</string>
+    <string name="settings_version">संस्करण 1.7</string>
     <string name="settings_view_github">GitHub पर देखें</string>
     <string name="settings_donate">दान करें</string>
     <string name="settings_donate_description">यदि इस ऐप ने आपकी मदद की, तो दान करने पर विचार करें</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">रद्द करें</string>
     <string name="tor_control_button_retry">कनेक्शन पुनः प्रयास करें</string>
     <string name="tor_control_button_install">InviZible Pro इंस्टॉल करें</string>
+    <string name="tor_control_button_install_lite">InviZible Lite इंस्टॉल करें</string>
     <string name="tor_control_button_open_invizible">InviZible Pro खोलें</string>
+    <string name="tor_control_button_open_app">%s खोलें</string>
 
     
     <string name="add_edit_tor_info">एम्बेडेड Tor का उपयोग - कोई प्रॉक्सी कॉन्फ़िगरेशन आवश्यक नहीं</string>
@@ -374,6 +378,7 @@
     <string name="toast_custom_proxy_saved">कस्टम प्रॉक्सी सेटिंग्स सहेजी गईं</string>
     <string name="toast_custom_proxy_cleared">कस्टम प्रॉक्सी सेटिंग्स साफ़ हुईं</string>
     <string name="toast_address_copied">पता क्लिपबोर्ड पर कॉपी किया गया</string>
+    <string name="toast_metadata_copied">गाने की जानकारी क्लिपबोर्ड पर कॉपी की गई</string>
     <string name="toast_using_default_directory">डिफ़ॉल्ट निर्देशिका का उपयोग किया जा रहा है</string>
 
     
@@ -560,6 +565,9 @@
     <string name="recording_error_connection_refused">कनेक्शन अस्वीकृत</string>
     <string name="recording_error_io">I/O त्रुटि: %s</string>
     <string name="recording_error_generic">त्रुटि: %s</string>
+    <string name="recording_error_hls_playlist">HLS प्लेलिस्ट प्राप्त करने में असमर्थ</string>
+    <string name="recording_error_rtsp_unsupported">RTSP स्ट्रीम के लिए रिकॉर्डिंग समर्थित नहीं है</string>
+    <string name="recording_error_proxy_blocked">रिकॉर्डिंग अवरुद्ध: आवश्यक प्रॉक्सी (Tor/कस्टम) उपलब्ध नहीं है</string>
 
     
     <string name="custom_proxy_not_configured_notification">कस्टम प्रॉक्सी कॉन्फ़िगर नहीं है</string>
@@ -601,6 +609,13 @@
     <string name="error_i2p_not_connected">I2P नहीं चल रहा है। इस स्ट्रीम को चलाने के लिए I2P शुरू करें (जैसे InviZible Pro)।</string>
     <string name="error_tor_required_for_clearnet">Tor कनेक्ट नहीं है। फोर्स Tor मोड के लिए क्लियरनेट स्ट्रीम में Tor आवश्यक है।</string>
     <string name="error_custom_proxy_not_configured">कस्टम प्रॉक्सी कॉन्फ़िगर नहीं है। सेटिंग्स में कॉन्फ़िगर करें।</string>
+    <string name="error_unsupported_codec">%1$s स्ट्रीम समर्थित नहीं हैं</string>
+    <string name="error_playlist_unreadable">प्लेलिस्ट नहीं पढ़ी जा सकी — स्टेशन ऑफ़लाइन हो सकता है</string>
+    <string name="error_station_geoblocked">आपके क्षेत्र में स्टेशन अवरुद्ध है (या इस एग्ज़िट नोड से)</string>
+    <string name="error_station_gone">स्टेशन अब उस URL पर मौजूद नहीं है</string>
+    <string name="error_station_auth_required">स्टेशन को प्रमाणीकरण की आवश्यकता है</string>
+    <string name="notification_unsupported_codec">%1$s स्ट्रीम समर्थित नहीं हैं</string>
+    <string name="notification_playlist_unreadable">प्लेलिस्ट नहीं पढ़ी जा सकी</string>
 
     
     <string name="cd_add_radio_station">रेडियो स्टेशन जोड़ें</string>

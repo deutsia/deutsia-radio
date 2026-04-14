@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">ステーションを並べ替え</string>
     <string name="dialog_delete_stations">ステーションを削除</string>
     <string name="button_save">保存</string>
+    <string name="button_edit">編集</string>
+    <string name="button_select_all">すべて選択</string>
     <string name="button_cancel">キャンセル</string>
     <string name="button_import">インポート</string>
     <string name="button_export">エクスポート</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">このアプリについて</string>
-    <string name="settings_version">バージョン 1.5</string>
+    <string name="settings_version">バージョン 1.7</string>
     <string name="settings_view_github">GitHubで見る</string>
     <string name="settings_donate">寄付</string>
     <string name="settings_donate_description">このアプリが役に立った場合は、寄付をご検討ください</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">キャンセル</string>
     <string name="tor_control_button_retry">再接続</string>
     <string name="tor_control_button_install">InviZible Proをインストール</string>
+    <string name="tor_control_button_install_lite">InviZible Liteをインストール</string>
     <string name="tor_control_button_open_invizible">InviZible Proを開く</string>
+    <string name="tor_control_button_open_app">%sを開く</string>
 
     
     <string name="add_edit_tor_info">埋め込みTorを使用 - プロキシ設定は不要</string>
@@ -374,6 +378,7 @@
     <string name="toast_custom_proxy_saved">カスタムプロキシ設定を保存しました</string>
     <string name="toast_custom_proxy_cleared">カスタムプロキシ設定をクリアしました</string>
     <string name="toast_address_copied">アドレスをクリップボードにコピーしました</string>
+    <string name="toast_metadata_copied">曲情報をクリップボードにコピーしました</string>
     <string name="toast_using_default_directory">デフォルトディレクトリを使用しています</string>
 
     
@@ -560,6 +565,9 @@
     <string name="recording_error_connection_refused">接続が拒否されました</string>
     <string name="recording_error_io">I/Oエラー: %s</string>
     <string name="recording_error_generic">エラー: %s</string>
+    <string name="recording_error_hls_playlist">HLSプレイリストを取得できません</string>
+    <string name="recording_error_rtsp_unsupported">RTSPストリームの録音はサポートされていません</string>
+    <string name="recording_error_proxy_blocked">録音がブロックされました: 必要なプロキシ (Tor/カスタム) が利用できません</string>
 
     
     <string name="custom_proxy_not_configured_notification">カスタムプロキシが設定されていません</string>
@@ -601,6 +609,13 @@
     <string name="error_i2p_not_connected">I2Pが実行されていません。このストリームを再生するにはI2P（例：InviZible Pro）を起動してください。</string>
     <string name="error_tor_required_for_clearnet">Torが接続されていません。Tor強制モードではクリアネットストリームにTorが必要です。</string>
     <string name="error_custom_proxy_not_configured">カスタムプロキシが設定されていません。設定で構成してください。</string>
+    <string name="error_unsupported_codec">%1$sストリームはサポートされていません</string>
+    <string name="error_playlist_unreadable">プレイリストを読み取れません — ステーションがオフラインの可能性があります</string>
+    <string name="error_station_geoblocked">このステーションはお住まいの地域 (またはこの出口ノード) ではブロックされています</string>
+    <string name="error_station_gone">このURLにステーションは存在しません</string>
+    <string name="error_station_auth_required">ステーションには認証が必要です</string>
+    <string name="notification_unsupported_codec">%1$sストリームはサポートされていません</string>
+    <string name="notification_playlist_unreadable">プレイリストを読み取れません</string>
 
     
     <string name="cd_add_radio_station">ラジオ局を追加</string>
