@@ -896,10 +896,33 @@ object PreferencesHelper {
     /**
      * Check if Android Auto support is enabled.
      * Default: false (private by default — the app is not visible to AA).
+     *
+     * Note: this returns the user's stored *preference*, which is distinct
+     * from whether AA is actually active right now. When any force-proxy
+     * setting is on, Android Auto is blocked regardless of this preference
+     * — see [isAndroidAutoBlockedByForceProxy].
      */
     fun isAndroidAutoEnabled(context: Context): Boolean {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getBoolean(KEY_ANDROID_AUTO_ENABLED, false)
+    }
+
+    /**
+     * Is Android Auto currently blocked because a force-proxy setting is on?
+     *
+     * The Android Auto media library service runs its own ExoPlayer with the
+     * default HTTP stack and does not route through Tor, I2P, or the custom
+     * proxy. If the user has turned on any "force everything through X"
+     * setting, allowing AA playback would silently bypass that routing and
+     * leak clearnet traffic. So AA is treated as hard-blocked whenever any
+     * force-proxy is active: the component stays disabled and the toggle
+     * in Settings is greyed out.
+     */
+    fun isAndroidAutoBlockedByForceProxy(context: Context): Boolean {
+        return isForceTorAll(context) ||
+            isForceTorExceptI2P(context) ||
+            isForceCustomProxy(context) ||
+            isForceCustomProxyExceptTorI2P(context)
     }
 
     // ===== Currently Playing Station Persistence =====

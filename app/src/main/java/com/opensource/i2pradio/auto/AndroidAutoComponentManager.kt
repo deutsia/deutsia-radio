@@ -22,6 +22,14 @@ import com.opensource.i2pradio.ui.PreferencesHelper
  * The manifest entries (service declaration, automotive meta-data, intent
  * filter) stay in the APK either way — they are simply dormant until the
  * component is enabled.
+ *
+ * Force-proxy override: the AA media library service plays through its own
+ * ExoPlayer on the default HTTP stack (no Tor / I2P / custom proxy). If the
+ * user has any force-proxy setting active, AA playback would silently
+ * bypass that routing, so we treat force-proxy as a hard block: the
+ * component stays disabled regardless of the stored AA preference. The
+ * user's AA preference is preserved and will take effect again as soon as
+ * they turn force-proxy off.
  */
 object AndroidAutoComponentManager {
 
@@ -35,21 +43,34 @@ object AndroidAutoComponentManager {
         "com.opensource.i2pradio.auto.DeutsiaMediaLibraryService"
 
     /**
-     * Apply the stored preference to the PackageManager component state.
-     * Safe to call repeatedly (e.g. on app start) — it is a no-op when the
-     * current component state already matches the desired state.
+     * The *effective* state of AA, combining the user's opt-in preference
+     * with the force-proxy override. This is what controls the component.
      */
-    fun applyStoredPreference(context: Context) {
-        setComponentEnabled(context, PreferencesHelper.isAndroidAutoEnabled(context))
+    fun isEffectivelyEnabled(context: Context): Boolean {
+        return PreferencesHelper.isAndroidAutoEnabled(context) &&
+            !PreferencesHelper.isAndroidAutoBlockedByForceProxy(context)
     }
 
     /**
-     * Persist the user's opt-in preference and immediately flip the
-     * component state to match.
+     * Apply the stored preference to the PackageManager component state.
+     * Safe to call repeatedly (e.g. on app start, or after the user flips a
+     * force-proxy setting) — it is a no-op when the current component state
+     * already matches the desired state.
+     */
+    fun applyStoredPreference(context: Context) {
+        setComponentEnabled(context, isEffectivelyEnabled(context))
+    }
+
+    /**
+     * Persist the user's opt-in preference and immediately reconcile the
+     * component state. If a force-proxy is active, the component remains
+     * disabled even if [enabled] is true — the preference is still stored
+     * so that AA turns back on automatically when the user lifts the
+     * force-proxy block.
      */
     fun setAndroidAutoEnabled(context: Context, enabled: Boolean) {
         PreferencesHelper.setAndroidAutoEnabled(context, enabled)
-        setComponentEnabled(context, enabled)
+        applyStoredPreference(context)
     }
 
     /**

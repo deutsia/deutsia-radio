@@ -1699,6 +1699,19 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:lineSpacingExtra="2dp" />
 
+                <!-- Shown when any force-proxy setting blocks AA -->
+                <TextView
+                    android:id="@+id/androidAutoBlockedNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/settings_android_auto_blocked_force_proxy"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary"
+                    android:lineSpacingExtra="2dp"
+                    android:visibility="gone" />
+
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>

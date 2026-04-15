@@ -118,6 +118,7 @@ class SettingsFragment : Fragment() {
 
     // Integrations UI elements
     private var androidAutoSwitch: MaterialSwitch? = null
+    private var androidAutoBlockedNote: TextView? = null
 
     // ViewModel for observing current station (for miniplayer padding)
     private val radioViewModel: RadioViewModel by activityViewModels()
@@ -262,6 +263,14 @@ class SettingsFragment : Fragment() {
                 setupTorSwitchListener()
             }
             updateTorContainerVisibility(torEnabled)
+        }
+
+        // Any change to a force-proxy preference needs to reconcile AA:
+        //   - update the component state (force-proxy hard-blocks AA)
+        //   - refresh the Settings switch UI (enabled/disabled, blocked note)
+        if (key in FORCE_PROXY_KEYS) {
+            AndroidAutoComponentManager.applyStoredPreference(requireContext())
+            setupAndroidAutoControls()
         }
     }
 
@@ -558,6 +567,7 @@ class SettingsFragment : Fragment() {
 
         // Integrations UI elements
         androidAutoSwitch = view.findViewById(R.id.androidAutoSwitch)
+        androidAutoBlockedNote = view.findViewById(R.id.androidAutoBlockedNote)
 
         // Setup authentication controls
         setupAuthenticationControls()
@@ -2773,9 +2783,33 @@ class SettingsFragment : Fragment() {
      * station metadata to Google's Android Auto app, and only flip the
      * component state if they confirm. Turning it off is immediate and needs
      * no confirmation.
+     *
+     * If any force-proxy setting is active, the switch is disabled entirely
+     * and a note explains why — the AA player has no proxy wiring, so we
+     * refuse to let it run while the user wants all traffic tunneled.
      */
     private fun setupAndroidAutoControls() {
         val switch = androidAutoSwitch ?: return
+
+        val blockedByForceProxy =
+            PreferencesHelper.isAndroidAutoBlockedByForceProxy(requireContext())
+
+        // Detach existing listener before mutating state so we don't fire
+        // the user-interaction handler while reflecting preferences.
+        switch.setOnCheckedChangeListener(null)
+
+        if (blockedByForceProxy) {
+            // Hard-blocked: show unchecked, greyed out, with an explanation.
+            switch.isEnabled = false
+            switch.isChecked = false
+            androidAutoBlockedNote?.visibility = View.VISIBLE
+            // Leave the stored preference alone — if the user turns off
+            // force-proxy later, AA comes back in whatever state they set it.
+            return
+        }
+
+        switch.isEnabled = true
+        androidAutoBlockedNote?.visibility = View.GONE
         switch.isChecked = PreferencesHelper.isAndroidAutoEnabled(requireContext())
 
         switch.setOnCheckedChangeListener { sw, isChecked ->
@@ -3057,6 +3091,21 @@ class SettingsFragment : Fragment() {
             settingsContentContainer?.paddingTop ?: 0,
             settingsContentContainer?.paddingRight ?: 0,
             bottomPadding
+        )
+    }
+
+    companion object {
+        /**
+         * Preference keys whose changes should trigger a re-evaluation of
+         * the Android Auto component state. Must match the key constants in
+         * [PreferencesHelper] — kept inline here so we can check them from
+         * an [SharedPreferences.OnSharedPreferenceChangeListener].
+         */
+        private val FORCE_PROXY_KEYS = setOf(
+            "force_tor_all",
+            "force_tor_except_i2p",
+            "force_custom_proxy",
+            "force_custom_proxy_except_tor_i2p"
         )
     }
 }
