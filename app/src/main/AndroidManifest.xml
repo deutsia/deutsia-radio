@@ -24,6 +24,17 @@
         android:theme="@style/Theme.I2PRadio"
         android:usesCleartextTraffic="true">
 
+        <!--
+            Android Auto descriptor. This meta-data only becomes active when
+            the DeutsiaMediaLibraryService component below is enabled. That
+            component is disabled by default; the user opts in via Settings,
+            which flips the component state at runtime. Until then, Android
+            Auto cannot see or bind to the app.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -51,6 +62,27 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <!--
+            Opt-in Android Auto media library service.
+
+            Declared with android:enabled="false" so that, by default,
+            Android Auto cannot bind to it and the app does not appear in
+            the car's media source list. AndroidAutoComponentManager flips
+            this component on via PackageManager.setComponentEnabledSetting
+            when the user enables Android Auto from Settings, and flips it
+            back off when the user disables it.
+        -->
+        <service
+            android:name=".auto.DeutsiaMediaLibraryService"
+            android:enabled="false"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaLibraryService" />
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
 
     </application>
 

@@ -39,6 +39,7 @@ import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.audio.EqualizerManager
+import com.opensource.i2pradio.auto.AndroidAutoComponentManager
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
@@ -114,6 +115,9 @@ class SettingsFragment : Fragment() {
     private var disableRadioRegistryApiSwitch: MaterialSwitch? = null
     private var disableCoverArtSwitch: MaterialSwitch? = null
     private var offlineModeNote: TextView? = null
+
+    // Integrations UI elements
+    private var androidAutoSwitch: MaterialSwitch? = null
 
     // ViewModel for observing current station (for miniplayer padding)
     private val radioViewModel: RadioViewModel by activityViewModels()
@@ -552,12 +556,18 @@ class SettingsFragment : Fragment() {
         disableCoverArtSwitch = view.findViewById(R.id.disableCoverArtSwitch)
         offlineModeNote = view.findViewById(R.id.offlineModeNote)
 
+        // Integrations UI elements
+        androidAutoSwitch = view.findViewById(R.id.androidAutoSwitch)
+
         // Setup authentication controls
         setupAuthenticationControls()
         setupDatabaseEncryptionControls()
 
         // Setup Network & API controls
         setupNetworkApiControls()
+
+        // Setup Integrations (Android Auto opt-in)
+        setupAndroidAutoControls()
 
         // Setup custom proxy controls
         setupCustomProxyControls()
@@ -2753,6 +2763,69 @@ class SettingsFragment : Fragment() {
     private fun updateOfflineModeNoteVisibility() {
         val isOfflineMode = PreferencesHelper.isOfflineMode(requireContext())
         offlineModeNote?.visibility = if (isOfflineMode) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Setup the Android Auto opt-in switch.
+     *
+     * Disabled by default. When the user turns it on, we show a plain-language
+     * warning dialog explaining that enabling this exposes non-proxied
+     * station metadata to Google's Android Auto app, and only flip the
+     * component state if they confirm. Turning it off is immediate and needs
+     * no confirmation.
+     */
+    private fun setupAndroidAutoControls() {
+        val switch = androidAutoSwitch ?: return
+        switch.isChecked = PreferencesHelper.isAndroidAutoEnabled(requireContext())
+
+        switch.setOnCheckedChangeListener { sw, isChecked ->
+            // Play the same tactile animation used by other switches.
+            sw.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    sw.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            if (isChecked) {
+                // Require explicit confirmation before exposing anything to AA.
+                showAndroidAutoEnableConfirmation()
+            } else {
+                AndroidAutoComponentManager.setAndroidAutoEnabled(requireContext(), false)
+            }
+        }
+    }
+
+    private fun showAndroidAutoEnableConfirmation() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.android_auto_warning_title)
+            .setMessage(R.string.android_auto_warning_message)
+            .setPositiveButton(R.string.android_auto_warning_enable) { _, _ ->
+                AndroidAutoComponentManager.setAndroidAutoEnabled(requireContext(), true)
+            }
+            .setNegativeButton(R.string.android_auto_warning_cancel) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setOnCancelListener {
+                // User backed out — revert the switch without re-triggering our listener.
+                revertAndroidAutoSwitch(checked = false)
+            }
+            .show()
+    }
+
+    private fun revertAndroidAutoSwitch(checked: Boolean) {
+        val sw = androidAutoSwitch ?: return
+        sw.setOnCheckedChangeListener(null)
+        sw.isChecked = checked
+        setupAndroidAutoControls()
     }
 
     /**

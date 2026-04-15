@@ -64,6 +64,9 @@ object PreferencesHelper {
     private const val KEY_DISABLE_RADIO_REGISTRY_API = "disable_radio_registry_api"
     private const val KEY_DISABLE_COVER_ART = "disable_cover_art"
 
+    // Integrations
+    private const val KEY_ANDROID_AUTO_ENABLED = "android_auto_enabled"
+
     // Currently playing station persistence
     private const val KEY_CURRENT_STATION_JSON = "current_station_json"
 
@@ -866,6 +869,37 @@ object PreferencesHelper {
      */
     fun isOfflineMode(context: Context): Boolean {
         return isRadioBrowserApiDisabled(context) && isRadioRegistryApiDisabled(context)
+    }
+
+    // ===== Integrations =====
+
+    /**
+     * Set whether Android Auto support is enabled.
+     *
+     * When disabled (the default), the MediaLibraryService component stays
+     * disabled at the PackageManager level, so Android Auto cannot bind to
+     * the app and the app never appears in the car's media source list.
+     *
+     * When enabled, the user explicitly opts in to exposing station metadata
+     * and the browse tree to Google's Android Auto app.
+     *
+     * This preference only records the user's intent; the actual component
+     * enable/disable is performed via AndroidAutoComponentManager.
+     */
+    fun setAndroidAutoEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_ANDROID_AUTO_ENABLED, enabled)
+            .apply()
+    }
+
+    /**
+     * Check if Android Auto support is enabled.
+     * Default: false (private by default — the app is not visible to AA).
+     */
+    fun isAndroidAutoEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_ANDROID_AUTO_ENABLED, false)
     }
 
     // ===== Currently Playing Station Persistence =====

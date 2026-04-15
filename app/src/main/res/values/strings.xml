@@ -302,6 +302,18 @@
     <string name="settings_network_api_info">The app only connects to: RadioBrowser API for clearnet stations, Radio Registry API for Tor/I2P stations, external servers for station cover art, and radio streams when playing.</string>
     <string name="settings_offline_mode_note">Both APIs disabled: Browse tab shows local library only. You can still play saved stations and import stations from files.</string>
 
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">Integrations</string>
+    <string name="settings_android_auto">Android Auto support</string>
+    <string name="settings_android_auto_description">Expose your stations to Google\'s Android Auto app so you can play them from a car head unit. Off by default.</string>
+    <string name="settings_android_auto_info">When enabled, only non-proxied stations appear in Android Auto. Stations routed over Tor, I2P, or a custom proxy stay hidden from Android Auto to protect their anonymity.</string>
+    <string name="android_auto_warning_title">Enable Android Auto?</string>
+    <string name="android_auto_warning_message">This exposes your non-proxied station list and playback metadata (station name, artwork, current track) to Google\'s Android Auto app.\n\nTor, I2P, and custom-proxy stations will stay hidden from Android Auto.\n\nYou can turn this off again at any time.</string>
+    <string name="android_auto_warning_enable">Enable</string>
+    <string name="android_auto_warning_cancel">Cancel</string>
+    <string name="auto_node_favorites">Favorites</string>
+    <string name="auto_node_all_stations">All stations</string>
+
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">Offline Mode</string>
     <string name="browse_offline_mode_message">External APIs are disabled in settings. Go to your Library to access saved stations, or enable APIs in Settings to browse online stations.</string>
