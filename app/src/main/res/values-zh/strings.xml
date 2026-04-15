@@ -567,7 +567,6 @@
     <string name="recording_error_io">I/O 错误：%s</string>
     <string name="recording_error_generic">错误：%s</string>
     <string name="recording_error_hls_playlist">无法获取HLS播放列表</string>
-    <string name="recording_error_rtsp_unsupported">RTSP流不支持录制</string>
     <string name="recording_error_proxy_blocked">录制被阻止：所需的代理（Tor/自定义）不可用</string>
 
     

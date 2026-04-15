@@ -567,7 +567,6 @@
     <string name="recording_error_io">خطای ورودی/خروجی: %s</string>
     <string name="recording_error_generic">خطا: %s</string>
     <string name="recording_error_hls_playlist">دریافت پلی‌لیست HLS ممکن نشد</string>
-    <string name="recording_error_rtsp_unsupported">ضبط برای جریان‌های RTSP پشتیبانی نمی‌شود</string>
     <string name="recording_error_proxy_blocked">ضبط مسدود شد: پروکسی موردنیاز (Tor/سفارشی) در دسترس نیست</string>
 
     

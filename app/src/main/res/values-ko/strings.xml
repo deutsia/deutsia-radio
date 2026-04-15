@@ -566,7 +566,6 @@
     <string name="recording_error_io">I/O 오류: %s</string>
     <string name="recording_error_generic">오류: %s</string>
     <string name="recording_error_hls_playlist">HLS 재생목록을 가져올 수 없음</string>
-    <string name="recording_error_rtsp_unsupported">RTSP 스트림에는 녹음이 지원되지 않습니다</string>
     <string name="recording_error_proxy_blocked">녹음 차단됨: 필요한 프록시 (Tor/사용자 지정)를 사용할 수 없음</string>
 
     

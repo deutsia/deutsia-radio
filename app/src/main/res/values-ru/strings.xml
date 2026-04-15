@@ -566,7 +566,6 @@
     <string name="recording_error_io">Ошибка ввода/вывода: %s</string>
     <string name="recording_error_generic">Ошибка: %s</string>
     <string name="recording_error_hls_playlist">Не удалось получить плейлист HLS</string>
-    <string name="recording_error_rtsp_unsupported">Запись не поддерживается для потоков RTSP</string>
     <string name="recording_error_proxy_blocked">Запись заблокирована: требуемый прокси (Tor/пользовательский) недоступен</string>
 
     

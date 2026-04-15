@@ -566,7 +566,6 @@
     <string name="recording_error_io">I/O त्रुटि: %s</string>
     <string name="recording_error_generic">त्रुटि: %s</string>
     <string name="recording_error_hls_playlist">HLS प्लेलिस्ट प्राप्त करने में असमर्थ</string>
-    <string name="recording_error_rtsp_unsupported">RTSP स्ट्रीम के लिए रिकॉर्डिंग समर्थित नहीं है</string>
     <string name="recording_error_proxy_blocked">रिकॉर्डिंग अवरुद्ध: आवश्यक प्रॉक्सी (Tor/कस्टम) उपलब्ध नहीं है</string>
 
     

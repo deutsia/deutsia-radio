@@ -566,7 +566,6 @@
     <string name="recording_error_io">Errore I/O: %s</string>
     <string name="recording_error_generic">Errore: %s</string>
     <string name="recording_error_hls_playlist">Impossibile recuperare la playlist HLS</string>
-    <string name="recording_error_rtsp_unsupported">La registrazione non è supportata per i flussi RTSP</string>
     <string name="recording_error_proxy_blocked">Registrazione bloccata: il proxy richiesto (Tor/personalizzato) non è disponibile</string>
 
     
