@@ -504,7 +504,8 @@ class RadioService : Service() {
                 // from a single direct URL, so pointers wouldn't work there.
                 serviceScope.launch(Dispatchers.IO) {
                     val resolution = resolveStreamUrlBlocking(
-                        newStreamUrl, newProxyHost, newProxyPort, newProxyType
+                        newStreamUrl, newProxyHost, newProxyPort, newProxyType,
+                        newHlsHint, newCodecHint
                     )
                     val resolvedUrl = resolution?.url ?: newStreamUrl
                     val effectiveHlsHint = newHlsHint || (resolution?.hlsDetected == true)
@@ -1791,7 +1792,9 @@ class RadioService : Service() {
         codecHint: String
     ) {
         serviceScope.launch(Dispatchers.IO) {
-            val resolution = resolveStreamUrlBlocking(streamUrl, proxyHost, proxyPort, proxyType)
+            val resolution = resolveStreamUrlBlocking(
+                streamUrl, proxyHost, proxyPort, proxyType, hlsHint, codecHint
+            )
             handler.post {
                 if (resolution == null) {
                     android.util.Log.e("RadioService", "Playlist pointer resolution failed for $streamUrl")
@@ -1862,8 +1865,23 @@ class RadioService : Service() {
         streamUrl: String,
         proxyHost: String,
         proxyPort: Int,
-        proxyType: ProxyType
+        proxyType: ProxyType,
+        hlsHint: Boolean = false,
+        codecHint: String = ""
     ): ResolvedStream? {
+        // Fast path: if Radio Browser's catalog hints are authoritative for
+        // this URL (codec is a direct audio codec, or HLS flag is set), skip
+        // the probe entirely. This saves a full round-trip (painful over
+        // Tor/I2P) for the majority of extensionless Shoutcast/Icecast URLs
+        // that previously triggered a content-type probe.
+        //
+        // This does NOT bypass the proxy - it just skips OUR probe request.
+        // ExoPlayer's subsequent stream fetch still goes through the proper
+        // proxy pipeline in playStream().
+        if (com.opensource.i2pradio.util.PlaylistResolver
+                .canSkipWithHints(streamUrl, hlsHint, codecHint)) {
+            return ResolvedStream(streamUrl, hlsDetected = hlsHint)
+        }
         return try {
             val forceTorAll = PreferencesHelper.isForceTorAll(this)
             val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
@@ -1936,9 +1954,12 @@ class RadioService : Service() {
                 else -> null  // no proxy required, safe to resolve direct
             }
 
+            // Short timeouts on purpose: a slow pointer host shouldn't stall
+            // playback start for tens of seconds. ExoPlayer's own timeouts
+            // still govern the actual audio fetch downstream.
             val builder = OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
+                .connectTimeout(6, TimeUnit.SECONDS)
+                .readTimeout(6, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
 
             if (effective != null) {

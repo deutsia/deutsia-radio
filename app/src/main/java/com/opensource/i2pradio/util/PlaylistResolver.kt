@@ -7,6 +7,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.xmlpull.v1.XmlPullParser
 import java.io.StringReader
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 /**
@@ -29,8 +30,32 @@ object PlaylistResolver {
     /** Maximum chained pointer resolutions (pls -> m3u -> stream is 2 hops). */
     const val MAX_DEPTH: Int = 2
 
-    private const val FETCH_TIMEOUT_SECONDS = 15L
+    // Kept short so a slow pointer host can't stall playback for tens of
+    // seconds. ExoPlayer's own timeouts still govern the actual stream fetch
+    // once resolution completes.
+    private const val FETCH_TIMEOUT_SECONDS = 6L
     private const val MAX_PLAYLIST_BYTES = 256 * 1024L
+
+    // In-memory cache of successful resolutions. Avoids the extra HTTP
+    // round-trip on repeat plays / station switches during the same session.
+    // Cache lives for the process lifetime with a per-entry TTL so pointer
+    // files that rotate their target URL aren't pinned forever. Failures are
+    // NEVER cached - a transient network blip shouldn't pin a dead station.
+    //
+    // Safety: we only store public URLs (the pointer input and the stream it
+    // resolved to) plus the hlsDetected flag. No proxy / auth / credential
+    // state. The proxy transport used to reach these URLs is determined at
+    // each play time - this cache does NOT bypass the proxy pipeline.
+    private const val CACHE_TTL_MS = 60L * 60L * 1000L  // 1 hour
+    private const val CACHE_MAX_ENTRIES = 256
+
+    private data class CacheEntry(
+        val resolvedUrl: String,
+        val hlsDetected: Boolean,
+        val expiresAt: Long
+    )
+
+    private val cache = ConcurrentHashMap<String, CacheEntry>()
 
     /**
      * Result of a resolution attempt.
@@ -64,7 +89,86 @@ object PlaylistResolver {
      *         if resolution failed.
      */
     fun resolve(originalUrl: String, httpClient: OkHttpClient): Result {
-        return resolveInternal(originalUrl, httpClient, depth = 0)
+        cacheLookup(originalUrl)?.let { cached ->
+            Log.d(TAG, "Resolver cache hit for $originalUrl -> ${cached.resolvedUrl}")
+            return Result.Resolved(cached.resolvedUrl, cached.hlsDetected)
+        }
+        val result = resolveInternal(originalUrl, httpClient, depth = 0)
+        if (result is Result.Resolved) {
+            cachePut(originalUrl, result.url, result.hlsDetected)
+        }
+        return result
+    }
+
+    /**
+     * Whether the caller can skip resolution entirely because authoritative
+     * catalog signals (Radio Browser's hls flag / codec field) already tell
+     * us the stream shape. This is purely an optimisation: when we know the
+     * content is HLS, ExoPlayer's HLS media source will follow any chained
+     * manifests itself; when we know the content is a direct audio codec,
+     * there's nothing to resolve.
+     *
+     * Returns false for URLs with an explicit pointer extension (.pls, .m3u,
+     * .asx, .xspf, .wax, .wvx) - those always need parsing because the URL
+     * itself is not a stream and ExoPlayer can't read them.
+     *
+     * IMPORTANT: this does NOT affect proxy routing. When the caller skips
+     * resolution, ExoPlayer still makes its request through the station's
+     * configured proxy. We're only skipping the resolver's probe request.
+     */
+    fun canSkipWithHints(url: String, hlsHint: Boolean, codecHint: String): Boolean {
+        // Never skip resolution for known pointer extensions - they MUST be
+        // parsed to get the underlying stream URL, regardless of hints.
+        if (extensionHint(url) != PointerFormat.NONE) return false
+        if (hlsHint) return true
+        return isDirectAudioCodecHint(codecHint)
+    }
+
+    /**
+     * Whether a Radio Browser codec hint describes a direct audio stream we
+     * can hand straight to ExoPlayer's progressive source. Video containers
+     * (H.264/HEVC MPEG-TS or MP4) and ambiguous / unknown values return
+     * false so we still probe to detect HLS-served-as-something-else.
+     */
+    private fun isDirectAudioCodecHint(codecHint: String): Boolean {
+        if (codecHint.isBlank()) return false
+        val upper = codecHint.uppercase()
+        if (upper.startsWith("UNKNOWN")) return false
+        // Anything with a video codec token needs further inspection - we
+        // currently can't tell from the codec alone whether the stream is
+        // a plain MPEG-TS or an HLS segment list.
+        if (upper.contains("H.264") || upper.contains("H264") ||
+            upper.contains("HEVC") || upper.contains("H.265")) {
+            return false
+        }
+        return when (upper.substringBefore(',').trim()) {
+            "MP3", "AAC", "AAC+", "OGG", "OPUS", "FLAC", "MP4", "M4A", "WAV" -> true
+            else -> false
+        }
+    }
+
+    private fun cacheLookup(url: String): CacheEntry? {
+        val entry = cache[url] ?: return null
+        if (System.currentTimeMillis() > entry.expiresAt) {
+            cache.remove(url, entry)
+            return null
+        }
+        return entry
+    }
+
+    private fun cachePut(url: String, resolvedUrl: String, hlsDetected: Boolean) {
+        // Bound the cache to avoid unbounded growth across a long-running
+        // session. Simple strategy: clear when we hit the ceiling. A proper
+        // LRU isn't worth the complexity here - 256 entries is far more than
+        // the typical favourites list.
+        if (cache.size >= CACHE_MAX_ENTRIES) {
+            cache.clear()
+        }
+        cache[url] = CacheEntry(
+            resolvedUrl = resolvedUrl,
+            hlsDetected = hlsDetected,
+            expiresAt = System.currentTimeMillis() + CACHE_TTL_MS
+        )
     }
 
     private fun resolveInternal(url: String, httpClient: OkHttpClient, depth: Int): Result {
