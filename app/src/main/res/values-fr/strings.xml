@@ -566,7 +566,6 @@
     <string name="recording_error_io">Erreur E/S : %s</string>
     <string name="recording_error_generic">Erreur : %s</string>
     <string name="recording_error_hls_playlist">Impossible de récupérer la liste de lecture HLS</string>
-    <string name="recording_error_rtsp_unsupported">L\'enregistrement n\'est pas pris en charge pour les flux RTSP</string>
     <string name="recording_error_proxy_blocked">Enregistrement bloqué : le proxy requis (Tor/personnalisé) n\'est pas disponible</string>
 
     

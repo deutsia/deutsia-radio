@@ -567,7 +567,6 @@
     <string name="recording_error_io">I/O အမှား: %s</string>
     <string name="recording_error_generic">အမှား: %s</string>
     <string name="recording_error_hls_playlist">HLS ပလေးလစ်ကို ရယူ၍မရပါ</string>
-    <string name="recording_error_rtsp_unsupported">RTSP streams အတွက် အသံသွင်းခြင်းကို မပံ့ပိုးပါ</string>
     <string name="recording_error_proxy_blocked">အသံသွင်းခြင်း ပိတ်ဆို့ထားသည်- လိုအပ်သော ပရောက်ဆီ (Tor/စိတ်ကြိုက်) မရနိုင်ပါ</string>
 
     

@@ -567,7 +567,6 @@
     <string name="recording_error_io">E/A-Fehler: %s</string>
     <string name="recording_error_generic">Fehler: %s</string>
     <string name="recording_error_hls_playlist">HLS-Playlist konnte nicht abgerufen werden</string>
-    <string name="recording_error_rtsp_unsupported">Aufnahme wird für RTSP-Streams nicht unterstützt</string>
     <string name="recording_error_proxy_blocked">Aufnahme blockiert: Benötigter Proxy (Tor/Benutzerdefiniert) nicht verfügbar</string>
 
     

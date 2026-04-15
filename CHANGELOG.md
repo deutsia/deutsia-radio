@@ -5,7 +5,6 @@ All notable changes to deutsia radio will be documented in this file.
 ## [1.7.1]
 
 ### Added
-- **RTSP playback support**: Added support for RTSP streams
 - **Copy now playing metadata**: Long-press the now playing info to copy song/station metadata to clipboard, with a confirmation toast
 - **URL resolution**: Separated URL resolution from format detection 
 ### Security

@@ -566,7 +566,6 @@
     <string name="recording_error_io">I/Oエラー: %s</string>
     <string name="recording_error_generic">エラー: %s</string>
     <string name="recording_error_hls_playlist">HLSプレイリストを取得できません</string>
-    <string name="recording_error_rtsp_unsupported">RTSPストリームの録音はサポートされていません</string>
     <string name="recording_error_proxy_blocked">録音がブロックされました: 必要なプロキシ (Tor/カスタム) が利用できません</string>
 
     

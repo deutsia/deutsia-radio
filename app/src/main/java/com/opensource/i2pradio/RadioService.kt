@@ -35,7 +35,6 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.rtsp.RtspMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.metadata.icy.IcyInfo
@@ -567,16 +566,6 @@ class RadioService : Service() {
         val streamUrl = currentStreamUrl ?: run {
             android.util.Log.e("RadioService", "Cannot start recording: no stream URL")
             broadcastRecordingError(getString(R.string.recording_error_no_stream))
-            return
-        }
-
-        // Recording uses OkHttp / HlsRecorder / DashRecorder, all of which
-        // assume an HTTP response body. RTSP streams are RTP, so there's
-        // nothing sensible to write to disk from this path. Surface a clear
-        // error instead of silently producing an empty file.
-        if (isRtspStream(streamUrl)) {
-            android.util.Log.w("RadioService", "Recording not supported for RTSP streams")
-            broadcastRecordingError(getString(R.string.recording_error_rtsp_unsupported))
             return
         }
 
@@ -1648,19 +1637,6 @@ class RadioService : Service() {
         return path.endsWith(".mpd") || path.contains(".mpd")
     }
 
-    /**
-     * RTSP streams use their own transport (RTP over UDP/TCP) and bypass
-     * OkHttp entirely. That has two important consequences:
-     *  - Proxy settings (Tor/I2P/custom) don't apply, so force-proxy modes
-     *    must reject rtsp:// URLs up front rather than silently leaking.
-     *  - Recording via [buildRecordingHttpClient] won't work - RTSP needs
-     *    its own RTP receiver. We surface a clear error instead of silently
-     *    producing an empty file.
-     */
-    private fun isRtspStream(streamUrl: String): Boolean {
-        return streamUrl.startsWith("rtsp://", ignoreCase = true)
-    }
-
     private fun switchRecordingStream(
         newStreamUrl: String,
         newProxyHost: String,
@@ -1672,17 +1648,6 @@ class RadioService : Service() {
     ) {
         if (!isRecording) {
             android.util.Log.d("RadioService", "switchRecordingStream called but not recording")
-            return
-        }
-
-        // Switching to an RTSP station while recording can't continue the
-        // recording - there's no HTTP response body to tee. Stop recording
-        // cleanly rather than hand an RTSP URL to the recording thread,
-        // which would just spin on connection failures.
-        if (isRtspStream(newStreamUrl)) {
-            android.util.Log.w("RadioService", "New stream is RTSP - stopping recording (RTSP recording unsupported)")
-            broadcastRecordingError(getString(R.string.recording_error_rtsp_unsupported))
-            stopRecording()
             return
         }
 
@@ -2065,22 +2030,6 @@ class RadioService : Service() {
             val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(this)
             val isI2PStream = proxyType == ProxyType.I2P || streamUrl.contains(".i2p")
             val isTorStream = proxyType == ProxyType.TOR || streamUrl.contains(".onion")
-            val isRtsp = isRtspStream(streamUrl)
-
-            // RTSP uses its own transport (RTP over UDP/TCP) and bypasses
-            // OkHttp entirely - proxy settings, including the per-station
-            // proxy, don't apply. Reject rtsp:// whenever the user has
-            // asked for ANY kind of proxying (global force-* modes OR a
-            // per-station proxyType other than NONE) rather than silently
-            // leaking raw RTP to the clearnet.
-            val anyProxyRequired = forceTorAll || forceTorExceptI2P ||
-                forceCustomProxy || forceCustomProxyExceptTorI2P ||
-                proxyType != ProxyType.NONE
-            if (isRtsp && anyProxyRequired) {
-                android.util.Log.e("RadioService", "RTSP blocked: user has proxying configured but RTSP can't be proxied")
-                rejectUnsupportedCodec("RTSP (proxy mode)")
-                return
-            }
 
             android.util.Log.d("RadioService", "===== STREAM CONNECTION REQUEST =====")
             android.util.Log.d("RadioService", "Stream URL: $streamUrl")
@@ -2438,19 +2387,9 @@ class RadioService : Service() {
                 // Browser. This fixes streams with extensionless URLs (e.g.
                 // /listen?sid=1) that are actually HLS - the catalog tells us
                 // truthfully what they are even when the URL doesn't.
-                val useRtsp = isRtspStream(streamUrl)
-                val useHls = !useRtsp && (isHlsStream(streamUrl) || hlsHint)
-                val useDash = !useRtsp && isDashStream(streamUrl)
+                val useHls = isHlsStream(streamUrl) || hlsHint
+                val useDash = isDashStream(streamUrl)
                 val mediaSource: MediaSource = when {
-                    useRtsp -> {
-                        // RTSP bypasses OkHttp so it doesn't share our proxy /
-                        // bandwidth-tracking pipeline. The gate at the top of
-                        // playStream has already rejected rtsp:// URLs under
-                        // any proxy mode, so reaching here means the user has
-                        // no proxy configured and direct playback is OK.
-                        RtspMediaSource.Factory()
-                            .createMediaSource(MediaItem.fromUri(streamUrl))
-                    }
                     useHls -> {
                         HlsMediaSource.Factory(dataSourceFactory)
                             .createMediaSource(MediaItem.fromUri(streamUrl))

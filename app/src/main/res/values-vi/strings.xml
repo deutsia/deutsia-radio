@@ -567,7 +567,6 @@
     <string name="recording_error_io">Lỗi I/O: %s</string>
     <string name="recording_error_generic">Lỗi: %s</string>
     <string name="recording_error_hls_playlist">Không thể tải danh sách phát HLS</string>
-    <string name="recording_error_rtsp_unsupported">Ghi âm không được hỗ trợ cho luồng RTSP</string>
     <string name="recording_error_proxy_blocked">Ghi âm bị chặn: proxy bắt buộc (Tor/tùy chỉnh) không khả dụng</string>
 
     

@@ -566,7 +566,6 @@
     <string name="recording_error_io">خطأ إدخال/إخراج: %s</string>
     <string name="recording_error_generic">خطأ: %s</string>
     <string name="recording_error_hls_playlist">تعذر جلب قائمة تشغيل HLS</string>
-    <string name="recording_error_rtsp_unsupported">التسجيل غير مدعوم لبث RTSP</string>
     <string name="recording_error_proxy_blocked">تم حظر التسجيل: البروكسي المطلوب (Tor/مخصص) غير متاح</string>
 
     

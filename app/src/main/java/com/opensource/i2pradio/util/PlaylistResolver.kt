@@ -74,10 +74,9 @@ object PlaylistResolver {
         }
 
         // Non-HTTP schemes can't be probed with OkHttp and never serve a
-        // playlist pointer in the first place - RTSP, MMS, and friends are
+        // playlist pointer in the first place - MMS, RTMP, and friends are
         // always direct transports. Short-circuit before any network work.
-        if (url.startsWith("rtsp://", ignoreCase = true) ||
-            url.startsWith("mms://", ignoreCase = true) ||
+        if (url.startsWith("mms://", ignoreCase = true) ||
             url.startsWith("rtmp://", ignoreCase = true) ||
             url.startsWith("rtmps://", ignoreCase = true)) {
             return Result.Resolved(url)
@@ -299,8 +298,7 @@ object PlaylistResolver {
             if (line.startsWith("#")) return@forEach
             if (line.startsWith("http://", ignoreCase = true) ||
                 line.startsWith("https://", ignoreCase = true) ||
-                line.startsWith("mms://", ignoreCase = true) ||
-                line.startsWith("rtsp://", ignoreCase = true)) {
+                line.startsWith("mms://", ignoreCase = true)) {
                 return line
             }
         }
@@ -364,8 +362,7 @@ object PlaylistResolver {
     private fun absolutise(baseUrl: String, resolved: String): String {
         if (resolved.startsWith("http://", ignoreCase = true) ||
             resolved.startsWith("https://", ignoreCase = true) ||
-            resolved.startsWith("mms://", ignoreCase = true) ||
-            resolved.startsWith("rtsp://", ignoreCase = true)) {
+            resolved.startsWith("mms://", ignoreCase = true)) {
             return resolved
         }
         return try {

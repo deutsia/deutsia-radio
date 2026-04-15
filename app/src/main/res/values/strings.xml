@@ -618,7 +618,6 @@
     <string name="recording_error_io">I/O error: %s</string>
     <string name="recording_error_generic">Error: %s</string>
     <string name="recording_error_hls_playlist">Unable to fetch HLS playlist</string>
-    <string name="recording_error_rtsp_unsupported">Recording isn\'t supported for RTSP streams</string>
     <string name="recording_error_proxy_blocked">Recording blocked: required proxy (Tor/custom) is not available</string>
 
     <!-- Custom Proxy Messages -->
