@@ -11,10 +11,13 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Metadata
+import androidx.media3.common.Player
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.extractor.metadata.icy.IcyInfo
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaLibraryService.LibraryParams
@@ -76,6 +79,14 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
     private var session: MediaLibrarySession? = null
     private var dataSourceFactory: StationProxyDataSourceFactory? = null
 
+    /**
+     * Last raw ICY title we surfaced to the session. Used to de-duplicate
+     * repeated `onMetadata` callbacks for the same track — ExoPlayer can
+     * deliver the same IcyInfo multiple times, and `replaceMediaItem` on
+     * every hit would thrash Android Auto's "now playing" UI.
+     */
+    private var currentIcyTitle: String? = null
+
     private val backgroundExecutor: Executor = Executors.newSingleThreadExecutor { r ->
         Thread(r, "DeutsiaAuto-DB").apply { isDaemon = true }
     }
@@ -100,6 +111,20 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
             )
             .setHandleAudioBecomingNoisy(true)
             .build()
+        exoPlayer.addListener(object : Player.Listener {
+            override fun onMetadata(metadata: Metadata) {
+                for (i in 0 until metadata.length()) {
+                    val entry = metadata.get(i)
+                    if (entry is IcyInfo) {
+                        val raw = entry.title?.trim().orEmpty()
+                        if (raw.isBlank() || raw == currentIcyTitle) continue
+                        currentIcyTitle = raw
+                        val (artist, title) = parseMetadata(raw)
+                        updateMediaMetadata(artist, title ?: raw)
+                    }
+                }
+            }
+        })
         player = exoPlayer
 
         val sessionActivity = PendingIntent.getActivity(
@@ -224,6 +249,7 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
                     val station = loadStation(mediaId) ?: return@mapNotNull null
                     if (factory == null) return@mapNotNull null
                     factory.setStation(station)
+                    currentIcyTitle = null
                     stationToMediaItem(station)
                 }.toMutableList()
             }
@@ -305,6 +331,7 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
         val metadataBuilder = MediaMetadata.Builder()
             .setTitle(station.name)
             .setArtist(station.genre.ifBlank { null })
+            .setAlbumTitle(station.name)
             .setIsBrowsable(false)
             .setIsPlayable(true)
             .setMediaType(MediaMetadata.MEDIA_TYPE_RADIO_STATION)
@@ -316,6 +343,56 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
             .setUri(station.streamUrl)
             .setMediaMetadata(metadataBuilder.build())
             .build()
+    }
+
+    // -----------------------------------------------------------------------
+    // ICY → MediaMetadata plumbing
+    // -----------------------------------------------------------------------
+
+    /**
+     * Parse an ICY `StreamTitle` into `(artist, title)` using the same
+     * delimiters as the main `RadioService`. Returns `(null, raw)` when the
+     * station doesn't use an artist/title separator.
+     */
+    private fun parseMetadata(raw: String): Pair<String?, String?> {
+        for (delimiter in METADATA_DELIMITERS) {
+            val index = raw.indexOf(delimiter)
+            if (index > 0 && index < raw.length - delimiter.length) {
+                val artist = raw.substring(0, index).trim()
+                val title = raw.substring(index + delimiter.length).trim()
+                if (artist.isNotBlank() && title.isNotBlank()) {
+                    return Pair(artist, title)
+                }
+            }
+        }
+        return Pair(null, raw)
+    }
+
+    /**
+     * Push the live track info into the current MediaItem's metadata so
+     * Android Auto's "now playing" view updates. The station name is moved
+     * to `albumTitle` so it stays visible on the third line while the
+     * track title/artist take the top two lines. Station artwork and other
+     * fields are preserved via `buildUpon()`.
+     */
+    private fun updateMediaMetadata(artist: String?, title: String) {
+        val exo = player ?: return
+        val index = exo.currentMediaItemIndex
+        if (index == C.INDEX_UNSET) return
+        val current = exo.currentMediaItem ?: return
+        val base = current.mediaMetadata
+        val stationName = base.albumTitle?.toString() ?: base.title?.toString()
+        val effectiveArtist = artist?.takeIf { it.isNotBlank() }
+            ?: base.artist?.toString()?.takeIf { it.isNotBlank() }
+        val updated = base.buildUpon()
+            .setTitle(title)
+            .setArtist(effectiveArtist)
+            .setAlbumTitle(stationName)
+            .build()
+        val newItem = current.buildUpon()
+            .setMediaMetadata(updated)
+            .build()
+        exo.replaceMediaItem(index, newItem)
     }
 
     // -----------------------------------------------------------------------
@@ -407,6 +484,11 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
         private const val AA_NOTIFICATION_CHANNEL_ID = "deutsia_android_auto"
         private const val NOTIFICATION_ID_FIRST_CONNECT = 4101
         private const val FIRST_CONNECT_REQUEST_CODE = 4102
+
+        // Kept in sync with RadioService.METADATA_DELIMITERS — the same
+        // separators stations use to pack "Artist - Title" into the single
+        // ICY StreamTitle field.
+        private val METADATA_DELIMITERS = listOf(" - ", " – ", " — ", " | ", " / ", " • ", " : ")
     }
 }
 
