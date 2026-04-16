@@ -66,6 +66,8 @@ object PreferencesHelper {
 
     // Integrations
     private const val KEY_ANDROID_AUTO_ENABLED = "android_auto_enabled"
+    private const val KEY_AA_FIRST_CONNECT_HANDLED = "aa_first_connect_handled"
+    private const val KEY_AA_ALLOW_PROXY_STATIONS = "aa_allow_proxy_stations"
 
     // Currently playing station persistence
     private const val KEY_CURRENT_STATION_JSON = "current_station_json"
@@ -923,6 +925,55 @@ object PreferencesHelper {
             isForceTorExceptI2P(context) ||
             isForceCustomProxy(context) ||
             isForceCustomProxyExceptTorI2P(context)
+    }
+
+    /**
+     * Has the user already been shown the "AA is now connected for the first
+     * time" notification (Moment 2 of the AA opt-in flow)? This is set to true
+     * the first time we observe Android Auto bind to our media library
+     * service so that we don't post the notification again on every reconnect.
+     */
+    fun hasAndroidAutoFirstConnectBeenHandled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_AA_FIRST_CONNECT_HANDLED, false)
+    }
+
+    fun setAndroidAutoFirstConnectHandled(context: Context, handled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_AA_FIRST_CONNECT_HANDLED, handled)
+            .apply()
+    }
+
+    /**
+     * Should Tor / I2P / custom-proxy stations be exposed in the Android Auto
+     * browse tree (and be playable from AA)?
+     *
+     * Default: false (privacy-by-default — proxy-routed stations stay hidden
+     * from AA). The user can opt in via Settings after reading the warning
+     * about metadata leakage to Google's AA process: even when audio is
+     * routed through the station's proxy, AA still hands the station name,
+     * track metadata, and artwork to Google so it can render the now-playing
+     * card on the head unit. So the audio is anonymous; the *fact you're
+     * listening* is not.
+     *
+     * When enabled, [DeutsiaMediaLibraryService] will (a) include proxy
+     * stations in the browse tree and (b) wire its ExoPlayer through the
+     * matching per-station proxy so the audio still routes correctly.
+     *
+     * Force-proxy still hard-blocks AA entirely regardless of this flag —
+     * see [isAndroidAutoBlockedByForceProxy].
+     */
+    fun isAndroidAutoProxyStationsAllowed(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_AA_ALLOW_PROXY_STATIONS, false)
+    }
+
+    fun setAndroidAutoProxyStationsAllowed(context: Context, allowed: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_AA_ALLOW_PROXY_STATIONS, allowed)
+            .apply()
     }
 
     // ===== Currently Playing Station Persistence =====

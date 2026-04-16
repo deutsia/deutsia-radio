@@ -1,12 +1,20 @@
 package com.opensource.i2pradio.auto
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaLibraryService.LibraryParams
@@ -20,9 +28,12 @@ import com.opensource.i2pradio.R
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioDatabase
 import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.ui.PreferencesHelper
+import okhttp3.OkHttpClient
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /**
  * Android Auto-facing media library service.
@@ -35,20 +46,35 @@ import java.util.concurrent.Executors
  *
  * Privacy constraints carried over from the rest of the app:
  *
- *  - Only stations with [ProxyType.NONE] (no Tor / I2P / custom proxy) are
- *    exposed in the browse tree. Privacy-routed stations stay invisible to
- *    Android Auto so that enabling AA never downgrades the anonymity of a
- *    station the user configured for Tor or I2P.
- *  - Playback from Android Auto uses a dedicated, browse-only ExoPlayer
- *    instance with a default HTTP stack. It deliberately does not share
- *    state with the main [com.opensource.i2pradio.RadioService], which
- *    continues to handle in-app playback with the full Tor / I2P / proxy
- *    stack.
+ *  - By default, only stations with [ProxyType.NONE] (no Tor / I2P /
+ *    custom proxy) are exposed in the browse tree. Privacy-routed stations
+ *    stay invisible to Android Auto so that enabling AA never silently
+ *    downgrades the anonymity of a station the user configured for Tor or
+ *    I2P. The user can opt in to exposing proxy stations via the "Show
+ *    proxy stations in Android Auto" toggle in Settings (with its own
+ *    metadata-leak warning); when that toggle is on, this service also
+ *    routes the AA player through the matching per-station proxy via
+ *    [AndroidAutoProxyHttp].
+ *  - The AA-facing ExoPlayer is dedicated to this service and does not
+ *    share state with the main [com.opensource.i2pradio.RadioService].
+ *
+ * Two-moment opt-in flow:
+ *
+ *  1. **Settings opt-in (Moment 1)** — handled in `SettingsFragment`. User
+ *     reads the explainer and flips the AA switch. Until they do, this
+ *     service is disabled at the manifest/PackageManager level.
+ *  2. **First connect (Moment 2)** — handled here. The first time Android
+ *     Auto actually binds to this service (detected via the controller's
+ *     package name in [LibraryCallback.onConnect]), we post a one-time
+ *     notification on the phone offering to manage the proxy-stations
+ *     setting. Persists until tapped or dismissed; safe defaults stay in
+ *     effect either way.
  */
 class DeutsiaMediaLibraryService : MediaLibraryService() {
 
     private var player: ExoPlayer? = null
     private var session: MediaLibrarySession? = null
+    private var dataSourceFactory: StationProxyDataSourceFactory? = null
 
     private val backgroundExecutor: Executor = Executors.newSingleThreadExecutor { r ->
         Thread(r, "DeutsiaAuto-DB").apply { isDaemon = true }
@@ -56,8 +82,15 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
 
     override fun onCreate() {
         super.onCreate()
+        ensureNotificationChannel()
+
+        val proxyAwareFactory = StationProxyDataSourceFactory(applicationContext)
+        dataSourceFactory = proxyAwareFactory
+        val mediaSourceFactory = DefaultMediaSourceFactory(applicationContext)
+            .setDataSourceFactory(proxyAwareFactory)
 
         val exoPlayer = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(mediaSourceFactory)
             .setAudioAttributes(
                 AudioAttributes.Builder()
                     .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
@@ -91,16 +124,27 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
         }
         session = null
         player = null
+        dataSourceFactory = null
         super.onDestroy()
     }
 
     private inner class LibraryCallback : MediaLibrarySession.Callback {
 
+        /**
+         * The first thing Android Auto does after binding is request the
+         * library root, so this is the cleanest hook for "AA just connected
+         * for the first time". We piggy-back the Moment-2 notification on
+         * it. Identifying the caller by package name distinguishes AA from
+         * the in-app player, the DHU test harness, etc.
+         */
         override fun onGetLibraryRoot(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             params: LibraryParams?
         ): ListenableFuture<LibraryResult<MediaItem>> {
+            if (isAndroidAutoPackage(browser.packageName)) {
+                maybePostFirstConnectNotification()
+            }
             return Futures.immediateFuture(LibraryResult.ofItem(buildRoot(), params))
         }
 
@@ -158,6 +202,14 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
          * station id in [MediaItem.mediaId] to re-resolve the stream URL
          * from the database so that we never trust stream URLs that might
          * have been cached stale in a MediaItem.
+         *
+         * As a side effect, we *also* tell the [StationProxyDataSourceFactory]
+         * which station is about to play, so that the OkHttpClient it
+         * vends to ExoPlayer is configured for that station's proxy
+         * (Tor / I2P / custom / direct). This is the wiring that makes
+         * proxy-station playback actually route correctly from AA — without
+         * it, proxy stations would either not play or, worse, leak through
+         * the default HTTP stack.
          */
         override fun onAddMediaItems(
             mediaSession: MediaSession,
@@ -167,7 +219,10 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
             val callable = Callable<MutableList<MediaItem>> {
                 mediaItems.mapNotNull { item ->
                     val mediaId = item.mediaId
-                    if (mediaId.startsWith(STATION_PREFIX)) loadStationItem(mediaId) else null
+                    if (!mediaId.startsWith(STATION_PREFIX)) return@mapNotNull null
+                    val station = loadStation(mediaId) ?: return@mapNotNull null
+                    dataSourceFactory?.setStation(station)
+                    stationToMediaItem(station)
                 }.toMutableList()
             }
             return Futures.submit(callable, backgroundExecutor)
@@ -212,23 +267,37 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
     private fun stationsAsItems(favoritesOnly: Boolean): List<MediaItem> {
         val dao = RadioDatabase.getDatabase(this).radioDao()
         val stations = kotlinx.coroutines.runBlocking { dao.getAllStationsSync() }
+        val allowProxy = PreferencesHelper.isAndroidAutoProxyStationsAllowed(this)
         return stations
             .asSequence()
-            .filter { it.getProxyTypeEnum() == ProxyType.NONE }
+            .filter { allowProxy || it.getProxyTypeEnum() == ProxyType.NONE }
             .filter { !favoritesOnly || it.isLiked }
             .map { stationToMediaItem(it) }
             .toList()
     }
 
-    private fun loadStationItem(mediaId: String): MediaItem? {
+    /**
+     * Re-resolve a station from the DB by mediaId, applying the same
+     * privacy filter as the browse tree: refuse to return a proxy station
+     * unless the user has opted in to proxy stations in AA. This is the
+     * defense-in-depth check for the play path — even if a stale browse
+     * entry pointed at a proxy station that is now disallowed, we won't
+     * play it.
+     */
+    private fun loadStation(mediaId: String): RadioStation? {
         val stationId = mediaId.removePrefix(STATION_PREFIX).toLongOrNull() ?: return null
         val dao = RadioDatabase.getDatabase(this).radioDao()
         val station = kotlinx.coroutines.runBlocking { dao.getStationById(stationId) } ?: return null
-        // Honor the same privacy rule as the browse tree: refuse to resolve a
-        // proxied station even if Android Auto somehow asked for one by id.
-        if (station.getProxyTypeEnum() != ProxyType.NONE) return null
-        return stationToMediaItem(station)
+        if (station.getProxyTypeEnum() != ProxyType.NONE &&
+            !PreferencesHelper.isAndroidAutoProxyStationsAllowed(this)
+        ) {
+            return null
+        }
+        return station
     }
+
+    private fun loadStationItem(mediaId: String): MediaItem? =
+        loadStation(mediaId)?.let { stationToMediaItem(it) }
 
     private fun stationToMediaItem(station: RadioStation): MediaItem {
         val metadataBuilder = MediaMetadata.Builder()
@@ -247,10 +316,133 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
             .build()
     }
 
+    // -----------------------------------------------------------------------
+    // First-connect notification (Moment 2)
+    // -----------------------------------------------------------------------
+
+    private fun isAndroidAutoPackage(pkg: String): Boolean {
+        // Both the production AA app and the desktop head-unit (DHU) used
+        // for testing connect under one of these package names.
+        return pkg == AA_PROJECTION_PACKAGE ||
+            pkg == AA_EMBEDDED_PACKAGE ||
+            pkg == AA_DHU_PACKAGE
+    }
+
+    private fun maybePostFirstConnectNotification() {
+        val ctx = applicationContext
+        if (PreferencesHelper.hasAndroidAutoFirstConnectBeenHandled(ctx)) return
+        // Mark as handled *before* posting so that even if the post fails
+        // (notifications disabled, etc.) we don't keep trying every connect.
+        PreferencesHelper.setAndroidAutoFirstConnectHandled(ctx, true)
+        postFirstConnectNotification()
+    }
+
+    private fun postFirstConnectNotification() {
+        val tapIntent = Intent(this, MainActivity::class.java).apply {
+            putExtra(MainActivity.EXTRA_SCROLL_TO_TAB, MainActivity.TAB_SETTINGS)
+            putExtra(MainActivity.EXTRA_SETTINGS_SECTION, MainActivity.SETTINGS_SECTION_ANDROID_AUTO)
+            // Bring an existing MainActivity to the front rather than stacking.
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            FIRST_CONNECT_REQUEST_CODE,
+            tapIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val notification = NotificationCompat.Builder(this, AA_NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_radio)
+            .setContentTitle(getString(R.string.aa_first_connect_title))
+            .setContentText(getString(R.string.aa_first_connect_text))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(getString(R.string.aa_first_connect_text))
+            )
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+
+        try {
+            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            nm.notify(NOTIFICATION_ID_FIRST_CONNECT, notification)
+        } catch (e: SecurityException) {
+            // POST_NOTIFICATIONS denied (Android 13+). Nothing to do — the
+            // safe defaults (proxy stations hidden) already apply.
+        }
+    }
+
+    private fun ensureNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (nm.getNotificationChannel(AA_NOTIFICATION_CHANNEL_ID) != null) return
+        val channel = NotificationChannel(
+            AA_NOTIFICATION_CHANNEL_ID,
+            getString(R.string.aa_notification_channel_name),
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = getString(R.string.aa_notification_channel_description)
+        }
+        nm.createNotificationChannel(channel)
+    }
+
     companion object {
         private const val ROOT_ID = "root"
         private const val NODE_FAVORITES = "favorites"
         private const val NODE_ALL = "all_stations"
         private const val STATION_PREFIX = "station:"
+
+        // Known package names for clients we treat as "Android Auto" for
+        // the first-connect detection. Production AA on the phone, AA on
+        // an embedded car head unit, and the desktop head-unit harness
+        // developers use for testing.
+        private const val AA_PROJECTION_PACKAGE = "com.google.android.projection.gearhead"
+        private const val AA_EMBEDDED_PACKAGE = "com.google.android.embedded.projection"
+        private const val AA_DHU_PACKAGE = "com.google.android.projection.gearhead.emulator"
+
+        private const val AA_NOTIFICATION_CHANNEL_ID = "deutsia_android_auto"
+        private const val NOTIFICATION_ID_FIRST_CONNECT = 4101
+        private const val FIRST_CONNECT_REQUEST_CODE = 4102
+    }
+}
+
+/**
+ * A [DataSource.Factory] whose underlying OkHttpClient can be re-configured
+ * per-station. The Android Auto service calls [setStation] in
+ * `onAddMediaItems` (right before ExoPlayer starts requesting the stream),
+ * so the very next [createDataSource] call returns a DataSource whose
+ * OkHttpClient is wired for that station's proxy.
+ *
+ * This is intentionally simple: it assumes only one station is being
+ * prepared at a time, which is the typical AA usage pattern (tap a station
+ * → it plays). Queueing multiple stations with different proxy
+ * configurations is not supported and is unnecessary for the current AA
+ * surface.
+ */
+private class StationProxyDataSourceFactory(
+    private val context: Context
+) : DataSource.Factory {
+
+    @Volatile
+    private var currentClient: OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(0, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .build()
+
+    fun setStation(station: RadioStation) {
+        currentClient = AndroidAutoProxyHttp.buildClient(context, station)
+    }
+
+    override fun createDataSource(): DataSource {
+        return OkHttpDataSource.Factory(currentClient)
+            .setUserAgent(USER_AGENT)
+            .setDefaultRequestProperties(mapOf("Icy-MetaData" to "1"))
+            .createDataSource()
+    }
+
+    companion object {
+        private const val USER_AGENT = "DeutsiaRadio/1.0 (AA)"
     }
 }
