@@ -2799,8 +2799,9 @@ class SettingsFragment : Fragment() {
      * no confirmation.
      *
      * If any force-proxy setting is active, the switch is disabled entirely
-     * and a note explains why — the AA player has no proxy wiring, so we
-     * refuse to let it run while the user wants all traffic tunneled.
+     * and a note explains why — force-proxy modes aren't wired into the AA
+     * path, so we refuse to let it run while the user wants all traffic
+     * tunneled.
      */
     private fun setupAndroidAutoControls() {
         val switch = androidAutoSwitch ?: return

@@ -23,13 +23,13 @@ import com.opensource.i2pradio.ui.PreferencesHelper
  * filter) stay in the APK either way — they are simply dormant until the
  * component is enabled.
  *
- * Force-proxy override: the AA media library service plays through its own
- * ExoPlayer on the default HTTP stack (no Tor / I2P / custom proxy). If the
- * user has any force-proxy setting active, AA playback would silently
- * bypass that routing, so we treat force-proxy as a hard block: the
- * component stays disabled regardless of the stored AA preference. The
- * user's AA preference is preserved and will take effect again as soon as
- * they turn force-proxy off.
+ * Force-proxy override: although per-station proxy routing is handled by
+ * [AndroidAutoProxyHttp], force-proxy modes are *not* wired into the AA
+ * path because they depend on global proxy state that doesn't map cleanly
+ * to the per-station model used here. Rather than risk a silent bypass, we
+ * treat force-proxy as a hard block: the component stays disabled
+ * regardless of the stored AA preference. The user's AA preference is
+ * preserved and will take effect again as soon as they turn force-proxy off.
  */
 object AndroidAutoComponentManager {
 

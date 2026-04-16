@@ -56,6 +56,10 @@ internal object AndroidAutoProxyHttp {
     }
 
     fun buildClient(context: Context, station: RadioStation): OkHttpClient {
+        check(!PreferencesHelper.isAndroidAutoBlockedByForceProxy(context)) {
+            "AA proxy client must not be built while force-proxy is active"
+        }
+
         val builder = OkHttpClient.Builder()
             .readTimeout(0, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
@@ -72,7 +76,7 @@ internal object AndroidAutoProxyHttp {
                 } else if (station.proxyHost.isNotEmpty()) {
                     station.proxyHost to station.proxyPort
                 } else {
-                    "127.0.0.1" to 9050
+                    ProxyType.TOR.getDefaultHost() to ProxyType.TOR.getDefaultPort()
                 }
                 builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port)))
                 builder.dns(socksDns)
@@ -80,8 +84,8 @@ internal object AndroidAutoProxyHttp {
             }
 
             ProxyType.I2P -> {
-                val host = station.proxyHost.ifEmpty { "127.0.0.1" }
-                val port = if (station.proxyPort > 0) station.proxyPort else 4444
+                val host = station.proxyHost.ifEmpty { ProxyType.I2P.getDefaultHost() }
+                val port = if (station.proxyPort > 0) station.proxyPort else ProxyType.I2P.getDefaultPort()
                 builder.proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(host, port)))
                 builder.connectTimeout(60, TimeUnit.SECONDS)
             }

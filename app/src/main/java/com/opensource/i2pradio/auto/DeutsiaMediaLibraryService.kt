@@ -217,11 +217,13 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
             mediaItems: MutableList<MediaItem>
         ): ListenableFuture<MutableList<MediaItem>> {
             val callable = Callable<MutableList<MediaItem>> {
+                val factory = dataSourceFactory
                 mediaItems.mapNotNull { item ->
                     val mediaId = item.mediaId
                     if (!mediaId.startsWith(STATION_PREFIX)) return@mapNotNull null
                     val station = loadStation(mediaId) ?: return@mapNotNull null
-                    dataSourceFactory?.setStation(station)
+                    if (factory == null) return@mapNotNull null
+                    factory.setStation(station)
                     stationToMediaItem(station)
                 }.toMutableList()
             }
@@ -338,6 +340,7 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
     }
 
     private fun postFirstConnectNotification() {
+        ensureNotificationChannel()
         val tapIntent = Intent(this, MainActivity::class.java).apply {
             putExtra(MainActivity.EXTRA_SCROLL_TO_TAB, MainActivity.TAB_SETTINGS)
             putExtra(MainActivity.EXTRA_SETTINGS_SECTION, MainActivity.SETTINGS_SECTION_ANDROID_AUTO)
