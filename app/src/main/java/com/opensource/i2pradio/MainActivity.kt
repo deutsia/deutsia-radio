@@ -192,6 +192,33 @@ class MainActivity : AppCompatActivity() {
         viewPager.currentItem = 0
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        // Update the activity's intent so SettingsFragment (which reads
+        // requireActivity().intent for its scroll-to hint) sees the new
+        // extras instead of the original launch intent.
+        setIntent(intent)
+        handleDeepLinkIntent(intent)
+    }
+
+    /**
+     * Honor the [EXTRA_SCROLL_TO_TAB] / [EXTRA_SETTINGS_SECTION] extras
+     * that the AA first-connect notification (and potentially other deep
+     * links) attach to the launch intent.
+     *
+     * The settings section hint is left on the intent for SettingsFragment
+     * to pick up in its onViewCreated; we don't try to consume it here
+     * because the fragment may not exist yet.
+     */
+    private fun handleDeepLinkIntent(intent: Intent?) {
+        if (intent == null) return
+        if (!intent.hasExtra(EXTRA_SCROLL_TO_TAB)) return
+        val tab = intent.getIntExtra(EXTRA_SCROLL_TO_TAB, -1)
+        if (tab in 0..3) {
+            viewPager.currentItem = tab
+        }
+    }
+
     /**
      * Initialize repositories and load preset stations
      * This is called either immediately in onCreate() if no encryption,
@@ -295,6 +322,10 @@ class MainActivity : AppCompatActivity() {
 
         setupViewPager()
         setupMiniPlayer()
+
+        // Handle launch-time deep links (e.g. tap on the Android Auto
+        // first-connect notification posted by DeutsiaMediaLibraryService).
+        handleDeepLinkIntent(intent)
 
         Intent(this, RadioService::class.java).also { intent ->
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
@@ -690,6 +721,28 @@ class MainActivity : AppCompatActivity() {
 
         // Broadcast action for proxy mode changes
         const val BROADCAST_PROXY_MODE_CHANGED = "com.opensource.i2pradio.PROXY_MODE_CHANGED"
+
+        // Tab indices for the main ViewPager.
+        const val TAB_LIBRARY = 0
+        const val TAB_BROWSE = 1
+        const val TAB_NOW_PLAYING = 2
+        const val TAB_SETTINGS = 3
+
+        /**
+         * Intent extra: integer tab index (0..3) to switch to on launch.
+         * Used by deep links (e.g. the Android Auto first-connect
+         * notification posted by [com.opensource.i2pradio.auto.DeutsiaMediaLibraryService]).
+         */
+        const val EXTRA_SCROLL_TO_TAB = "scroll_to_tab"
+
+        /**
+         * Intent extra: optional Settings section to scroll to after
+         * switching tabs. Currently only [SETTINGS_SECTION_ANDROID_AUTO]
+         * is recognized. Read by [com.opensource.i2pradio.ui.SettingsFragment]
+         * via the activity intent.
+         */
+        const val EXTRA_SETTINGS_SECTION = "settings_section"
+        const val SETTINGS_SECTION_ANDROID_AUTO = "android_auto"
 
         // Stream error toast debounce to prevent spam
         private const val ERROR_TOAST_COOLDOWN_MS = 30_000L // 30 seconds
