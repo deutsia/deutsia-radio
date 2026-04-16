@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android Auto descriptor for deutsia radio.
+
+    This file is only meaningful when the DeutsiaMediaLibraryService
+    component is enabled at runtime via AndroidAutoComponentManager. The
+    component is disabled by default, so Android Auto does not see the app
+    until the user explicitly opts in from Settings.
+-->
+<automotiveApp>
+    <uses name="media" />
+</automotiveApp>

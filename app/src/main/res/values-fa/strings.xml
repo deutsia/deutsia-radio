@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">مرتب‌سازی ایستگاه‌ها</string>
     <string name="dialog_delete_stations">حذف ایستگاه‌ها</string>
     <string name="button_save">ذخیره</string>
+    <string name="button_edit">ویرایش</string>
+    <string name="button_select_all">انتخاب همه</string>
     <string name="button_cancel">لغو</string>
     <string name="button_import">وارد کردن</string>
     <string name="button_export">خروجی گرفتن</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">درباره</string>
-    <string name="settings_version">نسخه 1.5</string>
+    <string name="settings_version">نسخه 1.7</string>
     <string name="settings_view_github">مشاهده در GitHub</string>
     <string name="settings_donate">کمک مالی</string>
     <string name="settings_donate_description">اگر این برنامه به شما کمک کرد، کمک مالی را در نظر بگیرید</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">لغو</string>
     <string name="tor_control_button_retry">تلاش مجدد</string>
     <string name="tor_control_button_install">نصب InviZible Pro</string>
+    <string name="tor_control_button_install_lite">نصب InviZible Lite</string>
     <string name="tor_control_button_open_invizible">باز کردن InviZible Pro</string>
+    <string name="tor_control_button_open_app">باز کردن %s</string>
 
 
     
@@ -375,6 +379,7 @@
     <string name="toast_custom_proxy_saved">تنظیمات پروکسی سفارشی ذخیره شد</string>
     <string name="toast_custom_proxy_cleared">تنظیمات پروکسی سفارشی پاک شد</string>
     <string name="toast_address_copied">آدرس به کلیپ‌بورد کپی شد</string>
+    <string name="toast_metadata_copied">اطلاعات آهنگ در کلیپ‌بورد کپی شد</string>
     <string name="toast_using_default_directory">در حال استفاده از پوشه پیش‌فرض</string>
 
     
@@ -561,6 +566,8 @@
     <string name="recording_error_connection_refused">اتصال رد شد</string>
     <string name="recording_error_io">خطای ورودی/خروجی: %s</string>
     <string name="recording_error_generic">خطا: %s</string>
+    <string name="recording_error_hls_playlist">دریافت پلی‌لیست HLS ممکن نشد</string>
+    <string name="recording_error_proxy_blocked">ضبط مسدود شد: پروکسی موردنیاز (Tor/سفارشی) در دسترس نیست</string>
 
     
     <string name="custom_proxy_not_configured_notification">پروکسی سفارشی پیکربندی نشده است</string>
@@ -602,6 +609,13 @@
     <string name="error_i2p_not_connected">I2P در حال اجرا نیست. I2P را راه‌اندازی کنید (مثلاً InviZible Pro) تا این پخش را اجرا کنید.</string>
     <string name="error_tor_required_for_clearnet">Tor متصل نیست. حالت اجباری Tor نیاز به Tor برای پخش‌های clearnet دارد.</string>
     <string name="error_custom_proxy_not_configured">پروکسی سفارشی پیکربندی نشده است. آن را در تنظیمات پیکربندی کنید.</string>
+    <string name="error_unsupported_codec">جریان‌های %1$s پشتیبانی نمی‌شوند</string>
+    <string name="error_playlist_unreadable">خواندن پلی‌لیست ممکن نشد — ممکن است ایستگاه آفلاین باشد</string>
+    <string name="error_station_geoblocked">ایستگاه در منطقه شما (یا از این گره خروجی) مسدود است</string>
+    <string name="error_station_gone">ایستگاه دیگر در این آدرس وجود ندارد</string>
+    <string name="error_station_auth_required">ایستگاه نیاز به احراز هویت دارد</string>
+    <string name="notification_unsupported_codec">جریان‌های %1$s پشتیبانی نمی‌شوند</string>
+    <string name="notification_playlist_unreadable">خواندن پلی‌لیست ممکن نشد</string>
 
     
     <string name="cd_add_radio_station">افزودن ایستگاه رادیویی</string>

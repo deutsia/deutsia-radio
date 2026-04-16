@@ -1,0 +1,9 @@
+## What's New
+- Long-press now playing info to copy metadata
+- Better HLS detection
+- Updated translation strings with out of date version numbers
+
+## Security
+- Fixed resolver not honoring custom proxy protocol/auth
+- Digest auth now uses SecureRandom + per-request nc
+- Capped DASH SegmentTimeline repeatCount to prevent DoS

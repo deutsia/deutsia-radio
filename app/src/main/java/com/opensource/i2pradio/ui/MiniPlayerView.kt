@@ -115,7 +115,9 @@ class MiniPlayerView @JvmOverloads constructor(
      * For privacy stations (Tor/I2P), uses loadSecurePrivacy to route through Tor when available.
      */
     fun updateCoverArt(coverArtUri: String?) {
-        if (coverArtUri != null) {
+        // When cover art is disabled, always show the default radio icon
+        // instead of attempting to load remote cover art (or leaving it empty).
+        if (coverArtUri != null && !PreferencesHelper.isCoverArtDisabled(context)) {
             // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
             coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
             // Use privacy loader for Tor/I2P stations to route cover art through Tor
@@ -150,7 +152,7 @@ class MiniPlayerView @JvmOverloads constructor(
                 coverImage.loadSecure(coverArtUri, imageLoadBuilder)
             }
         } else {
-            // No cover art - use fitCenter so vector placeholder fills container
+            // No cover art (or cover art disabled) - use fitCenter so vector placeholder fills container
             coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
             // Force reload to get fresh drawable with current theme colors (Material You)
             coverImage.setImageDrawable(null)
@@ -214,7 +216,9 @@ class MiniPlayerView @JvmOverloads constructor(
         // Handle cover art update properly - clear old image when switching stations
         // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
         // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
-        if (station.coverArtUri != null) {
+        // When cover art is disabled, always show the default radio icon
+        // instead of attempting to load remote cover art (or leaving it empty).
+        if (station.coverArtUri != null && !PreferencesHelper.isCoverArtDisabled(context)) {
             // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
             coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
             val isPrivacyStation = station.getProxyTypeEnum().let {
@@ -245,7 +249,7 @@ class MiniPlayerView @JvmOverloads constructor(
                 coverImage.loadSecure(station.coverArtUri, imageLoadBuilder)
             }
         } else {
-            // No cover art - use fitCenter so vector placeholder fills container
+            // No cover art (or cover art disabled) - use fitCenter so vector placeholder fills container
             coverImage.scaleType = ImageView.ScaleType.FIT_CENTER
             // Explicitly clear any cached/loading state and set default drawable
             // Force reload to get fresh drawable with current theme colors (Material You)
@@ -392,6 +396,8 @@ class MiniPlayerView @JvmOverloads constructor(
                 putExtra("proxy_port", station.proxyPort)
                 putExtra("proxy_type", proxyType.name)
                 putExtra("cover_art_uri", station.coverArtUri)
+                putExtra("hls_hint", station.hlsHint)
+                putExtra("codec_hint", station.codecHint)
             }
             ContextCompat.startForegroundService(context, intent)
             // Don't update playing state here - wait for service to confirm playback started

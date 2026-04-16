@@ -3,6 +3,8 @@ package com.opensource.i2pradio.ui
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
@@ -163,11 +165,15 @@ class NowPlayingFragment : Fragment() {
     private var isBuffering: Boolean = false
     private lateinit var infoContainer: View
     private lateinit var controlsContainer: View
-
-    // Flag to track if views are initialized and valid (set in onCreateView, cleared in onDestroyView)
+    
+        // Flag to track if views are initialized and valid (set in onCreateView, cleared in onDestroyView)
     private var viewsInitialized = false
 
-    // Broadcast receiver for metadata, stream info, playback state, recording updates, cover art, and time updates
+    // metadata for copying
+    private var lastArtist: String? = null
+    private var lastTitle: String? = null
+
+    // Broadcast receiver
     private val metadataReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
@@ -176,12 +182,16 @@ class NowPlayingFragment : Fragment() {
                     val title = intent.getStringExtra(RadioService.EXTRA_TITLE)
                     val rawMetadata = intent.getStringExtra(RadioService.EXTRA_METADATA)
 
-                    // Display formatted artist - title if both are present, otherwise raw metadata
+                    lastArtist = artist
+                    lastTitle = title
+
+                    // Display formatted artist
                     val displayText = when {
                         !artist.isNullOrBlank() && !title.isNullOrBlank() -> "$artist — $title"
                         !rawMetadata.isNullOrBlank() -> rawMetadata
                         else -> null
                     }
+
 
                     if (!displayText.isNullOrBlank()) {
                         metadataText.text = displayText
@@ -244,6 +254,14 @@ class NowPlayingFragment : Fragment() {
                             RadioService.ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED -> getString(R.string.error_custom_proxy_not_configured)
                             RadioService.ERROR_TYPE_MAX_RETRIES -> getString(R.string.error_stream_max_retries)
                             RadioService.ERROR_TYPE_STREAM_FAILED -> getString(R.string.error_stream_failed)
+                            RadioService.ERROR_TYPE_UNSUPPORTED_CODEC -> {
+                                val codecName = intent.getStringExtra(RadioService.EXTRA_UNSUPPORTED_CODEC_NAME) ?: "This"
+                                getString(R.string.error_unsupported_codec, codecName)
+                            }
+                            RadioService.ERROR_TYPE_PLAYLIST_UNREADABLE -> getString(R.string.error_playlist_unreadable)
+                            RadioService.ERROR_TYPE_STATION_GEOBLOCKED -> getString(R.string.error_station_geoblocked)
+                            RadioService.ERROR_TYPE_STATION_GONE -> getString(R.string.error_station_gone)
+                            RadioService.ERROR_TYPE_STATION_AUTH_REQUIRED -> getString(R.string.error_station_auth_required)
                             else -> getString(R.string.error_stream_failed)
                         }
                         // Privacy/security errors always show, others respect toast setting
@@ -321,6 +339,33 @@ class NowPlayingFragment : Fragment() {
         stationName = view.findViewById(R.id.nowPlayingStationName)
         genreText = view.findViewById(R.id.nowPlayingGenre)
         metadataText = view.findViewById(R.id.nowPlayingMetadata)
+        metadataText.setOnLongClickListener {
+            val artist = lastArtist?.takeIf { it.isNotBlank() }
+            val title = lastTitle?.takeIf { it.isNotBlank() }
+
+            val text = when {
+                artist != null && title != null -> "$artist - $title"
+                title != null -> title
+                artist != null -> artist
+                else -> metadataText.text?.toString().orEmpty()
+            }
+
+            if (text.isBlank()) {
+                return@setOnLongClickListener false
+            }
+
+            val clipboard = requireContext()
+                .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("Now Playing", text))
+
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.toast_metadata_copied),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            true
+        }
         streamInfoText = view.findViewById(R.id.nowPlayingStreamInfo)
         likeButton = view.findViewById(R.id.likeButton)
         addToLibraryButton = view.findViewById(R.id.addToLibraryButton)
@@ -646,7 +691,9 @@ class NowPlayingFragment : Fragment() {
                 // Handle cover art update properly - switch scaleType based on content
                 // Use loadSecure to route remote URLs through Tor when Force Tor is enabled
                 // For privacy stations (Tor/I2P), use loadSecurePrivacy to route through Tor when available
-                if (station.coverArtUri != null) {
+                // When cover art is disabled, always show the default radio icon
+                // instead of attempting to load remote cover art (or leaving it empty).
+                if (station.coverArtUri != null && !PreferencesHelper.isCoverArtDisabled(requireContext())) {
                     // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
                     coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                     val isPrivacyStation = station.getProxyTypeEnum().let {
@@ -678,7 +725,7 @@ class NowPlayingFragment : Fragment() {
                         coverArt.loadSecure(station.coverArtUri, imageLoadBuilder)
                     }
                 } else {
-                    // No cover art - use fitCenter so vector placeholder fills container
+                    // No cover art (or cover art disabled) - use fitCenter so vector placeholder fills container
                     coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
                     // Force reload to get fresh drawable with current theme colors (Material You)
                     coverArt.setImageDrawable(null)
@@ -736,6 +783,8 @@ class NowPlayingFragment : Fragment() {
                     putExtra("proxy_port", station.proxyPort)
                     putExtra("proxy_type", proxyType.name)
                     putExtra("cover_art_uri", station.coverArtUri)
+                    putExtra("hls_hint", station.hlsHint)
+                    putExtra("codec_hint", station.codecHint)
                 }
                 ContextCompat.startForegroundService(requireContext(), intent)
                 // Show buffering state while connecting - service will update when ready
@@ -1136,7 +1185,9 @@ class NowPlayingFragment : Fragment() {
      * For privacy stations (Tor/I2P), uses loadSecurePrivacy to route through Tor when available.
      */
     private fun updateCoverArt(coverArtUri: String?) {
-        if (coverArtUri != null) {
+        // When cover art is disabled, always show the default radio icon
+        // instead of attempting to load remote cover art (or leaving it empty).
+        if (coverArtUri != null && !PreferencesHelper.isCoverArtDisabled(requireContext())) {
             // Start with fitCenter for placeholder (scales vector up to fill container), switch to centerCrop on successful load
             coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
             // Check if current station is a privacy station (Tor/I2P)
@@ -1171,6 +1222,7 @@ class NowPlayingFragment : Fragment() {
                 coverArt.loadSecure(coverArtUri, imageLoadBuilder)
             }
         } else {
+            // No cover art (or cover art disabled) - use fitCenter so vector placeholder fills container
             coverArt.scaleType = ImageView.ScaleType.FIT_CENTER
             coverArt.load(R.drawable.ic_radio) {
                 crossfade(true)

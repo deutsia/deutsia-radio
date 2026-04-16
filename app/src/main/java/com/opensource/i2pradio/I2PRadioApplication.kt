@@ -1,6 +1,7 @@
 package com.opensource.i2pradio
 
 import android.app.Application
+import com.opensource.i2pradio.auto.AndroidAutoComponentManager
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.tor.TorService
 import com.opensource.i2pradio.ui.PreferencesHelper
@@ -21,6 +22,11 @@ class I2PRadioApplication : Application() {
         // Initialize SQLCipher library early
         // This must be done before any database operations
         DatabaseEncryptionManager.initializeSQLCipher(this)
+
+        // Reconcile the Android Auto media library component with the stored
+        // opt-in preference on every launch. Off by default — the component
+        // stays disabled unless the user explicitly enabled it in Settings.
+        AndroidAutoComponentManager.applyStoredPreference(this)
 
         // Dynamic colors are now applied at Activity level in MainActivity
         // to allow toggling Material You on/off without requiring app restart

@@ -2,20 +2,37 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.7.1]
+
+### Added
+- **Copy now playing metadata**: Long-press the now playing info to copy song/station metadata to clipboard, with a confirmation toast
+- **URL resolution**: Separated URL resolution from format detection 
+### Security
+- **Stricter Force Proxy enforcement**: Added fail-closed safeguards so recording and URL resolution never fall back to a direct connection when Force Tor or Force Custom Proxy is enabled
+- **Resolver ignoring custom proxy**: URL resolver now honors the custom proxy's protocol (SOCKS4/5, HTTP) and authentication credentials instead of falling back to direct
+- **Digest auth hardening**: cnonce is now generated with SecureRandom, and the nonce count (`nc`) is properly incremented per request instead of being hardcoded
+- **DASH DoS cap**: Capped SegmentTimeline `repeatCount` values to prevent a malicious manifest from consuming unbounded memory
+
+### Fixed
+- **HLS detection**: HLS streams are now detected based on content instead of trusting the URL extension, so streams are identified correctly even when the extension is misleading #442
+
+### Localization
+- Translated 15 missing strings across all 16 supported locales
+
+
+
 ## [1.7.0]
 
 ### Added
-- **HLS stream support**: Full HLS (HTTP Live Streaming) playback and recording support via media3-exoplayer-hls, with recordings saved through MediaStore
-- **fMP4/CMAF support**: Added fMP4/CMAF segment support for both DASH and HLS streams — fragmented MP4 streams now play and record correctly
+- **Full HLS stream and recording support**: Full HLS (HTTP Live Streaming) playback and recording support via media3-exoplayer-hls, with recordings saved through MediaStore
+- **Full fMP4/CMAF stream and recording support**: Added fMP4/CMAF segment support for both DASH and HLS streams 
 - **Tor auto-detection**: The app now automatically detects if a Tor SOCKS5 proxy is already running on port 9050 (e.g. from InviZible Lite or Orbot) and connects through it without needing to manually press connect
 
 ### Fixed
-- **Cover art lockscreen leak**: Fixed SecureImageLoader bypassing cover art disabled checks on the lockscreen — album art could still appear on the lock screen even with cover art disabled in settings
-- **DASH recording producing 0 bytes**: Fixed DASH live stream recordings saving as empty files
-- **HLS recorder dropping segments**: Fixed HLS recorder losing segments on transient network errors
-- **Recording indicator collapse**: Fixed recording indicator collapsing when the add-to-library button was hidden
-- **HLS recording file extension**: Fixed fMP4/CMAF recordings using wrong file extension
 - **Metadata delay**: Metadata now sets immediately instead of waiting behind cover art load
+
+### Security
+- **Cover art lockscreen leak**: Fixed SecureImageLoader bypassing cover art disabled checks on the lockscreen: album art could still appear on the lock screen when cover art was disabled in settings
 
 ### UI/UX Improvements
 - Show default radio icon in miniplayer and now playing screen when cover art is disabled instead of blank space

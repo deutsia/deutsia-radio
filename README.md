@@ -32,7 +32,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.6.5** Material 3 redesign, custom genre tagging, and Tor fallback for the Radio Registry API
+- **New Release: v1.7.0** Tor auto-detection, HLS, fmp4, and DASH support, security patch and bug fixes
 
 ---
 
@@ -105,10 +105,10 @@ Releases are signed with [Sigstore](https://www.sigstore.dev/). To verify, downl
 # Replace version number with the release you downloaded
 cd ~/Downloads
 cosign verify-blob \
-  --bundle deutsia-radio-v1.6.5.apk.sigstore \
+  --bundle deutsia-radio-v1.7.0.apk.sigstore \
   --certificate-identity siewargottlichschon@gmail.com \
   --certificate-oidc-issuer https://github.com/login/oauth \
-  deutsia-radio-v1.6.5.apk
+  deutsia-radio-v1.7.0.apk
 ```
 ### Verifying from Zapstore
 

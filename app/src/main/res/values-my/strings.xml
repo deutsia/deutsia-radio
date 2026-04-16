@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">စတေးရှင်းများကို စီရန်</string>
     <string name="dialog_delete_stations">စတေးရှင်းများကို ဖျက်ရန်</string>
     <string name="button_save">သိမ်းဆည်းရန်</string>
+    <string name="button_edit">ပြင်ဆင်ရန်</string>
+    <string name="button_select_all">အားလုံး ရွေးပါ</string>
     <string name="button_cancel">ပယ်ဖျက်ရန်</string>
     <string name="button_import">တင်သွင်းရန်</string>
     <string name="button_export">ထုတ်ယူရန်</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">အကြောင်း</string>
-    <string name="settings_version">ဗားရှင်း 1.5</string>
+    <string name="settings_version">ဗားရှင်း 1.7</string>
     <string name="settings_view_github">GitHub တွင် ကြည့်ရန်</string>
     <string name="settings_donate">လှူဒါန်းရန်</string>
     <string name="settings_donate_description">ဒီအက်ပ်က သင့်ကို ကူညီခဲ့ရင် လှူဒါန်းရန် စဉ်းစားပါ</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">ပယ်ဖျက်ပါ</string>
     <string name="tor_control_button_retry">ချိတ်ဆက်မှုကို ပြန်လည်ကြိုးစားပါ</string>
     <string name="tor_control_button_install">InviZible Pro ကို တပ်ဆင်ပါ</string>
+    <string name="tor_control_button_install_lite">InviZible Lite ကို တပ်ဆင်ပါ</string>
     <string name="tor_control_button_open_invizible">InviZible Pro ကို ဖွင့်ပါ</string>
+    <string name="tor_control_button_open_app">%s ကို ဖွင့်ပါ</string>
 
 
     
@@ -375,6 +379,7 @@
     <string name="toast_custom_proxy_saved">စိတ်ကြိုက် proxy ဆက်တင်များကို သိမ်းဆည်းပြီးပါပြီ</string>
     <string name="toast_custom_proxy_cleared">စိတ်ကြိုက် proxy ဆက်တင်များကို ရှင်းလင်းပြီးပါပြီ</string>
     <string name="toast_address_copied">လိပ်စာကို clipboard သို့ ကူးယူပြီးပါပြီ</string>
+    <string name="toast_metadata_copied">သီချင်းအချက်အလက်ကို clipboard သို့ ကူးယူပြီးပါပြီ</string>
     <string name="toast_using_default_directory">မူလ ဖိုင်တွဲကို သုံးနေသည်</string>
 
     
@@ -561,6 +566,8 @@
     <string name="recording_error_connection_refused">ချိတ်ဆက်မှု ငြင်းပယ်ခံရသည်</string>
     <string name="recording_error_io">I/O အမှား: %s</string>
     <string name="recording_error_generic">အမှား: %s</string>
+    <string name="recording_error_hls_playlist">HLS ပလေးလစ်ကို ရယူ၍မရပါ</string>
+    <string name="recording_error_proxy_blocked">အသံသွင်းခြင်း ပိတ်ဆို့ထားသည်- လိုအပ်သော ပရောက်ဆီ (Tor/စိတ်ကြိုက်) မရနိုင်ပါ</string>
 
     
     <string name="custom_proxy_not_configured_notification">စိတ်ကြိုက် ပရောက်ဆီ ပြင်ဆင်မထားပါ</string>
@@ -602,6 +609,13 @@
     <string name="error_i2p_not_connected">I2P မလည်ပတ်ပါ။ ဤထုတ်လွှင့်မှုကို ဖွင့်ရန် I2P (ဥပမာ InviZible Pro) ကို စတင်ပါ။</string>
     <string name="error_tor_required_for_clearnet">Tor ချိတ်ဆက်မထားပါ။ Force Tor မုဒ်တွင် clearnet ထုတ်လွှင့်မှုများအတွက် Tor လိုအပ်သည်။</string>
     <string name="error_custom_proxy_not_configured">စိတ်ကြိုက် ပရောက်ဆီ စီစဉ်မထားပါ။ ဆက်တင်များတွင် စီစဉ်ပါ။</string>
+    <string name="error_unsupported_codec">%1$s streams ကို မပံ့ပိုးပါ</string>
+    <string name="error_playlist_unreadable">ပလေးလစ်ကို ဖတ်၍မရပါ — ဌာနသည် အော့ဖ်လိုင်းဖြစ်နိုင်သည်</string>
+    <string name="error_station_geoblocked">သင့်ဒေသတွင် (သို့မဟုတ် ဤထွက်ပေါက် node မှ) ဌာနကို ပိတ်ဆို့ထားသည်</string>
+    <string name="error_station_gone">ဤ URL တွင် ဌာနမရှိတော့ပါ</string>
+    <string name="error_station_auth_required">ဌာနသည် အထောက်အထား စိစစ်ခြင်း လိုအပ်သည်</string>
+    <string name="notification_unsupported_codec">%1$s streams ကို မပံ့ပိုးပါ</string>
+    <string name="notification_playlist_unreadable">ပလေးလစ်ကို ဖတ်၍မရပါ</string>
 
     
     <string name="cd_add_radio_station">ရေဒီယို ဘူတာရုံ ထည့်ပါ</string>

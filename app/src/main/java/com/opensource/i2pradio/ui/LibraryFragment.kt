@@ -620,6 +620,8 @@ class LibraryFragment : Fragment() {
             putExtra("proxy_password", RadioStationPasswordHelper.getDecryptedPassword(requireContext(), station))
             putExtra("proxy_auth_type", station.proxyAuthType)
             putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
+            putExtra("hls_hint", station.hlsHint)
+            putExtra("codec_hint", station.codecHint)
         }
         // Use startForegroundService for Android 8+ compatibility
         ContextCompat.startForegroundService(requireContext(), intent)

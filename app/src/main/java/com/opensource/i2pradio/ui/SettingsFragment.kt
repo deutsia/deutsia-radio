@@ -39,6 +39,7 @@ import com.opensource.i2pradio.MainActivity
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.RadioService
 import com.opensource.i2pradio.audio.EqualizerManager
+import com.opensource.i2pradio.auto.AndroidAutoComponentManager
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
@@ -114,6 +115,15 @@ class SettingsFragment : Fragment() {
     private var disableRadioRegistryApiSwitch: MaterialSwitch? = null
     private var disableCoverArtSwitch: MaterialSwitch? = null
     private var offlineModeNote: TextView? = null
+
+    // Integrations UI elements
+    private var androidAutoSwitch: MaterialSwitch? = null
+    private var androidAutoBlockedNote: TextView? = null
+    private var aaProxyStationsDivider: View? = null
+    private var aaProxyStationsRow: View? = null
+    private var aaAllowProxyStationsSwitch: MaterialSwitch? = null
+    private var integrationsCard: View? = null
+    private var settingsScrollView: android.widget.ScrollView? = null
 
     // ViewModel for observing current station (for miniplayer padding)
     private val radioViewModel: RadioViewModel by activityViewModels()
@@ -258,6 +268,14 @@ class SettingsFragment : Fragment() {
                 setupTorSwitchListener()
             }
             updateTorContainerVisibility(torEnabled)
+        }
+
+        // Any change to a force-proxy preference needs to reconcile AA:
+        //   - update the component state (force-proxy hard-blocks AA)
+        //   - refresh the Settings switch UI (enabled/disabled, blocked note)
+        if (key in FORCE_PROXY_KEYS) {
+            AndroidAutoComponentManager.applyStoredPreference(requireContext())
+            setupAndroidAutoControls()
         }
     }
 
@@ -552,12 +570,28 @@ class SettingsFragment : Fragment() {
         disableCoverArtSwitch = view.findViewById(R.id.disableCoverArtSwitch)
         offlineModeNote = view.findViewById(R.id.offlineModeNote)
 
+        // Integrations UI elements
+        androidAutoSwitch = view.findViewById(R.id.androidAutoSwitch)
+        androidAutoBlockedNote = view.findViewById(R.id.androidAutoBlockedNote)
+        aaProxyStationsDivider = view.findViewById(R.id.aaProxyStationsDivider)
+        aaProxyStationsRow = view.findViewById(R.id.aaProxyStationsRow)
+        aaAllowProxyStationsSwitch = view.findViewById(R.id.aaAllowProxyStationsSwitch)
+        integrationsCard = view.findViewById(R.id.integrationsCard)
+        settingsScrollView = view.findViewById(R.id.settingsScrollView)
+
         // Setup authentication controls
         setupAuthenticationControls()
         setupDatabaseEncryptionControls()
 
         // Setup Network & API controls
         setupNetworkApiControls()
+
+        // Setup Integrations (Android Auto opt-in)
+        setupAndroidAutoControls()
+
+        // If we got here from the AA first-connect notification, scroll the
+        // integrations card into view so the user lands on the right place.
+        maybeScrollToDeepLinkSection()
 
         // Setup custom proxy controls
         setupCustomProxyControls()
@@ -2756,6 +2790,177 @@ class SettingsFragment : Fragment() {
     }
 
     /**
+     * Setup the Android Auto opt-in switch.
+     *
+     * Disabled by default. When the user turns it on, we show a plain-language
+     * warning dialog explaining that enabling this exposes non-proxied
+     * station metadata to Google's Android Auto app, and only flip the
+     * component state if they confirm. Turning it off is immediate and needs
+     * no confirmation.
+     *
+     * If any force-proxy setting is active, the switch is disabled entirely
+     * and a note explains why — force-proxy modes aren't wired into the AA
+     * path, so we refuse to let it run while the user wants all traffic
+     * tunneled.
+     */
+    private fun setupAndroidAutoControls() {
+        val switch = androidAutoSwitch ?: return
+
+        val blockedByForceProxy =
+            PreferencesHelper.isAndroidAutoBlockedByForceProxy(requireContext())
+
+        // Detach existing listener before mutating state so we don't fire
+        // the user-interaction handler while reflecting preferences.
+        switch.setOnCheckedChangeListener(null)
+
+        if (blockedByForceProxy) {
+            // Hard-blocked: show unchecked, greyed out, with an explanation.
+            switch.isEnabled = false
+            switch.isChecked = false
+            androidAutoBlockedNote?.visibility = View.VISIBLE
+            // Sub-toggle for proxy stations is meaningless when AA itself
+            // is blocked — hide it.
+            setProxyStationsRowVisible(false)
+            // Leave the stored preference alone — if the user turns off
+            // force-proxy later, AA comes back in whatever state they set it.
+            return
+        }
+
+        switch.isEnabled = true
+        androidAutoBlockedNote?.visibility = View.GONE
+        val aaOn = PreferencesHelper.isAndroidAutoEnabled(requireContext())
+        switch.isChecked = aaOn
+        // The proxy-stations sub-toggle only makes sense when AA itself is on.
+        setProxyStationsRowVisible(aaOn)
+        if (aaOn) setupAaProxyStationsControl()
+
+        switch.setOnCheckedChangeListener { sw, isChecked ->
+            // Play the same tactile animation used by other switches.
+            sw.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    sw.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+
+            if (isChecked) {
+                // Require explicit confirmation before exposing anything to AA.
+                showAndroidAutoEnableConfirmation()
+            } else {
+                AndroidAutoComponentManager.setAndroidAutoEnabled(requireContext(), false)
+                setProxyStationsRowVisible(false)
+            }
+        }
+    }
+
+    /**
+     * Show or hide the "Show proxy stations in Android Auto" row + its
+     * separating divider as one unit.
+     */
+    private fun setProxyStationsRowVisible(visible: Boolean) {
+        val v = if (visible) View.VISIBLE else View.GONE
+        aaProxyStationsDivider?.visibility = v
+        aaProxyStationsRow?.visibility = v
+    }
+
+    /**
+     * Bind the per-station proxy opt-in switch to the stored preference.
+     * Turning it ON shows the metadata-leak warning dialog; turning it OFF
+     * is immediate (privacy-restoring action, no confirmation needed).
+     */
+    private fun setupAaProxyStationsControl() {
+        val sw = aaAllowProxyStationsSwitch ?: return
+        sw.setOnCheckedChangeListener(null)
+        sw.isChecked = PreferencesHelper.isAndroidAutoProxyStationsAllowed(requireContext())
+        sw.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                showAaProxyStationsWarning()
+            } else {
+                PreferencesHelper.setAndroidAutoProxyStationsAllowed(requireContext(), false)
+            }
+        }
+    }
+
+    private fun showAaProxyStationsWarning() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.aa_allow_proxy_warning_title)
+            .setMessage(R.string.aa_allow_proxy_warning_message)
+            .setPositiveButton(R.string.aa_allow_proxy_warning_enable) { _, _ ->
+                PreferencesHelper.setAndroidAutoProxyStationsAllowed(requireContext(), true)
+            }
+            .setNegativeButton(R.string.aa_allow_proxy_warning_cancel) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setOnCancelListener {
+                // Revert the switch without re-firing the listener.
+                aaAllowProxyStationsSwitch?.let { sw ->
+                    sw.setOnCheckedChangeListener(null)
+                    sw.isChecked = false
+                    setupAaProxyStationsControl()
+                }
+            }
+            .show()
+    }
+
+    private fun showAndroidAutoEnableConfirmation() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.android_auto_warning_title)
+            .setMessage(R.string.android_auto_warning_message)
+            .setPositiveButton(R.string.android_auto_warning_enable) { _, _ ->
+                AndroidAutoComponentManager.setAndroidAutoEnabled(requireContext(), true)
+                // Reveal the proxy-stations sub-toggle now that AA is on.
+                setProxyStationsRowVisible(true)
+                setupAaProxyStationsControl()
+            }
+            .setNegativeButton(R.string.android_auto_warning_cancel) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setOnCancelListener {
+                // User backed out — revert the switch without re-triggering our listener.
+                revertAndroidAutoSwitch(checked = false)
+            }
+            .show()
+    }
+
+    private fun revertAndroidAutoSwitch(checked: Boolean) {
+        val sw = androidAutoSwitch ?: return
+        sw.setOnCheckedChangeListener(null)
+        sw.isChecked = checked
+        setupAndroidAutoControls()
+    }
+
+    /**
+     * If the activity was launched (or re-entered via onNewIntent) with a
+     * deep-link extra pointing at the Android Auto section — for example,
+     * the tap target on the AA first-connect notification posted by
+     * [com.opensource.i2pradio.auto.DeutsiaMediaLibraryService] — scroll
+     * the integrations card into view and consume the extra so we don't
+     * scroll again on the next config change or fragment recreation.
+     */
+    private fun maybeScrollToDeepLinkSection() {
+        val activity = activity ?: return
+        val intent = activity.intent ?: return
+        val section = intent.getStringExtra(MainActivity.EXTRA_SETTINGS_SECTION) ?: return
+        if (section != MainActivity.SETTINGS_SECTION_ANDROID_AUTO) return
+        val card = integrationsCard ?: return
+        val scrollView = settingsScrollView ?: return
+        // Defer until after layout so card.top is meaningful.
+        scrollView.post {
+            scrollView.smoothScrollTo(0, card.top)
+        }
+        // Consume the extra so we don't keep scrolling on rotation, etc.
+        intent.removeExtra(MainActivity.EXTRA_SETTINGS_SECTION)
+    }
+
+    /**
      * Restart the app to apply database encryption changes
      */
     private fun restartApp() {
@@ -2984,6 +3189,21 @@ class SettingsFragment : Fragment() {
             settingsContentContainer?.paddingTop ?: 0,
             settingsContentContainer?.paddingRight ?: 0,
             bottomPadding
+        )
+    }
+
+    companion object {
+        /**
+         * Preference keys whose changes should trigger a re-evaluation of
+         * the Android Auto component state. Must match the key constants in
+         * [PreferencesHelper] — kept inline here so we can check them from
+         * an [SharedPreferences.OnSharedPreferenceChangeListener].
+         */
+        private val FORCE_PROXY_KEYS = setOf(
+            "force_tor_all",
+            "force_tor_except_i2p",
+            "force_custom_proxy",
+            "force_custom_proxy_except_tor_i2p"
         )
     }
 }

@@ -326,18 +326,38 @@ class DigestAuthenticatorTest {
     }
 
     @Test
-    fun `test nonce count is always 00000001`() {
-        // Stateless implementation uses nc=00000001
-        val challenge = """Digest realm="test", nonce="abc123", qop="auth""""
+    fun `test nonce count increments for same server nonce`() {
+        val challenge = """Digest realm="test", nonce="nc-increment-unique-nonce", qop="auth""""
         val response = createMockResponse(challenge)
 
-        val result = DigestAuthenticator.authenticate(response, "user", "pass")
+        val ncs = mutableListOf<String>()
+        repeat(3) {
+            val result = DigestAuthenticator.authenticate(response, "user", "pass")
+            assertNotNull(result)
+            val authHeader = result!!.header("Proxy-Authorization")!!
+            val ncMatch = """nc=([0-9a-f]{8})""".toRegex().find(authHeader)
+            assertNotNull("Should contain nc", ncMatch)
+            ncs.add(ncMatch!!.groupValues[1])
+        }
+
+        assertEquals("First nc should be 00000001", "00000001", ncs[0])
+        assertEquals("Second nc should be 00000002", "00000002", ncs[1])
+        assertEquals("Third nc should be 00000003", "00000003", ncs[2])
+    }
+
+    @Test
+    fun `test nonce count resets when server nonce changes`() {
+        val challenge1 = """Digest realm="test", nonce="nc-reset-nonce-first", qop="auth""""
+        val challenge2 = """Digest realm="test", nonce="nc-reset-nonce-second", qop="auth""""
+
+        DigestAuthenticator.authenticate(createMockResponse(challenge1), "user", "pass")
+        val result = DigestAuthenticator.authenticate(createMockResponse(challenge2), "user", "pass")
 
         assertNotNull(result)
-        val authHeader = result!!.header("Proxy-Authorization")!!
-        assertTrue("Nonce count should be 00000001",
-            authHeader.contains("nc=00000001"))
+        assertTrue("Fresh server nonce should reset nc to 00000001",
+            result!!.header("Proxy-Authorization")!!.contains("nc=00000001"))
     }
+
 
     @Test
     fun `test client nonce is unique per request`() {

@@ -29,6 +29,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Metadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.datasource.HttpDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
@@ -88,6 +89,11 @@ class RadioService : Service() {
     private var currentProxyPassword: String = ""
     private var currentProxyAuthType: String = "NONE"
     private var currentProxyConnectionTimeout: Int = 30
+    // Hints from Radio Browser. Used for media-source selection, FLV
+    // rejection, and recording extension. Default values match manually-added
+    // stations (no hint available, behaviour identical to previous versions).
+    private var currentHlsHint: Boolean = false
+    private var currentCodecHint: String = ""
     private val handler = Handler(Looper.getMainLooper())
     private var reconnectAttempts = 0
     private val maxReconnectAttempts = 10
@@ -230,6 +236,15 @@ class RadioService : Service() {
         const val ERROR_TYPE_CUSTOM_PROXY_NOT_CONFIGURED = "custom_proxy_not_configured"
         const val ERROR_TYPE_MAX_RETRIES = "max_retries"
         const val ERROR_TYPE_STREAM_FAILED = "stream_failed"
+        const val ERROR_TYPE_UNSUPPORTED_CODEC = "unsupported_codec"
+        const val ERROR_TYPE_PLAYLIST_UNREADABLE = "playlist_unreadable"
+        const val EXTRA_UNSUPPORTED_CODEC_NAME = "unsupported_codec_name"
+        // Distinct error types for specific HTTP response codes. These let
+        // the UI show a targeted message instead of the generic
+        // "reconnect loop" that an opaque STREAM_FAILED would trigger.
+        const val ERROR_TYPE_STATION_GEOBLOCKED = "station_geoblocked"   // 403 / 451
+        const val ERROR_TYPE_STATION_GONE = "station_gone"               // 404 / 410
+        const val ERROR_TYPE_STATION_AUTH_REQUIRED = "station_auth_required"  // 401
 
         /**
          * Custom DNS resolver that forces DNS resolution through SOCKS5 proxy.
@@ -409,6 +424,11 @@ class RadioService : Service() {
                 val proxyPassword = intent.getStringExtra("proxy_password") ?: ""
                 val proxyAuthType = intent.getStringExtra("proxy_auth_type") ?: "NONE"
                 val proxyConnectionTimeout = intent.getIntExtra("proxy_connection_timeout", 30)
+                // Hints from the station catalog. These are authoritative
+                // signals from Radio Browser used to pick the media source
+                // type and recording extension before we've seen any traffic.
+                val hlsHint = intent.getBooleanExtra("hls_hint", false)
+                val codecHint = intent.getStringExtra("codec_hint") ?: ""
 
                 currentStreamUrl = streamUrl
                 currentProxyHost = proxyHost
@@ -419,6 +439,8 @@ class RadioService : Service() {
                 currentProxyPassword = proxyPassword
                 currentProxyAuthType = proxyAuthType
                 currentProxyConnectionTimeout = proxyConnectionTimeout
+                currentHlsHint = hlsHint
+                currentCodecHint = codecHint
                 currentStationName = stationName
                 currentCoverArtUri = coverArtUri
                 reconnectAttempts = 0
@@ -429,7 +451,19 @@ class RadioService : Service() {
                 updateMediaMetadata(stationName, coverArtUri, proxyType == ProxyType.TOR || proxyType == ProxyType.I2P)
                 updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
 
-                playStream(streamUrl, proxyHost, proxyPort, proxyType, customProxyProtocol, proxyUsername, proxyPassword, proxyAuthType, proxyConnectionTimeout)
+                // Reject FLV streams up front - ExoPlayer can't decode them and
+                // users will otherwise hit a confusing playback error.
+                if (isFlvCodec(codecHint)) {
+                    rejectUnsupportedCodec("FLV")
+                    return START_STICKY
+                }
+
+                startPlayAfterResolve(
+                    streamUrl, proxyHost, proxyPort, proxyType,
+                    customProxyProtocol, proxyUsername, proxyPassword,
+                    proxyAuthType, proxyConnectionTimeout,
+                    hlsHint, codecHint
+                )
             }
             ACTION_PAUSE -> {
                 player?.pause()
@@ -462,8 +496,26 @@ class RadioService : Service() {
                 val newProxyTypeStr = intent.getStringExtra("proxy_type") ?: ProxyType.NONE.name
                 val newProxyType = ProxyType.fromString(newProxyTypeStr)
                 val newStationName = intent.getStringExtra("station_name") ?: "Unknown Station"
+                val newHlsHint = intent.getBooleanExtra("hls_hint", false)
+                val newCodecHint = intent.getStringExtra("codec_hint") ?: ""
 
-                switchRecordingStream(newStreamUrl, newProxyHost, newProxyPort, newProxyType, newStationName)
+                // Resolve the new URL on a worker thread before handing it to
+                // the recording switch machinery - the recording thread reads
+                // from a single direct URL, so pointers wouldn't work there.
+                serviceScope.launch(Dispatchers.IO) {
+                    val resolution = resolveStreamUrlBlocking(
+                        newStreamUrl, newProxyHost, newProxyPort, newProxyType,
+                        newHlsHint, newCodecHint
+                    )
+                    val resolvedUrl = resolution?.url ?: newStreamUrl
+                    val effectiveHlsHint = newHlsHint || (resolution?.hlsDetected == true)
+                    handler.post {
+                        switchRecordingStream(
+                            resolvedUrl, newProxyHost, newProxyPort, newProxyType,
+                            newStationName, effectiveHlsHint, newCodecHint
+                        )
+                    }
+                }
             }
             ACTION_SET_SLEEP_TIMER -> {
                 val minutes = intent.getIntExtra("minutes", 0)
@@ -520,29 +572,29 @@ class RadioService : Service() {
 
         currentStationName = stationName
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val isHls = isHlsStream(streamUrl)
+        // HLS / DASH detection combines URL extension signals with the hls
+        // hint from Radio Browser so extensionless HLS streams are captured
+        // with the correct container.
+        val isHls = isHlsStream(streamUrl) || currentHlsHint
         val isDash = isDashStream(streamUrl)
-        val format = when {
+        // detectRecordingFormat uses codecHint first, URL extension as
+        // fallback. Content-Type from the HTTP response is applied inside
+        // the recording thread if the codec hint wasn't authoritative.
+        val initialFormat = when {
             isHls -> "ts"
             isDash -> "m4a"
-            else -> detectStreamFormat(streamUrl)
+            else -> detectRecordingFormat(currentCodecHint, streamUrl)
         }
         val sanitizedName = stationName.replace(Regex("[^a-zA-Z0-9\\s]"), "").replace(Regex("\\s+"), "_")
-        val fileName = "${sanitizedName}_$timestamp.$format"
+        val fileName = "${sanitizedName}_$timestamp.$initialFormat"
+        val format = initialFormat
 
-        android.util.Log.d("RadioService", "Starting recording for: $stationName, URL: $streamUrl (HLS=$isHls, DASH=$isDash)")
+        android.util.Log.d("RadioService", "Starting recording for: $stationName, URL: $streamUrl (HLS=$isHls, DASH=$isDash, codecHint=$currentCodecHint, format=$format)")
 
         val mimeType = when {
             isHls -> HlsRecorder.mimeTypeForExtension(format)
             isDash -> DashRecorder.mimeTypeForExtension()
-            else -> when (format) {
-                "ogg" -> "audio/ogg"
-                "opus" -> "audio/opus"
-                "aac" -> "audio/aac"
-                "flac" -> "audio/flac"
-                "m4a" -> "audio/mp4"
-                else -> "audio/mpeg"
-            }
+            else -> mimeTypeForFormat(format)
         }
 
         val customDirUri = PreferencesHelper.getRecordingDirectoryUri(this)
@@ -571,7 +623,13 @@ class RadioService : Service() {
         isRecording = true
 
         val initialCall: Call? = if (!isHls && !isDash) {
-            val recordingClient = buildRecordingHttpClient()
+            val recordingClient = buildRecordingHttpClient() ?: run {
+                android.util.Log.e("RadioService", "Recording refused: proxy requirement not met")
+                isRecordingActive.set(false)
+                isRecording = false
+                broadcastRecordingError(getString(R.string.recording_error_proxy_blocked))
+                return
+            }
             val request = Request.Builder()
                 .url(streamUrl)
                 .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
@@ -581,6 +639,17 @@ class RadioService : Service() {
                 .build()
             recordingClient.newCall(request).also { recordingCall = it }
         } else {
+            // HLS/DASH: the provider-based path handles null internally.
+            // Verify up front so we surface a user-facing error before the
+            // recording thread starts, instead of silently ending with an
+            // empty output file.
+            if (buildRecordingHttpClient() == null) {
+                android.util.Log.e("RadioService", "Recording refused: proxy requirement not met")
+                isRecordingActive.set(false)
+                isRecording = false
+                broadcastRecordingError(getString(R.string.recording_error_proxy_blocked))
+                return
+            }
             recordingCall = null
             null
         }
@@ -593,6 +662,7 @@ class RadioService : Service() {
         val finalUseCustomDir = useCustomDir
         val finalCustomDirUri = customDirUri
         val finalFormat = format
+        val finalCodecHint = currentCodecHint
         val finalIsHls = isHls
         val finalIsDash = isDash
 
@@ -672,12 +742,48 @@ class RadioService : Service() {
                         }
                         return@Thread
                     }
+
+                    // Refine extension / MIME from the Content-Type header
+                    // before the first byte is written. We only override the
+                    // URL-based guess if the server told us something more
+                    // specific; the codec hint (when present) has already
+                    // been applied via finalFormat/finalMimeType.
+                    val contentTypeHeader = response!!.header("Content-Type").orEmpty()
+                    val ctFormat = formatFromContentType(contentTypeHeader)
+                    if (ctFormat != null && ctFormat != finalFormat) {
+                        // Trust the server only when the codec hint didn't
+                        // already resolve the format (i.e. we fell through to
+                        // URL-extension detection).
+                        val hintResolved = detectRecordingFormatFromCodecHint(finalCodecHint) != null
+                        if (!hintResolved) {
+                            val baseName = actualFileName.substringBeforeLast('.', actualFileName)
+                            actualFileName = "$baseName.$ctFormat"
+                            actualMimeType = mimeTypeForFormat(ctFormat)
+                            android.util.Log.d(
+                                "RadioService",
+                                "Recording format upgraded from Content-Type '$contentTypeHeader' to $ctFormat"
+                            )
+                        }
+                    }
                 }
 
                 // Pre-detect fMP4/CMAF format for HLS streams before creating output file
                 if (finalIsHls && isRecordingActive.get()) {
                     try {
-                        val detectClient = buildRecordingHttpClient()
+                        // If the required proxy disappeared between
+                        // startRecording's up-front check and now, abort
+                        // here rather than probe over a non-proxied client.
+                        // The provider path downstream also returns null,
+                        // so the recorder would halt either way - fail fast
+                        // with a user-visible error.
+                        val detectClient = buildRecordingHttpClient() ?: run {
+                            android.util.Log.e("RadioService", "HLS format detection aborted: proxy requirement not met")
+                            handler.post {
+                                broadcastRecordingError(getString(R.string.recording_error_proxy_blocked))
+                                cleanupRecording()
+                            }
+                            return@Thread
+                        }
                         val detectRequest = Request.Builder()
                             .url(finalStreamUrl)
                             .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
@@ -931,6 +1037,14 @@ class RadioService : Service() {
                                         }
 
                                         val newRecordingClient = buildRecordingHttpClient()
+                                        if (newRecordingClient == null) {
+                                            android.util.Log.e("RadioService", "Stream-switch aborted: proxy requirement not met (fail-closed)")
+                                            handler.post {
+                                                broadcastRecordingError(getString(R.string.recording_error_proxy_blocked))
+                                            }
+                                            pendingRecordingStreamUrl = null
+                                            break@outerLoop
+                                        }
                                         val newRequest = Request.Builder()
                                             .url(newStreamUrl)
                                             .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
@@ -1108,13 +1222,50 @@ class RadioService : Service() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
-    private fun buildRecordingHttpClient(): OkHttpClient {
+    /**
+     * Build an OkHttp client configured for recording traffic.
+     *
+     * Returns null when the user has a force-proxy mode enabled but the
+     * required proxy isn't currently reachable - we fail CLOSED rather
+     * than silently rebuilding with a direct connection (which would leak
+     * clearnet traffic every time an HLS/DASH segment is fetched, or
+     * whenever the recording thread reconnects). Callers MUST treat null
+     * as a hard abort.
+     */
+    private fun buildRecordingHttpClient(): OkHttpClient? {
         val forceTorAll = PreferencesHelper.isForceTorAll(this)
         val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
         val forceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
         val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(this)
         val isI2PStream = currentProxyType == ProxyType.I2P || currentStreamUrl?.contains(".i2p") == true
         val isTorStream = currentProxyType == ProxyType.TOR || currentStreamUrl?.contains(".onion") == true
+
+        // Fail-closed safeguards BEFORE the routing selection runs.
+        // Each of these short-circuits any code path that would fall
+        // through to Triple("", 0, ProxyType.NONE) - i.e. a direct
+        // connection - while a force-* mode is active.
+        if (forceTorAll && !TorManager.isConnected()) {
+            android.util.Log.e("RadioService", "Recording refused: force-Tor-all enabled but Tor not connected")
+            return null
+        }
+        if (forceTorExceptI2P && !isI2PStream && !TorManager.isConnected()) {
+            android.util.Log.e("RadioService", "Recording refused: force-Tor-except-I2P enabled, non-I2P stream, Tor not connected")
+            return null
+        }
+        if (forceCustomProxy) {
+            val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
+            if (customProxyHost.isEmpty()) {
+                android.util.Log.e("RadioService", "Recording refused: force-custom-proxy enabled but not configured")
+                return null
+            }
+        }
+        if (forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream) {
+            val customProxyHost = PreferencesHelper.getCustomProxyHost(this)
+            if (customProxyHost.isEmpty()) {
+                android.util.Log.e("RadioService", "Recording refused: force-custom-proxy-except-Tor-I2P enabled, clearnet stream, custom proxy not configured")
+                return null
+            }
+        }
 
         android.util.Log.d("RadioService", "===== RECORDING CONNECTION REQUEST =====")
         android.util.Log.d("RadioService", "Recording URL: $currentStreamUrl")
@@ -1331,6 +1482,144 @@ class RadioService : Service() {
         }
     }
 
+    /**
+     * Pick a recording file extension, preferring the Radio Browser codec
+     * hint (most reliable) and falling back to URL extension detection
+     * (the legacy behaviour). The content-type from the first HTTP response
+     * is applied in the recording thread as an additional refinement.
+     */
+    private fun detectRecordingFormat(codecHint: String, streamUrl: String): String {
+        return detectRecordingFormatFromCodecHint(codecHint) ?: detectStreamFormat(streamUrl)
+    }
+
+    /**
+     * Map a Radio Browser codec string to a file extension, or return null
+     * if the hint is missing / ambiguous ("UNKNOWN", empty). Video+audio
+     * containers are kept as their real container (.ts for MPEG-TS, .mp4 for
+     * MP4) so the file is actually playable; ExoPlayer's audio renderer can
+     * still decode audio-only playback from them.
+     */
+    private fun detectRecordingFormatFromCodecHint(codecHint: String): String? {
+        if (codecHint.isBlank()) return null
+        val upper = codecHint.uppercase()
+        // UNKNOWN alone (or UNKNOWN,H.264 etc.) means Radio Browser doesn't
+        // trust its own probe - fall through to other signals.
+        if (upper.startsWith("UNKNOWN")) return null
+        // Video+audio containers. Tokens split by ',' contain a video codec.
+        if (upper.contains("H.264") || upper.contains("H264") ||
+            upper.contains("HEVC") || upper.contains("H.265")) {
+            // AAC,H.264 → MPEG-TS (.ts); MP4,H.264 → .mp4
+            return if (upper.startsWith("MP4")) "mp4" else "ts"
+        }
+        return when (upper.substringBefore(',').trim()) {
+            "MP3" -> "mp3"
+            "AAC", "AAC+" -> "aac"
+            "OGG" -> "ogg"
+            "FLAC" -> "flac"
+            "MP4" -> "m4a"
+            "FLV" -> null  // FLV is rejected before recording can start
+            else -> null
+        }
+    }
+
+    /**
+     * Best-effort MIME type for a given file extension.
+     */
+    private fun mimeTypeForFormat(format: String): String {
+        return when (format) {
+            "ogg" -> "audio/ogg"
+            "opus" -> "audio/opus"
+            "aac" -> "audio/aac"
+            "flac" -> "audio/flac"
+            "m4a" -> "audio/mp4"
+            "mp4" -> "video/mp4"
+            "ts" -> "video/mp2t"
+            "webm" -> "audio/webm"
+            else -> "audio/mpeg"
+        }
+    }
+
+    /**
+     * Derive a file extension from a Content-Type response header. Returns
+     * null for unrecognised values so callers can keep their existing guess.
+     */
+    private fun formatFromContentType(contentType: String): String? {
+        if (contentType.isBlank()) return null
+        val ct = contentType.substringBefore(';').trim().lowercase()
+        return when (ct) {
+            "audio/mpeg", "audio/mp3" -> "mp3"
+            "audio/aac", "audio/aacp" -> "aac"
+            "audio/ogg", "application/ogg" -> "ogg"
+            "audio/opus" -> "opus"
+            "audio/flac", "audio/x-flac" -> "flac"
+            "audio/mp4", "audio/m4a", "audio/x-m4a" -> "m4a"
+            "audio/webm" -> "webm"
+            "video/mp4" -> "mp4"
+            "video/mp2t" -> "ts"
+            else -> null
+        }
+    }
+
+    /**
+     * Whether a codec hint identifies an FLV stream (audio- or AV-container
+     * FLV). Checked before playback and recording - ExoPlayer's default
+     * renderers cannot decode FLV so we surface a clear error to the user
+     * instead of a generic decoder failure.
+     */
+    private fun isFlvCodec(codecHint: String): Boolean {
+        if (codecHint.isBlank()) return false
+        val upper = codecHint.uppercase()
+        return upper == "FLV" || upper.startsWith("FLV,")
+    }
+
+    /**
+     * Inspect a [PlaybackException] for a well-known HTTP status code and
+     * broadcast a targeted error type to the UI. Called on every
+     * onPlayerError so the user gets an accurate toast even during the
+     * reconnect loop (each attempt surfaces the same classification).
+     *
+     * Walks the cause chain because ExoPlayer usually wraps the
+     * InvalidResponseCodeException inside a higher-level PlaybackException.
+     */
+    private fun classifyAndBroadcastHttpError(error: PlaybackException) {
+        var cause: Throwable? = error
+        var httpException: HttpDataSource.InvalidResponseCodeException? = null
+        while (cause != null) {
+            if (cause is HttpDataSource.InvalidResponseCodeException) {
+                httpException = cause
+                break
+            }
+            cause = cause.cause
+        }
+        val responseCode = httpException?.responseCode ?: return
+        val errorType = when (responseCode) {
+            401 -> ERROR_TYPE_STATION_AUTH_REQUIRED
+            403, 451 -> ERROR_TYPE_STATION_GEOBLOCKED
+            404, 410 -> ERROR_TYPE_STATION_GONE
+            else -> return
+        }
+        android.util.Log.w(
+            "RadioService",
+            "HTTP $responseCode on stream - broadcasting $errorType"
+        )
+        broadcastStreamError(errorType)
+    }
+
+    /**
+     * Abort playback with a clear "unsupported codec" error. Used for FLV
+     * and potentially future codecs we know we can't decode.
+     */
+    private fun rejectUnsupportedCodec(codecName: String) {
+        android.util.Log.w("RadioService", "Rejecting stream with unsupported codec: $codecName")
+        isStartingNewStream.set(false)
+        broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+        broadcastStreamError(ERROR_TYPE_UNSUPPORTED_CODEC, codecName)
+        startForeground(
+            NOTIFICATION_ID,
+            createNotification(getString(R.string.notification_unsupported_codec, codecName))
+        )
+    }
+
     private fun isHlsStream(streamUrl: String): Boolean {
         val path = try {
             Uri.parse(streamUrl).path?.lowercase() ?: ""
@@ -1354,7 +1643,9 @@ class RadioService : Service() {
         newProxyHost: String,
         newProxyPort: Int,
         newProxyType: ProxyType,
-        newStationName: String
+        newStationName: String,
+        newHlsHint: Boolean = false,
+        newCodecHint: String = ""
     ) {
         if (!isRecording) {
             android.util.Log.d("RadioService", "switchRecordingStream called but not recording")
@@ -1368,6 +1659,8 @@ class RadioService : Service() {
         currentProxyPort = newProxyPort
         currentProxyType = newProxyType
         currentStationName = newStationName
+        currentHlsHint = newHlsHint
+        currentCodecHint = newCodecHint
 
         pendingRecordingStreamUrl = newStreamUrl
         pendingRecordingProxyHost = newProxyHost
@@ -1475,6 +1768,261 @@ class RadioService : Service() {
         }
     }
 
+    /**
+     * Resolve a playlist pointer (if any) on a worker thread and then call
+     * [playStream] on the main thread with the final direct URL.
+     *
+     * URL resolution is kept strictly separate from format/codec detection.
+     * If resolution fails we surface [ERROR_TYPE_PLAYLIST_UNREADABLE] rather
+     * than silently falling back to the original URL: in practice, pointer
+     * URLs never play back directly and pretending they might would just
+     * waste reconnect attempts on something that can't work.
+     */
+    private fun startPlayAfterResolve(
+        streamUrl: String,
+        proxyHost: String,
+        proxyPort: Int,
+        proxyType: ProxyType,
+        customProxyProtocol: String,
+        proxyUsername: String,
+        proxyPassword: String,
+        proxyAuthType: String,
+        proxyConnectionTimeout: Int,
+        hlsHint: Boolean,
+        codecHint: String
+    ) {
+        serviceScope.launch(Dispatchers.IO) {
+            val resolution = resolveStreamUrlBlocking(
+                streamUrl, proxyHost, proxyPort, proxyType, hlsHint, codecHint
+            )
+            handler.post {
+                if (resolution == null) {
+                    android.util.Log.e("RadioService", "Playlist pointer resolution failed for $streamUrl")
+                    isStartingNewStream.set(false)
+                    broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+                    broadcastStreamError(ERROR_TYPE_PLAYLIST_UNREADABLE)
+                    startForeground(
+                        NOTIFICATION_ID,
+                        createNotification(getString(R.string.notification_playlist_unreadable))
+                    )
+                    return@post
+                }
+                val resolved = resolution.url
+                // OR the catalog hlsHint with what the probe actually saw
+                // on the wire. This fixes URLs whose extension lies (.pls
+                // serving an HLS manifest, .m3u serving #EXTM3U, etc.).
+                val effectiveHlsHint = hlsHint || resolution.hlsDetected
+                if (resolved != streamUrl) {
+                    android.util.Log.d("RadioService", "Resolved pointer $streamUrl -> $resolved")
+                    // Update currentStreamUrl so recording picks up the direct
+                    // URL (pointers would otherwise confuse the recording
+                    // thread, which expects raw audio bytes).
+                    currentStreamUrl = resolved
+                }
+                if (resolution.hlsDetected && !hlsHint) {
+                    android.util.Log.d(
+                        "RadioService",
+                        "Probe detected HLS on $resolved - overriding media source"
+                    )
+                    // Persist so reconnect / recording uses HlsMediaSource too.
+                    currentHlsHint = true
+                }
+                playStream(
+                    resolved, proxyHost, proxyPort, proxyType,
+                    customProxyProtocol, proxyUsername, proxyPassword,
+                    proxyAuthType, proxyConnectionTimeout, effectiveHlsHint, codecHint
+                )
+            }
+        }
+    }
+
+    /**
+     * Outcome of blocking URL resolution: the final direct URL plus whether
+     * the probe revealed HLS content. [hlsDetected] overrides a missing
+     * catalog hlsHint when the URL extension lied about the real format
+     * (classic case: .pls URLs that serve an HLS manifest directly).
+     */
+    private data class ResolvedStream(val url: String, val hlsDetected: Boolean)
+
+    /**
+     * Resolve a playlist pointer using an OkHttpClient that matches the
+     * effective proxy configuration (honouring force-* modes). Returns
+     * [ResolvedStream] with the final URL and an HLS-detected flag, or
+     * null if the pointer couldn't be parsed/fetched.
+     *
+     * Fail-safe is important here: this runs BEFORE playStream's force-*
+     * checks, so if we built a direct client for a clearnet station under
+     * force-Tor-all, the resolver's own fetch would leak before playback
+     * got a chance to refuse. If the required proxy isn't reachable we
+     * return the original URL untouched so that playStream can apply its
+     * proxy gate and surface the correct error (tor-not-connected etc.)
+     * without ever opening a socket from the resolver.
+     *
+     * Runs on the caller's thread - callers must ensure they're off the
+     * main thread when invoking.
+     */
+    private fun resolveStreamUrlBlocking(
+        streamUrl: String,
+        proxyHost: String,
+        proxyPort: Int,
+        proxyType: ProxyType,
+        hlsHint: Boolean = false,
+        codecHint: String = ""
+    ): ResolvedStream? {
+        // Fast path: if Radio Browser's catalog hints are authoritative for
+        // this URL (codec is a direct audio codec, or HLS flag is set), skip
+        // the probe entirely. This saves a full round-trip (painful over
+        // Tor/I2P) for the majority of extensionless Shoutcast/Icecast URLs
+        // that previously triggered a content-type probe.
+        //
+        // This does NOT bypass the proxy - it just skips OUR probe request.
+        // ExoPlayer's subsequent stream fetch still goes through the proper
+        // proxy pipeline in playStream().
+        if (com.opensource.i2pradio.util.PlaylistResolver
+                .canSkipWithHints(streamUrl, hlsHint, codecHint)) {
+            return ResolvedStream(streamUrl, hlsDetected = hlsHint)
+        }
+        return try {
+            val forceTorAll = PreferencesHelper.isForceTorAll(this)
+            val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
+            val forceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
+            val forceCustomProxyExceptTorI2P = PreferencesHelper.isForceCustomProxyExceptTorI2P(this)
+            val isI2PStream = proxyType == ProxyType.I2P || streamUrl.contains(".i2p")
+            val isTorStream = proxyType == ProxyType.TOR || streamUrl.contains(".onion")
+
+            // Compute effective proxy the same way playStream and
+            // buildRecordingHttpClient do. If a force-* mode is set but the
+            // required proxy isn't reachable, skip the resolver's network
+            // fetch entirely - return the URL unchanged so playStream can
+            // reject with the correct error message. This prevents any
+            // clearnet leak from the resolver itself.
+            val skipResolution = ResolvedStream(streamUrl, hlsDetected = false)
+            val effective: Triple<String, Int, ProxyType>? = when {
+                forceTorAll -> {
+                    if (!TorManager.isConnected()) {
+                        android.util.Log.w("RadioService", "Resolver skipping: force-Tor-all but Tor not connected - deferring to playStream gate")
+                        return skipResolution
+                    }
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
+                forceTorExceptI2P && isI2PStream ->
+                    Triple(
+                        if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyHost else "127.0.0.1",
+                        if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyPort else 4444,
+                        ProxyType.I2P
+                    )
+                forceTorExceptI2P && !isI2PStream -> {
+                    if (!TorManager.isConnected()) {
+                        android.util.Log.w("RadioService", "Resolver skipping: force-Tor-except-I2P, non-I2P, Tor not connected")
+                        return skipResolution
+                    }
+                    Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                }
+                forceCustomProxy -> {
+                    val customHost = PreferencesHelper.getCustomProxyHost(this)
+                    if (customHost.isEmpty()) {
+                        android.util.Log.w("RadioService", "Resolver skipping: force-custom-proxy not configured")
+                        return skipResolution
+                    }
+                    Triple(customHost, PreferencesHelper.getCustomProxyPort(this), ProxyType.CUSTOM)
+                }
+                forceCustomProxyExceptTorI2P && isI2PStream ->
+                    Triple(
+                        if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyHost else "127.0.0.1",
+                        if (proxyHost.isNotEmpty() && proxyType == ProxyType.I2P) proxyPort else 4444,
+                        ProxyType.I2P
+                    )
+                forceCustomProxyExceptTorI2P && isTorStream -> {
+                    if (TorManager.isConnected()) {
+                        Triple(TorManager.getProxyHost(), TorManager.getProxyPort(), ProxyType.TOR)
+                    } else if (proxyHost.isNotEmpty() && proxyType == ProxyType.TOR) {
+                        Triple(proxyHost, proxyPort, ProxyType.TOR)
+                    } else {
+                        Triple("127.0.0.1", 9050, ProxyType.TOR)
+                    }
+                }
+                forceCustomProxyExceptTorI2P && !isI2PStream && !isTorStream -> {
+                    val customHost = PreferencesHelper.getCustomProxyHost(this)
+                    if (customHost.isEmpty()) {
+                        android.util.Log.w("RadioService", "Resolver skipping: force-custom-proxy-except-Tor-I2P, clearnet stream, not configured")
+                        return skipResolution
+                    }
+                    Triple(customHost, PreferencesHelper.getCustomProxyPort(this), ProxyType.CUSTOM)
+                }
+                proxyHost.isNotEmpty() && proxyType != ProxyType.NONE ->
+                    Triple(proxyHost, proxyPort, proxyType)
+                else -> null  // no proxy required, safe to resolve direct
+            }
+
+            // Short timeouts on purpose: a slow pointer host shouldn't stall
+            // playback start for tens of seconds. ExoPlayer's own timeouts
+            // still govern the actual audio fetch downstream.
+            val builder = OkHttpClient.Builder()
+                .connectTimeout(6, TimeUnit.SECONDS)
+                .readTimeout(6, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(true)
+
+            if (effective != null) {
+                val (effHost, effPort, effType) = effective
+                val customProtocol = PreferencesHelper.getCustomProxyProtocol(this)
+                val javaProxyType = when (effType) {
+                    ProxyType.TOR -> Proxy.Type.SOCKS
+                    ProxyType.I2P -> Proxy.Type.HTTP
+                    ProxyType.CUSTOM -> when (customProtocol.uppercase()) {
+                        "SOCKS4", "SOCKS5" -> Proxy.Type.SOCKS
+                        "HTTP", "HTTPS" -> Proxy.Type.HTTP
+                        else -> Proxy.Type.HTTP
+                    }
+                    ProxyType.NONE -> Proxy.Type.DIRECT
+                }
+
+                builder.proxy(Proxy(javaProxyType, InetSocketAddress(effHost, effPort)))
+                if (effType == ProxyType.CUSTOM) {
+                    val username = PreferencesHelper.getCustomProxyUsername(this)
+                    val password = PreferencesHelper.getCustomProxyPassword(this)
+                    val authType = PreferencesHelper.getCustomProxyAuthType(this)
+                    if (username.isNotEmpty() && password.isNotEmpty()) {
+                        builder.proxyAuthenticator { _, response ->
+                            // Avoid infinite auth loops
+                            if (response.request.header("Proxy-Authorization") != null) {
+                                return@proxyAuthenticator null
+                            }
+                            when (authType.uppercase()) {
+                                "DIGEST" -> DigestAuthenticator.authenticate(
+                                    response, username, password
+                                )
+                                else -> {
+                                    val credential = okhttp3.Credentials.basic(username, password)
+                                    response.request.newBuilder()
+                                        .header("Proxy-Authorization", credential)
+                                        .build()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (javaProxyType == Proxy.Type.SOCKS) {
+                    builder.dns(SOCKS5_DNS)
+                }
+            }
+
+            val client = builder.build()
+            when (val result = com.opensource.i2pradio.util.PlaylistResolver.resolve(streamUrl, client)) {
+                is com.opensource.i2pradio.util.PlaylistResolver.Result.Resolved ->
+                    ResolvedStream(result.url, result.hlsDetected)
+                is com.opensource.i2pradio.util.PlaylistResolver.Result.Failed -> {
+                    android.util.Log.w("RadioService", "Playlist resolution failed: ${result.reason}")
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("RadioService", "Unexpected error during playlist resolution: ${e.message}", e)
+            // Fall through - caller will treat null as a failure.
+            null
+        }
+    }
+
     private fun playStream(
         streamUrl: String,
         proxyHost: String,
@@ -1484,9 +2032,19 @@ class RadioService : Service() {
         proxyUsername: String = "",
         proxyPassword: String = "",
         proxyAuthType: String = "NONE",
-        proxyConnectionTimeout: Int = 30
+        proxyConnectionTimeout: Int = 30,
+        hlsHint: Boolean = false,
+        codecHint: String = ""
     ) {
         try {
+            // Reject FLV up front - ExoPlayer's default renderers can't decode
+            // it. Checked here (in addition to the ACTION_PLAY handler) so
+            // reconnects on an FLV station also short-circuit cleanly.
+            if (isFlvCodec(codecHint)) {
+                rejectUnsupportedCodec("FLV")
+                return
+            }
+
             val forceTorAll = PreferencesHelper.isForceTorAll(this)
             val forceTorExceptI2P = PreferencesHelper.isForceTorExceptI2P(this)
             val forceCustomProxy = PreferencesHelper.isForceCustomProxy(this)
@@ -1846,12 +2404,18 @@ class RadioService : Service() {
                 .setAudioAttributes(audioAttributes, true)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
+                // Combine URL extension signals with the hlsHint from Radio
+                // Browser. This fixes streams with extensionless URLs (e.g.
+                // /listen?sid=1) that are actually HLS - the catalog tells us
+                // truthfully what they are even when the URL doesn't.
+                val useHls = isHlsStream(streamUrl) || hlsHint
+                val useDash = isDashStream(streamUrl)
                 val mediaSource: MediaSource = when {
-                    isHlsStream(streamUrl) -> {
+                    useHls -> {
                         HlsMediaSource.Factory(dataSourceFactory)
                             .createMediaSource(MediaItem.fromUri(streamUrl))
                     }
-                    isDashStream(streamUrl) -> {
+                    useDash -> {
                         DashMediaSource.Factory(dataSourceFactory)
                             .createMediaSource(MediaItem.fromUri(streamUrl))
                     }
@@ -1871,6 +2435,12 @@ class RadioService : Service() {
                     override fun onPlayerError(error: PlaybackException) {
                         android.util.Log.e("RadioService", "Playback error: ${error.message}")
                         updatePlaybackState(PlaybackStateCompat.STATE_ERROR)
+                        // Surface distinct errors for well-known HTTP status
+                        // codes so the UI can show something actionable
+                        // (geo-block vs station removed vs auth needed)
+                        // instead of the generic "stream failed" toast a
+                        // reconnect loop eventually yields.
+                        classifyAndBroadcastHttpError(error)
                         scheduleReconnect()
                     }
 
@@ -2007,7 +2577,8 @@ class RadioService : Service() {
             currentStreamUrl?.let { url ->
                 playStream(url, currentProxyHost ?: "", currentProxyPort, currentProxyType,
                     currentCustomProxyProtocol, currentProxyUsername, currentProxyPassword,
-                    currentProxyAuthType, currentProxyConnectionTimeout)
+                    currentProxyAuthType, currentProxyConnectionTimeout,
+                    currentHlsHint, currentCodecHint)
             }
         }
         handler.postDelayed(reconnectRunnable!!, delay)
@@ -2251,9 +2822,12 @@ class RadioService : Service() {
     /**
      * Broadcast stream error to UI for toast notification
      */
-    private fun broadcastStreamError(errorType: String) {
+    private fun broadcastStreamError(errorType: String, codecName: String? = null) {
         val intent = Intent(BROADCAST_STREAM_ERROR).apply {
             putExtra(EXTRA_STREAM_ERROR_TYPE, errorType)
+            if (codecName != null) {
+                putExtra(EXTRA_UNSUPPORTED_CODEC_NAME, codecName)
+            }
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }

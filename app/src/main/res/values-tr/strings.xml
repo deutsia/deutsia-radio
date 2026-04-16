@@ -140,6 +140,8 @@
     <string name="dialog_sort_stations">İstasyonları Sırala</string>
     <string name="dialog_delete_stations">İstasyonları sil</string>
     <string name="button_save">Kaydet</string>
+    <string name="button_edit">Düzenle</string>
+    <string name="button_select_all">Tümünü Seç</string>
     <string name="button_cancel">İptal</string>
     <string name="button_import">İçe Aktar</string>
     <string name="button_export">Dışa Aktar</string>
@@ -268,7 +270,7 @@
 
     
     <string name="settings_about">Hakkında</string>
-    <string name="settings_version">Sürüm 1.5</string>
+    <string name="settings_version">Sürüm 1.7</string>
     <string name="settings_view_github">GitHub\'da Görüntüle</string>
     <string name="settings_donate">Bağış Yap</string>
     <string name="settings_donate_description">Bu uygulama işinize yaradıysa bağış yapmayı düşünün</string>
@@ -327,7 +329,9 @@
     <string name="tor_control_button_cancel">İptal</string>
     <string name="tor_control_button_retry">Bağlantıyı Yeniden Dene</string>
     <string name="tor_control_button_install">InviZible Pro\'yu Yükle</string>
+    <string name="tor_control_button_install_lite">InviZible Lite\'ı Yükle</string>
     <string name="tor_control_button_open_invizible">InviZible Pro\'yu Aç</string>
+    <string name="tor_control_button_open_app">%s\'i Aç</string>
 
 
     
@@ -375,6 +379,7 @@
     <string name="toast_custom_proxy_saved">Özel vekil sunucu ayarları kaydedildi</string>
     <string name="toast_custom_proxy_cleared">Özel vekil sunucu ayarları temizlendi</string>
     <string name="toast_address_copied">Adres panoya kopyalandı</string>
+    <string name="toast_metadata_copied">Şarkı bilgisi panoya kopyalandı</string>
     <string name="toast_using_default_directory">Varsayılan dizin kullanılıyor</string>
 
     
@@ -561,6 +566,8 @@
     <string name="recording_error_connection_refused">Bağlantı reddedildi</string>
     <string name="recording_error_io">G/Ç hatası: %s</string>
     <string name="recording_error_generic">Hata: %s</string>
+    <string name="recording_error_hls_playlist">HLS çalma listesi alınamadı</string>
+    <string name="recording_error_proxy_blocked">Kayıt engellendi: Gerekli proxy (Tor/özel) mevcut değil</string>
 
     
     <string name="custom_proxy_not_configured_notification">Özel proxy yapılandırılmamış</string>
@@ -602,6 +609,13 @@
     <string name="error_i2p_not_connected">I2P çalışmıyor. Bu yayını oynatmak için I2P\'yi başlatın (örn. InviZible Pro).</string>
     <string name="error_tor_required_for_clearnet">Tor bağlı değil. Zorla Tor modu clearnet yayınları için Tor gerektirir.</string>
     <string name="error_custom_proxy_not_configured">Özel proxy yapılandırılmamış. Ayarlar\'da yapılandırın.</string>
+    <string name="error_unsupported_codec">%1$s akışları desteklenmiyor</string>
+    <string name="error_playlist_unreadable">Çalma listesi okunamadı — istasyon çevrimdışı olabilir</string>
+    <string name="error_station_geoblocked">İstasyon bölgenizde engellendi (veya bu çıkış düğümünden)</string>
+    <string name="error_station_gone">İstasyon artık bu URL\'de mevcut değil</string>
+    <string name="error_station_auth_required">İstasyon kimlik doğrulama gerektiriyor</string>
+    <string name="notification_unsupported_codec">%1$s akışları desteklenmiyor</string>
+    <string name="notification_playlist_unreadable">Çalma listesi okunamadı</string>
 
     
     <string name="cd_add_radio_station">Radyo İstasyonu Ekle</string>
