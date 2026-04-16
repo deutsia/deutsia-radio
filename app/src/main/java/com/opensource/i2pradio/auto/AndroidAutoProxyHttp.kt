@@ -9,9 +9,9 @@ import com.opensource.i2pradio.utils.DigestAuthenticator
 import okhttp3.Credentials
 import okhttp3.Dns
 import okhttp3.OkHttpClient
-import okhttp3.Proxy
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
 /**
