@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">정보</string>
-    <string name="settings_version">버전 1.7</string>
+    <string name="settings_version">버전 1.8</string>
     <string name="settings_view_github">GitHub에서 보기</string>
     <string name="settings_donate">기부</string>
     <string name="settings_donate_description">이 앱이 도움이 되었다면 기부를 고려해주세요</string>
@@ -679,6 +679,33 @@
     <string name="settings_disable_cover_art_description">외부 서버에서 방송국 아트워크 로드 방지</string>
     <string name="settings_network_api_info">앱은 다음에만 연결됩니다: 클리어넷 방송국용 RadioBrowser API, Tor/I2P 방송국용 Radio Registry API, 커버 아트용 외부 서버, 재생 시 라디오 스트림.</string>
     <string name="settings_offline_mode_note">두 API 모두 비활성화됨: 탐색 탭에 로컬 라이브러리만 표시됩니다. 저장된 방송국을 재생하고 파일에서 방송국을 가져올 수 있습니다.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">통합</string>
+    <string name="settings_android_auto">Android Auto 지원</string>
+    <string name="settings_android_auto_description">Google의 Android Auto 앱에 방송국을 노출하여 차량 헤드 유닛에서 재생할 수 있도록 합니다. 기본값은 꺼짐입니다.</string>
+    <string name="settings_android_auto_info">활성화되면 프록시되지 않은 방송국만 Android Auto에 표시됩니다. 프록시된 방송국(Tor, I2P 등)은 프라이버시를 위해 기본적으로 Android Auto에서 숨겨집니다.</string>
+    <string name="settings_android_auto_blocked_force_proxy">강제 프록시 설정(Tor 강제, I2P 제외 Tor 강제 또는 사용자 지정 프록시 강제)이 활성화되어 있기 때문에 Android Auto가 비활성화되었습니다. Android Auto에서의 재생은 해당 프록시를 거치지 않는 별도의 오디오 파이프라인을 사용하므로 활성화하면 이를 우회하게 됩니다. Android Auto를 활성화하려면 강제 프록시를 끄세요.</string>
+    <string name="android_auto_warning_title">Android Auto를 활성화하시겠습니까?</string>
+    <string name="android_auto_warning_message">이를 켜기 전에 다음 변경 사항을 확인하세요:\n\n• 클리어넷 방송국이 Android Auto에 표시됩니다.\n\n• 재생 중 Google의 Android Auto 프로세스가 방송국 이름, 현재 트랙 및 아트워크를 볼 수 있습니다.\n\n• Tor, I2P 및 사용자 지정 프록시 방송국은 기본적으로 숨겨진 상태로 유지됩니다. Android Auto를 활성화한 후 해당 방송국도 표시할지 선택할 수 있으며, 설정에서 실행 전에 프라이버시 트레이드오프에 대해 경고합니다.\n\n• Tor 강제 또는 사용자 지정 프록시 강제를 켜면 다시 끌 때까지 Android Auto가 자동으로 비활성화됩니다.\n\n• 설정에서 언제든지 Android Auto를 다시 끌 수 있습니다.</string>
+    <string name="android_auto_warning_enable">Android Auto 활성화</string>
+    <string name="android_auto_warning_cancel">취소</string>
+    <string name="auto_node_favorites">즐겨찾기</string>
+    <string name="auto_node_all_stations">모든 방송국</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Android Auto에 프록시 방송국 표시</string>
+    <string name="settings_aa_allow_proxy_stations_description">기본적으로 꺼져 있습니다. 켜면 Tor / I2P / 사용자 지정 프록시 방송국도 Android Auto에 표시되며 해당 프록시를 통해 재생됩니다. 오디오 자체는 비공개이지만, 방송국 이름과 메타데이터는 Google의 Android Auto 프로세스에 표시됩니다.</string>
+    <string name="aa_allow_proxy_warning_title">Android Auto에 프록시 방송국을 표시하시겠습니까?</string>
+    <string name="aa_allow_proxy_warning_message">이 방송국의 오디오는 휴대전화에서 구성된 Tor / I2P / 사용자 지정 프록시를 통해 계속 라우팅됩니다: 재생 자체는 프록시된 상태로 유지됩니다.\n\n하지만 Google의 Android Auto 프로세스는 방송국 이름, 현재 트랙 및 아트워크를 볼 수 있습니다. 따라서 *듣고 있는 것* 은 Google에 전송되지 않지만, *특정 방송국을 듣고 있다는 사실* 은 Google에서 볼 수 있습니다. 프라이버시가 꼭 필요하다면 Android Auto를 사용하지 마세요. </string>
+    <string name="aa_allow_proxy_warning_enable">표시하기</string>
+    <string name="aa_allow_proxy_warning_cancel">숨긴 상태로 유지</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Android Auto 설정에 대한 일회성 알림입니다. 앱은 지속적인 재생에는 이 채널을 사용하지 않습니다.</string>
+    <string name="aa_first_connect_title">Android Auto가 연결되었습니다</string>
+    <string name="aa_first_connect_text">클리어넷 방송국이 자동차에 표시되고 있습니다. Tor, I2P 및 사용자 지정 프록시 방송국도 표시할지 선택하려면 탭하세요.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">오프라인 모드</string>

@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">Про програму</string>
-    <string name="settings_version">Версія 1.7</string>
+    <string name="settings_version">Версія 1.8</string>
     <string name="settings_view_github">Переглянути на GitHub</string>
     <string name="settings_donate">Підтримати</string>
     <string name="settings_donate_description">Якщо цей додаток вам допоміг, розгляньте можливість підтримки</string>
@@ -680,6 +680,33 @@
     <string name="settings_disable_cover_art_description">Заборонити завантаження зображень станцій із зовнішніх серверів</string>
     <string name="settings_network_api_info">Додаток підключається лише до: API RadioBrowser для clearnet-станцій, API Radio Registry для Tor/I2P-станцій, зовнішніх серверів для обкладинок та радіопотоків під час відтворення.</string>
     <string name="settings_offline_mode_note">Обидва API вимкнено: вкладка «Огляд» показує лише локальну бібліотеку. Ви можете відтворювати збережені станції та імпортувати станції з файлів.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">Інтеграції</string>
+    <string name="settings_android_auto">Підтримка Android Auto</string>
+    <string name="settings_android_auto_description">Надає ваші станції додатку Google Android Auto, щоб ви могли відтворювати їх через автомобільну магнітолу. За замовчуванням вимкнено.</string>
+    <string name="settings_android_auto_info">Коли увімкнено, в Android Auto відображаються лише станції без проксі. Станції з проксі (Tor, I2P тощо) за замовчуванням приховані з Android Auto для захисту конфіденційності.</string>
+    <string name="settings_android_auto_blocked_force_proxy">Android Auto вимкнено, оскільки увімкнено налаштування примусового проксі (Примусовий Tor, Примусовий Tor крім I2P або Примусовий користувацький проксі). Відтворення через Android Auto використовує окремий аудіоконвеєр, який не проходить через ці проксі, тож його увімкнення обійшло б їх. Вимкніть примусовий проксі, щоб увімкнути Android Auto.</string>
+    <string name="android_auto_warning_title">Увімкнути Android Auto?</string>
+    <string name="android_auto_warning_message">Перш ніж увімкнути, ось що зміниться:\n\n• Ваші clearnet-станції з\'являться в Android Auto.\n\n• Процес Google Android Auto побачить назву станції, поточний трек та обкладинку під час відтворення.\n\n• Станції Tor, I2P та з користувацьким проксі за замовчуванням залишаються прихованими. Після увімкнення Android Auto ви можете дозволити їх відображення: Налаштування попередять вас про компроміс конфіденційності перед цим.\n\n• Якщо ви коли-небудь увімкнете Примусовий Tor або Примусовий користувацький проксі, Android Auto буде автоматично вимкнено, доки ви це не вимкнете.\n\n• Ви можете знову вимкнути Android Auto у будь-який час у Налаштуваннях.</string>
+    <string name="android_auto_warning_enable">Увімкнути Android Auto</string>
+    <string name="android_auto_warning_cancel">Скасувати</string>
+    <string name="auto_node_favorites">Улюблені</string>
+    <string name="auto_node_all_stations">Усі станції</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Показувати проксі-станції в Android Auto</string>
+    <string name="settings_aa_allow_proxy_stations_description">За замовчуванням вимкнено. Коли увімкнено, ваші станції Tor / I2P / з користувацьким проксі також відображаються в Android Auto і відтворюються через свій проксі. Сам звук залишається приватним, але назва станції та метадані видимі процесу Google Android Auto.</string>
+    <string name="aa_allow_proxy_warning_title">Показувати проксі-станції в Android Auto?</string>
+    <string name="aa_allow_proxy_warning_message">Звук цих станцій все одно проходитиме через налаштований Tor / I2P / користувацький проксі на вашому телефоні: саме відтворення залишається проксованим.\n\nАле процес Google Android Auto бачить назву станції, поточний трек та обкладинку. Тож хоча *те, що ви чуєте*, не надсилається до Google, *факт того, що ви слухаєте певну станцію*, буде видимий Google. Якщо конфіденційність обов\'язкова, не використовуйте Android Auto. </string>
+    <string name="aa_allow_proxy_warning_enable">Показати</string>
+    <string name="aa_allow_proxy_warning_cancel">Залишити прихованими</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Одноразові сповіщення про налаштування Android Auto. Додаток не використовує цей канал для поточного відтворення.</string>
+    <string name="aa_first_connect_title">Android Auto підключено</string>
+    <string name="aa_first_connect_text">Ваші clearnet-станції відображаються в автомобілі. Натисніть, щоб обрати, чи повинні також з\'явитися станції Tor, I2P та з користувацьким проксі.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">Автономний режим</string>

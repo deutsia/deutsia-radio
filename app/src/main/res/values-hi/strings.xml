@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">के बारे में</string>
-    <string name="settings_version">संस्करण 1.7</string>
+    <string name="settings_version">संस्करण 1.8</string>
     <string name="settings_view_github">GitHub पर देखें</string>
     <string name="settings_donate">दान करें</string>
     <string name="settings_donate_description">यदि इस ऐप ने आपकी मदद की, तो दान करने पर विचार करें</string>
@@ -679,6 +679,33 @@
     <string name="settings_disable_cover_art_description">बाहरी सर्वरों से स्टेशन आर्टवर्क लोड होने से रोकें</string>
     <string name="settings_network_api_info">ऐप केवल इनसे कनेक्ट होता है: क्लियरनेट स्टेशनों के लिए RadioBrowser API, Tor/I2P स्टेशनों के लिए Radio Registry API, कवर आर्ट के लिए बाहरी सर्वर, और चलाते समय रेडियो स्ट्रीम।</string>
     <string name="settings_offline_mode_note">दोनों APIs अक्षम: ब्राउज़ टैब केवल स्थानीय लाइब्रेरी दिखाता है। आप अभी भी सहेजे गए स्टेशन चला सकते हैं और फ़ाइलों से स्टेशन आयात कर सकते हैं।</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">एकीकरण</string>
+    <string name="settings_android_auto">Android Auto समर्थन</string>
+    <string name="settings_android_auto_description">अपने स्टेशन Google के Android Auto ऐप को उजागर करें ताकि आप उन्हें कार हेड यूनिट से चला सकें। डिफ़ॉल्ट रूप से बंद।</string>
+    <string name="settings_android_auto_info">सक्षम होने पर, केवल गैर-प्रॉक्सी स्टेशन Android Auto में दिखाई देते हैं। प्रॉक्सी वाले स्टेशन (Tor, I2P, आदि) गोपनीयता के लिए Android Auto से डिफ़ॉल्ट रूप से छिपे रहते हैं।</string>
+    <string name="settings_android_auto_blocked_force_proxy">Android Auto अक्षम है क्योंकि एक फ़ोर्स-प्रॉक्सी सेटिंग चालू है (फ़ोर्स Tor, I2P को छोड़कर फ़ोर्स Tor, या फ़ोर्स कस्टम प्रॉक्सी)। Android Auto से प्लेबैक एक अलग ऑडियो पाइपलाइन का उपयोग करता है जो उन प्रॉक्सियों से नहीं गुज़रती, इसलिए इसे सक्षम करना उन्हें बायपास कर देगा। Android Auto सक्षम करने के लिए फ़ोर्स-प्रॉक्सी बंद करें।</string>
+    <string name="android_auto_warning_title">Android Auto सक्षम करें?</string>
+    <string name="android_auto_warning_message">इसे चालू करने से पहले, यहां क्या बदलता है:\n\n• आपके क्लियरनेट स्टेशन Android Auto में दिखाई देंगे।\n\n• Google की Android Auto प्रक्रिया आपके चलाते समय स्टेशन का नाम, वर्तमान ट्रैक और आर्टवर्क देखेगी।\n\n• Tor, I2P और कस्टम-प्रॉक्सी स्टेशन डिफ़ॉल्ट रूप से छिपे रहते हैं। Android Auto सक्षम करने के बाद, आप उन्हें भी दिखाने की अनुमति दे सकते हैं: पहले सेटिंग्स आपको गोपनीयता समझौते के बारे में चेतावनी देगी।\n\n• यदि आप कभी फ़ोर्स Tor या फ़ोर्स कस्टम प्रॉक्सी चालू करते हैं, तो Android Auto स्वचालित रूप से अक्षम हो जाएगा जब तक आप इसे वापस बंद नहीं करते।\n\n• आप किसी भी समय सेटिंग्स से Android Auto को फिर से बंद कर सकते हैं।</string>
+    <string name="android_auto_warning_enable">Android Auto सक्षम करें</string>
+    <string name="android_auto_warning_cancel">रद्द करें</string>
+    <string name="auto_node_favorites">पसंदीदा</string>
+    <string name="auto_node_all_stations">सभी स्टेशन</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Android Auto में प्रॉक्सी स्टेशन दिखाएं</string>
+    <string name="settings_aa_allow_proxy_stations_description">डिफ़ॉल्ट रूप से बंद। चालू होने पर, आपके Tor / I2P / कस्टम-प्रॉक्सी स्टेशन भी Android Auto में दिखाई देते हैं और अपने प्रॉक्सी के माध्यम से चलते हैं। ऑडियो स्वयं निजी है, लेकिन स्टेशन का नाम और मेटाडेटा Google की Android Auto प्रक्रिया को दिखाई देते हैं।</string>
+    <string name="aa_allow_proxy_warning_title">Android Auto में प्रॉक्सी स्टेशन दिखाएं?</string>
+    <string name="aa_allow_proxy_warning_message">इन स्टेशनों के लिए ऑडियो अभी भी आपके फ़ोन पर कॉन्फ़िगर किए गए Tor / I2P / कस्टम प्रॉक्सी के माध्यम से रूट होगा: प्लेबैक स्वयं प्रॉक्सीकृत रहता है।\n\nलेकिन Google की Android Auto प्रक्रिया स्टेशन का नाम, वर्तमान ट्रैक और आर्टवर्क देखती है। तो जबकि *आप जो सुन रहे हैं* वह Google को नहीं भेजा जाता है, *यह तथ्य कि आप एक विशिष्ट स्टेशन सुन रहे हैं* Google को दिखाई देगा। यदि गोपनीयता अनिवार्य है, तो Android Auto का उपयोग न करें। </string>
+    <string name="aa_allow_proxy_warning_enable">दिखाएं</string>
+    <string name="aa_allow_proxy_warning_cancel">छिपा रखें</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Android Auto सेटअप के बारे में एक बार की सूचनाएं। ऐप चल रहे प्लेबैक के लिए इस चैनल का उपयोग नहीं करता है।</string>
+    <string name="aa_first_connect_title">Android Auto अब कनेक्ट है</string>
+    <string name="aa_first_connect_text">आपके क्लियरनेट स्टेशन कार में दिख रहे हैं। Tor, I2P और कस्टम-प्रॉक्सी स्टेशन भी दिखने चाहिए या नहीं यह चुनने के लिए टैप करें।</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">ऑफ़लाइन मोड</string>

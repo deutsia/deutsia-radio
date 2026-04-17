@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">Giới thiệu</string>
-    <string name="settings_version">Phiên bản 1.7</string>
+    <string name="settings_version">Phiên bản 1.8</string>
     <string name="settings_view_github">Xem trên GitHub</string>
     <string name="settings_donate">Quyên góp</string>
     <string name="settings_donate_description">Nếu ứng dụng này hữu ích cho bạn, hãy xem xét quyên góp</string>
@@ -680,6 +680,33 @@
     <string name="settings_disable_cover_art_description">Ngăn tải hình ảnh đài từ máy chủ bên ngoài</string>
     <string name="settings_network_api_info">Ứng dụng chỉ kết nối với: API RadioBrowser cho các đài clearnet, API Radio Registry cho các đài Tor/I2P, máy chủ bên ngoài cho ảnh bìa và luồng radio khi phát.</string>
     <string name="settings_offline_mode_note">Cả hai API đã tắt: Tab Duyệt chỉ hiển thị thư viện cục bộ. Bạn vẫn có thể phát các đài đã lưu và nhập đài từ tệp.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">Tích hợp</string>
+    <string name="settings_android_auto">Hỗ trợ Android Auto</string>
+    <string name="settings_android_auto_description">Hiển thị các đài của bạn cho ứng dụng Android Auto của Google để bạn có thể phát chúng từ đầu điều khiển trên xe hơi. Mặc định tắt.</string>
+    <string name="settings_android_auto_info">Khi bật, chỉ các đài không qua proxy mới xuất hiện trong Android Auto. Các đài qua proxy (Tor, I2P, v.v.) được ẩn khỏi Android Auto theo mặc định để bảo vệ quyền riêng tư.</string>
+    <string name="settings_android_auto_blocked_force_proxy">Android Auto bị tắt vì cài đặt bắt buộc proxy đang bật (Bắt buộc Tor, Bắt buộc Tor trừ I2P, hoặc Bắt buộc proxy tùy chỉnh). Việc phát từ Android Auto sử dụng một đường dẫn âm thanh riêng không đi qua các proxy đó, vì vậy bật nó sẽ bỏ qua chúng. Tắt bắt buộc proxy để bật Android Auto.</string>
+    <string name="android_auto_warning_title">Bật Android Auto?</string>
+    <string name="android_auto_warning_message">Trước khi bật tính năng này, đây là những gì sẽ thay đổi:\n\n• Các đài clearnet của bạn sẽ xuất hiện trong Android Auto.\n\n• Tiến trình Android Auto của Google sẽ thấy tên đài, bản nhạc hiện tại và ảnh bìa trong khi bạn đang phát.\n\n• Các đài Tor, I2P và proxy tùy chỉnh vẫn ẩn theo mặc định. Sau khi bật Android Auto, bạn có thể chọn hiển thị chúng: Cài đặt sẽ cảnh báo bạn về sự đánh đổi quyền riêng tư trước khi bạn thực hiện.\n\n• Nếu bạn bật Bắt buộc Tor hoặc Bắt buộc proxy tùy chỉnh, Android Auto sẽ tự động bị tắt cho đến khi bạn tắt chúng trở lại.\n\n• Bạn có thể tắt Android Auto bất kỳ lúc nào từ Cài đặt.</string>
+    <string name="android_auto_warning_enable">Bật Android Auto</string>
+    <string name="android_auto_warning_cancel">Hủy</string>
+    <string name="auto_node_favorites">Yêu thích</string>
+    <string name="auto_node_all_stations">Tất cả các đài</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Hiển thị các đài proxy trong Android Auto</string>
+    <string name="settings_aa_allow_proxy_stations_description">Mặc định tắt. Khi bật, các đài Tor / I2P / proxy tùy chỉnh của bạn cũng sẽ xuất hiện trong Android Auto và phát qua proxy của chúng. Bản thân âm thanh vẫn riêng tư, nhưng tên đài và siêu dữ liệu sẽ hiển thị cho tiến trình Android Auto của Google.</string>
+    <string name="aa_allow_proxy_warning_title">Hiển thị các đài proxy trong Android Auto?</string>
+    <string name="aa_allow_proxy_warning_message">Âm thanh của các đài này vẫn sẽ được định tuyến qua Tor / I2P / proxy tùy chỉnh đã cấu hình trên điện thoại của bạn: bản thân việc phát vẫn đi qua proxy.\n\nTuy nhiên, tiến trình Android Auto của Google sẽ thấy tên đài, bản nhạc hiện tại và ảnh bìa. Vì vậy, trong khi *những gì bạn đang nghe* không được gửi cho Google, *việc bạn đang nghe một đài cụ thể* sẽ hiển thị cho Google. Nếu quyền riêng tư là bắt buộc, đừng sử dụng Android Auto. </string>
+    <string name="aa_allow_proxy_warning_enable">Hiển thị chúng</string>
+    <string name="aa_allow_proxy_warning_cancel">Giữ ẩn</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Thông báo một lần về thiết lập Android Auto. Ứng dụng không sử dụng kênh này cho việc phát liên tục.</string>
+    <string name="aa_first_connect_title">Android Auto đã được kết nối</string>
+    <string name="aa_first_connect_text">Các đài clearnet của bạn đang hiển thị trong xe. Nhấn để chọn xem các đài Tor, I2P và proxy tùy chỉnh có nên xuất hiện hay không.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">Chế độ ngoại tuyến</string>

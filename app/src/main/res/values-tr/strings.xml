@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">Hakkında</string>
-    <string name="settings_version">Sürüm 1.7</string>
+    <string name="settings_version">Sürüm 1.8</string>
     <string name="settings_view_github">GitHub\'da Görüntüle</string>
     <string name="settings_donate">Bağış Yap</string>
     <string name="settings_donate_description">Bu uygulama işinize yaradıysa bağış yapmayı düşünün</string>
@@ -680,6 +680,33 @@
     <string name="settings_disable_cover_art_description">Harici sunuculardan istasyon görsellerinin yüklenmesini engelle</string>
     <string name="settings_network_api_info">Uygulama yalnızca şunlara bağlanır: clearnet istasyonları için RadioBrowser API, Tor/I2P istasyonları için Radio Registry API, kapak resimleri için harici sunucular ve oynatırken radyo akışları.</string>
     <string name="settings_offline_mode_note">Her iki API de devre dışı: Gözat sekmesi yalnızca yerel kütüphaneyi gösterir. Kayıtlı istasyonları çalmaya ve dosyalardan istasyon içe aktarmaya devam edebilirsiniz.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">Entegrasyonlar</string>
+    <string name="settings_android_auto">Android Auto desteği</string>
+    <string name="settings_android_auto_description">İstasyonlarınızı Google\'ın Android Auto uygulamasına sunarak araç ünitesinden oynatmanıza olanak tanır. Varsayılan olarak kapalı.</string>
+    <string name="settings_android_auto_info">Etkinleştirildiğinde, Android Auto\'da yalnızca proxy kullanmayan istasyonlar görünür. Proxy kullanan istasyonlar (Tor, I2P vb.) gizlilik için Android Auto\'dan varsayılan olarak gizlenir.</string>
+    <string name="settings_android_auto_blocked_force_proxy">Android Auto devre dışı çünkü bir zorla-proxy ayarı açık (Tor\'u Zorla, I2P Hariç Tor\'u Zorla veya Özel Proxy\'yi Zorla). Android Auto\'dan oynatma, bu proxy\'lerden geçmeyen ayrı bir ses hattı kullanır, bu yüzden etkinleştirmek onları atlatır. Android Auto\'yu etkinleştirmek için zorla-proxy\'yi kapatın.</string>
+    <string name="android_auto_warning_title">Android Auto etkinleştirilsin mi?</string>
+    <string name="android_auto_warning_message">Bunu açmadan önce, işte neler değişecek:\n\n• Clearnet istasyonlarınız Android Auto\'da görünecek.\n\n• Google\'ın Android Auto süreci, siz oynatırken istasyon adını, mevcut parçayı ve kapak görselini görecek.\n\n• Tor, I2P ve özel proxy istasyonları varsayılan olarak gizli kalır. Android Auto\'yu etkinleştirdikten sonra, onların da görünmesine izin vermeyi seçebilirsiniz: Ayarlar sizi önce gizlilik ödünü hakkında uyaracak.\n\n• Tor\'u Zorla veya Özel Proxy\'yi Zorla\'yı açarsanız, onu tekrar kapatana kadar Android Auto otomatik olarak devre dışı bırakılır.\n\n• Android Auto\'yu istediğiniz zaman Ayarlar\'dan tekrar kapatabilirsiniz.</string>
+    <string name="android_auto_warning_enable">Android Auto\'yu etkinleştir</string>
+    <string name="android_auto_warning_cancel">İptal</string>
+    <string name="auto_node_favorites">Favoriler</string>
+    <string name="auto_node_all_stations">Tüm istasyonlar</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Android Auto\'da proxy istasyonlarını göster</string>
+    <string name="settings_aa_allow_proxy_stations_description">Varsayılan olarak kapalı. Açıldığında, Tor / I2P / özel proxy istasyonlarınız da Android Auto\'da görünür ve proxy\'leri üzerinden çalınır. Sesin kendisi özeldir, ancak istasyon adı ve meta veriler Google\'ın Android Auto süreci tarafından görülebilir.</string>
+    <string name="aa_allow_proxy_warning_title">Android Auto\'da proxy istasyonları gösterilsin mi?</string>
+    <string name="aa_allow_proxy_warning_message">Bu istasyonların sesi, telefonunuzdaki yapılandırılmış Tor / I2P / özel proxy üzerinden yönlendirilmeye devam edecek: oynatma proxy\'li kalır.\n\nAncak Google\'ın Android Auto süreci istasyon adını, mevcut parçayı ve kapak görselini görür. Yani *duyduğunuz şey* Google\'a gönderilmese de, *belirli bir istasyonu dinlediğiniz gerçeği* Google\'a görünür olacak. Gizlilik şartsa, Android Auto kullanmayın. </string>
+    <string name="aa_allow_proxy_warning_enable">Göster</string>
+    <string name="aa_allow_proxy_warning_cancel">Gizli tut</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Android Auto kurulumu hakkında tek seferlik bildirimler. Uygulama bu kanalı sürekli oynatma için kullanmaz.</string>
+    <string name="aa_first_connect_title">Android Auto şimdi bağlandı</string>
+    <string name="aa_first_connect_text">Clearnet istasyonlarınız araçta görünüyor. Tor, I2P ve özel proxy istasyonlarının da görünüp görünmeyeceğini seçmek için dokunun.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">Çevrimdışı Mod</string>

@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">Informazioni</string>
-    <string name="settings_version">Versione 1.7</string>
+    <string name="settings_version">Versione 1.8</string>
     <string name="settings_view_github">Visualizza su GitHub</string>
     <string name="settings_donate">Dona</string>
     <string name="settings_donate_description">Se questa app ti ha aiutato, considera di donare</string>
@@ -679,6 +679,33 @@
     <string name="settings_disable_cover_art_description">Impedisci il caricamento delle immagini delle stazioni da server esterni</string>
     <string name="settings_network_api_info">L\'app si connette solo a: API RadioBrowser per stazioni clearnet, API Radio Registry per stazioni Tor/I2P, server esterni per copertine e streaming radio durante la riproduzione.</string>
     <string name="settings_offline_mode_note">Entrambe le API disabilitate: la scheda Sfoglia mostra solo la libreria locale. Puoi comunque riprodurre stazioni salvate e importare stazioni da file.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">Integrazioni</string>
+    <string name="settings_android_auto">Supporto Android Auto</string>
+    <string name="settings_android_auto_description">Esponi le tue stazioni all\'app Android Auto di Google per poterle riprodurre dall\'unità principale dell\'auto. Disattivato per impostazione predefinita.</string>
+    <string name="settings_android_auto_info">Quando abilitato, in Android Auto appaiono solo le stazioni senza proxy. Le stazioni che usano un proxy (Tor, I2P, ecc.) sono nascoste da Android Auto per impostazione predefinita per motivi di privacy.</string>
+    <string name="settings_android_auto_blocked_force_proxy">Android Auto è disabilitato perché è attiva un\'impostazione di forzatura proxy (Forza Tor, Forza Tor eccetto I2P o Forza proxy personalizzato). La riproduzione da Android Auto utilizza una pipeline audio separata che non viene instradata attraverso quei proxy, quindi abilitarlo li aggirerebbe. Disattiva la forzatura proxy per abilitare Android Auto.</string>
+    <string name="android_auto_warning_title">Abilitare Android Auto?</string>
+    <string name="android_auto_warning_message">Prima di attivarlo, ecco cosa cambia:\n\n• Le tue stazioni clearnet appariranno in Android Auto.\n\n• Il processo Android Auto di Google vedrà il nome della stazione, il brano corrente e la copertina durante la riproduzione.\n\n• Le stazioni Tor, I2P e con proxy personalizzato rimangono nascoste per impostazione predefinita. Dopo aver abilitato Android Auto, puoi scegliere di mostrarle anche: le Impostazioni ti avviseranno del compromesso sulla privacy prima di farlo.\n\n• Se mai attivi Forza Tor o Forza proxy personalizzato, Android Auto verrà disabilitato automaticamente finché non lo riattivi.\n\n• Puoi disattivare Android Auto in qualsiasi momento dalle Impostazioni.</string>
+    <string name="android_auto_warning_enable">Abilita Android Auto</string>
+    <string name="android_auto_warning_cancel">Annulla</string>
+    <string name="auto_node_favorites">Preferiti</string>
+    <string name="auto_node_all_stations">Tutte le stazioni</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Mostra stazioni proxy in Android Auto</string>
+    <string name="settings_aa_allow_proxy_stations_description">Disattivato per impostazione predefinita. Quando attivato, le tue stazioni Tor / I2P / con proxy personalizzato appaiono anche in Android Auto e vengono riprodotte attraverso il loro proxy. L\'audio in sé è privato, ma il nome della stazione e i metadati sono visibili al processo Android Auto di Google.</string>
+    <string name="aa_allow_proxy_warning_title">Mostrare stazioni proxy in Android Auto?</string>
+    <string name="aa_allow_proxy_warning_message">L\'audio di queste stazioni verrà comunque instradato attraverso il proxy Tor / I2P / personalizzato configurato sul telefono: la riproduzione stessa rimane proxied.\n\nMa il processo Android Auto di Google vede il nome della stazione, il brano corrente e la copertina. Quindi, mentre *ciò che stai ascoltando* non viene inviato a Google, *il fatto che tu stia ascoltando una stazione specifica* sarà visibile a Google. Se la privacy è indispensabile, non usare Android Auto. </string>
+    <string name="aa_allow_proxy_warning_enable">Mostrale</string>
+    <string name="aa_allow_proxy_warning_cancel">Mantienile nascoste</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Notifiche una tantum sulla configurazione di Android Auto. L\'app non usa questo canale per la riproduzione continua.</string>
+    <string name="aa_first_connect_title">Android Auto è ora connesso</string>
+    <string name="aa_first_connect_text">Le tue stazioni clearnet sono visibili in auto. Tocca per scegliere se far apparire anche le stazioni Tor, I2P e con proxy personalizzato.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">Modalità offline</string>
