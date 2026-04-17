@@ -2,6 +2,15 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.8.0]
+
+### Added
+- **Android Auto support**: deutsia radio is now usable from your car's dashboard
+- **Quicker stream loading:** the resolver now skips redundant probing and caches results.
+
+### Localization
+- Updated all strings across the 16 locales
+
 ## [1.7.1]
 
 ### Added
