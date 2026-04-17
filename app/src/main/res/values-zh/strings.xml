@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">关于</string>
-    <string name="settings_version">版本 1.7</string>
+    <string name="settings_version">版本 1.8</string>
     <string name="settings_view_github">在 GitHub 上查看</string>
     <string name="settings_donate">捐赠</string>
     <string name="settings_donate_description">如果此应用对您有帮助，请考虑捐赠</string>
@@ -680,6 +680,33 @@
     <string name="settings_disable_cover_art_description">阻止从外部服务器加载电台图片</string>
     <string name="settings_network_api_info">应用仅连接到：用于明网电台的 RadioBrowser API、用于 Tor/I2P 电台的 Radio Registry API、用于封面的外部服务器以及播放时的广播流。</string>
     <string name="settings_offline_mode_note">两个 API 均已禁用：浏览标签页仅显示本地库。您仍可以播放已保存的电台并从文件导入电台。</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">集成</string>
+    <string name="settings_android_auto">Android Auto 支持</string>
+    <string name="settings_android_auto_description">将您的电台公开给 Google 的 Android Auto 应用，以便您可以在汽车主机上播放。默认关闭。</string>
+    <string name="settings_android_auto_info">启用后，仅非代理电台会出现在 Android Auto 中。为保护隐私，代理电台（Tor、I2P 等）默认不会在 Android Auto 中显示。</string>
+    <string name="settings_android_auto_blocked_force_proxy">由于强制代理设置已启用（强制 Tor、强制 Tor 除 I2P 之外，或强制自定义代理），Android Auto 已被禁用。Android Auto 的播放使用独立的音频管道，不会通过这些代理，因此启用它会绕过代理。请关闭强制代理以启用 Android Auto。</string>
+    <string name="android_auto_warning_title">启用 Android Auto？</string>
+    <string name="android_auto_warning_message">在开启此功能之前，请注意以下变化：\n\n• 您的明网电台将出现在 Android Auto 中。\n\n• 播放时，Google 的 Android Auto 进程将看到电台名称、当前曲目和封面图片。\n\n• Tor、I2P 和自定义代理电台默认保持隐藏。启用 Android Auto 后，您可以选择让它们也显示：设置会在您操作前警告您有关隐私权衡的问题。\n\n• 如果您启用强制 Tor 或强制自定义代理，Android Auto 将自动被禁用，直到您将其关闭。\n\n• 您可以随时从设置中再次关闭 Android Auto。</string>
+    <string name="android_auto_warning_enable">启用 Android Auto</string>
+    <string name="android_auto_warning_cancel">取消</string>
+    <string name="auto_node_favorites">收藏</string>
+    <string name="auto_node_all_stations">所有电台</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">在 Android Auto 中显示代理电台</string>
+    <string name="settings_aa_allow_proxy_stations_description">默认关闭。开启后，您的 Tor / I2P / 自定义代理电台也会显示在 Android Auto 中，并通过其代理播放。音频本身是私密的，但电台名称和元数据对 Google 的 Android Auto 进程可见。</string>
+    <string name="aa_allow_proxy_warning_title">在 Android Auto 中显示代理电台？</string>
+    <string name="aa_allow_proxy_warning_message">这些电台的音频仍将通过您手机上配置的 Tor / I2P / 自定义代理路由：播放本身保持代理状态。\n\n但 Google 的 Android Auto 进程会看到电台名称、当前曲目和封面图片。因此，虽然*您所听到的内容*不会发送给 Google，但*您正在收听特定电台这一事实*将对 Google 可见。如果隐私是必须的，请勿使用 Android Auto。 </string>
+    <string name="aa_allow_proxy_warning_enable">显示它们</string>
+    <string name="aa_allow_proxy_warning_cancel">保持隐藏</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">有关 Android Auto 设置的一次性通知。本应用不会将此通道用于持续播放。</string>
+    <string name="aa_first_connect_title">Android Auto 已连接</string>
+    <string name="aa_first_connect_text">您的明网电台正在汽车中显示。点击选择是否也显示 Tor、I2P 和自定义代理电台。</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">离线模式</string>

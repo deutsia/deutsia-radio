@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">အကြောင်း</string>
-    <string name="settings_version">ဗားရှင်း 1.7</string>
+    <string name="settings_version">ဗားရှင်း 1.8</string>
     <string name="settings_view_github">GitHub တွင် ကြည့်ရန်</string>
     <string name="settings_donate">လှူဒါန်းရန်</string>
     <string name="settings_donate_description">ဒီအက်ပ်က သင့်ကို ကူညီခဲ့ရင် လှူဒါန်းရန် စဉ်းစားပါ</string>
@@ -680,6 +680,33 @@
     <string name="settings_disable_cover_art_description">ပြင်ပဆာဗာများမှ စတေးရှင်းပုံများ တင်ခြင်း တားဆီးရန်</string>
     <string name="settings_network_api_info">အက်ပ်သည် ဤအရာများနှင့်သာ ချိတ်ဆက်သည်: clearnet စတေးရှင်းများအတွက် RadioBrowser API၊ Tor/I2P စတေးရှင်းများအတွက် Radio Registry API၊ cover art အတွက် ပြင်ပဆာဗာများနှင့် ဖွင့်သည့်အခါ ရေဒီယိုစတရိမ်များ။</string>
     <string name="settings_offline_mode_note">API နှစ်ခုလုံး ပိတ်ထားသည်: Browse တက်ဘ်တွင် ဒေသတွင်း စာကြည့်တိုက်သာ ပြသသည်။ သိမ်းဆည်းထားသော စတေးရှင်းများကို ဖွင့်နိုင်ပြီး ဖိုင်များမှ တင်သွင်းနိုင်ပါသည်။</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">ပေါင်းစပ်မှုများ</string>
+    <string name="settings_android_auto">Android Auto ပံ့ပိုးမှု</string>
+    <string name="settings_android_auto_description">သင်၏ စတေးရှင်းများကို Google ၏ Android Auto အက်ပ်သို့ ထုတ်ဖော်ပြသကာ ကားခေါင်းယူနစ်မှ ဖွင့်နိုင်စေသည်။ ပုံသေအားဖြင့် ပိတ်ထားသည်။</string>
+    <string name="settings_android_auto_info">ဖွင့်ထားသည့်အခါ၊ proxy မပါသော စတေးရှင်းများသာ Android Auto တွင် ပြသသည်။ Proxy ပါသော စတေးရှင်းများ (Tor၊ I2P စသည်) ကို ကိုယ်ရေးကာကွယ်မှုအတွက် Android Auto မှ ပုံသေအားဖြင့် ဖျောက်ထားသည်။</string>
+    <string name="settings_android_auto_blocked_force_proxy">Force-proxy ဆက်တင် (Force Tor၊ I2P မှလွဲ၍ Force Tor သို့မဟုတ် Force စိတ်ကြိုက် proxy) ဖွင့်ထားသောကြောင့် Android Auto ပိတ်ထားသည်။ Android Auto မှ ဖွင့်ခြင်းသည် အဆိုပါ proxy များကို မဖြတ်သော သီးခြား audio pipeline ကို အသုံးပြုသောကြောင့် ၎င်းကို ဖွင့်ခြင်းသည် ၎င်းတို့ကို ကျော်သွားမည်။ Android Auto ဖွင့်ရန် force-proxy ကို ပိတ်ပါ။</string>
+    <string name="android_auto_warning_title">Android Auto ဖွင့်မည်လား?</string>
+    <string name="android_auto_warning_message">၎င်းကို မဖွင့်မီ၊ ဤသည်မှာ ပြောင်းလဲသွားမည့်အရာများ:\n\n• သင်၏ clearnet စတေးရှင်းများသည် Android Auto တွင် ပြသလာမည်။\n\n• Google ၏ Android Auto လုပ်ငန်းစဉ်သည် သင်ဖွင့်နေစဉ် စတေးရှင်းအမည်၊ လက်ရှိသီချင်းနှင့် artwork ကို မြင်မည်။\n\n• Tor၊ I2P နှင့် စိတ်ကြိုက်-proxy စတေးရှင်းများသည် ပုံသေအားဖြင့် ဖျောက်ထားသည်။ Android Auto ဖွင့်ပြီးနောက် သူတို့လည်း ပြသရန် ရွေးချယ်နိုင်သည်: မရွေးချယ်မီ ဆက်တင်များမှ ကိုယ်ရေးကာကွယ်မှုဆိုင်ရာ အပြန်အလှန် သတိပေးလိမ့်မည်။\n\n• Force Tor သို့မဟုတ် Force စိတ်ကြိုက် proxy ကို ဖွင့်လျှင်၊ ၎င်းကို ပြန်ပိတ်သည်အထိ Android Auto ကို အလိုအလျောက် ပိတ်သွားမည်။\n\n• Android Auto ကို အချိန်မရွေး ဆက်တင်များမှ ပြန်ပိတ်နိုင်သည်။</string>
+    <string name="android_auto_warning_enable">Android Auto ဖွင့်မည်</string>
+    <string name="android_auto_warning_cancel">ပယ်ဖျက်မည်</string>
+    <string name="auto_node_favorites">အကြိုက်ဆုံးများ</string>
+    <string name="auto_node_all_stations">စတေးရှင်းအားလုံး</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Android Auto တွင် proxy စတေးရှင်းများ ပြရန်</string>
+    <string name="settings_aa_allow_proxy_stations_description">ပုံသေအားဖြင့် ပိတ်ထားသည်။ ဖွင့်သောအခါ၊ သင်၏ Tor / I2P / စိတ်ကြိုက်-proxy စတေးရှင်းများသည်လည်း Android Auto တွင် ပြသပြီး သူတို့၏ proxy မှ ဖွင့်မည်။ အသံကိုယ်တိုင်သည် သီးသန့်ဖြစ်သော်လည်း၊ စတေးရှင်းအမည်နှင့် metadata သည် Google ၏ Android Auto လုပ်ငန်းစဉ်တွင် မြင်နိုင်သည်။</string>
+    <string name="aa_allow_proxy_warning_title">Android Auto တွင် proxy စတေးရှင်းများ ပြမည်လား?</string>
+    <string name="aa_allow_proxy_warning_message">ဤစတေးရှင်းများအတွက် အသံသည် သင်၏ ဖုန်းရှိ ကွန်ဖီဂါရေးရှင်းလုပ်ထားသော Tor / I2P / စိတ်ကြိုက် proxy မှ ဆက်လက်သွားမည်: ဖွင့်ခြင်းကိုယ်တိုင် proxy ဖြင့် ဆက်ရှိနေသည်။\n\nသို့သော် Google ၏ Android Auto လုပ်ငန်းစဉ်သည် စတေးရှင်းအမည်၊ လက်ရှိသီချင်းနှင့် artwork ကို မြင်သည်။ ထို့ကြောင့် *သင်ကြားနေရသည့်အရာ* ကို Google သို့ မပို့သော်လည်း၊ *သင်သည် တိကျသော စတေးရှင်းတစ်ခုကို နားထောင်နေသည် ဆိုသည့်အချက်* ကို Google မြင်နိုင်မည်။ ကိုယ်ရေးကာကွယ်မှုသည် မလွဲသာဖြစ်ပါက၊ Android Auto ကို မသုံးပါနှင့်။ </string>
+    <string name="aa_allow_proxy_warning_enable">ပြမည်</string>
+    <string name="aa_allow_proxy_warning_cancel">ဖျောက်ထားမည်</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Android Auto တပ်ဆင်ခြင်းအကြောင်း တစ်ကြိမ်တည်း အကြောင်းကြားချက်များ။ အက်ပ်သည် ဤချန်နယ်ကို ဆက်လက်ဖွင့်ခြင်းအတွက် အသုံးမပြုပါ။</string>
+    <string name="aa_first_connect_title">Android Auto ယခု ချိတ်ဆက်ပြီးပါပြီ</string>
+    <string name="aa_first_connect_text">သင်၏ clearnet စတေးရှင်းများကို ကားတွင် ပြနေသည်။ Tor၊ I2P နှင့် စိတ်ကြိုက်-proxy စတေးရှင်းများကိုလည်း ပြသင့်မပြသင့် ရွေးချယ်ရန် တို့ပါ။</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">အော့ဖ်လိုင်းမုဒ်</string>

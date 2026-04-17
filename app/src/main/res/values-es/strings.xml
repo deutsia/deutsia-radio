@@ -274,7 +274,7 @@
 
     
     <string name="settings_about">Acerca de</string>
-    <string name="settings_version">Versión 1.7</string>
+    <string name="settings_version">Versión 1.8</string>
     <string name="settings_view_github">Ver en GitHub</string>
     <string name="settings_donate">Donar</string>
     <string name="settings_donate_description">Si esta aplicación te ayudó, considera hacer una donación</string>
@@ -680,6 +680,33 @@
     <string name="settings_disable_cover_art_description">Evitar cargar imágenes de emisoras desde servidores externos</string>
     <string name="settings_network_api_info">La aplicación solo se conecta a: API de RadioBrowser para emisoras de clearnet, API de Radio Registry para emisoras Tor/I2P, servidores externos para carátulas y transmisiones de radio al reproducir.</string>
     <string name="settings_offline_mode_note">Ambas APIs desactivadas: La pestaña Explorar muestra solo la biblioteca local. Puedes seguir reproduciendo emisoras guardadas e importar emisoras desde archivos.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">Integraciones</string>
+    <string name="settings_android_auto">Compatibilidad con Android Auto</string>
+    <string name="settings_android_auto_description">Expón tus emisoras a la aplicación Android Auto de Google para poder reproducirlas desde la unidad principal del coche. Desactivado por defecto.</string>
+    <string name="settings_android_auto_info">Cuando está activado, solo las emisoras sin proxy aparecen en Android Auto. Las emisoras que usan un proxy (Tor, I2P, etc.) están ocultas de Android Auto por defecto por privacidad.</string>
+    <string name="settings_android_auto_blocked_force_proxy">Android Auto está desactivado porque hay un ajuste de forzar proxy activado (Forzar Tor, Forzar Tor excepto I2P o Forzar proxy personalizado). La reproducción desde Android Auto usa una canalización de audio separada que no pasa por esos proxies, así que activarlo los eludiría. Desactiva forzar proxy para activar Android Auto.</string>
+    <string name="android_auto_warning_title">¿Activar Android Auto?</string>
+    <string name="android_auto_warning_message">Antes de activarlo, esto es lo que cambia:\n\n• Tus emisoras clearnet aparecerán en Android Auto.\n\n• El proceso de Android Auto de Google verá el nombre de la emisora, la pista actual y la carátula mientras reproduces.\n\n• Las emisoras Tor, I2P y de proxy personalizado permanecen ocultas por defecto. Después de activar Android Auto, puedes elegir que también se muestren: los ajustes te advertirán sobre el compromiso de privacidad antes de hacerlo.\n\n• Si alguna vez activas Forzar Tor o Forzar proxy personalizado, Android Auto se desactivará automáticamente hasta que vuelvas a apagarlo.\n\n• Puedes desactivar Android Auto de nuevo en cualquier momento desde Ajustes.</string>
+    <string name="android_auto_warning_enable">Activar Android Auto</string>
+    <string name="android_auto_warning_cancel">Cancelar</string>
+    <string name="auto_node_favorites">Favoritos</string>
+    <string name="auto_node_all_stations">Todas las emisoras</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Mostrar emisoras proxy en Android Auto</string>
+    <string name="settings_aa_allow_proxy_stations_description">Desactivado por defecto. Cuando está activado, tus emisoras Tor / I2P / proxy personalizado también aparecen en Android Auto y se reproducen a través de su proxy. El audio en sí es privado, pero el nombre de la emisora y los metadatos son visibles para el proceso de Android Auto de Google.</string>
+    <string name="aa_allow_proxy_warning_title">¿Mostrar emisoras proxy en Android Auto?</string>
+    <string name="aa_allow_proxy_warning_message">El audio de estas emisoras seguirá enrutándose a través de su proxy Tor / I2P / personalizado configurado en tu teléfono: la reproducción en sí permanece en el proxy.\n\nPero el proceso de Android Auto de Google ve el nombre de la emisora, la pista actual y la carátula. Así que aunque *lo que estás escuchando* no se envía a Google, *el hecho de que estás escuchando una emisora concreta* será visible para Google. Si la privacidad es imprescindible, no uses Android Auto. </string>
+    <string name="aa_allow_proxy_warning_enable">Mostrarlas</string>
+    <string name="aa_allow_proxy_warning_cancel">Mantenerlas ocultas</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Notificaciones únicas sobre la configuración de Android Auto. La aplicación no usa este canal para reproducción continua.</string>
+    <string name="aa_first_connect_title">Android Auto ya está conectado</string>
+    <string name="aa_first_connect_text">Tus emisoras clearnet se muestran en el coche. Toca para elegir si las emisoras Tor, I2P y de proxy personalizado también deben aparecer.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">Modo sin conexión</string>

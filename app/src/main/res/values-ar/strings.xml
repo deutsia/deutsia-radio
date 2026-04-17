@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">حول</string>
-    <string name="settings_version">الإصدار 1.7</string>
+    <string name="settings_version">الإصدار 1.8</string>
     <string name="settings_view_github">عرض على GitHub</string>
     <string name="settings_donate">تبرع</string>
     <string name="settings_donate_description">إذا ساعدك هذا التطبيق، فكر في التبرع</string>
@@ -679,6 +679,33 @@
     <string name="settings_disable_cover_art_description">منع تحميل صور المحطات من الخوادم الخارجية</string>
     <string name="settings_network_api_info">يتصل التطبيق فقط بـ: واجهة RadioBrowser لمحطات الإنترنت العادي، وواجهة Radio Registry لمحطات Tor/I2P، والخوادم الخارجية لصور الغلاف، والبث المباشر عند التشغيل.</string>
     <string name="settings_offline_mode_note">كلتا الواجهتين معطلتان: يعرض تبويب التصفح المكتبة المحلية فقط. يمكنك الاستمرار في تشغيل المحطات المحفوظة واستيراد محطات من الملفات.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">عمليات الدمج</string>
+    <string name="settings_android_auto">دعم Android Auto</string>
+    <string name="settings_android_auto_description">اكشف محطاتك لتطبيق Android Auto من Google حتى تتمكن من تشغيلها من وحدة رأس السيارة. معطّل افتراضيًا.</string>
+    <string name="settings_android_auto_info">عند التفعيل، تظهر فقط المحطات غير المعتمدة على وكيل في Android Auto. المحطات التي تستخدم وكيلًا (Tor، I2P، إلخ) مخفية افتراضيًا من Android Auto للحفاظ على الخصوصية.</string>
+    <string name="settings_android_auto_blocked_force_proxy">تم تعطيل Android Auto لأن إعداد فرض الوكيل مفعّل (فرض Tor، أو فرض Tor باستثناء I2P، أو فرض الوكيل المخصص). يستخدم التشغيل من Android Auto خط صوتي منفصل لا يمر عبر تلك الوكلاء، لذا فإن تفعيله سيتجاوزها. أوقف فرض الوكيل لتفعيل Android Auto.</string>
+    <string name="android_auto_warning_title">تفعيل Android Auto؟</string>
+    <string name="android_auto_warning_message">قبل تفعيل هذا، إليك ما سيتغير:\n\n• ستظهر محطاتك على الإنترنت العادي في Android Auto.\n\n• ستشاهد عملية Android Auto من Google اسم المحطة والمقطع الحالي والغلاف أثناء التشغيل.\n\n• تبقى محطات Tor وI2P والوكيل المخصص مخفية افتراضيًا. بعد تفعيل Android Auto، يمكنك اختيار السماح بإظهارها أيضًا: ستحذرك الإعدادات من المساومة على الخصوصية قبل ذلك.\n\n• إذا فعّلت يومًا فرض Tor أو فرض الوكيل المخصص، سيتم تعطيل Android Auto تلقائيًا حتى تعيد إيقاف ذلك.\n\n• يمكنك إيقاف Android Auto مرة أخرى في أي وقت من الإعدادات.</string>
+    <string name="android_auto_warning_enable">تفعيل Android Auto</string>
+    <string name="android_auto_warning_cancel">إلغاء</string>
+    <string name="auto_node_favorites">المفضلة</string>
+    <string name="auto_node_all_stations">جميع المحطات</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">إظهار محطات الوكيل في Android Auto</string>
+    <string name="settings_aa_allow_proxy_stations_description">معطّل افتراضيًا. عند التفعيل، ستظهر أيضًا محطات Tor / I2P / الوكيل المخصص في Android Auto وتُشغَّل عبر وكيلها. الصوت نفسه خاص، ولكن اسم المحطة والبيانات الوصفية مرئية لعملية Android Auto من Google.</string>
+    <string name="aa_allow_proxy_warning_title">إظهار محطات الوكيل في Android Auto؟</string>
+    <string name="aa_allow_proxy_warning_message">سيظل صوت هذه المحطات يمر عبر وكيل Tor / I2P / المخصص المكوَّن على هاتفك: يبقى التشغيل نفسه عبر الوكيل.\n\nولكن عملية Android Auto من Google ترى اسم المحطة والمقطع الحالي والغلاف. فبينما *ما تستمع إليه* لا يُرسل إلى Google، فإن *حقيقة استماعك إلى محطة معينة* ستكون مرئية لـ Google. إذا كانت الخصوصية ضرورية، فلا تستخدم Android Auto. </string>
+    <string name="aa_allow_proxy_warning_enable">إظهارها</string>
+    <string name="aa_allow_proxy_warning_cancel">إبقاؤها مخفية</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">إشعارات لمرة واحدة حول إعداد Android Auto. لا يستخدم التطبيق هذه القناة للتشغيل المستمر.</string>
+    <string name="aa_first_connect_title">تم الاتصال بـ Android Auto</string>
+    <string name="aa_first_connect_text">تظهر محطات الإنترنت العادي في السيارة. اضغط لاختيار ما إذا كانت محطات Tor وI2P والوكيل المخصص يجب أن تظهر أيضًا.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">وضع عدم الاتصال</string>

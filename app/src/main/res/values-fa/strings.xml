@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">درباره</string>
-    <string name="settings_version">نسخه 1.7</string>
+    <string name="settings_version">نسخه 1.8</string>
     <string name="settings_view_github">مشاهده در GitHub</string>
     <string name="settings_donate">کمک مالی</string>
     <string name="settings_donate_description">اگر این برنامه به شما کمک کرد، کمک مالی را در نظر بگیرید</string>
@@ -680,6 +680,33 @@
     <string name="settings_disable_cover_art_description">جلوگیری از بارگذاری تصاویر ایستگاه از سرورهای خارجی</string>
     <string name="settings_network_api_info">برنامه فقط به این موارد متصل می‌شود: API رادیو براوزر برای ایستگاه‌های کلیرنت، API رجیستری رادیو برای ایستگاه‌های Tor/I2P، سرورهای خارجی برای تصاویر جلد، و پخش رادیو در هنگام پخش.</string>
     <string name="settings_offline_mode_note">هر دو API غیرفعال: زبانه مرور فقط کتابخانه محلی را نشان می‌دهد. می‌توانید همچنان ایستگاه‌های ذخیره شده را پخش کنید و ایستگاه‌ها را از فایل‌ها وارد کنید.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">یکپارچه‌سازی‌ها</string>
+    <string name="settings_android_auto">پشتیبانی از Android Auto</string>
+    <string name="settings_android_auto_description">ایستگاه‌های خود را در معرض برنامه Android Auto گوگل قرار دهید تا بتوانید آن‌ها را از سیستم‌صوتی خودرو پخش کنید. به طور پیش‌فرض خاموش است.</string>
+    <string name="settings_android_auto_info">وقتی فعال باشد، فقط ایستگاه‌های بدون پراکسی در Android Auto نمایش داده می‌شوند. ایستگاه‌هایی که از پراکسی استفاده می‌کنند (Tor، I2P و غیره) به طور پیش‌فرض برای حفظ حریم خصوصی از Android Auto پنهان هستند.</string>
+    <string name="settings_android_auto_blocked_force_proxy">Android Auto غیرفعال است زیرا یک تنظیم اجبار-پراکسی روشن است (اجبار Tor، اجبار Tor به جز I2P، یا اجبار پراکسی سفارشی). پخش از Android Auto از یک خط صوتی جداگانه استفاده می‌کند که از آن پراکسی‌ها عبور نمی‌کند، بنابراین فعال کردن آن آن‌ها را دور می‌زند. اجبار-پراکسی را خاموش کنید تا Android Auto فعال شود.</string>
+    <string name="android_auto_warning_title">Android Auto فعال شود؟</string>
+    <string name="android_auto_warning_message">قبل از فعال کردن، آنچه تغییر می‌کند:\n\n• ایستگاه‌های کلیرنت شما در Android Auto ظاهر می‌شوند.\n\n• فرآیند Android Auto گوگل هنگام پخش، نام ایستگاه، قطعه فعلی و تصویر جلد را می‌بیند.\n\n• ایستگاه‌های Tor، I2P و پراکسی سفارشی به طور پیش‌فرض پنهان می‌مانند. پس از فعال کردن Android Auto، می‌توانید اجازه دهید آن‌ها نیز نمایش داده شوند: تنظیمات قبل از آن درباره معامله حریم خصوصی به شما هشدار می‌دهد.\n\n• اگر روزی اجبار Tor یا اجبار پراکسی سفارشی را روشن کنید، Android Auto به طور خودکار غیرفعال می‌شود تا زمانی که آن را خاموش کنید.\n\n• می‌توانید هر زمان بخواهید Android Auto را از تنظیمات خاموش کنید.</string>
+    <string name="android_auto_warning_enable">فعال کردن Android Auto</string>
+    <string name="android_auto_warning_cancel">لغو</string>
+    <string name="auto_node_favorites">موردعلاقه‌ها</string>
+    <string name="auto_node_all_stations">همه ایستگاه‌ها</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">نمایش ایستگاه‌های پراکسی در Android Auto</string>
+    <string name="settings_aa_allow_proxy_stations_description">به طور پیش‌فرض خاموش. وقتی روشن باشد، ایستگاه‌های Tor / I2P / پراکسی سفارشی شما نیز در Android Auto ظاهر می‌شوند و از طریق پراکسی خود پخش می‌شوند. خود صدا خصوصی است، اما نام ایستگاه و فراداده‌ها برای فرآیند Android Auto گوگل قابل مشاهده است.</string>
+    <string name="aa_allow_proxy_warning_title">ایستگاه‌های پراکسی در Android Auto نمایش داده شوند؟</string>
+    <string name="aa_allow_proxy_warning_message">صدای این ایستگاه‌ها همچنان از طریق پراکسی Tor / I2P / سفارشی پیکربندی‌شده روی تلفن شما مسیریابی می‌شود: خود پخش پراکسی‌شده باقی می‌ماند.\n\nاما فرآیند Android Auto گوگل نام ایستگاه، قطعه فعلی و تصویر جلد را می‌بیند. بنابراین درحالی‌که *آنچه می‌شنوید* به گوگل ارسال نمی‌شود، *این واقعیت که به یک ایستگاه خاص گوش می‌دهید* برای گوگل قابل مشاهده خواهد بود. اگر حریم خصوصی ضروری است، از Android Auto استفاده نکنید. </string>
+    <string name="aa_allow_proxy_warning_enable">نمایش آن‌ها</string>
+    <string name="aa_allow_proxy_warning_cancel">پنهان نگه دارید</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">اعلان‌های یک‌بار مصرف درباره راه‌اندازی Android Auto. برنامه از این کانال برای پخش مداوم استفاده نمی‌کند.</string>
+    <string name="aa_first_connect_title">Android Auto اکنون متصل شد</string>
+    <string name="aa_first_connect_text">ایستگاه‌های کلیرنت شما در خودرو نمایش داده می‌شوند. ضربه بزنید تا انتخاب کنید ایستگاه‌های Tor، I2P و پراکسی سفارشی نیز نمایش داده شوند یا نه.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">حالت آفلاین</string>

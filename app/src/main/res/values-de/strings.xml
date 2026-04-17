@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">Über</string>
-    <string name="settings_version">Version 1.7</string>
+    <string name="settings_version">Version 1.8</string>
     <string name="settings_view_github">Auf GitHub ansehen</string>
     <string name="settings_donate">Spenden</string>
     <string name="settings_donate_description">Wenn Ihnen diese App geholfen hat, ziehen Sie eine Spende in Betracht</string>
@@ -680,6 +680,33 @@
     <string name="settings_disable_cover_art_description">Laden von Sender-Artwork von externen Servern verhindern</string>
     <string name="settings_network_api_info">Die App verbindet sich nur mit: RadioBrowser-API für Clearnet-Sender, Radio Registry-API für Tor/I2P-Sender, externen Servern für Sender-Cover-Art und Radiostreams beim Abspielen.</string>
     <string name="settings_offline_mode_note">Beide APIs deaktiviert: Der Durchsuchen-Tab zeigt nur die lokale Bibliothek. Sie können weiterhin gespeicherte Sender abspielen und Sender aus Dateien importieren.</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">Integrationen</string>
+    <string name="settings_android_auto">Android Auto-Unterstützung</string>
+    <string name="settings_android_auto_description">Geben Sie Ihre Sender für Googles Android Auto-App frei, damit Sie sie über das Autoradio wiedergeben können. Standardmäßig deaktiviert.</string>
+    <string name="settings_android_auto_info">Wenn aktiviert, werden in Android Auto nur nicht-proxied Sender angezeigt. Sender, die über einen Proxy (Tor, I2P usw.) laufen, werden aus Datenschutzgründen standardmäßig in Android Auto ausgeblendet.</string>
+    <string name="settings_android_auto_blocked_force_proxy">Android Auto ist deaktiviert, weil eine Proxy-Erzwingungseinstellung aktiv ist (Tor erzwingen, Tor erzwingen außer I2P oder Benutzerdefinierten Proxy erzwingen). Die Wiedergabe über Android Auto verwendet eine separate Audio-Pipeline, die nicht über diese Proxys geleitet wird, sodass die Aktivierung sie umgehen würde. Deaktivieren Sie die Proxy-Erzwingung, um Android Auto zu aktivieren.</string>
+    <string name="android_auto_warning_title">Android Auto aktivieren?</string>
+    <string name="android_auto_warning_message">Bevor Sie dies aktivieren, hier was sich ändert:\n\n• Ihre Clearnet-Sender werden in Android Auto angezeigt.\n\n• Googles Android Auto-Prozess sieht während der Wiedergabe den Sendernamen, den aktuellen Titel und das Cover.\n\n• Tor-, I2P- und benutzerdefinierte Proxy-Sender bleiben standardmäßig ausgeblendet. Nach der Aktivierung von Android Auto können Sie wählen, ob diese ebenfalls angezeigt werden sollen: Die Einstellungen warnen Sie zuvor über den Datenschutz-Kompromiss.\n\n• Wenn Sie jemals Tor erzwingen oder Benutzerdefinierten Proxy erzwingen aktivieren, wird Android Auto automatisch deaktiviert, bis Sie dies wieder ausschalten.\n\n• Sie können Android Auto jederzeit wieder über die Einstellungen deaktivieren.</string>
+    <string name="android_auto_warning_enable">Android Auto aktivieren</string>
+    <string name="android_auto_warning_cancel">Abbrechen</string>
+    <string name="auto_node_favorites">Favoriten</string>
+    <string name="auto_node_all_stations">Alle Sender</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Proxy-Sender in Android Auto anzeigen</string>
+    <string name="settings_aa_allow_proxy_stations_description">Standardmäßig deaktiviert. Wenn aktiviert, werden Ihre Tor- / I2P- / benutzerdefinierten Proxy-Sender ebenfalls in Android Auto angezeigt und über ihren Proxy wiedergegeben. Der Audiostream selbst bleibt privat, aber der Sendername und die Metadaten sind für Googles Android Auto-Prozess sichtbar.</string>
+    <string name="aa_allow_proxy_warning_title">Proxy-Sender in Android Auto anzeigen?</string>
+    <string name="aa_allow_proxy_warning_message">Das Audio dieser Sender wird weiterhin über den konfigurierten Tor- / I2P- / benutzerdefinierten Proxy auf Ihrem Telefon geleitet: Die Wiedergabe selbst bleibt proxied.\n\nAber Googles Android Auto-Prozess sieht den Sendernamen, den aktuellen Titel und das Cover. Während also *das, was Sie hören*, nicht an Google gesendet wird, ist *die Tatsache, dass Sie einen bestimmten Sender hören*, für Google sichtbar. Wenn Datenschutz ein Muss ist, verwenden Sie Android Auto nicht. </string>
+    <string name="aa_allow_proxy_warning_enable">Anzeigen</string>
+    <string name="aa_allow_proxy_warning_cancel">Ausgeblendet lassen</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Einmalige Benachrichtigungen zur Einrichtung von Android Auto. Die App verwendet diesen Kanal nicht für die laufende Wiedergabe.</string>
+    <string name="aa_first_connect_title">Android Auto ist jetzt verbunden</string>
+    <string name="aa_first_connect_text">Ihre Clearnet-Sender werden im Auto angezeigt. Tippen Sie, um auszuwählen, ob Tor-, I2P- und benutzerdefinierte Proxy-Sender ebenfalls erscheinen sollen.</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">Offline-Modus</string>

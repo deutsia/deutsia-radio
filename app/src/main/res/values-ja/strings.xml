@@ -270,7 +270,7 @@
 
     
     <string name="settings_about">このアプリについて</string>
-    <string name="settings_version">バージョン 1.7</string>
+    <string name="settings_version">バージョン 1.8</string>
     <string name="settings_view_github">GitHubで見る</string>
     <string name="settings_donate">寄付</string>
     <string name="settings_donate_description">このアプリが役に立った場合は、寄付をご検討ください</string>
@@ -679,6 +679,33 @@
     <string name="settings_disable_cover_art_description">外部サーバーからのステーションアートワークの読み込みを防止</string>
     <string name="settings_network_api_info">アプリは次にのみ接続します: クリアネットステーション用のRadioBrowser API、Tor/I2Pステーション用のRadio Registry API、カバーアート用の外部サーバー、再生時のラジオストリーム。</string>
     <string name="settings_offline_mode_note">両方のAPIが無効: 参照タブはローカルライブラリのみを表示します。保存されたステーションの再生やファイルからのステーションのインポートは引き続き可能です。</string>
+
+    <!-- Integrations (Android Auto) -->
+    <string name="settings_integrations">統合</string>
+    <string name="settings_android_auto">Android Auto サポート</string>
+    <string name="settings_android_auto_description">Google の Android Auto アプリにステーションを公開し、車のヘッドユニットから再生できるようにします。デフォルトはオフです。</string>
+    <string name="settings_android_auto_info">有効にすると、プロキシされていないステーションのみが Android Auto に表示されます。プロキシされたステーション (Tor、I2P など) は、プライバシー保護のためデフォルトで Android Auto から非表示になります。</string>
+    <string name="settings_android_auto_blocked_force_proxy">強制プロキシ設定 (Tor を強制、I2P 以外に Tor を強制、またはカスタムプロキシを強制) が有効になっているため、Android Auto は無効になっています。Android Auto からの再生は、これらのプロキシを経由しない別のオーディオパイプラインを使用するため、有効にするとそれらをバイパスすることになります。Android Auto を有効にするには、強制プロキシをオフにしてください。</string>
+    <string name="android_auto_warning_title">Android Auto を有効にしますか？</string>
+    <string name="android_auto_warning_message">オンにする前に、以下の変更点をご確認ください:\n\n• クリアネットのステーションが Android Auto に表示されます。\n\n• 再生中、Google の Android Auto プロセスはステーション名、現在のトラック、アートワークを参照します。\n\n• Tor、I2P、カスタムプロキシのステーションはデフォルトで非表示のままです。Android Auto を有効にした後、それらも表示するかどうかを選択できます。実行前に設定でプライバシーのトレードオフについて警告が表示されます。\n\n• Tor を強制またはカスタムプロキシを強制をオンにした場合、再度オフにするまで Android Auto は自動的に無効になります。\n\n• Android Auto は、いつでも設定から再びオフにできます。</string>
+    <string name="android_auto_warning_enable">Android Auto を有効にする</string>
+    <string name="android_auto_warning_cancel">キャンセル</string>
+    <string name="auto_node_favorites">お気に入り</string>
+    <string name="auto_node_all_stations">すべてのステーション</string>
+
+    <!-- AA: per-station proxy opt-in -->
+    <string name="settings_aa_allow_proxy_stations">Android Auto にプロキシステーションを表示</string>
+    <string name="settings_aa_allow_proxy_stations_description">デフォルトではオフです。オンにすると、Tor / I2P / カスタムプロキシのステーションも Android Auto に表示され、それぞれのプロキシ経由で再生されます。オーディオ自体はプライベートですが、ステーション名とメタデータは Google の Android Auto プロセスから見えます。</string>
+    <string name="aa_allow_proxy_warning_title">Android Auto にプロキシステーションを表示しますか？</string>
+    <string name="aa_allow_proxy_warning_message">これらのステーションのオーディオは、引き続き端末上で設定された Tor / I2P / カスタムプロキシ経由でルーティングされます。再生自体はプロキシ経由のままです。\n\nしかし、Google の Android Auto プロセスはステーション名、現在のトラック、アートワークを参照します。つまり、*聴いている音声自体* は Google に送信されませんが、*特定のステーションを聴いているという事実* は Google から見えます。プライバシーが必須の場合は、Android Auto を使用しないでください。 </string>
+    <string name="aa_allow_proxy_warning_enable">表示する</string>
+    <string name="aa_allow_proxy_warning_cancel">非表示のままにする</string>
+
+    <!-- AA: first-connect notification (Moment 2) -->
+    <string name="aa_notification_channel_name">Android Auto</string>
+    <string name="aa_notification_channel_description">Android Auto のセットアップに関する 1 回限りの通知。アプリは継続的な再生にこのチャンネルを使用しません。</string>
+    <string name="aa_first_connect_title">Android Auto が接続されました</string>
+    <string name="aa_first_connect_text">クリアネットのステーションが車に表示されています。タップして、Tor、I2P、カスタムプロキシのステーションも表示するかどうかを選択してください。</string>
 
     <!-- Browse - Offline Mode -->
     <string name="browse_offline_mode_title">オフラインモード</string>
