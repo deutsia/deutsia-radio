@@ -1673,42 +1673,51 @@ class SettingsFragment : Fragment() {
                 .show()
         }
     }
-
+    
     private fun performImport(
         stations: List<com.opensource.i2pradio.data.RadioStation>,
         replaceExisting: Boolean = false
-    ) {
-        // Capture context early to avoid crashes if Fragment is destroyed during async operation
+) {
         val context = requireContext()
         lifecycleScope.launch(Dispatchers.IO) {
             if (replaceExisting) {
-                repository.deleteAllStations()
+            repository.deleteAllStations()
+        }
+
+            val existingUrls = if (replaceExisting) {
+                emptySet()
+            } else {
+                repository.getAllStationsSync().mapTo(HashSet()) { it.streamUrl }
             }
 
             var imported = 0
+            var skipped = 0
             for (station in stations) {
-                try {
-                    repository.insertStation(station)
-                    imported++
-                } catch (e: Exception) {
-                    // Skip duplicate or invalid stations
-                }
+                if (station.streamUrl in existingUrls) {
+                skipped++
+                continue
             }
+            try {
+                repository.insertStation(station)
+                imported++
+            } catch (e: Exception) {
+                skipped++
+            }
+        }
 
-            withContext(Dispatchers.Main) {
-                // Check if Fragment is still attached before showing UI
-                if (!isAdded) return@withContext
-
-                if (!PreferencesHelper.isToastMessagesDisabled(context)) {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.imported_stations_success, imported),
-                        Toast.LENGTH_SHORT
-                    ).show()
+        withContext(Dispatchers.Main) {
+            if (!isAdded) return@withContext
+            if (!PreferencesHelper.isToastMessagesDisabled(context)) {
+                val msg = if (skipped > 0) {
+                    getString(R.string.imported_stations_with_skipped, imported, skipped)
+                } else {
+                    getString(R.string.imported_stations_success, imported)
                 }
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             }
         }
     }
+}
 
     private fun exportStationsToUri(uri: Uri, format: StationImportExport.FileFormat) {
         // Capture context early to avoid crashes if Fragment is destroyed during async operation
