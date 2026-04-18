@@ -548,9 +548,9 @@
     <string name="more_warnings">• ...e altri %d\n</string>
     <string name="import_confirmation">Vuoi importare queste stazioni?</string>
     <string name="import_replace_existing">Sostituisci stazioni esistenti</string>
-    <string name="import_replace_hint">Cancella l'intera libreria prima dell'importazione</string>
+    <string name="import_replace_hint">Cancella l\'intera libreria prima dell\'importazione</string>
     <string name="import_replace_confirm_title">Sostituire tutte le stazioni?</string>
-    <string name="import_replace_confirm_message">Questa operazione eliminerà definitivamente tutte le %1$d stazioni esistenti (incluse quelle preferite e preimpostate) prima dell'importazione. Questa azione non può essere annullata.</string>
+    <string name="import_replace_confirm_message">Questa operazione eliminerà definitivamente tutte le %1$d stazioni esistenti (incluse quelle preferite e preimpostate) prima dell\'importazione. Questa azione non può essere annullata.</string>
     <string name="button_replace_and_import">Sostituisci e importa</string>
     <string name="import_error_message">Errore di importazione: %s</string>
     <string name="imported_stations_success">%d stazione/i importata/e</string>
