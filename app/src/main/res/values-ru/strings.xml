@@ -554,6 +554,7 @@
     <string name="button_replace_and_import">Заменить и импортировать</string>
     <string name="import_error_message">Ошибка импорта: %s</string>
     <string name="imported_stations_success">Импортировано %d станций</string>
+    <string name="imported_stations_with_skipped">Импортировано %1$d, пропущено %2$d дубликатов</string>
     <string name="no_stations_to_export">Нет станций для экспорта</string>
     <string name="exported_stations_success">Экспортировано %1$d станций в %2$s</string>
     <string name="export_error_message">Ошибка экспорта: %s</string>

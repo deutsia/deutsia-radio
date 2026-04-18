@@ -555,6 +555,7 @@
     <string name="button_replace_and_import">Ersetzen &amp; Importieren</string>
     <string name="import_error_message">Importfehler: %s</string>
     <string name="imported_stations_success">%d Sender importiert</string>
+    <string name="imported_stations_with_skipped">%1$d importiert, %2$d Duplikat(e) übersprungen</string>
     <string name="no_stations_to_export">Keine Sender zum Exportieren</string>
     <string name="exported_stations_success">%1$d Sender nach %2$s exportiert</string>
     <string name="export_error_message">Exportfehler: %s</string>

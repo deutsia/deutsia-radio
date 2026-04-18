@@ -555,6 +555,7 @@
     <string name="button_replace_and_import">အစားထိုးပြီး တင်သွင်းမည်</string>
     <string name="import_error_message">တင်သွင်းမှု အမှား: %s</string>
     <string name="imported_stations_success">ဘူတာ %d ခု တင်သွင်းပြီး</string>
+    <string name="imported_stations_with_skipped">%1$d ခု တင်သွင်းပြီး၊ ထပ်နေသော %2$d ခု ကျော်လွှားသည်</string>
     <string name="no_stations_to_export">တင်ပို့ရန် ဘူတာများ မရှိပါ</string>
     <string name="exported_stations_success">ဘူတာ %1$d ခုကို %2$s သို့ တင်ပို့ပြီး</string>
     <string name="export_error_message">တင်ပို့မှု အမှား: %s</string>

@@ -555,6 +555,7 @@
     <string name="button_replace_and_import">替换并导入</string>
     <string name="import_error_message">导入错误：%s</string>
     <string name="imported_stations_success">已导入 %d 个电台</string>
+    <string name="imported_stations_with_skipped">已导入 %1$d 个，跳过 %2$d 个重复</string>
     <string name="no_stations_to_export">没有要导出的电台</string>
     <string name="exported_stations_success">已将 %1$d 个电台导出到 %2$s</string>
     <string name="export_error_message">导出错误：%s</string>

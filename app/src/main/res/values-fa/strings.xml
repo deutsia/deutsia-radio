@@ -555,6 +555,7 @@
     <string name="button_replace_and_import">جایگزینی و وارد کردن</string>
     <string name="import_error_message">خطای وارد کردن: %s</string>
     <string name="imported_stations_success">%d ایستگاه وارد شد</string>
+    <string name="imported_stations_with_skipped">%1$d وارد شد، %2$d مورد تکراری نادیده گرفته شد</string>
     <string name="no_stations_to_export">هیچ ایستگاهی برای صادر کردن وجود ندارد</string>
     <string name="exported_stations_success">%1$d ایستگاه به %2$s صادر شد</string>
     <string name="export_error_message">خطای صادر کردن: %s</string>

@@ -554,6 +554,7 @@
     <string name="button_replace_and_import">置き換えてインポート</string>
     <string name="import_error_message">インポートエラー: %s</string>
     <string name="imported_stations_success">%d個のステーションをインポートしました</string>
+    <string name="imported_stations_with_skipped">%1$d個をインポート、%2$d個の重複をスキップしました</string>
     <string name="no_stations_to_export">エクスポートするステーションがありません</string>
     <string name="exported_stations_success">%1$d個のステーションを%2$sにエクスポートしました</string>
     <string name="export_error_message">エクスポートエラー: %s</string>
