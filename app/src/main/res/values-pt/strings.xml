@@ -548,6 +548,11 @@
     <string name="warnings_header">Avisos:\n</string>
     <string name="more_warnings">• ...e mais %d\n</string>
     <string name="import_confirmation">Deseja importar estas estações?</string>
+    <string name="import_replace_existing">Substituir estações existentes</string>
+    <string name="import_replace_hint">Limpa toda a sua biblioteca antes de importar</string>
+    <string name="import_replace_confirm_title">Substituir todas as estações?</string>
+    <string name="import_replace_confirm_message">Isto excluirá permanentemente todas as %1$d estação(ões) existentes (incluindo favoritas e predefinidas) antes de importar. Esta ação não pode ser desfeita.</string>
+    <string name="button_replace_and_import">Substituir e importar</string>
     <string name="import_error_message">Erro de importação: %s</string>
     <string name="imported_stations_success">%d estação(ões) importada(s)</string>
     <string name="no_stations_to_export">Nenhuma estação para exportar</string>

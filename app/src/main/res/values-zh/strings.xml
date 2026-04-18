@@ -548,6 +548,11 @@
     <string name="warnings_header">警告：\n</string>
     <string name="more_warnings">• ...还有 %d 个\n</string>
     <string name="import_confirmation">要导入这些电台吗？</string>
+    <string name="import_replace_existing">替换现有电台</string>
+    <string name="import_replace_hint">导入前清空整个媒体库</string>
+    <string name="import_replace_confirm_title">替换所有电台？</string>
+    <string name="import_replace_confirm_message">这将在导入前永久删除所有 %1$d 个现有电台（包括喜欢的和预设的电台）。此操作无法撤销。</string>
+    <string name="button_replace_and_import">替换并导入</string>
     <string name="import_error_message">导入错误：%s</string>
     <string name="imported_stations_success">已导入 %d 个电台</string>
     <string name="no_stations_to_export">没有要导出的电台</string>

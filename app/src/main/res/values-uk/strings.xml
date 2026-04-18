@@ -548,6 +548,11 @@
     <string name="warnings_header">Попередження:\n</string>
     <string name="more_warnings">• ...і ще %d\n</string>
     <string name="import_confirmation">Ви хочете імпортувати ці станції?</string>
+    <string name="import_replace_existing">Замінити наявні станції</string>
+    <string name="import_replace_hint">Очищає всю вашу бібліотеку перед імпортом</string>
+    <string name="import_replace_confirm_title">Замінити всі станції?</string>
+    <string name="import_replace_confirm_message">Це назавжди видалить усі %1$d наявних станцій (включно з улюбленими та попередньо встановленими) перед імпортом. Цю дію неможливо скасувати.</string>
+    <string name="button_replace_and_import">Замінити та імпортувати</string>
     <string name="import_error_message">Помилка імпорту: %s</string>
     <string name="imported_stations_success">Імпортовано %d станцій</string>
     <string name="no_stations_to_export">Немає станцій для експорту</string>

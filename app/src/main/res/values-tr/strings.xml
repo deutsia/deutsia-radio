@@ -548,6 +548,11 @@
     <string name="warnings_header">Uyarılar:\n</string>
     <string name="more_warnings">• ...ve %d tane daha\n</string>
     <string name="import_confirmation">Bu istasyonları içe aktarmak istiyor musunuz?</string>
+    <string name="import_replace_existing">Mevcut istasyonları değiştir</string>
+    <string name="import_replace_hint">İçe aktarmadan önce tüm kitaplığınızı temizler</string>
+    <string name="import_replace_confirm_title">Tüm istasyonlar değiştirilsin mi?</string>
+    <string name="import_replace_confirm_message">Bu işlem, içe aktarmadan önce mevcut %1$d istasyonu (beğenilen ve önceden ayarlanmış istasyonlar dahil) kalıcı olarak silecektir. Bu işlem geri alınamaz.</string>
+    <string name="button_replace_and_import">Değiştir ve İçe Aktar</string>
     <string name="import_error_message">İçe aktarma hatası: %s</string>
     <string name="imported_stations_success">%d istasyon içe aktarıldı</string>
     <string name="no_stations_to_export">Dışa aktarılacak istasyon yok</string>

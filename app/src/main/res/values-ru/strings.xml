@@ -547,6 +547,11 @@
     <string name="warnings_header">Предупреждения:\n</string>
     <string name="more_warnings">• ...и ещё %d\n</string>
     <string name="import_confirmation">Вы хотите импортировать эти станции?</string>
+    <string name="import_replace_existing">Заменить существующие станции</string>
+    <string name="import_replace_hint">Очищает всю вашу библиотеку перед импортом</string>
+    <string name="import_replace_confirm_title">Заменить все станции?</string>
+    <string name="import_replace_confirm_message">Это навсегда удалит все %1$d существующих станций (включая избранные и предустановленные) перед импортом. Это действие нельзя отменить.</string>
+    <string name="button_replace_and_import">Заменить и импортировать</string>
     <string name="import_error_message">Ошибка импорта: %s</string>
     <string name="imported_stations_success">Импортировано %d станций</string>
     <string name="no_stations_to_export">Нет станций для экспорта</string>
