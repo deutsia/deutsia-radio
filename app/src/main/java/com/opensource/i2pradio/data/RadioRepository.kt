@@ -79,6 +79,12 @@ class RadioRepository(context: Context) {
         }
     }
 
+    suspend fun deleteAllStations() {
+        withContext(Dispatchers.IO) {
+            radioDao.deleteAllStations()
+        }
+    }
+
     suspend fun getStationById(id: Long): RadioStation? {
         return withContext(Dispatchers.IO) {
             radioDao.getStationById(id)

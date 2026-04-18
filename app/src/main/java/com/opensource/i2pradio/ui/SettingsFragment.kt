@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import android.widget.LinearLayout
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputEditText
@@ -1610,14 +1611,7 @@ class SettingsFragment : Fragment() {
                         append(getString(R.string.import_confirmation))
                     }
 
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(getString(R.string.dialog_import_stations))
-                        .setMessage(message)
-                        .setPositiveButton(getString(R.string.button_import)) { _, _ ->
-                            performImport(result.stations)
-                        }
-                        .setNegativeButton(getString(R.string.button_cancel), null)
-                        .show()
+                    showImportConfirmationDialog(message, result.stations)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -1636,10 +1630,61 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun performImport(stations: List<com.opensource.i2pradio.data.RadioStation>) {
+    private fun showImportConfirmationDialog(
+        message: String,
+        stations: List<com.opensource.i2pradio.data.RadioStation>
+    ) {
+        val context = requireContext()
+        val dialogView = LayoutInflater.from(context)
+            .inflate(R.layout.dialog_import_confirmation, null)
+        val messageView = dialogView.findViewById<TextView>(R.id.importMessage)
+        val replaceCheckbox = dialogView.findViewById<MaterialCheckBox>(R.id.replaceExistingCheckbox)
+        messageView.text = message
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(getString(R.string.dialog_import_stations))
+            .setView(dialogView)
+            .setPositiveButton(getString(R.string.button_import)) { _, _ ->
+                if (replaceCheckbox.isChecked) {
+                    confirmReplaceAndImport(stations)
+                } else {
+                    performImport(stations, replaceExisting = false)
+                }
+            }
+            .setNegativeButton(getString(R.string.button_cancel), null)
+            .show()
+    }
+
+    private fun confirmReplaceAndImport(stations: List<com.opensource.i2pradio.data.RadioStation>) {
+        val context = requireContext()
+        lifecycleScope.launch {
+            val existingCount = withContext(Dispatchers.IO) {
+                repository.getAllStationsSync().size
+            }
+            if (!isAdded) return@launch
+
+            MaterialAlertDialogBuilder(context)
+                .setTitle(getString(R.string.import_replace_confirm_title))
+                .setMessage(getString(R.string.import_replace_confirm_message, existingCount))
+                .setPositiveButton(getString(R.string.button_replace_and_import)) { _, _ ->
+                    performImport(stations, replaceExisting = true)
+                }
+                .setNegativeButton(getString(R.string.button_cancel), null)
+                .show()
+        }
+    }
+
+    private fun performImport(
+        stations: List<com.opensource.i2pradio.data.RadioStation>,
+        replaceExisting: Boolean = false
+    ) {
         // Capture context early to avoid crashes if Fragment is destroyed during async operation
         val context = requireContext()
         lifecycleScope.launch(Dispatchers.IO) {
+            if (replaceExisting) {
+                repository.deleteAllStations()
+            }
+
             var imported = 0
             for (station in stations) {
                 try {
