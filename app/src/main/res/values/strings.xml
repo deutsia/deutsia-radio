@@ -482,6 +482,7 @@
 
     <!-- Other Error Messages -->
     <string name="error_unknown">Unknown error</string>
+    <string name="error_import_image_failed">Couldn\'t import image</string>
     <string name="folder_custom">Custom folder</string>
 
     <!-- AddEditRadioDialog Default Values -->

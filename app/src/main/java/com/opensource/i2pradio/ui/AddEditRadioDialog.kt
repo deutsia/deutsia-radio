@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.fragment.app.DialogFragment
@@ -25,6 +26,9 @@ import com.opensource.i2pradio.data.RadioStationPasswordHelper
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.UUID
 
 class AddEditRadioDialog : DialogFragment() {
     private lateinit var repository: RadioRepository
@@ -49,19 +53,45 @@ class AddEditRadioDialog : DialogFragment() {
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { selectedUri ->
-            // Take persistable permission to keep access after app restart
-            try {
-                requireContext().contentResolver.takePersistableUriPermission(
-                    selectedUri,
-                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            } catch (e: Exception) {
-                // Permission might not be available for all content providers
-            }
+        uri?.let { selectedUri -> importPickedImage(selectedUri) }
+    }
 
-            selectedImageUri = selectedUri
-            updateImagePreview(selectedUri.toString())
+    // The system photo picker (including GrapheneOS's) hands back a transient content:// URI
+    // whose read grant can't be persisted via takePersistableUriPermission. Copy the bytes
+    // into app-private storage up front so the cover survives app restarts.
+    private fun importPickedImage(sourceUri: Uri) {
+        val appContext = requireContext().applicationContext
+        lifecycleScope.launch {
+            val localUri = withContext(Dispatchers.IO) {
+                try {
+                    val bytes = appContext.contentResolver.openInputStream(sourceUri)
+                        ?.use { it.readBytes() }
+                        ?: return@withContext null
+                    val ext = when (appContext.contentResolver.getType(sourceUri)?.lowercase()) {
+                        "image/png" -> "png"
+                        "image/jpeg", "image/jpg" -> "jpg"
+                        "image/gif" -> "gif"
+                        "image/webp" -> "webp"
+                        else -> "img"
+                    }
+                    val dir = File(appContext.filesDir, "imported_covers").apply { mkdirs() }
+                    val file = File(dir, "${UUID.randomUUID()}.$ext")
+                    file.outputStream().use { it.write(bytes) }
+                    Uri.fromFile(file).toString()
+                } catch (_: Exception) {
+                    null
+                }
+            }
+            if (localUri != null) {
+                selectedImageUri = Uri.parse(localUri)
+                updateImagePreview(localUri)
+            } else if (isAdded) {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.error_import_image_failed,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
