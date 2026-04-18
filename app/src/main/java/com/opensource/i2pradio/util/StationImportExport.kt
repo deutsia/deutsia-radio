@@ -63,7 +63,7 @@ object StationImportExport {
                     escapeCsvField(station.proxyHost),
                     station.proxyPort.toString(),
                     escapeCsvField(station.genre),
-                    escapeCsvField(encodeCoverArtForExport(context, station.coverArtUri)),
+                    escapeCsvField(encodeCoverArtForExport(context, station.coverArtUri) ?: ""),
                     if (station.isLiked) "true" else "false"
                 ).joinToString(",")
                 writer.write("$line\n")
