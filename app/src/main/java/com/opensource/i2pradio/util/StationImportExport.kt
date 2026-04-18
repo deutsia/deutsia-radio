@@ -2,19 +2,28 @@ package com.opensource.i2pradio.util
 
 import android.content.Context
 import android.net.Uri
+import android.util.Base64
 import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioStation
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import java.io.OutputStream
+import java.util.UUID
 
 /**
  * Utility class for importing and exporting radio stations in various formats.
  * Supports CSV, JSON, M3U, and PLS formats.
  */
 object StationImportExport {
+
+    // Cover art above this raw size is kept as its original URI rather than inlined, to
+    // prevent runaway export file sizes.
+    private const val MAX_INLINE_IMAGE_BYTES = 2 * 1024 * 1024
+
+    private const val IMPORTED_COVERS_DIR = "imported_covers"
 
     /**
      * Supported file formats for import/export
@@ -40,7 +49,7 @@ object StationImportExport {
     /**
      * Export stations to CSV format
      */
-    fun exportToCsv(stations: List<RadioStation>, outputStream: OutputStream) {
+    fun exportToCsv(context: Context, stations: List<RadioStation>, outputStream: OutputStream) {
         outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
             // Header row
             writer.write("name,url,proxyType,proxyHost,proxyPort,genre,coverArtUri,isLiked\n")
@@ -54,7 +63,7 @@ object StationImportExport {
                     escapeCsvField(station.proxyHost),
                     station.proxyPort.toString(),
                     escapeCsvField(station.genre),
-                    escapeCsvField(station.coverArtUri ?: ""),
+                    escapeCsvField(encodeCoverArtForExport(context, station.coverArtUri) ?: ""),
                     if (station.isLiked) "true" else "false"
                 ).joinToString(",")
                 writer.write("$line\n")
@@ -65,10 +74,11 @@ object StationImportExport {
     /**
      * Export stations to JSON format
      */
-    fun exportToJson(stations: List<RadioStation>, outputStream: OutputStream) {
+    fun exportToJson(context: Context, stations: List<RadioStation>, outputStream: OutputStream) {
         val jsonArray = JSONArray()
 
         for (station in stations) {
+            val exportedCover = encodeCoverArtForExport(context, station.coverArtUri)
             val jsonObj = JSONObject().apply {
                 put("name", station.name)
                 put("streamUrl", station.streamUrl)
@@ -76,7 +86,7 @@ object StationImportExport {
                 put("proxyHost", station.proxyHost)
                 put("proxyPort", station.proxyPort)
                 put("genre", station.genre)
-                put("coverArtUri", station.coverArtUri ?: JSONObject.NULL)
+                put("coverArtUri", exportedCover?.takeIf { it.isNotEmpty() } ?: JSONObject.NULL)
                 put("isLiked", station.isLiked)
             }
             jsonArray.put(jsonObj)
@@ -96,7 +106,7 @@ object StationImportExport {
     /**
      * Export stations to M3U format
      */
-    fun exportToM3u(stations: List<RadioStation>, outputStream: OutputStream) {
+    fun exportToM3u(context: Context, stations: List<RadioStation>, outputStream: OutputStream) {
         outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
             writer.write("#EXTM3U\n")
             writer.write("# deutsia radio Station Export\n\n")
@@ -122,8 +132,9 @@ object StationImportExport {
                     writer.write("#I2PRADIO:proxyHost=${station.proxyHost}\n")
                     writer.write("#I2PRADIO:proxyPort=${station.proxyPort}\n")
                 }
-                if (!station.coverArtUri.isNullOrEmpty()) {
-                    writer.write("#I2PRADIO:coverArt=${station.coverArtUri}\n")
+                val exportedCover = encodeCoverArtForExport(context, station.coverArtUri)
+                if (!exportedCover.isNullOrEmpty()) {
+                    writer.write("#I2PRADIO:coverArt=$exportedCover\n")
                 }
                 if (station.isLiked) {
                     writer.write("#I2PRADIO:liked=true\n")
@@ -137,7 +148,7 @@ object StationImportExport {
     /**
      * Export stations to PLS format
      */
-    fun exportToPls(stations: List<RadioStation>, outputStream: OutputStream) {
+    fun exportToPls(context: Context, stations: List<RadioStation>, outputStream: OutputStream) {
         outputStream.bufferedWriter(Charsets.UTF_8).use { writer ->
             writer.write("[playlist]\n")
             writer.write("NumberOfEntries=${stations.size}\n\n")
@@ -164,8 +175,9 @@ object StationImportExport {
                     writer.write("; I2PRADIO:proxyHost=${station.proxyHost}\n")
                     writer.write("; I2PRADIO:proxyPort=${station.proxyPort}\n")
                 }
-                if (!station.coverArtUri.isNullOrEmpty()) {
-                    writer.write("; I2PRADIO:coverArt=${station.coverArtUri}\n")
+                val exportedCover = encodeCoverArtForExport(context, station.coverArtUri)
+                if (!exportedCover.isNullOrEmpty()) {
+                    writer.write("; I2PRADIO:coverArt=$exportedCover\n")
                 }
                 if (station.isLiked) {
                     writer.write("; I2PRADIO:liked=true\n")
@@ -198,13 +210,13 @@ object StationImportExport {
         val format = detectFormat(content, uri.toString())
 
         return when (format) {
-            FileFormat.CSV -> importFromCsv(content, errors)
-            FileFormat.JSON -> importFromJson(content, errors)
-            FileFormat.M3U -> importFromM3u(content, errors)
-            FileFormat.PLS -> importFromPls(content, errors)
+            FileFormat.CSV -> importFromCsv(context, content, errors)
+            FileFormat.JSON -> importFromJson(context, content, errors)
+            FileFormat.M3U -> importFromM3u(context, content, errors)
+            FileFormat.PLS -> importFromPls(context, content, errors)
             null -> {
                 // Try to extract stations from plain text with URLs
-                val textResult = importFromPlainText(content, errors)
+                val textResult = importFromPlainText(context, content, errors)
                 if (textResult.stations.isNotEmpty()) {
                     textResult
                 } else {
@@ -247,7 +259,7 @@ object StationImportExport {
     /**
      * Import stations from CSV content
      */
-    private fun importFromCsv(content: String, errors: MutableList<String>): ImportResult {
+    private fun importFromCsv(context: Context, content: String, errors: MutableList<String>): ImportResult {
         val stations = mutableListOf<RadioStation>()
         val lines = content.lines().filter { it.isNotBlank() }
 
@@ -305,7 +317,10 @@ object StationImportExport {
                     proxyPort = fields.getOrNull(proxyPortIdx)?.toIntOrNull() ?: proxyType.getDefaultPort(),
                     useProxy = useProxy,
                     genre = fields.getOrNull(genreIdx)?.trim() ?: "Other",
-                    coverArtUri = fields.getOrNull(coverArtIdx)?.trim()?.takeIf { it.isNotEmpty() },
+                    coverArtUri = materializeImportedCoverArt(
+                        context,
+                        fields.getOrNull(coverArtIdx)?.trim()?.takeIf { it.isNotEmpty() }
+                    ),
                     isLiked = fields.getOrNull(likedIdx)?.trim()?.lowercase() in listOf("true", "1", "yes")
                 )
 
@@ -319,17 +334,9 @@ object StationImportExport {
     }
 
     /**
-     * Import stations from JSON content (public convenience method)
-     */
-    fun importFromJson(content: String): ImportResult {
-        val errors = mutableListOf<String>()
-        return importFromJson(content, errors)
-    }
-
-    /**
      * Import stations from JSON content
      */
-    private fun importFromJson(content: String, errors: MutableList<String>): ImportResult {
+    private fun importFromJson(context: Context, content: String, errors: MutableList<String>): ImportResult {
         val stations = mutableListOf<RadioStation>()
 
         try {
@@ -420,7 +427,10 @@ object StationImportExport {
                         proxyPort = obj.optInt("proxyPort", proxyType.getDefaultPort()),
                         useProxy = useProxy,
                         genre = obj.optString("genre", "Other"),
-                        coverArtUri = obj.optString("coverArtUri", null)?.takeIf { it.isNotEmpty() && it != "null" },
+                        coverArtUri = materializeImportedCoverArt(
+                            context,
+                            obj.optString("coverArtUri", null)?.takeIf { it.isNotEmpty() && it != "null" }
+                        ),
                         isLiked = obj.optBoolean("isLiked", false)
                     )
 
@@ -439,7 +449,7 @@ object StationImportExport {
     /**
      * Import stations from M3U content
      */
-    private fun importFromM3u(content: String, errors: MutableList<String>): ImportResult {
+    private fun importFromM3u(context: Context, content: String, errors: MutableList<String>): ImportResult {
         val stations = mutableListOf<RadioStation>()
         val lines = content.lines()
 
@@ -521,7 +531,7 @@ object StationImportExport {
                             proxyPort = if (useProxy) (currentProxyPort.takeIf { it > 0 } ?: detectedProxyType.getDefaultPort()) else 0,
                             useProxy = useProxy,
                             genre = currentGenre,
-                            coverArtUri = currentCoverArt,
+                            coverArtUri = materializeImportedCoverArt(context, currentCoverArt),
                             isLiked = currentLiked
                         )
                         stations.add(station)
@@ -545,7 +555,7 @@ object StationImportExport {
     /**
      * Import stations from PLS content
      */
-    private fun importFromPls(content: String, errors: MutableList<String>): ImportResult {
+    private fun importFromPls(context: Context, content: String, errors: MutableList<String>): ImportResult {
         val stations = mutableListOf<RadioStation>()
         val lines = content.lines()
 
@@ -631,7 +641,7 @@ object StationImportExport {
                 proxyPort = proxyPorts[num] ?: detectedProxyType.getDefaultPort(),
                 useProxy = useProxy,
                 genre = genres[num] ?: "Other",
-                coverArtUri = coverArts[num]?.takeIf { it.isNotEmpty() },
+                coverArtUri = materializeImportedCoverArt(context, coverArts[num]?.takeIf { it.isNotEmpty() }),
                 isLiked = liked[num] ?: false
             )
             stations.add(station)
@@ -688,6 +698,85 @@ object StationImportExport {
     }
 
     /**
+     * A cover art URI is "local" when it doesn't point at a network resource — i.e. it's a
+     * file://, content://, bare path, or similar. Those references won't resolve after the
+     * export file is moved to another device, so we inline them as data URIs on export.
+     */
+    private fun isLocalCoverArt(uri: String): Boolean {
+        if (uri.isEmpty()) return false
+        if (uri.startsWith("data:", ignoreCase = true)) return false
+        return !uri.startsWith("http://", ignoreCase = true) &&
+            !uri.startsWith("https://", ignoreCase = true)
+    }
+
+    /**
+     * Encode a cover art URI for export. Network URLs are returned unchanged; local URIs
+     * are read and re-emitted as base64 data URIs. If the local file can't be read or is
+     * larger than [MAX_INLINE_IMAGE_BYTES], the original URI is returned as a best-effort
+     * fallback.
+     */
+    private fun encodeCoverArtForExport(context: Context, coverArt: String?): String? {
+        if (coverArt.isNullOrEmpty() || !isLocalCoverArt(coverArt)) return coverArt
+        return try {
+            val uri = Uri.parse(coverArt)
+            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                ?: return coverArt
+            if (bytes.size > MAX_INLINE_IMAGE_BYTES) return coverArt
+            val mime = context.contentResolver.getType(uri)?.takeIf { it.startsWith("image/") }
+                ?: guessImageMime(bytes)
+            val payload = Base64.encodeToString(bytes, Base64.NO_WRAP)
+            "data:$mime;base64,$payload"
+        } catch (_: Exception) {
+            coverArt
+        }
+    }
+
+    /**
+     * If the given cover art is a data URI produced by [encodeCoverArtForExport], decode
+     * it to a file in app-private storage and return the resulting file:// URI. Otherwise
+     * return the input unchanged.
+     */
+    private fun materializeImportedCoverArt(context: Context, coverArt: String?): String? {
+        if (coverArt.isNullOrEmpty() || !coverArt.startsWith("data:", ignoreCase = true)) {
+            return coverArt
+        }
+        return try {
+            val comma = coverArt.indexOf(',')
+            if (comma <= 5) return null
+            val header = coverArt.substring(5, comma)
+            val body = coverArt.substring(comma + 1)
+            val parts = header.split(";")
+            if (parts.none { it.equals("base64", ignoreCase = true) }) return null
+            val mime = parts.firstOrNull().orEmpty()
+            val bytes = Base64.decode(body, Base64.DEFAULT)
+            val dir = File(context.filesDir, IMPORTED_COVERS_DIR).apply { mkdirs() }
+            val file = File(dir, "${UUID.randomUUID()}.${mimeToExtension(mime)}")
+            file.outputStream().use { it.write(bytes) }
+            Uri.fromFile(file).toString()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun guessImageMime(bytes: ByteArray): String = when {
+        bytes.size >= 2 && bytes[0] == 0x89.toByte() && bytes[1] == 0x50.toByte() -> "image/png"
+        bytes.size >= 2 && bytes[0] == 0xFF.toByte() && bytes[1] == 0xD8.toByte() -> "image/jpeg"
+        bytes.size >= 3 && bytes[0] == 'G'.code.toByte() && bytes[1] == 'I'.code.toByte() &&
+            bytes[2] == 'F'.code.toByte() -> "image/gif"
+        bytes.size >= 12 && bytes[8] == 'W'.code.toByte() && bytes[9] == 'E'.code.toByte() &&
+            bytes[10] == 'B'.code.toByte() && bytes[11] == 'P'.code.toByte() -> "image/webp"
+        else -> "application/octet-stream"
+    }
+
+    private fun mimeToExtension(mime: String): String = when (mime.lowercase()) {
+        "image/png" -> "png"
+        "image/jpeg", "image/jpg" -> "jpg"
+        "image/gif" -> "gif"
+        "image/webp" -> "webp"
+        else -> "img"
+    }
+
+    /**
      * Auto-detect proxy type from URL
      */
     private fun detectProxyTypeFromUrl(url: String): ProxyType {
@@ -722,7 +811,7 @@ object StationImportExport {
      * Import stations from plain text containing URLs
      * This is a fallback for malformed files that just contain stream URLs
      */
-    private fun importFromPlainText(content: String, errors: MutableList<String>): ImportResult {
+    private fun importFromPlainText(context: Context, content: String, errors: MutableList<String>): ImportResult {
         val stations = mutableListOf<RadioStation>()
         val lines = content.lines()
 
@@ -799,7 +888,7 @@ object StationImportExport {
                     proxyPort = if (useProxy) proxyType.getDefaultPort() else 0,
                     useProxy = useProxy,
                     genre = "Other",
-                    coverArtUri = currentCoverArt,
+                    coverArtUri = materializeImportedCoverArt(context, currentCoverArt),
                     isLiked = false
                 )
 

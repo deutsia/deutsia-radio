@@ -1691,13 +1691,13 @@ class SettingsFragment : Fragment() {
                 context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                     when (format) {
                         StationImportExport.FileFormat.CSV ->
-                            StationImportExport.exportToCsv(stations, outputStream)
+                            StationImportExport.exportToCsv(context, stations, outputStream)
                         StationImportExport.FileFormat.JSON ->
-                            StationImportExport.exportToJson(stations, outputStream)
+                            StationImportExport.exportToJson(context, stations, outputStream)
                         StationImportExport.FileFormat.M3U ->
-                            StationImportExport.exportToM3u(stations, outputStream)
+                            StationImportExport.exportToM3u(context, stations, outputStream)
                         StationImportExport.FileFormat.PLS ->
-                            StationImportExport.exportToPls(stations, outputStream)
+                            StationImportExport.exportToPls(context, stations, outputStream)
                     }
                 }
 
