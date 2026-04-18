@@ -113,10 +113,15 @@ object SecureImageLoader {
 
     // add cover art disabled check and privacy loader selection to execute()
     suspend fun execute(context: Context, request: ImageRequest, isPrivacyStation: Boolean = false): ImageResult {
-        if (isCoverArtDisabled(context) && isRemoteUrl(request.data?.toString())) {
+        val uriString = request.data?.toString()
+        if (isCoverArtDisabled(context) && isRemoteUrl(uriString)) {
             return coil.request.ErrorResult(null, request, Throwable("Cover art disabled"))
         }
-        val loader = if (isPrivacyStation) getPrivacyImageLoader(context) else getImageLoader(context)
+        // Only gate on Tor availability when the image URL itself is a hidden service.
+        // Tor/I2P stations frequently host cover art on clearnet; those should load
+        // through the regular loader (which still honors Force Tor / Force Custom Proxy).
+        val usePrivacyLoader = isPrivacyStation && isHiddenServiceUrl(uriString)
+        val loader = if (usePrivacyLoader) getPrivacyImageLoader(context) else getImageLoader(context)
         return loader.execute(request)
     }
     /**
@@ -146,6 +151,21 @@ object SecureImageLoader {
         if (uri.isNullOrEmpty()) return false
         val lowerUri = uri.lowercase()
         return lowerUri.startsWith("file://") || lowerUri.startsWith("content://")
+    }
+
+    /**
+     * Check if a URI points at a Tor (.onion) or I2P (.i2p) hidden service.
+     * Only these URLs actually require Tor/I2P to be reachable — clearnet artwork
+     * served by a privacy station is just a normal http(s) fetch.
+     */
+    fun isHiddenServiceUrl(uri: String?): Boolean {
+        if (uri.isNullOrEmpty()) return false
+        val host = try {
+            android.net.Uri.parse(uri).host?.lowercase()
+        } catch (e: Exception) {
+            null
+        } ?: return false
+        return host.endsWith(".onion") || host.endsWith(".i2p")
     }
 
     /**
@@ -473,9 +493,10 @@ fun ImageView.loadSecurePrivacy(
     data: Any?,
     builder: ImageRequest.Builder.() -> Unit = {}
 ): Disposable {
+    val uriString = data?.toString()
     // Check if cover art is disabled for remote URLs
     // Local files (file://, content://) are ALWAYS allowed even when cover art is disabled
-    if (SecureImageLoader.isCoverArtDisabled(context) && SecureImageLoader.isRemoteUrl(data?.toString())) {
+    if (SecureImageLoader.isCoverArtDisabled(context) && SecureImageLoader.isRemoteUrl(uriString)) {
         android.util.Log.d("SecureImageLoader", "Cover art disabled - showing default icon instead of privacy image: $data")
         // Show the default radio icon instead of leaving the image view empty
         this.scaleType = ImageView.ScaleType.FIT_CENTER
@@ -486,6 +507,14 @@ fun ImageView.loadSecurePrivacy(
         }
     }
 
-    val imageLoader = SecureImageLoader.getPrivacyImageLoader(context)
+    // Only route through the privacy (Tor-gated) loader when the image URL itself
+    // is a hidden service. Privacy stations often serve artwork from clearnet hosts;
+    // those should load via the regular loader, which still honors Force Tor /
+    // Force Custom Proxy settings when the user has enabled them.
+    val imageLoader = if (SecureImageLoader.isHiddenServiceUrl(uriString)) {
+        SecureImageLoader.getPrivacyImageLoader(context)
+    } else {
+        SecureImageLoader.getImageLoader(context)
+    }
     return this.load(data, imageLoader, builder)
 }
