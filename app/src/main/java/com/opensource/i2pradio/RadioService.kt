@@ -131,24 +131,19 @@ class RadioService : Service() {
             }
         }
     }
-
-    // Broadcast receiver to pause playback when audio output device disconnects (e.g., Bluetooth)
-    private val becomingNoisyReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
-                android.util.Log.d("RadioService", "Audio becoming noisy - pausing playback")
-                player?.let { exoPlayer ->
-                    if (exoPlayer.isPlaying) {
-                        exoPlayer.pause()
-                        updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
-                        scheduleSessionDeactivation()
-                        startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
-                        broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                    }
+// Broadcast receiver to pause playback when audio output device disconnects (e.g., Bluetooth)
+private val becomingNoisyReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
+            android.util.Log.d("RadioService", "Audio becoming noisy - pausing playback")
+            player?.let { exoPlayer ->
+                if (exoPlayer.isPlaying) {
+                    pauseOrStopForLive()
                 }
             }
         }
     }
+}
     private var becomingNoisyReceiverRegistered = false
 
     private var mediaSession: MediaSessionCompat? = null
@@ -166,6 +161,7 @@ class RadioService : Service() {
     private var recordingFile: File? = null
     private var recordingMediaStoreUri: Uri? = null  // For Android 10+ MediaStore recordings
 
+    @Volatile private var isLiveStream: Boolean = false
     @Volatile private var pendingRecordingStreamUrl: String? = null
     @Volatile private var pendingRecordingProxyHost: String? = null
     @Volatile private var pendingRecordingProxyPort: Int = 0
@@ -282,41 +278,38 @@ class RadioService : Service() {
     }
 
     private fun initializeMediaSession() {
-        mediaSession = MediaSessionCompat(this, "DeutsiaRadioSession").apply {
-            val sessionActivityIntent = Intent(this@RadioService, MainActivity::class.java)
-            val sessionActivityPendingIntent = PendingIntent.getActivity(
-                this@RadioService,
-                99,
-                sessionActivityIntent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-            setSessionActivity(sessionActivityPendingIntent)
+    mediaSession = MediaSessionCompat(this, "DeutsiaRadioSession").apply {
+        val sessionActivityIntent = Intent(this@RadioService, MainActivity::class.java)
+        val sessionActivityPendingIntent = PendingIntent.getActivity(
+            this@RadioService,
+            99,
+            sessionActivityIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        setSessionActivity(sessionActivityPendingIntent)
 
-            @Suppress("DEPRECATION")
-            setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS)
+        @Suppress("DEPRECATION")
+        setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS)
 
-            setCallback(object : MediaSessionCompat.Callback() {
-                override fun onPlay() {
-                    player?.play()
-                    updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
+        setCallback(object : MediaSessionCompat.Callback() {
+            override fun onPlay() {
+                player?.play()
+                updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
+            }
+
+            override fun onPause() {
+                pauseOrStopForLive()
+            }
+
+            override fun onStop() {
+                val stopIntent = Intent(this@RadioService, RadioService::class.java).apply {
+                    action = ACTION_STOP
                 }
-
-                override fun onPause() {
-                    player?.pause()
-                    updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
-                    scheduleSessionDeactivation()
-                }
-
-                override fun onStop() {
-                    val stopIntent = Intent(this@RadioService, RadioService::class.java).apply {
-                        action = ACTION_STOP
-                    }
-                    startService(stopIntent)
-                }
-            })
-        }
+                startService(stopIntent)
+            }
+        })
     }
-
+}
     private fun updatePlaybackState(state: Int) {
         val playbackStateBuilder = PlaybackStateCompat.Builder()
             .setActions(
@@ -356,7 +349,7 @@ class RadioService : Service() {
                                 .build()
 
                             handler.post {
-                                mediaSession?.setMetadata(updatedMetadata)
+                                MediaSessionmediaSession?.setMetadata(updatedMetadata)
                             }
                             return@launch
                         }
@@ -408,125 +401,118 @@ class RadioService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
-            ACTION_PLAY -> {
-                val streamUrl = intent.getStringExtra("stream_url") ?: return START_NOT_STICKY
-                val proxyHost = intent.getStringExtra("proxy_host") ?: ""
-                val proxyPort = intent.getIntExtra("proxy_port", 4444)
-                val proxyTypeStr = intent.getStringExtra("proxy_type") ?: ProxyType.NONE.name
-                val proxyType = ProxyType.fromString(proxyTypeStr)
-                val stationName = intent.getStringExtra("station_name") ?: "Unknown Station"
-                val coverArtUri = intent.getStringExtra("cover_art_uri")
+    when (intent?.action) {
+        ACTION_PLAY -> {
+            val streamUrl = intent.getStringExtra("stream_url") ?: return START_NOT_STICKY
+            val proxyHost = intent.getStringExtra("proxy_host") ?: ""
+            val proxyPort = intent.getIntExtra("proxy_port", 4444)
+            val proxyTypeStr = intent.getStringExtra("proxy_type") ?: ProxyType.NONE.name
+            val proxyType = ProxyType.fromString(proxyTypeStr)
+            val stationName = intent.getStringExtra("station_name") ?: "Unknown Station"
+            val coverArtUri = intent.getStringExtra("cover_art_uri")
 
-                // Custom proxy fields
-                val customProxyProtocol = intent.getStringExtra("custom_proxy_protocol") ?: "HTTP"
-                val proxyUsername = intent.getStringExtra("proxy_username") ?: ""
-                val proxyPassword = intent.getStringExtra("proxy_password") ?: ""
-                val proxyAuthType = intent.getStringExtra("proxy_auth_type") ?: "NONE"
-                val proxyConnectionTimeout = intent.getIntExtra("proxy_connection_timeout", 30)
-                // Hints from the station catalog. These are authoritative
-                // signals from Radio Browser used to pick the media source
-                // type and recording extension before we've seen any traffic.
-                val hlsHint = intent.getBooleanExtra("hls_hint", false)
-                val codecHint = intent.getStringExtra("codec_hint") ?: ""
+            // Custom proxy fields
+            val customProxyProtocol = intent.getStringExtra("custom_proxy_protocol") ?: "HTTP"
+            val proxyUsername = intent.getStringExtra("proxy_username") ?: ""
+            val proxyPassword = intent.getStringExtra("proxy_password") ?: ""
+            val proxyAuthType = intent.getStringExtra("proxy_auth_type") ?: "NONE"
+            val proxyConnectionTimeout = intent.getIntExtra("proxy_connection_timeout", 30)
+            // Hints from the station catalog. These are authoritative
+            // signals from Radio Browser used to pick the media source
+            // type and recording extension before we've seen any traffic.
+            val hlsHint = intent.getBooleanExtra("hls_hint", false)
+            val codecHint = intent.getStringExtra("codec_hint") ?: ""
 
-                currentStreamUrl = streamUrl
-                currentProxyHost = proxyHost
-                currentProxyPort = proxyPort
-                currentProxyType = proxyType
-                currentCustomProxyProtocol = customProxyProtocol
-                currentProxyUsername = proxyUsername
-                currentProxyPassword = proxyPassword
-                currentProxyAuthType = proxyAuthType
-                currentProxyConnectionTimeout = proxyConnectionTimeout
-                currentHlsHint = hlsHint
-                currentCodecHint = codecHint
-                currentStationName = stationName
-                currentCoverArtUri = coverArtUri
-                reconnectAttempts = 0
+            currentStreamUrl = streamUrl
+            currentProxyHost = proxyHost
+            currentProxyPort = proxyPort
+            currentProxyType = proxyType
+            currentCustomProxyProtocol = customProxyProtocol
+            currentProxyUsername = proxyUsername
+            currentProxyPassword = proxyPassword
+            currentProxyAuthType = proxyAuthType
+            currentProxyConnectionTimeout = proxyConnectionTimeout
+            currentHlsHint = hlsHint
+            currentCodecHint = codecHint
+            currentStationName = stationName
+            currentCoverArtUri = coverArtUri
+            reconnectAttempts = 0
 
-                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connecting)))
-                broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
-                activateMediaSession()
-                updateMediaMetadata(stationName, coverArtUri, proxyType == ProxyType.TOR || proxyType == ProxyType.I2P)
-                updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
+            startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connecting)))
+            broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
+            activateMediaSession()
+            updateMediaMetadata(stationName, coverArtUri, proxyType == ProxyType.TOR || proxyType == ProxyType.I2P)
+            updatePlaybackState(PlaybackStateCompat.STATE_BUFFERING)
 
-                // Reject FLV streams up front - ExoPlayer can't decode them and
-                // users will otherwise hit a confusing playback error.
-                if (isFlvCodec(codecHint)) {
-                    rejectUnsupportedCodec("FLV")
-                    return START_STICKY
-                }
+            // Reject FLV streams up front - ExoPlayer can't decode them and
+            // users will otherwise hit a confusing playback error.
+            if (isFlvCodec(codecHint)) {
+                rejectUnsupportedCodec("FLV")
+                return START_STICKY
+            }
 
-                startPlayAfterResolve(
-                    streamUrl, proxyHost, proxyPort, proxyType,
-                    customProxyProtocol, proxyUsername, proxyPassword,
-                    proxyAuthType, proxyConnectionTimeout,
-                    hlsHint, codecHint
+            startPlayAfterResolve(
+                streamUrl, proxyHost, proxyPort, proxyType,
+                customProxyProtocol, proxyUsername, proxyPassword,
+                proxyAuthType, proxyConnectionTimeout,
+                hlsHint, codecHint
+            )
+        }
+        ACTION_PAUSE -> {
+            pauseOrStopForLive()
+        }
+        ACTION_STOP -> {
+            stopRecording()
+            currentStreamUrl = null
+            updatePlaybackState(PlaybackStateCompat.STATE_STOPPED)
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+            deactivateMediaSession()
+            stopStream()
+            stopForeground(true)
+            stopSelf()
+        }
+        ACTION_START_RECORDING -> {
+            val stationName = intent.getStringExtra("station_name") ?: "Unknown Station"
+            startRecording(stationName)
+        }
+        ACTION_STOP_RECORDING -> {
+            stopRecording()
+        }
+        ACTION_SWITCH_RECORDING_STREAM -> {
+            val newStreamUrl = intent.getStringExtra("stream_url") ?: return START_NOT_STICKY
+            val newProxyHost = intent.getStringExtra("proxy_host") ?: ""
+            val newProxyPort = intent.getIntExtra("proxy_port", 4444)
+            val newProxyTypeStr = intent.getStringExtra("proxy_type") ?: ProxyType.NONE.name
+            val newProxyType = ProxyType.fromString(newProxyTypeStr)
+            val newStationName = intent.getStringExtra("station_name") ?: "Unknown Station"
+            val newHlsHint = intent.getBooleanExtra("hls_hint", false)
+            val newCodecHint = intent.getStringExtra("codec_hint") ?: ""
+
+            serviceScope.launch(Dispatchers.IO) {
+                val resolution = resolveStreamUrlBlocking(
+                    newStreamUrl, newProxyHost, newProxyPort, newProxyType,
+                    newHlsHint, newCodecHint
                 )
-            }
-            ACTION_PAUSE -> {
-                player?.pause()
-                updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
-                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                scheduleSessionDeactivation()
-                startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
-            }
-            ACTION_STOP -> {
-                stopRecording()
-                currentStreamUrl = null
-                updatePlaybackState(PlaybackStateCompat.STATE_STOPPED)
-                broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
-                deactivateMediaSession()
-                stopStream()
-                stopForeground(true)
-                stopSelf()
-            }
-            ACTION_START_RECORDING -> {
-                val stationName = intent.getStringExtra("station_name") ?: "Unknown Station"
-                startRecording(stationName)
-            }
-            ACTION_STOP_RECORDING -> {
-                stopRecording()
-            }
-            ACTION_SWITCH_RECORDING_STREAM -> {
-                val newStreamUrl = intent.getStringExtra("stream_url") ?: return START_NOT_STICKY
-                val newProxyHost = intent.getStringExtra("proxy_host") ?: ""
-                val newProxyPort = intent.getIntExtra("proxy_port", 4444)
-                val newProxyTypeStr = intent.getStringExtra("proxy_type") ?: ProxyType.NONE.name
-                val newProxyType = ProxyType.fromString(newProxyTypeStr)
-                val newStationName = intent.getStringExtra("station_name") ?: "Unknown Station"
-                val newHlsHint = intent.getBooleanExtra("hls_hint", false)
-                val newCodecHint = intent.getStringExtra("codec_hint") ?: ""
-
-                // Resolve the new URL on a worker thread before handing it to
-                // the recording switch machinery - the recording thread reads
-                // from a single direct URL, so pointers wouldn't work there.
-                serviceScope.launch(Dispatchers.IO) {
-                    val resolution = resolveStreamUrlBlocking(
-                        newStreamUrl, newProxyHost, newProxyPort, newProxyType,
-                        newHlsHint, newCodecHint
+                val resolvedUrl = resolution?.url ?: newStreamUrl
+                val effectiveHlsHint = newHlsHint || (resolution?.hlsDetected == true)
+                handler.post {
+                    switchRecordingStream(
+                        resolvedUrl, newProxyHost, newProxyPort, newProxyType,
+                        newStationName, effectiveHlsHint, newCodecHint
                     )
-                    val resolvedUrl = resolution?.url ?: newStreamUrl
-                    val effectiveHlsHint = newHlsHint || (resolution?.hlsDetected == true)
-                    handler.post {
-                        switchRecordingStream(
-                            resolvedUrl, newProxyHost, newProxyPort, newProxyType,
-                            newStationName, effectiveHlsHint, newCodecHint
-                        )
-                    }
                 }
-            }
-            ACTION_SET_SLEEP_TIMER -> {
-                val minutes = intent.getIntExtra("minutes", 0)
-                setSleepTimer(minutes)
-            }
-            ACTION_CANCEL_SLEEP_TIMER -> {
-                cancelSleepTimer()
             }
         }
-        return START_STICKY
+        ACTION_SET_SLEEP_TIMER -> {
+            val minutes = intent.getIntExtra("minutes", 0)
+            setSleepTimer(minutes)
+        }
+        ACTION_CANCEL_SLEEP_TIMER -> {
+            cancelSleepTimer()
+        }
     }
+    return START_STICKY
+}
 
     private fun setSleepTimer(minutes: Int) {
         cancelSleepTimer()
@@ -2410,6 +2396,8 @@ class RadioService : Service() {
                 // truthfully what they are even when the URL doesn't.
                 val useHls = isHlsStream(streamUrl) || hlsHint
                 val useDash = isDashStream(streamUrl)
+                isLiveStream = !useHls && !useDash
+                
                 val mediaSource: MediaSource = when {
                     useHls -> {
                         HlsMediaSource.Factory(dataSourceFactory)
@@ -2583,10 +2571,25 @@ class RadioService : Service() {
         }
         handler.postDelayed(reconnectRunnable!!, delay)
     }
-
+    
+    private fun pauseOrStopForLive() {
+    if (isLiveStream) {
+        val stopIntent = Intent(this, RadioService::class.java).apply {
+            action = ACTION_STOP
+        }
+        startService(stopIntent)
+    } else {
+        player?.pause()
+        updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+        broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+        scheduleSessionDeactivation()
+        startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
+    }
+}
     private fun stopStream() {
         // Stop playback time updates first
         stopPlaybackTimeUpdates()
+        isLiveStream = false
 
         // Cancel only the reconnect runnable, not ALL callbacks
         // Using removeCallbacksAndMessages(null) is too aggressive and can
