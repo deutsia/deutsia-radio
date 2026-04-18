@@ -87,6 +87,8 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
      */
     private var currentIcyTitle: String? = null
 
+    @Volatile private var isLiveStream: Boolean = false
+
     private val backgroundExecutor: Executor = Executors.newSingleThreadExecutor { r ->
         Thread(r, "DeutsiaAuto-DB").apply { isDaemon = true }
     }
@@ -124,6 +126,16 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
                     }
                 }
             }
+
+            override fun onMediaItemTransition(
+                mediaItem: androidx.media3.common.MediaItem?,
+                reason: Int
+            ) {
+                val url = mediaItem?.localConfiguration?.uri?.toString().orEmpty().lowercase()
+                val path = url.substringBefore('?')
+                isLiveStream = !path.endsWith(".m3u8") && !path.contains(".m3u8") &&
+                               !path.endsWith(".mpd")  && !path.contains(".mpd")
+            }
         })
         player = exoPlayer
 
@@ -134,7 +146,8 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        session = MediaLibrarySession.Builder(this, exoPlayer, LibraryCallback())
+        val sessionPlayer = LiveAwarePlayer(exoPlayer) { isLiveStream }
+        session = MediaLibrarySession.Builder(this, sessionPlayer, LibraryCallback())
             .setSessionActivity(sessionActivity)
             .build()
     }
@@ -529,5 +542,27 @@ private class StationProxyDataSourceFactory(
 
     companion object {
         private const val USER_AGENT = "DeutsiaRadio/1.0 (AA)"
+    }
+}
+
+private class LiveAwarePlayer(
+    private val inner: ExoPlayer,
+    private val isLive: () -> Boolean
+) : androidx.media3.common.ForwardingPlayer(inner) {
+    override fun pause() {
+        if (isLive()) {
+            inner.stop()
+        } else {
+            inner.pause()
+        }
+    }
+
+    override fun play() {
+        if (inner.playbackState == androidx.media3.common.Player.STATE_IDLE &&
+            inner.mediaItemCount > 0
+        ) {
+            inner.prepare()
+        }
+        inner.play()
     }
 }
