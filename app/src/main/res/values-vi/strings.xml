@@ -555,6 +555,7 @@
     <string name="button_replace_and_import">Thay thế và nhập</string>
     <string name="import_error_message">Lỗi nhập: %s</string>
     <string name="imported_stations_success">Đã nhập %d đài</string>
+    <string name="imported_stations_with_skipped">Đã nhập %1$d, bỏ qua %2$d bản trùng</string>
     <string name="no_stations_to_export">Không có đài để xuất</string>
     <string name="exported_stations_success">Đã xuất %1$d đài sang %2$s</string>
     <string name="export_error_message">Lỗi xuất: %s</string>

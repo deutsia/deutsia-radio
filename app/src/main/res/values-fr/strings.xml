@@ -554,6 +554,7 @@
     <string name="button_replace_and_import">Remplacer et importer</string>
     <string name="import_error_message">Erreur d\'importation : %s</string>
     <string name="imported_stations_success">%d station(s) importée(s)</string>
+    <string name="imported_stations_with_skipped">%1$d importée(s), %2$d doublon(s) ignoré(s)</string>
     <string name="no_stations_to_export">Aucune station à exporter</string>
     <string name="exported_stations_success">%1$d station(s) exportée(s) vers %2$s</string>
     <string name="export_error_message">Erreur d\'exportation : %s</string>

@@ -554,6 +554,7 @@
     <string name="button_replace_and_import">Sostituisci e importa</string>
     <string name="import_error_message">Errore di importazione: %s</string>
     <string name="imported_stations_success">%d stazione/i importata/e</string>
+    <string name="imported_stations_with_skipped">Importate %1$d, saltati %2$d duplicati</string>
     <string name="no_stations_to_export">Nessuna stazione da esportare</string>
     <string name="exported_stations_success">%1$d stazione/i esportata/e in %2$s</string>
     <string name="export_error_message">Errore di esportazione: %s</string>

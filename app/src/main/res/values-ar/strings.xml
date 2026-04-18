@@ -554,6 +554,7 @@
     <string name="button_replace_and_import">استبدال واستيراد</string>
     <string name="import_error_message">خطأ في الاستيراد: %s</string>
     <string name="imported_stations_success">تم استيراد %d محطة</string>
+    <string name="imported_stations_with_skipped">تم استيراد %1$d، وتم تخطي %2$d مكررة</string>
     <string name="no_stations_to_export">لا توجد محطات للتصدير</string>
     <string name="exported_stations_success">تم تصدير %1$d محطة إلى %2$s</string>
     <string name="export_error_message">خطأ في التصدير: %s</string>

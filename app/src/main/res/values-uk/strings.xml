@@ -555,6 +555,7 @@
     <string name="button_replace_and_import">Замінити та імпортувати</string>
     <string name="import_error_message">Помилка імпорту: %s</string>
     <string name="imported_stations_success">Імпортовано %d станцій</string>
+    <string name="imported_stations_with_skipped">Імпортовано %1$d, пропущено %2$d дублікатів</string>
     <string name="no_stations_to_export">Немає станцій для експорту</string>
     <string name="exported_stations_success">Експортовано %1$d станцій до %2$s</string>
     <string name="export_error_message">Помилка експорту: %s</string>
