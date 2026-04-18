@@ -548,6 +548,11 @@
     <string name="warnings_header">သတိပေးချက်များ:\n</string>
     <string name="more_warnings">• ...နှင့် နောက်ထပ် %d ခု\n</string>
     <string name="import_confirmation">ဤဘူတာများကို တင်သွင်းမလား?</string>
+    <string name="import_replace_existing">ရှိပြီးသား ဘူတာများကို အစားထိုးမည်</string>
+    <string name="import_replace_hint">တင်သွင်းခြင်းမပြုမီ သင်၏စာကြည့်တိုက်တစ်ခုလုံးကို ရှင်းလင်းသည်</string>
+    <string name="import_replace_confirm_title">ဘူတာအားလုံးကို အစားထိုးမလား?</string>
+    <string name="import_replace_confirm_message">ဤလုပ်ဆောင်ချက်သည် တင်သွင်းခြင်းမပြုမီ ရှိပြီးသား ဘူတာ %1$d ခုလုံး (နှစ်သက်ထားသည့်နှင့် ကြိုတင်သတ်မှတ်ထားသည့် ဘူတာများအပါအဝင်) ကို အပြီးတိုင် ဖျက်ပစ်ပါမည်။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်၍မရပါ။</string>
+    <string name="button_replace_and_import">အစားထိုးပြီး တင်သွင်းမည်</string>
     <string name="import_error_message">တင်သွင်းမှု အမှား: %s</string>
     <string name="imported_stations_success">ဘူတာ %d ခု တင်သွင်းပြီး</string>
     <string name="no_stations_to_export">တင်ပို့ရန် ဘူတာများ မရှိပါ</string>

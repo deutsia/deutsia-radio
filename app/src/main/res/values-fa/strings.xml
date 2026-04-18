@@ -548,6 +548,11 @@
     <string name="warnings_header">هشدارها:\n</string>
     <string name="more_warnings">• ...و %d مورد دیگر\n</string>
     <string name="import_confirmation">آیا می‌خواهید این ایستگاه‌ها را وارد کنید؟</string>
+    <string name="import_replace_existing">جایگزینی ایستگاه‌های موجود</string>
+    <string name="import_replace_hint">قبل از وارد کردن، تمام کتابخانه شما را پاک می‌کند</string>
+    <string name="import_replace_confirm_title">جایگزینی همه ایستگاه‌ها؟</string>
+    <string name="import_replace_confirm_message">این کار تمام %1$d ایستگاه موجود (از جمله ایستگاه‌های مورد علاقه و پیش‌تنظیم‌شده) را قبل از وارد کردن برای همیشه حذف می‌کند. این عمل قابل بازگشت نیست.</string>
+    <string name="button_replace_and_import">جایگزینی و وارد کردن</string>
     <string name="import_error_message">خطای وارد کردن: %s</string>
     <string name="imported_stations_success">%d ایستگاه وارد شد</string>
     <string name="no_stations_to_export">هیچ ایستگاهی برای صادر کردن وجود ندارد</string>

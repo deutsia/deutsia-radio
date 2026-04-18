@@ -547,6 +547,11 @@
     <string name="warnings_header">경고:\n</string>
     <string name="more_warnings">• ...외 %d개\n</string>
     <string name="import_confirmation">이 스테이션들을 가져오시겠습니까?</string>
+    <string name="import_replace_existing">기존 스테이션 교체</string>
+    <string name="import_replace_hint">가져오기 전에 전체 라이브러리를 지웁니다</string>
+    <string name="import_replace_confirm_title">모든 스테이션을 교체하시겠습니까?</string>
+    <string name="import_replace_confirm_message">가져오기 전에 기존의 %1$d개 스테이션(좋아요 및 프리셋 스테이션 포함)이 모두 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다.</string>
+    <string name="button_replace_and_import">교체 후 가져오기</string>
     <string name="import_error_message">가져오기 오류: %s</string>
     <string name="imported_stations_success">%d개의 스테이션을 가져왔습니다</string>
     <string name="no_stations_to_export">내보낼 스테이션이 없습니다</string>

@@ -547,6 +547,11 @@
     <string name="warnings_header">चेतावनियां:\n</string>
     <string name="more_warnings">• ...और %d और\n</string>
     <string name="import_confirmation">क्या आप इन स्टेशनों को आयात करना चाहते हैं?</string>
+    <string name="import_replace_existing">मौजूदा स्टेशन बदलें</string>
+    <string name="import_replace_hint">आयात से पहले आपकी पूरी लाइब्रेरी साफ़ कर देगा</string>
+    <string name="import_replace_confirm_title">सभी स्टेशन बदलें?</string>
+    <string name="import_replace_confirm_message">यह आयात से पहले %1$d मौजूदा स्टेशन(स्टेशनों) को स्थायी रूप से हटा देगा (पसंदीदा और प्रीसेट स्टेशनों सहित)। इसे पूर्ववत नहीं किया जा सकता।</string>
+    <string name="button_replace_and_import">बदलें और आयात करें</string>
     <string name="import_error_message">आयात त्रुटि: %s</string>
     <string name="imported_stations_success">%d स्टेशन आयात किए गए</string>
     <string name="no_stations_to_export">निर्यात करने के लिए कोई स्टेशन नहीं</string>

@@ -547,6 +547,11 @@
     <string name="warnings_header">تحذيرات:\n</string>
     <string name="more_warnings">• ...و %d أخرى\n</string>
     <string name="import_confirmation">هل تريد استيراد هذه المحطات؟</string>
+    <string name="import_replace_existing">استبدال المحطات الحالية</string>
+    <string name="import_replace_hint">يمسح مكتبتك بالكامل قبل الاستيراد</string>
+    <string name="import_replace_confirm_title">استبدال جميع المحطات؟</string>
+    <string name="import_replace_confirm_message">سيؤدي هذا إلى حذف جميع المحطات الحالية البالغ عددها %1$d نهائيًا (بما في ذلك المحطات المفضلة والمعدة مسبقًا) قبل الاستيراد. لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="button_replace_and_import">استبدال واستيراد</string>
     <string name="import_error_message">خطأ في الاستيراد: %s</string>
     <string name="imported_stations_success">تم استيراد %d محطة</string>
     <string name="no_stations_to_export">لا توجد محطات للتصدير</string>

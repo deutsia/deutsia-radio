@@ -548,6 +548,11 @@
     <string name="warnings_header">Cảnh báo:\n</string>
     <string name="more_warnings">• ...và %d cảnh báo khác\n</string>
     <string name="import_confirmation">Bạn có muốn nhập các đài này không?</string>
+    <string name="import_replace_existing">Thay thế các đài hiện có</string>
+    <string name="import_replace_hint">Xóa toàn bộ thư viện của bạn trước khi nhập</string>
+    <string name="import_replace_confirm_title">Thay thế tất cả các đài?</string>
+    <string name="import_replace_confirm_message">Điều này sẽ xóa vĩnh viễn tất cả %1$d đài hiện có (bao gồm cả các đài yêu thích và cài đặt sẵn) trước khi nhập. Không thể hoàn tác thao tác này.</string>
+    <string name="button_replace_and_import">Thay thế và nhập</string>
     <string name="import_error_message">Lỗi nhập: %s</string>
     <string name="imported_stations_success">Đã nhập %d đài</string>
     <string name="no_stations_to_export">Không có đài để xuất</string>

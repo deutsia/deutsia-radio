@@ -547,6 +547,11 @@
     <string name="warnings_header">警告:\n</string>
     <string name="more_warnings">• ...他%d件\n</string>
     <string name="import_confirmation">これらのステーションをインポートしますか？</string>
+    <string name="import_replace_existing">既存のステーションを置き換える</string>
+    <string name="import_replace_hint">インポート前にライブラリ全体を消去します</string>
+    <string name="import_replace_confirm_title">すべてのステーションを置き換えますか？</string>
+    <string name="import_replace_confirm_message">これにより、インポート前に既存の %1$d 件のステーション（お気に入りやプリセットを含む）がすべて完全に削除されます。この操作は元に戻せません。</string>
+    <string name="button_replace_and_import">置き換えてインポート</string>
     <string name="import_error_message">インポートエラー: %s</string>
     <string name="imported_stations_success">%d個のステーションをインポートしました</string>
     <string name="no_stations_to_export">エクスポートするステーションがありません</string>

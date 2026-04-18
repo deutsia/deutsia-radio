@@ -548,6 +548,11 @@
     <string name="warnings_header">Warnungen:\n</string>
     <string name="more_warnings">• ...und %d weitere\n</string>
     <string name="import_confirmation">Möchten Sie diese Sender importieren?</string>
+    <string name="import_replace_existing">Vorhandene Sender ersetzen</string>
+    <string name="import_replace_hint">Löscht vor dem Import Ihre gesamte Bibliothek</string>
+    <string name="import_replace_confirm_title">Alle Sender ersetzen?</string>
+    <string name="import_replace_confirm_message">Dadurch werden alle %1$d vorhandenen Sender (einschließlich favorisierter und voreingestellter Sender) vor dem Import dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="button_replace_and_import">Ersetzen &amp; Importieren</string>
     <string name="import_error_message">Importfehler: %s</string>
     <string name="imported_stations_success">%d Sender importiert</string>
     <string name="no_stations_to_export">Keine Sender zum Exportieren</string>
