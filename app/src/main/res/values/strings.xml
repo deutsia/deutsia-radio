@@ -626,6 +626,11 @@
     <string name="warnings_header">Warnings:\n</string>
     <string name="more_warnings">• ...and %d more\n</string>
     <string name="import_confirmation">Do you want to import these stations?</string>
+    <string name="import_replace_existing">Replace existing stations</string>
+    <string name="import_replace_hint">Clears your entire library before importing</string>
+    <string name="import_replace_confirm_title">Replace all stations?</string>
+    <string name="import_replace_confirm_message">This will permanently delete all %1$d existing station(s) (including liked and preset stations) before importing. This cannot be undone.</string>
+    <string name="button_replace_and_import">Replace &amp; Import</string>
     <string name="import_error_message">Import error: %s</string>
     <string name="imported_stations_success">Imported %d station(s)</string>
     <string name="no_stations_to_export">No stations to export</string>
