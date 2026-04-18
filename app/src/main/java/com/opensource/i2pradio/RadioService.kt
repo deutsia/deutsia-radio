@@ -349,7 +349,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                                 .build()
 
                             handler.post {
-                                MediaSessionmediaSession?.setMetadata(updatedMetadata)
+                                mediaSession?.setMetadata(updatedMetadata)
                             }
                             return@launch
                         }
