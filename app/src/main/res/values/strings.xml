@@ -634,6 +634,7 @@
     <string name="button_replace_and_import">Replace &amp; Import</string>
     <string name="import_error_message">Import error: %s</string>
     <string name="imported_stations_success">Imported %d station(s)</string>
+    <string name="imported_stations_with_skipped">Imported %1$d, skipped %2$d duplicate(s)</string>
     <string name="no_stations_to_export">No stations to export</string>
     <string name="exported_stations_success">Exported %1$d station(s) to %2$s</string>
     <string name="export_error_message">Export error: %s</string>
