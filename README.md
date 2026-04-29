@@ -32,7 +32,7 @@ Privacy-focused, censorship-resistant multinet radio player with Material You.
 ---
 
 ## Updates
-- **New Release: v1.7.0** Tor auto-detection, HLS, fmp4, and DASH support, security patch and bug fixes
+- **New Release: v1.8.0** - Android Auto support, bug fixes
 
 ---
 
