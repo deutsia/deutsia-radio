@@ -724,4 +724,27 @@
     <string name="cd_like_station">Like station</string>
     <string name="cd_add_to_library">Add to library</string>
     <string name="cd_stop">Stop</string>
+
+    <!-- Three-layer playback queue -->
+    <string name="cd_open_queue">Open queue</string>
+    <string name="menu_add_to_queue">Add to queue</string>
+    <string name="station_added_to_queue">%s added to queue</string>
+    <string name="queue_title">Queue</string>
+    <string name="queue_up_next">Up next</string>
+    <string name="queue_clear">Clear</string>
+    <string name="queue_empty">Manual queue is empty. Long-press a station and pick \"Add to queue,\" or just walk the library list.</string>
+    <string name="queue_next">Next</string>
+    <string name="queue_previous">Previous</string>
+    <string name="queue_remove">Remove from queue</string>
+    <string name="queue_discover_title">Discover</string>
+    <string name="queue_discover_description">When the manual queue and library list are exhausted, pick a similar station to keep playing.</string>
+    <string name="queue_subtitle_discover_on">Discover on</string>
+    <plurals name="queue_subtitle_count">
+        <item quantity="one">%d in queue</item>
+        <item quantity="other">%d in queue</item>
+    </plurals>
+
+    <!-- Discover toggle in Settings -->
+    <string name="settings_discover_title">Discover</string>
+    <string name="settings_discover_description">Continue with a similar station after the queue runs out</string>
 </resources>

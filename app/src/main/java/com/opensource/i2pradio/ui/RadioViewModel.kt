@@ -2,12 +2,19 @@ package com.opensource.i2pradio.ui
 
 import android.app.Application
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.data.PlaybackQueueManager
 import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.data.RadioStationPasswordHelper
+import com.opensource.i2pradio.data.radiobrowser.RadioBrowserRepository
+import com.opensource.i2pradio.data.radiobrowser.RadioBrowserResult
 import com.opensource.i2pradio.ui.PreferencesHelper
+import kotlinx.coroutines.launch
 
 /**
  * Recording state to track the current recording status.
@@ -47,6 +54,11 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     // Miniplayer visibility state for UI components that need to adjust when miniplayer shows/hides
     private val _isMiniPlayerVisible = MutableLiveData<Boolean>(false)
     val isMiniPlayerVisible: LiveData<Boolean> = _isMiniPlayerVisible
+
+    // Three-layer queue. The manager is a process-wide singleton; the
+    // ViewModel just exposes its LiveData and orchestrates the Discover
+    // network call when both eager layers are exhausted.
+    val manualQueue: LiveData<List<RadioStation>> = PlaybackQueueManager.manualQueue
 
     fun setCurrentStation(station: RadioStation?) {
         val previousStation = _currentStation.value
@@ -218,5 +230,122 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             0L
         }
+    }
+
+    // ===== Three-layer queue =====
+
+    /**
+     * Snapshot the visible filtered+sorted list at play time. The position of
+     * [currentStation] inside [stations] becomes the cursor that walks
+     * forward/back via [skipNext] and [skipPrevious].
+     */
+    fun setPlaybackContext(stations: List<RadioStation>, currentStation: RadioStation?) {
+        PlaybackQueueManager.setContext(stations, currentStation)
+    }
+
+    fun addToManualQueue(station: RadioStation) {
+        PlaybackQueueManager.addToManualQueue(station)
+    }
+
+    fun removeFromManualQueueAt(index: Int) {
+        PlaybackQueueManager.removeFromManualQueueAt(index)
+    }
+
+    fun clearManualQueue() {
+        PlaybackQueueManager.clearManualQueue()
+    }
+
+    /**
+     * Pick the next station and start it. Walks the three layers in
+     * priority order: manual queue, then context list, then Discover (only
+     * when the user has opted in).
+     */
+    fun skipNext() {
+        val app = getApplication<Application>()
+
+        PlaybackQueueManager.popManualQueue()?.let { station ->
+            PlaybackQueueManager.notifyNowPlaying(station)
+            playStationInternal(station)
+            return
+        }
+
+        PlaybackQueueManager.advanceContext()?.let { station ->
+            playStationInternal(station)
+            return
+        }
+
+        if (!PreferencesHelper.isDiscoverEnabled(app)) return
+
+        val hint = PlaybackQueueManager.discoverHint(_currentStation.value) ?: return
+        viewModelScope.launch {
+            val repo = RadioBrowserRepository(app)
+            val candidates = mutableListOf<RadioStation>()
+
+            val byTag = if (hint.tag.isNotBlank()) repo.getByTag(hint.tag, limit = 25) else null
+            if (byTag is RadioBrowserResult.Success) {
+                byTag.data.forEach { candidates += repo.convertToRadioStation(it) }
+            }
+            if (candidates.none { acceptable(it, hint) } && hint.countryCode.isNotBlank()) {
+                val byCountry = repo.getByCountryCode(hint.countryCode, limit = 25)
+                if (byCountry is RadioBrowserResult.Success) {
+                    byCountry.data.forEach { candidates += repo.convertToRadioStation(it) }
+                }
+            }
+
+            val pick = candidates.firstOrNull { acceptable(it, hint) } ?: return@launch
+            playStationInternal(pick)
+        }
+    }
+
+    /**
+     * Step back one entry in the context list. The manual queue is FIFO and
+     * is not affected; if there's no context behind us, this is a no-op.
+     */
+    fun skipPrevious() {
+        val previous = PlaybackQueueManager.rewindContext() ?: return
+        playStationInternal(previous)
+    }
+
+    /**
+     * Play [station] now and mark it as the new context cursor (used when
+     * the user picks something out of the queue UI directly).
+     */
+    fun playFromQueue(station: RadioStation) {
+        PlaybackQueueManager.notifyNowPlaying(station)
+        playStationInternal(station)
+    }
+
+    private fun acceptable(candidate: RadioStation, hint: PlaybackQueueManager.DiscoverHint): Boolean {
+        val uuid = candidate.radioBrowserUuid
+        if (uuid.isNullOrEmpty()) return true
+        return uuid !in hint.excludeUuids
+    }
+
+    private fun playStationInternal(station: RadioStation) {
+        val app = getApplication<Application>()
+        setCurrentStation(station)
+        setBuffering(true)
+
+        val proxyType = station.getProxyTypeEnum()
+        val intent = Intent(app, RadioService::class.java).apply {
+            action = RadioService.ACTION_PLAY
+            putExtra("stream_url", station.streamUrl)
+            putExtra("station_name", station.name)
+            putExtra("proxy_host", if (station.useProxy) station.proxyHost else "")
+            putExtra("proxy_port", station.proxyPort)
+            putExtra("proxy_type", proxyType.name)
+            putExtra("cover_art_uri", station.coverArtUri)
+            putExtra("custom_proxy_protocol", station.customProxyProtocol)
+            putExtra("proxy_username", station.proxyUsername)
+            putExtra(
+                "proxy_password",
+                RadioStationPasswordHelper.getDecryptedPassword(app, station)
+            )
+            putExtra("proxy_auth_type", station.proxyAuthType)
+            putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
+            putExtra("hls_hint", station.hlsHint)
+            putExtra("codec_hint", station.codecHint)
+        }
+        ContextCompat.startForegroundService(app, intent)
     }
 }

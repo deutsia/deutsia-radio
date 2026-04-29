@@ -57,6 +57,7 @@ class LibraryFragment : Fragment() {
     private lateinit var fabAddRadio: FloatingActionButton
     private lateinit var sortButton: MaterialButton
     private lateinit var genreFilterButton: MaterialButton
+    private lateinit var queueButton: MaterialButton
     private lateinit var searchInput: TextInputEditText
     private lateinit var adapter: RadioStationAdapter
     private lateinit var repository: RadioRepository
@@ -69,6 +70,11 @@ class LibraryFragment : Fragment() {
 
     // Cache for search filtering
     private var allStationsCache: List<RadioStation> = emptyList()
+
+    // Snapshot of what's actually on screen after sort+filter+search. This is
+    // the "context list" layer of the playback queue: walking next/prev walks
+    // exactly what the user is looking at.
+    private var visibleStations: List<RadioStation> = emptyList()
 
     // Selection mode
     private var actionMode: ActionMode? = null
@@ -223,6 +229,7 @@ class LibraryFragment : Fragment() {
         fabAddRadio = view.findViewById(R.id.fabAddRadio)
         sortButton = view.findViewById(R.id.sortButton)
         genreFilterButton = view.findViewById(R.id.genreFilterButton)
+        queueButton = view.findViewById(R.id.queueButton)
         searchInput = view.findViewById(R.id.searchInput)
 
         adapter = RadioStationAdapter(
@@ -263,6 +270,10 @@ class LibraryFragment : Fragment() {
 
         genreFilterButton.setOnClickListener {
             showGenreFilterDialog()
+        }
+
+        queueButton.setOnClickListener {
+            QueueBottomSheet().show(parentFragmentManager, "QueueBottomSheet")
         }
 
         view.findViewById<MaterialButton>(R.id.emptyStateAddButton).setOnClickListener {
@@ -345,6 +356,8 @@ class LibraryFragment : Fragment() {
                 }
             }
         }
+
+        visibleStations = filteredStations
 
         if (filteredStations.isEmpty()) {
             recyclerView.visibility = View.GONE
@@ -597,6 +610,10 @@ class LibraryFragment : Fragment() {
     }
 
     private fun playStation(station: RadioStation) {
+        // Snapshot the visible list as the queue's context layer so
+        // skipNext/skipPrevious walk exactly what the user is looking at.
+        viewModel.setPlaybackContext(visibleStations, station)
+
         viewModel.setCurrentStation(station)
         viewModel.setBuffering(true)  // Show buffering state while connecting
 
@@ -693,6 +710,18 @@ class LibraryFragment : Fragment() {
         )
         popupWindow.elevation = 8f
         popupWindow.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        popupView.findViewById<View>(R.id.menuItemAddToQueue).setOnClickListener {
+            popupWindow.dismiss()
+            viewModel.addToManualQueue(station)
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.station_added_to_queue, station.name),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
 
         popupView.findViewById<View>(R.id.menuItemEdit).setOnClickListener {
             popupWindow.dismiss()

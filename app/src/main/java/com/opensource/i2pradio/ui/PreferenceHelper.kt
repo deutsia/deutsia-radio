@@ -72,6 +72,12 @@ object PreferencesHelper {
     // Currently playing station persistence
     private const val KEY_CURRENT_STATION_JSON = "current_station_json"
 
+    // Discover (third queue layer): when manual queue + context list are both
+    // exhausted, ask Radio Browser for a similar station and continue. Off by
+    // default - this layer reaches out to the network without a user action,
+    // so it stays opt-in.
+    private const val KEY_DISCOVER_ENABLED = "discover_enabled"
+
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
@@ -1093,5 +1099,19 @@ object PreferencesHelper {
      */
     fun clearCurrentStation(context: Context) {
         saveCurrentStation(context, null)
+    }
+
+    // ===== Discover (third queue layer) =====
+
+    fun setDiscoverEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_DISCOVER_ENABLED, enabled)
+            .apply()
+    }
+
+    fun isDiscoverEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_DISCOVER_ENABLED, false)
     }
 }

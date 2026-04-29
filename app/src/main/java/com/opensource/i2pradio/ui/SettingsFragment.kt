@@ -444,6 +444,27 @@ class SettingsFragment : Fragment() {
             openBuiltInEqualizer()
         }
 
+        // Discover (third queue layer)
+        val discoverSwitch = view.findViewById<MaterialSwitch>(R.id.discoverSwitch)
+        discoverSwitch?.isChecked = PreferencesHelper.isDiscoverEnabled(requireContext())
+        discoverSwitch?.setOnCheckedChangeListener { switch, isChecked ->
+            switch.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(100)
+                .setInterpolator(OvershootInterpolator(2f))
+                .withEndAction {
+                    switch.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(OvershootInterpolator(1.5f))
+                        .start()
+                }
+                .start()
+            PreferencesHelper.setDiscoverEnabled(requireContext(), isChecked)
+        }
+
         // Recording directory
         recordingDirectoryPath = view.findViewById(R.id.recordingDirectoryPath)
         recordingDirectoryButton = view.findViewById(R.id.recordingDirectoryButton)

@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="start"
+            android:gravity="center_vertical"
             android:paddingHorizontal="4dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp">
@@ -83,6 +83,24 @@
                 android:textSize="12sp"
                 app:icon="@drawable/ic_sort"
                 app:iconSize="24dp" />
+
+            <!-- Spacer pushes the queue hamburger to the far right -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Queue button (hamburger) - opens the playback queue sheet -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/queueButton"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@string/cd_open_queue"
+                app:icon="@drawable/ic_menu"
+                app:iconSize="32dp"
+                app:iconTint="?attr/colorOnSurface" />
 
         </LinearLayout>
 
