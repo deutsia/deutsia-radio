@@ -635,22 +635,29 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             val dao = com.opensource.i2pradio.data.RadioDatabase
                 .getDatabase(this@RadioService)
                 .radioDao()
-            val current = if (currentStationId > 0L) dao.getStationById(currentStationId) else null
-            val newContext = if (replaceContext) {
+            val current: com.opensource.i2pradio.data.RadioStation? =
+                if (currentStationId > 0L) dao.getStationById(currentStationId) else null
+            // Resolve the new context list (or null when caller didn't supply
+            // one). Explicit type so smart-cast survives use across the
+            // when-block below.
+            val newContext: List<com.opensource.i2pradio.data.RadioStation>? = if (replaceContext) {
                 // Preserve the order the caller supplied — SQLite's IN clause
                 // doesn't guarantee row order, so re-index by id after load.
-                val rows = dao.getStationsByIds(contextStationIds!!.toList())
+                val ids = contextStationIds!!
+                val rows = dao.getStationsByIds(ids.toList())
                 val byId = rows.associateBy { it.id }
-                contextStationIds.mapNotNull { byId[it] }
+                ids.mapNotNull { id -> byId[id] }
             } else null
-            val resolvedIndex = if (newContext != null) {
-                when {
-                    newContext.isEmpty() -> -1
-                    contextIndex in newContext.indices -> contextIndex
-                    current != null -> newContext.indexOfFirst { it.id == current.id }.coerceAtLeast(0)
-                    else -> 0
-                }
-            } else -1
+            val resolvedIndex: Int = if (newContext == null || newContext.isEmpty()) {
+                -1
+            } else if (contextIndex in newContext.indices) {
+                contextIndex
+            } else if (current != null) {
+                val currentId = current.id
+                newContext.indexOfFirst { s -> s.id == currentId }.coerceAtLeast(0)
+            } else {
+                0
+            }
             handler.post {
                 if (newContext != null) {
                     playbackQueue.setContext(newContext, resolvedIndex)
