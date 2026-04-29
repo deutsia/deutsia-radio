@@ -643,10 +643,12 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             val newContext: List<com.opensource.i2pradio.data.RadioStation>? = if (replaceContext) {
                 // Preserve the order the caller supplied — SQLite's IN clause
                 // doesn't guarantee row order, so re-index by id after load.
-                val ids = contextStationIds!!
-                val rows = dao.getStationsByIds(ids.toList())
+                // LongArray has no mapNotNull, so work in List<Long> from the
+                // start (the DAO call wants a List<Long> anyway).
+                val idList: List<Long> = contextStationIds!!.toList()
+                val rows = dao.getStationsByIds(idList)
                 val byId = rows.associateBy { it.id }
-                ids.mapNotNull { id -> byId[id] }
+                idList.mapNotNull { id -> byId[id] }
             } else null
             val resolvedIndex: Int = if (newContext == null || newContext.isEmpty()) {
                 -1
