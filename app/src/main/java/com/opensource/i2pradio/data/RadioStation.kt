@@ -139,6 +139,12 @@ data class RadioStation(
     val cachedAt: Long = 0L, // When fetched from RadioBrowser
     val bitrate: Int = 0, // Bitrate in kbps (from RadioBrowser)
     val codec: String = "", // Audio codec (from RadioBrowser)
+    // Full comma-separated tag list captured from the source catalog. The
+    // single `genre` column above is the displayed primary tag; `tags` keeps
+    // every tag the catalog reports so features like Discover can match on
+    // multiple axes without re-querying. Defaults to empty for stations that
+    // predate this column; the v9->v10 migration backfills `tags = genre`.
+    val tags: String = "",
     // Hints from the source catalog used to pick the right ExoPlayer source
     // and recording extension without relying on URL extensions alone.
     // Default values make manually-added stations behave as before.

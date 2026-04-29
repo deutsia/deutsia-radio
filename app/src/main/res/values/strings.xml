@@ -111,6 +111,10 @@
     <string name="station_removed">%s removed from library</string>
     <string name="station_already_in_library">Station is already in your library</string>
     <string name="station_added_to_favorites">%s added to favorites</string>
+    <string name="menu_play_next">Play next</string>
+    <string name="menu_add_to_queue">Add to queue</string>
+    <string name="queue_play_next_toast">%s will play next</string>
+    <string name="queue_added_toast">%s added to queue</string>
     <string name="station_removed_from_favorites">%s removed from favorites</string>
     <string name="tor_required_warning">Force Tor is enabled but Tor is not connected. Connect to Tor to browse stations.</string>
     <string name="browse_by_genre">Browse by Genre</string>
@@ -269,6 +273,8 @@
     <string name="settings_sleep_timer_presets">Quick presets</string>
     <string name="settings_sleep_timer_precision_hint">Hold slider to zoom</string>
     <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
+    <string name="settings_discover_title">Discover similar stations</string>
+    <string name="settings_discover_description">When the queue ends, plays a similar station from your library. Stays offline.</string>
     <string name="settings_recording_directory">Recording Directory</string>
     <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>
     <string name="settings_recording_directory_choose">Choose custom folder...</string>

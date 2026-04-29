@@ -56,6 +56,12 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations WHERE id = :id")
     suspend fun getStationById(id: Long): RadioStation?
 
+    // Batch lookup by id list. Used to rehydrate the playback queue's context
+    // list from a saved id sequence; the caller re-orders the rows since
+    // SQLite's IN-clause doesn't preserve input order.
+    @Query("SELECT * FROM radio_stations WHERE id IN (:ids)")
+    suspend fun getStationsByIds(ids: List<Long>): List<RadioStation>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStation(station: RadioStation): Long
 

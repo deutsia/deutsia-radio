@@ -185,6 +185,17 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
 
     private var equalizerManager: EqualizerManager? = null
 
+    // Playback queue. Populated from EXTRA_CONTEXT_STATION_IDS / _INDEX when
+    // the user starts playback from a list (Library, Favorites, etc.) and
+    // walked by skip-next / skip-previous from the notification, lock
+    // screen, Bluetooth / AVRCP, and the in-app Now Playing UI.
+    private val playbackQueue = com.opensource.i2pradio.playback.Queue()
+    // The station currently playing, kept in sync with the queue so skip
+    // actions can compare candidates against it for the "same station"
+    // dedupe in DiscoverEngine.
+    @Volatile
+    private var currentQueueStation: com.opensource.i2pradio.data.RadioStation? = null
+
     companion object {
         const val ACTION_PLAY = "com.opensource.i2pradio.PLAY"
         const val ACTION_PAUSE = "com.opensource.i2pradio.PAUSE"
@@ -194,6 +205,20 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         const val ACTION_SWITCH_RECORDING_STREAM = "com.opensource.i2pradio.SWITCH_RECORDING_STREAM"
         const val ACTION_SET_SLEEP_TIMER = "com.opensource.i2pradio.SET_SLEEP_TIMER"
         const val ACTION_CANCEL_SLEEP_TIMER = "com.opensource.i2pradio.CANCEL_SLEEP_TIMER"
+        // Queue actions. ACTION_PLAY accepts optional extras
+        // EXTRA_CONTEXT_STATION_IDS (LongArray) and EXTRA_CONTEXT_INDEX (Int)
+        // to seed the playback context the user was browsing. Skip-next /
+        // skip-previous walk that context; "play next" and "add to queue"
+        // insert into the manual queue ahead of the context.
+        const val ACTION_SKIP_NEXT = "com.opensource.i2pradio.SKIP_NEXT"
+        const val ACTION_SKIP_PREVIOUS = "com.opensource.i2pradio.SKIP_PREVIOUS"
+        const val ACTION_PLAY_NEXT = "com.opensource.i2pradio.PLAY_NEXT"
+        const val ACTION_ADD_TO_QUEUE = "com.opensource.i2pradio.ADD_TO_QUEUE"
+        const val ACTION_CLEAR_QUEUE = "com.opensource.i2pradio.CLEAR_QUEUE"
+        const val EXTRA_CONTEXT_STATION_IDS = "context_station_ids"
+        const val EXTRA_CONTEXT_INDEX = "context_index"
+        const val EXTRA_QUEUE_STATION_ID = "queue_station_id"
+        const val BROADCAST_QUEUE_CHANGED = "com.opensource.i2pradio.QUEUE_CHANGED"
         const val CHANNEL_ID = "DeutsiaRadioChannel"
         const val NOTIFICATION_ID = 1
 
@@ -275,6 +300,11 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         val becomingNoisyFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
         registerReceiver(becomingNoisyReceiver, becomingNoisyFilter)
         becomingNoisyReceiverRegistered = true
+
+        // Pull the saved queue back into memory so skip-next/prev work
+        // immediately if AVRCP fires before any new ACTION_PLAY does. A
+        // fresh ACTION_PLAY with explicit context still overwrites this.
+        restoreQueueFromPrefs()
     }
 
     private fun initializeMediaSession() {
@@ -307,21 +337,50 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                 }
                 startService(stopIntent)
             }
+
+            override fun onSkipToNext() {
+                val skipIntent = Intent(this@RadioService, RadioService::class.java).apply {
+                    action = ACTION_SKIP_NEXT
+                }
+                startService(skipIntent)
+            }
+
+            override fun onSkipToPrevious() {
+                val skipIntent = Intent(this@RadioService, RadioService::class.java).apply {
+                    action = ACTION_SKIP_PREVIOUS
+                }
+                startService(skipIntent)
+            }
         })
     }
 }
     private fun updatePlaybackState(state: Int) {
+        // Skip actions are only advertised when the queue can actually move
+        // in that direction. AVRCP / lock-screen UIs use the action mask to
+        // enable or grey out their next/previous buttons; advertising skip
+        // when the queue is at the end would give the user a button that
+        // does nothing.
+        var actions = PlaybackStateCompat.ACTION_PLAY or
+            PlaybackStateCompat.ACTION_PAUSE or
+            PlaybackStateCompat.ACTION_STOP or
+            PlaybackStateCompat.ACTION_PLAY_PAUSE
+        if (playbackQueue.hasNext() || isDiscoverEnabled()) {
+            actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+        }
+        if (playbackQueue.hasPrevious()) {
+            actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+        }
+
         val playbackStateBuilder = PlaybackStateCompat.Builder()
-            .setActions(
-                PlaybackStateCompat.ACTION_PLAY or
-                PlaybackStateCompat.ACTION_PAUSE or
-                PlaybackStateCompat.ACTION_STOP or
-                PlaybackStateCompat.ACTION_PLAY_PAUSE
-            )
+            .setActions(actions)
             .setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f)
 
         mediaSession?.setPlaybackState(playbackStateBuilder.build())
+        lastPlaybackStateForActionRefresh = state
     }
+
+    private fun isDiscoverEnabled(): Boolean =
+        com.opensource.i2pradio.ui.PreferencesHelper.isDiscoverEnabled(this)
 
     private fun updateMediaMetadata(stationName: String, coverArtUri: String?, isPrivacyStation: Boolean = false) {
         val metadataBuilder = MediaMetadataCompat.Builder()
@@ -457,6 +516,15 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                 proxyAuthType, proxyConnectionTimeout,
                 hlsHint, codecHint
             )
+
+            // Seed the playback queue with the context list (if any) and
+            // record the current station so skip-next/prev and Discover have
+            // something to work with. Done async because RadioStation lookups
+            // hit the DB and we don't want to block startup of the player.
+            val playStationId = intent.getLongExtra("station_id", 0L)
+            val contextIds = intent.getLongArrayExtra(EXTRA_CONTEXT_STATION_IDS)
+            val contextIndex = intent.getIntExtra(EXTRA_CONTEXT_INDEX, -1)
+            seedQueueAsync(playStationId, contextIds, contextIndex)
         }
         ACTION_PAUSE -> {
             pauseOrStopForLive()
@@ -510,9 +578,272 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         ACTION_CANCEL_SLEEP_TIMER -> {
             cancelSleepTimer()
         }
+        ACTION_SKIP_NEXT -> {
+            handleSkipNext()
+        }
+        ACTION_SKIP_PREVIOUS -> {
+            handleSkipPrevious()
+        }
+        ACTION_PLAY_NEXT -> {
+            val stationId = intent.getLongExtra(EXTRA_QUEUE_STATION_ID, 0L)
+            if (stationId > 0L) enqueueStationAsync(stationId, asNext = true)
+        }
+        ACTION_ADD_TO_QUEUE -> {
+            val stationId = intent.getLongExtra(EXTRA_QUEUE_STATION_ID, 0L)
+            if (stationId > 0L) enqueueStationAsync(stationId, asNext = false)
+        }
+        ACTION_CLEAR_QUEUE -> {
+            playbackQueue.clearManual()
+            broadcastQueueChanged()
+            // Refresh playback state action mask in case the previously
+            // advertised SKIP_TO_NEXT no longer applies.
+            updatePlaybackState(currentMediaSessionState())
+        }
     }
     return START_STICKY
 }
+
+    /**
+     * Update the playback queue when ACTION_PLAY arrives. Two distinct
+     * cases:
+     *
+     *  - **Caller supplied a context list** (`contextStationIds` non-null
+     *    and non-empty): replace the existing context with the new list and
+     *    point the cursor at the user's tap. This is the common case when
+     *    the user clicks a station in Library / Favorites / Genre view.
+     *  - **Caller did not supply a context** (`contextStationIds` is null
+     *    or empty): preserve the existing context and only refresh the
+     *    "currently playing" pointer. This is what happens when skip-next
+     *    re-fires ACTION_PLAY internally — the queue stays intact and the
+     *    cursor advance has already happened on the in-memory queue.
+     *
+     * Runs on IO because Room lookups would otherwise block the play path.
+     */
+    private fun seedQueueAsync(
+        currentStationId: Long,
+        contextStationIds: LongArray?,
+        contextIndex: Int
+    ) {
+        val replaceContext = contextStationIds != null && contextStationIds.isNotEmpty()
+        if (currentStationId <= 0L && !replaceContext) {
+            // Nothing to do — the play came from a path that doesn't know
+            // about the queue (legacy retry, ad-hoc Browse). Leave the queue
+            // alone and let the next ACTION_PLAY with context populate it.
+            return
+        }
+        serviceScope.launch(Dispatchers.IO) {
+            val dao = com.opensource.i2pradio.data.RadioDatabase
+                .getDatabase(this@RadioService)
+                .radioDao()
+            val current = if (currentStationId > 0L) dao.getStationById(currentStationId) else null
+            val newContext = if (replaceContext) {
+                // Preserve the order the caller supplied — SQLite's IN clause
+                // doesn't guarantee row order, so re-index by id after load.
+                val rows = dao.getStationsByIds(contextStationIds!!.toList())
+                val byId = rows.associateBy { it.id }
+                contextStationIds.mapNotNull { byId[it] }
+            } else null
+            val resolvedIndex = if (newContext != null) {
+                when {
+                    newContext.isEmpty() -> -1
+                    contextIndex in newContext.indices -> contextIndex
+                    current != null -> newContext.indexOfFirst { it.id == current.id }.coerceAtLeast(0)
+                    else -> 0
+                }
+            } else -1
+            handler.post {
+                if (newContext != null) {
+                    playbackQueue.setContext(newContext, resolvedIndex)
+                }
+                if (current != null) currentQueueStation = current
+                broadcastQueueChanged()
+                updatePlaybackState(currentMediaSessionState())
+            }
+        }
+    }
+
+    /**
+     * Remember the most recently set MediaSession state so we can re-emit it
+     * after the action mask changes (e.g. after the queue gains or loses a
+     * "next" entry). Falls back to BUFFERING which is safe at startup.
+     */
+    @Volatile
+    private var lastPlaybackStateForActionRefresh: Int = PlaybackStateCompat.STATE_BUFFERING
+
+    private fun currentMediaSessionState(): Int = lastPlaybackStateForActionRefresh
+
+    /**
+     * Resolve the next station the user wants to hear: pop from manual
+     * queue, walk the context cursor, or — if Discover is enabled and the
+     * queue is exhausted — pick a similar station from the user's library.
+     * Then dispatch a fresh ACTION_PLAY for it.
+     */
+    private fun handleSkipNext() {
+        val direct = playbackQueue.next()
+        if (direct != null) {
+            playStationFromQueue(direct)
+            return
+        }
+        if (!isDiscoverEnabled()) {
+            android.util.Log.d("RadioService", "Skip-next: queue exhausted, Discover off — no-op")
+            return
+        }
+        val current = currentQueueStation
+        if (current == null) {
+            android.util.Log.d("RadioService", "Skip-next: no current station, can't run Discover")
+            return
+        }
+        serviceScope.launch(Dispatchers.IO) {
+            val dao = com.opensource.i2pradio.data.RadioDatabase
+                .getDatabase(this@RadioService)
+                .radioDao()
+            val library = dao.getAllStationsSync()
+            val pick = com.opensource.i2pradio.playback.DiscoverEngine
+                .suggestNext(current, library)
+            handler.post {
+                if (pick != null) {
+                    playbackQueue.appendToContext(pick)
+                    val next = playbackQueue.next()
+                    if (next != null) {
+                        android.util.Log.d("RadioService", "Discover picked '${next.name}'")
+                        playStationFromQueue(next)
+                    }
+                } else {
+                    android.util.Log.d("RadioService", "Discover found no suitable candidate")
+                }
+            }
+        }
+    }
+
+    private fun handleSkipPrevious() {
+        val prev = playbackQueue.previous()
+        if (prev != null) {
+            playStationFromQueue(prev)
+        } else {
+            android.util.Log.d("RadioService", "Skip-previous: at start of context, no-op")
+        }
+    }
+
+    /**
+     * Build an ACTION_PLAY intent for [station] and dispatch it to ourselves.
+     * Goes through the same pipeline as a user-initiated play so proxy,
+     * resolution, recording, and metadata all behave identically. Decrypts
+     * the proxy password on the way through; the existing play handler
+     * expects plaintext just like LibraryFragment.playStation does.
+     */
+    private fun playStationFromQueue(station: com.opensource.i2pradio.data.RadioStation) {
+        currentQueueStation = station
+        val password = com.opensource.i2pradio.data.RadioStationPasswordHelper
+            .getDecryptedPassword(this, station)
+        val intent = Intent(this, RadioService::class.java).apply {
+            action = ACTION_PLAY
+            putExtra("stream_url", station.streamUrl)
+            putExtra("station_name", station.name)
+            putExtra("station_id", station.id)
+            putExtra("proxy_host", if (station.useProxy) station.proxyHost else "")
+            putExtra("proxy_port", station.proxyPort)
+            putExtra("proxy_type", station.getProxyTypeEnum().name)
+            putExtra("cover_art_uri", station.coverArtUri)
+            putExtra("custom_proxy_protocol", station.customProxyProtocol)
+            putExtra("proxy_username", station.proxyUsername)
+            putExtra("proxy_password", password)
+            putExtra("proxy_auth_type", station.proxyAuthType)
+            putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
+            putExtra("hls_hint", station.hlsHint)
+            putExtra("codec_hint", station.codecHint)
+            // Skip seeding the queue again — onStartCommand will skip the
+            // seed when EXTRA_CONTEXT_STATION_IDS is absent, so the existing
+            // queue state is preserved.
+        }
+        androidx.core.content.ContextCompat.startForegroundService(this, intent)
+        broadcastQueueChanged()
+    }
+
+    private fun enqueueStationAsync(stationId: Long, asNext: Boolean) {
+        serviceScope.launch(Dispatchers.IO) {
+            val dao = com.opensource.i2pradio.data.RadioDatabase
+                .getDatabase(this@RadioService)
+                .radioDao()
+            val station = dao.getStationById(stationId) ?: return@launch
+            handler.post {
+                if (asNext) playbackQueue.playNext(station)
+                else playbackQueue.addToQueue(station)
+                broadcastQueueChanged()
+                updatePlaybackState(currentMediaSessionState())
+            }
+        }
+    }
+
+    private fun broadcastQueueChanged() {
+        // Persist the queue so that if Android kills us between the user's
+        // action and the next play attempt, we can rehydrate. Only stations
+        // with non-zero ids survive — ad-hoc Browse rows don't exist in the
+        // DB, so the queue UI loses them on restart, which is acceptable.
+        val contextIds = playbackQueue.context.map { it.id }
+        val manualIds = playbackQueue.manualSnapshot().map { it.id }
+        com.opensource.i2pradio.ui.PreferencesHelper.saveQueueState(
+            this, contextIds, playbackQueue.contextIndex, manualIds
+        )
+        val intent = Intent(BROADCAST_QUEUE_CHANGED)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    /**
+     * Pull the persisted queue out of prefs and seed [playbackQueue] from it.
+     * Called once at service create — if a subsequent ACTION_PLAY arrives
+     * with an explicit context, it overwrites this restored state, which is
+     * what we want (a fresh user click should win over the previous
+     * session's queue).
+     */
+    private fun restoreQueueFromPrefs() {
+        val contextIds = com.opensource.i2pradio.ui.PreferencesHelper
+            .getQueueContextIds(this)
+        val manualIds = com.opensource.i2pradio.ui.PreferencesHelper
+            .getQueueManualIds(this)
+        val savedIndex = com.opensource.i2pradio.ui.PreferencesHelper
+            .getQueueContextIndex(this)
+        if (contextIds.isEmpty() && manualIds.isEmpty()) return
+        serviceScope.launch(Dispatchers.IO) {
+            val dao = com.opensource.i2pradio.data.RadioDatabase
+                .getDatabase(this@RadioService)
+                .radioDao()
+            val allIds = (contextIds + manualIds).distinct()
+            val rows = if (allIds.isNotEmpty()) dao.getStationsByIds(allIds) else emptyList()
+            val byId = rows.associateBy { it.id }
+            val contextRows = contextIds.mapNotNull { byId[it] }
+            val manualRows = manualIds.mapNotNull { byId[it] }
+            handler.post {
+                if (contextRows.isNotEmpty()) {
+                    val resolvedIndex = if (savedIndex in contextRows.indices) savedIndex else 0
+                    playbackQueue.setContext(contextRows, resolvedIndex)
+                    currentQueueStation = contextRows.getOrNull(resolvedIndex)
+                }
+                manualRows.forEach { playbackQueue.addToQueue(it) }
+                if (contextRows.isNotEmpty() || manualRows.isNotEmpty()) {
+                    android.util.Log.d(
+                        "RadioService",
+                        "Restored queue: context=${contextRows.size} manual=${manualRows.size}"
+                    )
+                    // Don't broadcast yet — UI isn't bound at onCreate time.
+                    updatePlaybackState(currentMediaSessionState())
+                }
+            }
+        }
+    }
+
+    /**
+     * Snapshot of the manual queue for UI rendering. Returned as a list copy
+     * so callers can render without worrying about concurrent mutation.
+     */
+    fun getManualQueue(): List<com.opensource.i2pradio.data.RadioStation> =
+        playbackQueue.manualSnapshot()
+
+    /** True if skip-next would do something. Cheap; safe to call from UI. */
+    fun queueHasNext(): Boolean =
+        playbackQueue.hasNext() || (isDiscoverEnabled() && currentQueueStation != null)
+
+    /** True if skip-previous would do something. */
+    fun queueHasPrevious(): Boolean = playbackQueue.hasPrevious()
 
     private fun setSleepTimer(minutes: Int) {
         cancelSleepTimer()

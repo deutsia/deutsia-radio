@@ -15,6 +15,66 @@
         android:paddingTop="4dp"
         android:paddingBottom="4dp">
 
+        <!-- Play next option -->
+        <LinearLayout
+            android:id="@+id/menuItemPlayNext"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_radio"
+                app:tint="?attr/colorOnSurfaceVariant"
+                android:contentDescription="@string/menu_play_next" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/menu_play_next"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- Add to queue option -->
+        <LinearLayout
+            android:id="@+id/menuItemAddToQueue"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_radio"
+                app:tint="?attr/colorOnSurfaceVariant"
+                android:contentDescription="@string/menu_add_to_queue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/menu_add_to_queue"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
         <!-- Edit option -->
         <LinearLayout
             android:id="@+id/menuItemEdit"

@@ -444,6 +444,15 @@ class SettingsFragment : Fragment() {
             openBuiltInEqualizer()
         }
 
+        // Discover similar stations toggle. Local-only ranking against the
+        // user's own library, off by default. No network access, no API
+        // call — safe in any Force-proxy mode.
+        val discoverSwitch = view.findViewById<com.google.android.material.materialswitch.MaterialSwitch>(R.id.discoverSwitch)
+        discoverSwitch?.isChecked = PreferencesHelper.isDiscoverEnabled(requireContext())
+        discoverSwitch?.setOnCheckedChangeListener { _, isChecked ->
+            PreferencesHelper.setDiscoverEnabled(requireContext(), isChecked)
+        }
+
         // Recording directory
         recordingDirectoryPath = view.findViewById(R.id.recordingDirectoryPath)
         recordingDirectoryButton = view.findViewById(R.id.recordingDirectoryButton)

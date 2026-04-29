@@ -72,6 +72,12 @@ object PreferencesHelper {
     // Currently playing station persistence
     private const val KEY_CURRENT_STATION_JSON = "current_station_json"
 
+    // Playback queue
+    private const val KEY_DISCOVER_ENABLED = "discover_enabled"
+    private const val KEY_QUEUE_CONTEXT_IDS = "queue_context_station_ids"
+    private const val KEY_QUEUE_CONTEXT_INDEX = "queue_context_index"
+    private const val KEY_QUEUE_MANUAL_IDS = "queue_manual_station_ids"
+
     fun saveThemeMode(context: Context, mode: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
@@ -1093,5 +1099,80 @@ object PreferencesHelper {
      */
     fun clearCurrentStation(context: Context) {
         saveCurrentStation(context, null)
+    }
+
+    // ===== Discover (local "play similar" suggestions) =====
+
+    /**
+     * Whether the local Discover feature is enabled. When on, the service
+     * picks a similar station from the user's library after the queue
+     * exhausts. Off by default — Discover has no privacy cost (it's
+     * local-only), but the behavior change of "playback continues past the
+     * end of my list" should be opt-in so it doesn't surprise existing
+     * users on upgrade.
+     */
+    fun isDiscoverEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_DISCOVER_ENABLED, false)
+    }
+
+    fun setDiscoverEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_DISCOVER_ENABLED, enabled)
+            .apply()
+    }
+
+    // ===== Playback queue persistence =====
+
+    /**
+     * Save the playback queue state so it survives a service rebirth.
+     * Stored as comma-separated id strings; ad-hoc Browse stations (id=0)
+     * are skipped because they can't be rehydrated from the local DB.
+     */
+    fun saveQueueState(
+        context: Context,
+        contextStationIds: List<Long>,
+        contextIndex: Int,
+        manualStationIds: List<Long>
+    ) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(KEY_QUEUE_CONTEXT_IDS, contextStationIds.filter { it > 0L }.joinToString(","))
+            .putInt(KEY_QUEUE_CONTEXT_INDEX, contextIndex)
+            .putString(KEY_QUEUE_MANUAL_IDS, manualStationIds.filter { it > 0L }.joinToString(","))
+            .apply()
+    }
+
+    /** Restore the persisted queue context-id list, in order. */
+    fun getQueueContextIds(context: Context): List<Long> {
+        val raw = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_QUEUE_CONTEXT_IDS, null) ?: return emptyList()
+        if (raw.isBlank()) return emptyList()
+        return raw.split(',').mapNotNull { it.trim().toLongOrNull() }
+    }
+
+    /** Restore the persisted queue context cursor, or -1 if none. */
+    fun getQueueContextIndex(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_QUEUE_CONTEXT_INDEX, -1)
+    }
+
+    /** Restore the persisted manual-queue id list. */
+    fun getQueueManualIds(context: Context): List<Long> {
+        val raw = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_QUEUE_MANUAL_IDS, null) ?: return emptyList()
+        if (raw.isBlank()) return emptyList()
+        return raw.split(',').mapNotNull { it.trim().toLongOrNull() }
+    }
+
+    /** Wipe the persisted queue (e.g. after the user explicitly clears it). */
+    fun clearQueueState(context: Context) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_QUEUE_CONTEXT_IDS)
+            .remove(KEY_QUEUE_CONTEXT_INDEX)
+            .remove(KEY_QUEUE_MANUAL_IDS)
+            .apply()
     }
 }

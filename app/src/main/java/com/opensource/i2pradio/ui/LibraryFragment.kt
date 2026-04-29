@@ -605,11 +605,21 @@ class LibraryFragment : Fragment() {
             repository.updateLastPlayedAt(station.id)
         }
 
+        // Seed the playback queue with the visible filtered list so
+        // skip-next/prev (from Bluetooth, lock screen, or in-app) walks
+        // exactly what the user is looking at. Stations with id=0
+        // (shouldn't happen for the library tab but defensively filtered)
+        // are skipped so the service can rehydrate from Room.
+        val displayedList = adapter.currentList()
+        val contextIds = displayedList.map { it.id }.filter { it > 0L }.toLongArray()
+        val contextIndex = displayedList.indexOfFirst { it.id == station.id }
+
         val proxyType = station.getProxyTypeEnum()
         val intent = Intent(requireContext(), RadioService::class.java).apply {
             action = RadioService.ACTION_PLAY
             putExtra("stream_url", station.streamUrl)
             putExtra("station_name", station.name)
+            putExtra("station_id", station.id)
             putExtra("proxy_host", if (station.useProxy) station.proxyHost else "")
             putExtra("proxy_port", station.proxyPort)
             putExtra("proxy_type", proxyType.name)
@@ -622,6 +632,10 @@ class LibraryFragment : Fragment() {
             putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
             putExtra("hls_hint", station.hlsHint)
             putExtra("codec_hint", station.codecHint)
+            if (contextIds.isNotEmpty() && contextIndex >= 0) {
+                putExtra(RadioService.EXTRA_CONTEXT_STATION_IDS, contextIds)
+                putExtra(RadioService.EXTRA_CONTEXT_INDEX, contextIndex)
+            }
         }
         // Use startForegroundService for Android 8+ compatibility
         ContextCompat.startForegroundService(requireContext(), intent)
@@ -694,6 +708,30 @@ class LibraryFragment : Fragment() {
         popupWindow.elevation = 8f
         popupWindow.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
 
+        popupView.findViewById<View>(R.id.menuItemPlayNext).setOnClickListener {
+            popupWindow.dismiss()
+            sendQueueIntent(RadioService.ACTION_PLAY_NEXT, station)
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.queue_play_next_toast, station.name),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        popupView.findViewById<View>(R.id.menuItemAddToQueue).setOnClickListener {
+            popupWindow.dismiss()
+            sendQueueIntent(RadioService.ACTION_ADD_TO_QUEUE, station)
+            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.queue_added_toast, station.name),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
         popupView.findViewById<View>(R.id.menuItemEdit).setOnClickListener {
             popupWindow.dismiss()
             val dialog = AddEditRadioDialog.newInstance(station)
@@ -708,6 +746,22 @@ class LibraryFragment : Fragment() {
         }
 
         popupWindow.showAsDropDown(anchor, 0, -anchor.height)
+    }
+
+    /**
+     * Send a queue manipulation action to [RadioService]. Stations with
+     * id=0 (ad-hoc Browse rows that haven't been saved) can't be enqueued
+     * because the service rehydrates entries from Room by id; the popup
+     * for those stations should hide the queue items, but defensive
+     * filtering here keeps us safe.
+     */
+    private fun sendQueueIntent(action: String, station: RadioStation) {
+        if (station.id <= 0L) return
+        val intent = Intent(requireContext(), RadioService::class.java).apply {
+            this.action = action
+            putExtra(RadioService.EXTRA_QUEUE_STATION_ID, station.id)
+        }
+        ContextCompat.startForegroundService(requireContext(), intent)
     }
 
     /**
@@ -865,6 +919,14 @@ class RadioStationAdapter(
         stations = newStations
         diffResult.dispatchUpdatesTo(this)
     }
+
+    /**
+     * The currently displayed list. Used by the fragment to seed the
+     * playback queue's context when a user taps a station — skip-next
+     * walks this list in display order, so the station the user just
+     * heard is followed by the one shown directly below it.
+     */
+    fun currentList(): List<RadioStation> = stations
 
     override fun getItemId(position: Int): Long = stations[position].id
 
