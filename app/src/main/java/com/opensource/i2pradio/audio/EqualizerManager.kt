@@ -52,6 +52,11 @@ class EqualizerManager(private val context: Context) {
     // Stored levels for the 5 fixed bands (for UI consistency)
     private var fixedBandLevels: ShortArray = ShortArray(FIXED_BAND_COUNT) { 0 }
 
+    // Listener invoked with a 0..1 multiplier whenever the recommended pre-amp
+    // changes. RadioService wires this to the ExoPlayer volume so that boosted
+    // bands / bass / surround don't push the signal past 0 dBFS into clipping.
+    private var preampListener: ((Float) -> Unit)? = null
+
     /**
      * Initialize the equalizer for the given audio session.
      * Must be called after ExoPlayer is prepared and playing.
@@ -167,6 +172,66 @@ class EqualizerManager(private val context: Context) {
      */
     fun isInitialized(): Boolean = equalizer != null || isPreviewMode
 
+    /**
+     * Register a listener for pre-amp / make-up gain changes. The listener
+     * receives a 0..1 multiplier that callers should apply as a player volume
+     * to leave headroom for the currently-active boost (EQ bands + bass +
+     * surround). Invoked immediately with the current value on registration.
+     */
+    fun setPreampListener(listener: ((Float) -> Unit)?) {
+        preampListener = listener
+        applyPreamp()
+    }
+
+    /**
+     * Compute the maximum positive boost (in dB) currently being applied
+     * across all EQ bands and effects. Returns 0 if nothing is boosting.
+     */
+    private fun computeMaxBoostDb(): Float {
+        var maxBoostDb = 0f
+
+        // Only consider band levels when the EQ itself is enabled
+        if (PreferencesHelper.isEqualizerEnabled(context)) {
+            for (level in fixedBandLevels) {
+                val db = level / 100f
+                if (db > maxBoostDb) maxBoostDb = db
+            }
+        }
+
+        // Bass boost and virtualizer add perceived loudness independently.
+        // Approximate worst-case contribution at full strength.
+        val bassStrength = PreferencesHelper.getBassBoostStrength(context).toInt()
+        if (bassStrength > 0) {
+            maxBoostDb += (bassStrength / 1000f) * 6f
+        }
+        val virtStrength = PreferencesHelper.getVirtualizerStrength(context).toInt()
+        if (virtStrength > 0) {
+            maxBoostDb += (virtStrength / 1000f) * 3f
+        }
+
+        return maxBoostDb
+    }
+
+    /**
+     * Convert the current max boost into a player-volume multiplier that
+     * leaves enough headroom to avoid clipping. 0 dB boost -> 1.0 (no
+     * attenuation). The result is clamped to a sensible minimum so that
+     * extreme presets don't make the stream effectively inaudible.
+     */
+    fun getRecommendedVolumeMultiplier(): Float {
+        val boostDb = computeMaxBoostDb()
+        if (boostDb <= 0f) return 1f
+        val multiplier = Math.pow(10.0, (-boostDb / 20.0).toDouble()).toFloat()
+        return multiplier.coerceIn(0.25f, 1f)
+    }
+
+    /**
+     * Notify the registered preamp listener of the current recommended value.
+     */
+    private fun applyPreamp() {
+        preampListener?.invoke(getRecommendedVolumeMultiplier())
+    }
+
     // Preview mode flag - allows UI to show without active audio session
     private var isPreviewMode: Boolean = false
 
@@ -236,6 +301,8 @@ class EqualizerManager(private val context: Context) {
         }
         // Bass boost and virtualizer work independently - they're controlled by their own strength values
         // So we don't disable them when equalizer is disabled
+
+        applyPreamp()
     }
 
     /**
@@ -266,6 +333,8 @@ class EqualizerManager(private val context: Context) {
                 Log.e(TAG, "Failed to set band level", e)
             }
         }
+
+        applyPreamp()
     }
 
     /**
@@ -311,6 +380,8 @@ class EqualizerManager(private val context: Context) {
                 Log.e(TAG, "Failed to apply preset", e)
             }
         }
+
+        applyPreamp()
     }
 
     /**
@@ -371,6 +442,8 @@ class EqualizerManager(private val context: Context) {
         } catch (e: Exception) {
             Log.w(TAG, "Error resetting effects: ${e.message}")
         }
+
+        applyPreamp()
 
         Log.d(TAG, "Reset to flat")
     }
@@ -470,6 +543,8 @@ class EqualizerManager(private val context: Context) {
                 Log.e(TAG, "Failed to set bass boost strength", e)
             }
         }
+
+        applyPreamp()
     }
 
     // ========== Virtualizer (Surround Sound) Methods ==========
@@ -506,6 +581,8 @@ class EqualizerManager(private val context: Context) {
                 Log.e(TAG, "Failed to set virtualizer strength", e)
             }
         }
+
+        applyPreamp()
     }
 
     /**

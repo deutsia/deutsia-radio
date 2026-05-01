@@ -269,7 +269,15 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         super.onCreate()
         createNotificationChannel()
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        equalizerManager = EqualizerManager(this)
+        equalizerManager = EqualizerManager(this).apply {
+            // Track the EQ pre-amp on the player volume so boosted bands
+            // (especially heavy presets) don't push the signal into clipping.
+            setPreampListener { multiplier ->
+                handler.post {
+                    player?.volume = multiplier.coerceIn(0f, 1f)
+                }
+            }
+        }
         initializeMediaSession()
 
         // Initialize I2P proxy availability monitoring (background health checks)
@@ -328,11 +336,23 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
     }
 
     private fun updateMediaMetadata(stationName: String, coverArtUri: String?, isPrivacyStation: Boolean = false) {
+        // Prefer the live ICY title/artist when we have one so the system
+        // media controls match what the Now Playing view shows. Fall back to
+        // the station name otherwise.
+        val icyTitle = currentTitle?.takeIf { it.isNotBlank() }
+        val icyArtist = currentArtist?.takeIf { it.isNotBlank() }
+        val displayTitle = icyTitle ?: stationName
+        val displayArtist = icyArtist ?: stationName
+        // Always keep the station name visible as the subtitle/album so the
+        // user still knows which station is playing on the lockscreen.
+        val displaySubtitle = stationName
+
         val metadataBuilder = MediaMetadataCompat.Builder()
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
-            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, stationName)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "deutsia radio")
-            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, "deutsia radio")
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, displayTitle)
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, displayTitle)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, displayArtist)
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, displaySubtitle)
+            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, stationName)
 
         if (!coverArtUri.isNullOrEmpty()) {
             mediaSession?.setMetadata(metadataBuilder.build())
@@ -2468,6 +2488,11 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                                     if (sessionId != 0) {
                                         broadcastAudioSessionOpen(sessionId)
                                         equalizerManager?.initialize(sessionId)
+                                        // Re-apply the preamp now that the player exists,
+                                        // so the saved EQ state takes effect immediately.
+                                        equalizerManager?.let { eq ->
+                                            player?.volume = eq.getRecommendedVolumeMultiplier()
+                                        }
                                     }
                                 }
                                 extractStreamInfo()
@@ -2538,6 +2563,15 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                                         currentTitle = title
 
                                         broadcastMetadataChanged(trimmedTitle, artist, title)
+                                        // Push the ICY info into the MediaSession so the
+                                        // system media panel / lockscreen / Bluetooth
+                                        // controls show the current track, not just the
+                                        // station name.
+                                        updateMediaMetadata(
+                                            currentStationName,
+                                            currentCoverArtUri,
+                                            currentProxyType == ProxyType.TOR || currentProxyType == ProxyType.I2P
+                                        )
                                         android.util.Log.d("RadioService", "ICY metadata: $trimmedTitle (Artist: $artist, Title: $title)")
                                     }
                                 }
