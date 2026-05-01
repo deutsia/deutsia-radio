@@ -2596,13 +2596,16 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         handler.postDelayed(reconnectRunnable!!, delay)
     }
     
-    private fun pauseOrStopForLive() {
+   private fun pauseOrStopForLive() {
     if (isLiveStream) {
         val stopIntent = Intent(this, RadioService::class.java).apply {
             action = ACTION_STOP
         }
         startService(stopIntent)
     } else {
+        if (!PreferencesHelper.isRecordAcrossStationsEnabled(this)) {
+            stopRecording()
+        }
         player?.pause()
         updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
         broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
