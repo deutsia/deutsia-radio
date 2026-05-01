@@ -150,6 +150,7 @@ class NowPlayingFragment : Fragment() {
                 if (isBuffering != viewModel.isBuffering.value) {
                     viewModel.setBuffering(isBuffering)
                 }
+
             }
         }
 

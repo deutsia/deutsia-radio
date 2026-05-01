@@ -56,4 +56,26 @@ object SleepTimerUtils {
     fun coerceDuration(minutes: Int): Int {
         return minutes.coerceIn(MIN_DURATION_MINUTES, MAX_DURATION_MINUTES)
     }
+
+    /**
+     * Formats remaining millis as a countdown clock. Rounds up so a timer
+     * with 30s left still reads 00:01 rather than 00:00.
+     *
+     * Examples:
+     * - 0 -> "00:00"
+     * - 1500 -> "00:02"
+     * - 65000 -> "01:05"
+     * - 3_700_000 -> "1:01:40"
+     */
+    fun formatCountdown(remainingMs: Long): String {
+        val totalSeconds = (remainingMs.coerceAtLeast(0L) + 999L) / 1000L
+        val hours = totalSeconds / 3600L
+        val minutes = (totalSeconds % 3600L) / 60L
+        val seconds = totalSeconds % 60L
+        return if (hours > 0) {
+            String.format("%d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            String.format("%02d:%02d", minutes, seconds)
+        }
+    }
 }
