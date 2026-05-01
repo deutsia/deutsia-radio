@@ -200,6 +200,7 @@ class MiniPlayerView @JvmOverloads constructor(
         }
 
         stationName.text = station.name
+        stationName.isSelected = true
         val proxyIndicator = if (station.useProxy) {
             when (station.getProxyTypeEnum()) {
                 ProxyType.I2P -> " • I2P"
