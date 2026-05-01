@@ -144,4 +144,42 @@ class SleepTimerUtilsTest {
     fun `MAX_DURATION_MINUTES is 720 (12 hours)`() {
         assertEquals(720, SleepTimerUtils.MAX_DURATION_MINUTES)
     }
+
+    // ========================================================================
+    // formatCountdown Tests
+    // ========================================================================
+
+    @Test
+    fun `formatCountdown returns 0000 for zero millis`() {
+        assertEquals("00:00", SleepTimerUtils.formatCountdown(0L))
+    }
+
+    @Test
+    fun `formatCountdown clamps negative millis to zero`() {
+        assertEquals("00:00", SleepTimerUtils.formatCountdown(-1L))
+        assertEquals("00:00", SleepTimerUtils.formatCountdown(-10_000L))
+    }
+
+    @Test
+    fun `formatCountdown rounds up sub-second remainders`() {
+        // 1ms remaining still reads 00:01 (so users don't see a stuck 00:00)
+        assertEquals("00:01", SleepTimerUtils.formatCountdown(1L))
+        assertEquals("00:01", SleepTimerUtils.formatCountdown(999L))
+        assertEquals("00:01", SleepTimerUtils.formatCountdown(1_000L))
+    }
+
+    @Test
+    fun `formatCountdown formats minutes and seconds for under one hour`() {
+        assertEquals("00:30", SleepTimerUtils.formatCountdown(29_500L))
+        assertEquals("01:05", SleepTimerUtils.formatCountdown(65_000L))
+        assertEquals("29:45", SleepTimerUtils.formatCountdown(29 * 60_000L + 45_000L))
+        assertEquals("59:59", SleepTimerUtils.formatCountdown(59 * 60_000L + 59_000L))
+    }
+
+    @Test
+    fun `formatCountdown formats hours minutes and seconds for one hour or more`() {
+        assertEquals("1:00:00", SleepTimerUtils.formatCountdown(3_600_000L))
+        assertEquals("1:01:40", SleepTimerUtils.formatCountdown(3_700_000L))
+        assertEquals("12:00:00", SleepTimerUtils.formatCountdown(12 * 3_600_000L))
+    }
 }

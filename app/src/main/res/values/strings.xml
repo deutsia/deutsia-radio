@@ -268,6 +268,11 @@
     <string name="settings_sleep_timer_max">12 hours</string>
     <string name="settings_sleep_timer_presets">Quick presets</string>
     <string name="settings_sleep_timer_precision_hint">Hold slider to zoom</string>
+    <string name="settings_sleep_timer_hours_label">Hours</string>
+    <string name="settings_sleep_timer_minutes_label">Minutes</string>
+    <string name="settings_sleep_timer_remaining">%1$s left</string>
+    <string name="cd_sleep_timer_countdown">Sleep timer running. Tap to cancel.</string>
+    <string name="sleep_timer_cancelled">Sleep timer cancelled</string>
     <string name="settings_equalizer_description">Adjust audio frequency bands and effects</string>
     <string name="settings_recording_directory">Recording Directory</string>
     <string name="settings_recording_directory_default">Default (Music/deutsia_radio)</string>

@@ -225,6 +225,10 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         const val EXTRA_BUFFERED_POSITION_MS = "buffered_position_ms"
         const val EXTRA_CURRENT_POSITION_MS = "current_position_ms"
 
+        const val BROADCAST_SLEEP_TIMER_STATE_CHANGED = "com.opensource.i2pradio.SLEEP_TIMER_STATE_CHANGED"
+        const val EXTRA_SLEEP_TIMER_REMAINING_MS = "sleep_timer_remaining_ms"
+        const val EXTRA_SLEEP_TIMER_MINUTES = "sleep_timer_minutes"
+
         const val BROADCAST_STREAM_ERROR = "com.opensource.i2pradio.STREAM_ERROR"
         const val EXTRA_STREAM_ERROR_TYPE = "stream_error_type"
         const val ERROR_TYPE_TOR_NOT_CONNECTED = "tor_not_connected"
@@ -504,7 +508,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             }
         }
         ACTION_SET_SLEEP_TIMER -> {
-            val minutes = intent.getIntExtra("minutes", 0)
+            val minutes = intent.getIntExtra(EXTRA_SLEEP_TIMER_MINUTES, 0)
             setSleepTimer(minutes)
         }
         ACTION_CANCEL_SLEEP_TIMER -> {
@@ -515,12 +519,21 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
 }
 
     private fun setSleepTimer(minutes: Int) {
-        cancelSleepTimer()
-        if (minutes <= 0) return
+        cancelSleepTimer(broadcastChange = false)
+        if (minutes <= 0) {
+            broadcastSleepTimerState()
+            return
+        }
 
         sleepTimerEndTime = System.currentTimeMillis() + (minutes * 60 * 1000L)
         sleepTimerRunnable = Runnable {
             android.util.Log.d("RadioService", "Sleep timer triggered, stopping playback")
+            sleepTimerRunnable = null
+            sleepTimerEndTime = 0L
+            // Clear the persisted "last selected duration" so the toggle no longer
+            // appears active after the timer has fired (fixes stale-state bug).
+            PreferencesHelper.setSleepTimerMinutes(this, 0)
+            broadcastSleepTimerState()
             val stopIntent = Intent(this, RadioService::class.java).apply {
                 action = ACTION_STOP
             }
@@ -528,20 +541,31 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         }
         handler.postDelayed(sleepTimerRunnable!!, minutes * 60 * 1000L)
         android.util.Log.d("RadioService", "Sleep timer set for $minutes minutes")
+        broadcastSleepTimerState()
     }
 
-    private fun cancelSleepTimer() {
+    private fun cancelSleepTimer(broadcastChange: Boolean = true) {
         sleepTimerRunnable?.let {
             handler.removeCallbacks(it)
             sleepTimerRunnable = null
         }
         sleepTimerEndTime = 0L
+        if (broadcastChange) {
+            broadcastSleepTimerState()
+        }
     }
 
     fun getSleepTimerRemainingMillis(): Long {
         return if (sleepTimerEndTime > 0) {
             maxOf(0L, sleepTimerEndTime - System.currentTimeMillis())
         } else 0L
+    }
+
+    private fun broadcastSleepTimerState() {
+        val intent = Intent(BROADCAST_SLEEP_TIMER_STATE_CHANGED).apply {
+            putExtra(EXTRA_SLEEP_TIMER_REMAINING_MS, getSleepTimerRemainingMillis())
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private fun startRecording(stationName: String) {
