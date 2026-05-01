@@ -377,12 +377,12 @@ object PreferencesHelper {
 
     /**
      * Get the selected color scheme.
-     * Returns: "default", "peach", "green", "purple", or "orange"
-     * Default: "default"
+     * Returns: "purple", "classic" (greyscale), "blue", "peach", "green", or "orange"
+     * Default: "purple"
      */
     fun getColorScheme(context: Context): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_COLOR_SCHEME, "default") ?: "default"
+            .getString(KEY_COLOR_SCHEME, "purple") ?: "purple"
     }
 
     // Language preferences

@@ -351,6 +351,9 @@ class SettingsFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             materialYouContainer?.visibility = View.VISIBLE
             materialYouSwitch?.isChecked = PreferencesHelper.isMaterialYouEnabled(requireContext())
+            // Material You overrides the custom color scheme, so the scheme
+            // picker is dimmed and unclickable while it's on.
+            updateColorSchemeButtonEnabled(colorSchemeButton, materialYouSwitch?.isChecked == true)
             materialYouSwitch?.setOnCheckedChangeListener { switch, isChecked ->
                 // Animate the switch with a smooth bounce effect
                 switch.animate()
@@ -369,6 +372,7 @@ class SettingsFragment : Fragment() {
                     .start()
 
                 PreferencesHelper.setMaterialYouEnabled(requireContext(), isChecked)
+                updateColorSchemeButtonEnabled(colorSchemeButton, isChecked)
                 // Delay recreate to allow the animation to complete
                 uiHandler.postDelayed({
                     MainActivity.prepareForUiRecreate()
@@ -1352,6 +1356,10 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
+    private fun updateColorSchemeButtonEnabled(button: MaterialButton, materialYouEnabled: Boolean) {
+        button.isEnabled = !materialYouEnabled
+    }
+
     private fun updateColorSchemeButtonText(button: MaterialButton) {
         val currentScheme = PreferencesHelper.getColorScheme(requireContext())
         button.text = when (currentScheme) {
@@ -1361,24 +1369,24 @@ class SettingsFragment : Fragment() {
             "green" -> getString(R.string.settings_color_green)
             "purple" -> getString(R.string.settings_color_purple)
             "orange" -> getString(R.string.settings_color_orange)
-            else -> getString(R.string.settings_color_classic) // default to Classic for backward compatibility
+            else -> getString(R.string.settings_color_purple) // new default
         }
     }
 
     private fun showColorSchemeDialog(colorSchemeButton: MaterialButton) {
         val schemes = arrayOf(
-            getString(R.string.settings_color_classic_default),
+            getString(R.string.settings_color_purple),
+            getString(R.string.settings_color_classic),
             getString(R.string.settings_color_blue),
             getString(R.string.settings_color_peach),
             getString(R.string.settings_color_green),
-            getString(R.string.settings_color_purple),
             getString(R.string.settings_color_orange)
         )
-        val schemeValues = arrayOf("classic", "blue", "peach", "green", "purple", "orange")
+        val schemeValues = arrayOf("purple", "classic", "blue", "peach", "green", "orange")
         var currentScheme = PreferencesHelper.getColorScheme(requireContext())
-        // Migrate "default" to "classic" for backward compatibility
+        // Migrate the legacy "default" pref value to the new default scheme.
         if (currentScheme == "default") {
-            currentScheme = "classic"
+            currentScheme = "purple"
         }
         val selectedIndex = schemeValues.indexOf(currentScheme).coerceAtLeast(0)
 

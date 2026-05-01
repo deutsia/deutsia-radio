@@ -5,9 +5,9 @@
     android:id="@+id/sleepTimerStatusContainer"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackgroundBorderless"
+    android:background="@drawable/bg_sleep_timer_chip"
     android:contentDescription="@string/cd_sleep_timer_countdown"
-    android:padding="8dp"
+    android:foreground="?attr/selectableItemBackground"
     android:focusable="true"
     android:clickable="true">
 
@@ -15,14 +15,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="6dp">
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:src="@drawable/ic_timer"
             android:contentDescription="@null"
-            app:tint="?attr/colorPrimary" />
+            app:tint="?attr/colorOnPrimaryContainer" />
 
         <TextView
             android:id="@+id/sleepTimerStatusText"
@@ -32,7 +34,7 @@
             android:fontFamily="monospace"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="?attr/colorOnPrimaryContainer"
             android:maxLines="1"
             android:ellipsize="end"
             tools:text="29:45" />
