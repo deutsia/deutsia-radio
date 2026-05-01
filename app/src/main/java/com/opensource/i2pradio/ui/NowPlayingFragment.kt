@@ -36,7 +36,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import coil.load
 import coil.request.CachePolicy
-import com.opensource.i2pradio.util.SleepTimerUtils
 import com.opensource.i2pradio.util.loadSecure
 import com.opensource.i2pradio.util.loadSecurePrivacy
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -86,17 +85,6 @@ class NowPlayingFragment : Fragment() {
     private var playbackElapsedTime: TextView? = null
     private var bufferProgressBar: com.google.android.material.progressindicator.LinearProgressIndicator? = null
     private var liveIndicator: TextView? = null
-
-    // Sleep timer countdown UI
-    private var sleepTimerChip: MaterialCardView? = null
-    private var sleepTimerCountdown: TextView? = null
-    private val sleepTimerHandler = Handler(Looper.getMainLooper())
-    private val sleepTimerTickRunnable = object : Runnable {
-        override fun run() {
-            updateSleepTimerCountdown()
-            sleepTimerHandler.postDelayed(this, 1000L)
-        }
-    }
 
     // Loading spinner for play/pause button
     private var playPauseSpinner: CircularProgressIndicator? = null
@@ -163,9 +151,6 @@ class NowPlayingFragment : Fragment() {
                     viewModel.setBuffering(isBuffering)
                 }
 
-                // Sync sleep timer chip with the live service state in case
-                // the timer was set/cancelled while the fragment was paused.
-                onSleepTimerStateChanged(svc.getSleepTimerRemainingMillis())
             }
         }
 
@@ -293,10 +278,6 @@ class NowPlayingFragment : Fragment() {
                         }
                     }
                 }
-                RadioService.BROADCAST_SLEEP_TIMER_STATE_CHANGED -> {
-                    val remainingMs = intent.getLongExtra(RadioService.EXTRA_SLEEP_TIMER_REMAINING_MS, 0L)
-                    onSleepTimerStateChanged(remainingMs)
-                }
                 MainActivity.BROADCAST_LIKE_STATE_CHANGED -> {
                     // Handle like state changes from station list or mini player
                     val isLiked = intent.getBooleanExtra(MainActivity.EXTRA_IS_LIKED, false)
@@ -406,25 +387,6 @@ class NowPlayingFragment : Fragment() {
         bufferProgressBar = view.findViewById(R.id.bufferProgressBar)
         liveIndicator = view.findViewById(R.id.liveIndicator)
 
-        // Sleep timer countdown chip
-        sleepTimerChip = view.findViewById(R.id.sleepTimerChip)
-        sleepTimerCountdown = view.findViewById(R.id.sleepTimerCountdown)
-        sleepTimerChip?.setOnClickListener {
-            // Tapping the chip cancels the timer for quick access
-            val intent = Intent(requireContext(), RadioService::class.java).apply {
-                action = RadioService.ACTION_CANCEL_SLEEP_TIMER
-            }
-            requireContext().startService(intent)
-            PreferencesHelper.setSleepTimerMinutes(requireContext(), 0)
-            if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.sleep_timer_cancelled),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
         // Loading spinner for play/pause button
         playPauseSpinner = view.findViewById(R.id.playPauseSpinner)
 
@@ -445,7 +407,6 @@ class NowPlayingFragment : Fragment() {
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
             addAction(RadioService.BROADCAST_PLAYBACK_TIME_UPDATE)
             addAction(RadioService.BROADCAST_STREAM_ERROR)
-            addAction(RadioService.BROADCAST_SLEEP_TIMER_STATE_CHANGED)
             addAction(MainActivity.BROADCAST_LIKE_STATE_CHANGED)
         }
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(metadataReceiver, filter)
@@ -1137,9 +1098,6 @@ class NowPlayingFragment : Fragment() {
         viewsInitialized = false
         super.onDestroyView()
         recordingHandler.removeCallbacks(recordingUpdateRunnable)
-        sleepTimerHandler.removeCallbacks(sleepTimerTickRunnable)
-        sleepTimerChip = null
-        sleepTimerCountdown = null
         recordingDot?.clearAnimation()
         previousPlayingState = null
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(metadataReceiver)
@@ -1270,37 +1228,6 @@ class NowPlayingFragment : Fragment() {
             coverArt.load(R.drawable.ic_radio) {
                 crossfade(true)
             }
-        }
-    }
-
-    /**
-     * Show or hide the sleep timer countdown chip and start/stop the 1s ticker.
-     */
-    private fun onSleepTimerStateChanged(remainingMs: Long) {
-        if (!viewsInitialized) return
-        if (remainingMs > 0L) {
-            sleepTimerChip?.visibility = View.VISIBLE
-            sleepTimerCountdown?.text = SleepTimerUtils.formatCountdown(remainingMs)
-            sleepTimerHandler.removeCallbacks(sleepTimerTickRunnable)
-            sleepTimerHandler.postDelayed(sleepTimerTickRunnable, 1000L)
-        } else {
-            sleepTimerHandler.removeCallbacks(sleepTimerTickRunnable)
-            sleepTimerChip?.visibility = View.GONE
-        }
-    }
-
-    /**
-     * Tick callback: re-read remaining time from the bound service and refresh
-     * the countdown. Drift-free because it always queries the absolute end time.
-     */
-    private fun updateSleepTimerCountdown() {
-        if (!viewsInitialized) return
-        val remainingMs = radioService?.getSleepTimerRemainingMillis() ?: 0L
-        if (remainingMs > 0L) {
-            sleepTimerCountdown?.text = SleepTimerUtils.formatCountdown(remainingMs)
-        } else {
-            sleepTimerHandler.removeCallbacks(sleepTimerTickRunnable)
-            sleepTimerChip?.visibility = View.GONE
         }
     }
 

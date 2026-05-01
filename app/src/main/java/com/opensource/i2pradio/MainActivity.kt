@@ -35,6 +35,7 @@ import com.opensource.i2pradio.ui.RadioViewModel
 import com.opensource.i2pradio.ui.StationActionHelper
 import com.opensource.i2pradio.ui.LibraryFragment
 import com.opensource.i2pradio.ui.TorQuickControlBottomSheet
+import com.opensource.i2pradio.ui.SleepTimerStatusView
 import com.opensource.i2pradio.ui.TorStatusView
 import com.opensource.i2pradio.ui.CustomProxyStatusView
 import com.opensource.i2pradio.ui.LocaleHelper
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var miniPlayerView: MiniPlayerView
     private lateinit var torStatusView: TorStatusView
     private lateinit var customProxyStatusView: CustomProxyStatusView
+    private lateinit var sleepTimerStatusView: SleepTimerStatusView
     private lateinit var repository: RadioRepository
     private lateinit var radioBrowserRepository: RadioBrowserRepository
     private val viewModel: RadioViewModel by viewModels()
@@ -120,6 +122,12 @@ class MainActivity : AppCompatActivity() {
                     // Update proxy status view visibility
                     updateProxyStatusViewVisibility()
                 }
+                RadioService.BROADCAST_SLEEP_TIMER_STATE_CHANGED -> {
+                    val remainingMs = intent.getLongExtra(RadioService.EXTRA_SLEEP_TIMER_REMAINING_MS, 0L)
+                    if (::sleepTimerStatusView.isInitialized) {
+                        sleepTimerStatusView.updateRemaining(remainingMs)
+                    }
+                }
                 RadioService.BROADCAST_STREAM_ERROR -> {
                     if (context != null) {
                         val errorType = intent.getStringExtra(RadioService.EXTRA_STREAM_ERROR_TYPE)
@@ -167,6 +175,12 @@ class MainActivity : AppCompatActivity() {
             radioService?.let { service ->
                 viewModel.setPlaying(service.isPlaying())
                 viewModel.setBuffering(service.isBuffering())
+
+                // Sync the toolbar countdown with whatever timer the service is
+                // already running (e.g., after process recreation).
+                if (::sleepTimerStatusView.isInitialized) {
+                    sleepTimerStatusView.updateRemaining(service.getSleepTimerRemainingMillis())
+                }
 
                 // Restore currently playing station from persistent storage if ViewModel has no station
                 // This handles the case where MainActivity was destroyed while audio was playing in background
@@ -319,6 +333,7 @@ class MainActivity : AppCompatActivity() {
 
         // Setup Tor status indicator in toolbar
         setupTorStatusView()
+        setupSleepTimerStatusView()
 
         setupViewPager()
         setupMiniPlayer()
@@ -341,6 +356,7 @@ class MainActivity : AppCompatActivity() {
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
             addAction(RadioService.BROADCAST_STREAM_ERROR)
+            addAction(RadioService.BROADCAST_SLEEP_TIMER_STATE_CHANGED)
             addAction(BROADCAST_LIKE_STATE_CHANGED)
             addAction(BROADCAST_PROXY_MODE_CHANGED)
         }
@@ -385,6 +401,30 @@ class MainActivity : AppCompatActivity() {
 
         // Update initial state and switch visibility based on Force Custom Proxy setting
         updateProxyStatusViewVisibility()
+    }
+
+    private fun setupSleepTimerStatusView() {
+        sleepTimerStatusView = findViewById(R.id.sleepTimerStatusView)
+        sleepTimerStatusView.setOnSleepTimerClickListener {
+            // Tap cancels the running timer.
+            val intent = Intent(this, RadioService::class.java).apply {
+                action = RadioService.ACTION_CANCEL_SLEEP_TIMER
+            }
+            startService(intent)
+            PreferencesHelper.setSleepTimerMinutes(this, 0)
+            if (!PreferencesHelper.isToastMessagesDisabled(this)) {
+                android.widget.Toast.makeText(
+                    this,
+                    getString(R.string.sleep_timer_cancelled),
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        // Initial state — covers the case where the service was already
+        // running before this Activity was created.
+        radioService?.let {
+            sleepTimerStatusView.updateRemaining(it.getSleepTimerRemainingMillis())
+        }
     }
 
     /**

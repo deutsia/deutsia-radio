@@ -63,54 +63,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Sleep Timer Countdown Chip - shown when a sleep timer is active -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/sleepTimerChip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true"
-        android:contentDescription="@string/cd_sleep_timer_countdown"
-        app:cardBackgroundColor="?attr/colorPrimaryContainer"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
-        app:strokeWidth="0dp"
-        app:layout_constraintStart_toEndOf="@id/equalizerButton"
-        app:layout_constraintTop_toTopOf="@id/equalizerButton"
-        app:layout_constraintBottom_toBottomOf="@id/equalizerButton">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_timer"
-                android:contentDescription="@null"
-                app:tint="?attr/colorOnPrimaryContainer" />
-
-            <TextView
-                android:id="@+id/sleepTimerCountdown"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:fontFamily="monospace"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnPrimaryContainer"
-                tools:text="29:45" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
     <!-- Cover Art - uses tonal surface for dark mode visibility -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/nowPlayingCoverCard"
