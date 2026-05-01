@@ -269,15 +269,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         super.onCreate()
         createNotificationChannel()
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        equalizerManager = EqualizerManager(this).apply {
-            // Track the EQ pre-amp on the player volume so boosted bands
-            // (especially heavy presets) don't push the signal into clipping.
-            setPreampListener { multiplier ->
-                handler.post {
-                    player?.volume = multiplier.coerceIn(0f, 1f)
-                }
-            }
-        }
+        equalizerManager = EqualizerManager(this)
         initializeMediaSession()
 
         // Initialize I2P proxy availability monitoring (background health checks)
@@ -2488,11 +2480,6 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                                     if (sessionId != 0) {
                                         broadcastAudioSessionOpen(sessionId)
                                         equalizerManager?.initialize(sessionId)
-                                        // Re-apply the preamp now that the player exists,
-                                        // so the saved EQ state takes effect immediately.
-                                        equalizerManager?.let { eq ->
-                                            player?.volume = eq.getRecommendedVolumeMultiplier()
-                                        }
                                     }
                                 }
                                 extractStreamInfo()
