@@ -15,6 +15,7 @@
     <string name="equalizer_init_failed">Не удалось инициализировать эквалайзер</string>
     <string name="equalizer_bass_boost">Усиление басов</string>
     <string name="equalizer_surround_sound">Объёмный звук</string>
+    <string name="equalizer_limiter">Лимитер</string>
 
     
     <string name="sort_default">По умолчанию</string>

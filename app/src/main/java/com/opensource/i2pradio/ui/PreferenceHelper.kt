@@ -24,6 +24,7 @@ object PreferencesHelper {
     private const val KEY_EQUALIZER_BANDS = "equalizer_bands"
     private const val KEY_BASS_BOOST_STRENGTH = "bass_boost_strength"
     private const val KEY_VIRTUALIZER_STRENGTH = "virtualizer_strength"
+    private const val KEY_LIMITER_ENABLED = "limiter_enabled"
     private const val KEY_RECORDING_DIRECTORY_URI = "recording_directory_uri"
     private const val KEY_GENRE_FILTER = "genre_filter"
     private const val KEY_FORCE_TOR_ALL = "force_tor_all"
@@ -221,6 +222,19 @@ object PreferencesHelper {
     fun getVirtualizerStrength(context: Context): Short {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getInt(KEY_VIRTUALIZER_STRENGTH, 0).toShort()
+    }
+
+    // Limiter preferences (DynamicsProcessing brick-wall limiter, API 28+)
+    fun setLimiterEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_LIMITER_ENABLED, enabled)
+            .apply()
+    }
+
+    fun isLimiterEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_LIMITER_ENABLED, true)
     }
 
     // Recording directory preferences

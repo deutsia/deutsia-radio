@@ -14,6 +14,7 @@
     <string name="equalizer_init_failed">Could not initialize equalizer</string>
     <string name="equalizer_bass_boost">Bass Booster</string>
     <string name="equalizer_surround_sound">Surround Sound</string>
+    <string name="equalizer_limiter">Limiter</string>
     <string name="equalizer_preset_custom">Custom</string>
     <string name="equalizer_preset_flat">Flat</string>
     <string name="equalizer_preset_bass_boost">Bass Boost</string>

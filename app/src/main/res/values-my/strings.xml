@@ -15,6 +15,7 @@
     <string name="equalizer_init_failed">အသံညှိစက်ကို စတင်၍မရပါ</string>
     <string name="equalizer_bass_boost">အသံနိမ့် မြှင့်တင်ရေး</string>
     <string name="equalizer_surround_sound">ပတ်ဝန်းကျင် အသံ</string>
+    <string name="equalizer_limiter">အသံကန့်သတ်ကိရိယာ</string>
 
     
     <string name="sort_default">မူလ</string>

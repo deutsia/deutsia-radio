@@ -15,6 +15,7 @@
     <string name="equalizer_init_failed">No se pudo inicializar el ecualizador</string>
     <string name="equalizer_bass_boost">Refuerzo de graves</string>
     <string name="equalizer_surround_sound">Sonido envolvente</string>
+    <string name="equalizer_limiter">Limitador</string>
 
     
     <string name="sort_default">Predeterminado</string>

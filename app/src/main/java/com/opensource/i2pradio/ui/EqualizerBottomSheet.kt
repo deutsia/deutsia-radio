@@ -39,6 +39,10 @@ class EqualizerBottomSheet(
     private lateinit var surroundSoundContainer: LinearLayout
     private lateinit var surroundSoundSlider: Slider
 
+    // Limiter
+    private lateinit var limiterContainer: LinearLayout
+    private lateinit var limiterSwitch: MaterialSwitch
+
     private val bandSliders = mutableListOf<SeekBar>()
 
     // Flag to prevent feedback loops when updating UI from preset
@@ -69,11 +73,16 @@ class EqualizerBottomSheet(
         surroundSoundContainer = view.findViewById(R.id.surroundSoundContainer)
         surroundSoundSlider = view.findViewById(R.id.surroundSoundSlider)
 
+        // Limiter
+        limiterContainer = view.findViewById(R.id.limiterContainer)
+        limiterSwitch = view.findViewById(R.id.limiterSwitch)
+
         setupEnableSwitch()
         setupPresetDropdown()
         setupBandSliders()
         setupBassBoostSlider()
         setupSurroundSoundSlider()
+        setupLimiterSwitch()
         setupResetButton()
         setupDbLabels()
         updateUIState()
@@ -198,6 +207,18 @@ class EqualizerBottomSheet(
             if (fromUser) {
                 equalizerManager.setVirtualizerStrength(value.toInt().toShort())
             }
+        }
+    }
+
+    private fun setupLimiterSwitch() {
+        if (!equalizerManager.isLimiterSupported) {
+            limiterContainer.visibility = View.GONE
+            return
+        }
+        limiterContainer.visibility = View.VISIBLE
+        limiterSwitch.isChecked = equalizerManager.isLimiterEnabled()
+        limiterSwitch.setOnCheckedChangeListener { _, isChecked ->
+            equalizerManager.setLimiterEnabled(isChecked)
         }
     }
 

@@ -2,8 +2,10 @@ package com.opensource.i2pradio.audio
 
 import android.content.Context
 import android.media.audiofx.BassBoost
+import android.media.audiofx.DynamicsProcessing
 import android.media.audiofx.Equalizer
 import android.media.audiofx.Virtualizer
+import android.os.Build
 import android.util.Log
 import com.opensource.i2pradio.R
 import com.opensource.i2pradio.ui.PreferencesHelper
@@ -23,11 +25,19 @@ class EqualizerManager(private val context: Context) {
         // Fixed 5-band EQ frequencies (in Hz) for consistent UI
         val FIXED_BAND_FREQUENCIES = listOf(60, 230, 910, 3600, 14000)
         const val FIXED_BAND_COUNT = 5
+
+        // Limiter parameters. -1 dBFS leaves headroom for intersample peaks.
+        private const val LIMITER_CHANNEL_COUNT = 2
+        private const val LIMITER_ATTACK_MS = 1.0f
+        private const val LIMITER_RELEASE_MS = 60.0f
+        private const val LIMITER_RATIO = 10.0f
+        private const val LIMITER_THRESHOLD_DB = -1.0f
     }
 
     private var equalizer: Equalizer? = null
     private var bassBoost: BassBoost? = null
     private var virtualizer: Virtualizer? = null
+    private var limiter: DynamicsProcessing? = null
     private var currentAudioSessionId: Int = 0
 
     // Equalizer properties (populated after initialization)
@@ -44,6 +54,8 @@ class EqualizerManager(private val context: Context) {
     var isBassBoostSupported: Boolean = false
         private set
     var isVirtualizerSupported: Boolean = false
+        private set
+    var isLimiterSupported: Boolean = false
         private set
 
     // Mapping from fixed band indices to native band indices
@@ -152,6 +164,11 @@ class EqualizerManager(private val context: Context) {
                 isVirtualizerSupported = false
             }
 
+            // Initialize Limiter (DynamicsProcessing). Created last so it sits at the
+            // end of the effect chain and clamps the post-EQ/post-BassBoost signal.
+            // Requires API 28+; on older devices the UI hides itself.
+            initializeLimiter(audioSessionId)
+
             currentAudioSessionId = audioSessionId
             Log.d(TAG, "Equalizer initialized: $numberOfBands bands, session $audioSessionId")
             true
@@ -213,6 +230,8 @@ class EqualizerManager(private val context: Context) {
         // Mark bass boost and virtualizer as available for preview
         isBassBoostSupported = true
         isVirtualizerSupported = true
+        // Limiter requires DynamicsProcessing (API 28+); only show UI on capable devices
+        isLimiterSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
 
         Log.d(TAG, "Initialized in preview mode - settings will be applied when playback starts")
     }
@@ -485,6 +504,72 @@ class EqualizerManager(private val context: Context) {
         }
     }
 
+    // ========== Limiter Methods ==========
+
+    /**
+     * Brick-wall limiter via DynamicsProcessing (API 28+). Threshold sits a hair
+     * below 0 dBFS so EQ/BassBoost peaks (and intersample overshoot from lossy
+     * codecs) get clamped instead of clipping.
+     */
+    private fun initializeLimiter(audioSessionId: Int) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            isLimiterSupported = false
+            return
+        }
+        try {
+            val cfg = DynamicsProcessing.Config.Builder(
+                DynamicsProcessing.VARIANT_FAVOR_FREQUENCY_RESOLUTION,
+                LIMITER_CHANNEL_COUNT,
+                /* preEqInUse */ false, /* preEqBandCount */ 0,
+                /* mbcInUse */ false, /* mbcBandCount */ 0,
+                /* postEqInUse */ false, /* postEqBandCount */ 0,
+                /* limiterInUse */ true
+            ).build()
+
+            val enabledPref = PreferencesHelper.isLimiterEnabled(context)
+            limiter = DynamicsProcessing(0, audioSessionId, cfg).apply {
+                for (ch in 0 until LIMITER_CHANNEL_COUNT) {
+                    val lim = DynamicsProcessing.Limiter(
+                        /* inUse */ true,
+                        /* enabled */ enabledPref,
+                        /* linkGroup */ 0,
+                        /* attackTime */ LIMITER_ATTACK_MS,
+                        /* releaseTime */ LIMITER_RELEASE_MS,
+                        /* ratio */ LIMITER_RATIO,
+                        /* threshold */ LIMITER_THRESHOLD_DB,
+                        /* postGain */ 0.0f
+                    )
+                    setLimiterByChannelIndex(ch, lim)
+                }
+                enabled = enabledPref
+            }
+            isLimiterSupported = true
+            Log.d(TAG, "Limiter initialized: enabled=$enabledPref")
+        } catch (e: Exception) {
+            Log.w(TAG, "DynamicsProcessing limiter not available", e)
+            limiter?.release()
+            limiter = null
+            isLimiterSupported = false
+        }
+    }
+
+    fun isLimiterEnabled(): Boolean =
+        limiter?.enabled ?: PreferencesHelper.isLimiterEnabled(context)
+
+    fun setLimiterEnabled(enabled: Boolean) {
+        PreferencesHelper.setLimiterEnabled(context, enabled)
+        Log.d(TAG, "Limiter enabled: $enabled (preview: $isPreviewMode)")
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return
+        limiter?.let { lim ->
+            try {
+                lim.enabled = enabled
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to toggle limiter", e)
+            }
+        }
+    }
+
     /**
      * Set virtualizer strength (0-1000)
      */
@@ -527,9 +612,15 @@ class EqualizerManager(private val context: Context) {
         } catch (e: Exception) {
             Log.e(TAG, "Error releasing virtualizer", e)
         }
+        try {
+            limiter?.release()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing limiter", e)
+        }
         equalizer = null
         bassBoost = null
         virtualizer = null
+        limiter = null
         currentAudioSessionId = 0
         Log.d(TAG, "Equalizer and effects released")
     }

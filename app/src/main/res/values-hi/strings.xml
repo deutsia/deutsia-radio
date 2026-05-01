@@ -15,6 +15,7 @@
     <string name="equalizer_init_failed">इक्वलाइज़र को इनिशियलाइज़ नहीं किया जा सका</string>
     <string name="equalizer_bass_boost">बास बूस्टर</string>
     <string name="equalizer_surround_sound">सराउंड साउंड</string>
+    <string name="equalizer_limiter">लिमिटर</string>
 
     
     <string name="sort_default">डिफ़ॉल्ट</string>

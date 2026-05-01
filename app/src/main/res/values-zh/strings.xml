@@ -15,6 +15,7 @@
     <string name="equalizer_init_failed">无法初始化均衡器</string>
     <string name="equalizer_bass_boost">低音增强</string>
     <string name="equalizer_surround_sound">环绕声</string>
+    <string name="equalizer_limiter">限幅器</string>
 
     
     <string name="sort_default">默认</string>

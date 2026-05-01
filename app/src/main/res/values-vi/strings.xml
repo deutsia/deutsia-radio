@@ -15,6 +15,7 @@
     <string name="equalizer_init_failed">Không thể khởi tạo bộ cân bằng</string>
     <string name="equalizer_bass_boost">Tăng bass</string>
     <string name="equalizer_surround_sound">Âm thanh vòm</string>
+    <string name="equalizer_limiter">Bộ giới hạn</string>
 
     
     <string name="sort_default">Mặc định</string>
