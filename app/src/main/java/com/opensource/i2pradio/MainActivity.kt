@@ -12,6 +12,8 @@ import android.os.IBinder
 import android.view.View
 import android.widget.Toast
 import android.widget.FrameLayout
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.WindowCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -182,16 +184,14 @@ class MainActivity : AppCompatActivity() {
                     sleepTimerStatusView.updateRemaining(service.getSleepTimerRemainingMillis())
                 }
 
-                // Restore currently playing station from persistent storage if ViewModel has no station
-                // This handles the case where MainActivity was destroyed while audio was playing in background
+                // Restore the last-played station so the Now Playing view
+                // shows it again after a fresh launch, even if the service
+                // isn't currently playing. The mini player surfaces a play
+                // button in that state so the user can resume.
                 if (viewModel.getCurrentStation() == null) {
                     val savedStation = PreferencesHelper.getCurrentStation(this@MainActivity)
                     if (savedStation != null) {
-                        // Only restore if service is actually playing or buffering
-                        // This prevents showing stale station info when nothing is playing
-                        if (service.isPlaying() || service.isBuffering()) {
-                            viewModel.setCurrentStation(savedStation)
-                        }
+                        viewModel.setCurrentStation(savedStation)
                     }
                 }
             }
@@ -307,6 +307,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Make status bar icon brightness follow the actual app surface
+        // colour, not just the system night-mode flag. Some color schemes
+        // produce a light-tinted surface even in dark mode (and vice-versa
+        // for Material You), and the system default would otherwise leave
+        // status-bar icons invisible against it.
+        applyStatusBarAppearance()
+
         // Preserve authentication state if we're recreating for UI changes (theme/color/language)
         // This prevents requiring re-authentication when the user changes visual settings
         if (savedInstanceState != null && preserveAuthOnRecreate) {
@@ -361,6 +368,26 @@ class MainActivity : AppCompatActivity() {
             addAction(BROADCAST_PROXY_MODE_CHANGED)
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(playbackStateReceiver, filter)
+    }
+
+    /**
+     * Resolve the toolbar/surface colour we draw behind the status bar and
+     * flip the status bar icon brightness so the icons stay legible. Without
+     * this, light-tinted themes in dark mode (or dark Material You schemes
+     * over a forced-light app) leave the status bar icons washed out.
+     */
+    private fun applyStatusBarAppearance() {
+        val surfaceColor = com.google.android.material.color.MaterialColors.getColor(
+            this,
+            com.google.android.material.R.attr.colorSurface,
+            android.graphics.Color.BLACK
+        )
+
+        val isLightSurface = ColorUtils.calculateLuminance(surfaceColor) > 0.5
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        // isAppearanceLightStatusBars=true draws DARK icons (for use over a
+        // light background); false draws light icons.
+        controller.isAppearanceLightStatusBars = isLightSurface
     }
 
     private fun setupTorStatusView() {
