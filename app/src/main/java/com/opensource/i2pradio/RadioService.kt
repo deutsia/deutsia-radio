@@ -117,26 +117,51 @@ class RadioService : Service() {
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: android.media.AudioFocusRequest? = null
     @Volatile private var hasAudioFocus = false
+    // Set when we pause for a transient interruption (e.g. a phone call) so we know
+    // to resume once focus returns. wasDuckedByFocusLoss tracks a temporary volume duck.
+    @Volatile private var resumeOnFocusGain = false
+    @Volatile private var wasDuckedByFocusLoss = false
 
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
         when (focusChange) {
             AudioManager.AUDIOFOCUS_GAIN -> {
                 hasAudioFocus = true
                 android.util.Log.d("RadioService", "Audio focus gained")
+                if (wasDuckedByFocusLoss) {
+                    player?.volume = 1.0f
+                    wasDuckedByFocusLoss = false
+                }
+                if (resumeOnFocusGain) {
+                    resumeOnFocusGain = false
+                    handler.post { resumeFromInterruption() }
+                }
             }
             AudioManager.AUDIOFOCUS_LOSS -> {
+                // Permanent loss (another media app took over). Stop for good.
                 hasAudioFocus = false
+                resumeOnFocusGain = false
+                wasDuckedByFocusLoss = false
                 android.util.Log.d("RadioService", "Audio focus lost permanently")
                 handler.post {
                     stopStream()
                 }
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                // e.g. an incoming phone call. Pause now; resume when focus returns.
                 hasAudioFocus = false
                 android.util.Log.d("RadioService", "Audio focus lost transiently")
+                handler.post { pauseForInterruption() }
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                // Brief interruption (e.g. a notification). Duck the volume instead
+                // of stopping, then restore it on AUDIOFOCUS_GAIN.
                 android.util.Log.d("RadioService", "Audio focus ducking")
+                player?.let {
+                    if (it.isPlaying) {
+                        it.volume = 0.2f
+                        wasDuckedByFocusLoss = true
+                    }
+                }
             }
         }
     }
@@ -465,6 +490,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             currentCoverArtUri = coverArtUri
             reconnectAttempts = 0
             reconnectCycleStartMs = 0L
+            resumeOnFocusGain = false
 
             startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connecting)))
             broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
@@ -2435,7 +2461,11 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
 
             player = ExoPlayer.Builder(this)
                 .setLoadControl(loadControl)
-                .setAudioAttributes(audioAttributes, true)
+                // We manage audio focus ourselves (see audioFocusChangeListener) so we
+                // can fully release the network on a phone call and reconnect after,
+                // instead of letting ExoPlayer pause-and-buffer. Passing true here would
+                // create a second, conflicting focus owner.
+                .setAudioAttributes(audioAttributes, false)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
                 // Combine URL extension signals with the hlsHint from Radio
@@ -2716,6 +2746,48 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
     }
 }
+    // Pause for a transient interruption (phone call, navigation prompt, etc.).
+    // For a live (Icecast/Shoutcast) stream we fully release the network connection
+    // so we don't keep pulling audio nobody can hear; for on-demand/HLS content a
+    // normal pause preserves position. We deliberately keep our audio-focus request
+    // (do NOT abandon it) so the system still delivers AUDIOFOCUS_GAIN to resume.
+    private fun pauseForInterruption() {
+        val p = player ?: return
+        if (!p.isPlaying &&
+            p.playbackState != Player.STATE_BUFFERING &&
+            p.playbackState != Player.STATE_READY
+        ) {
+            return
+        }
+        resumeOnFocusGain = true
+        if (isLiveStream) {
+            p.stop()
+        } else {
+            p.pause()
+        }
+        updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+        broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+        startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
+    }
+
+    // Resume after a transient interruption ends. Live streams reconnect fresh to the
+    // live edge (avoiding the stale-buffer-then-stall problem); other content just plays.
+    private fun resumeFromInterruption() {
+        if (isLiveStream) {
+            val url = currentStreamUrl ?: return
+            playStream(
+                url, currentProxyHost ?: "", currentProxyPort, currentProxyType,
+                currentCustomProxyProtocol, currentProxyUsername, currentProxyPassword,
+                currentProxyAuthType, currentProxyConnectionTimeout,
+                currentHlsHint, currentCodecHint
+            )
+        } else {
+            player?.play()
+            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = true)
+        }
+    }
+
     private fun stopStream() {
         // Stop playback time updates first
         stopPlaybackTimeUpdates()

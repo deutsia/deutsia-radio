@@ -45,6 +45,68 @@
 
         </LinearLayout>
 
+        <!-- Move up (Custom order only) -->
+        <LinearLayout
+            android:id="@+id/menuItemMoveUp"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_keyboard_arrow_up"
+                app:tint="?attr/colorOnSurfaceVariant"
+                android:contentDescription="@string/menu_move_up" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/menu_move_up"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- Move down (Custom order only) -->
+        <LinearLayout
+            android:id="@+id/menuItemMoveDown"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_keyboard_arrow_down"
+                app:tint="?attr/colorOnSurfaceVariant"
+                android:contentDescription="@string/menu_move_down" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/menu_move_down"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
         <!-- Delete option -->
         <LinearLayout
             android:id="@+id/menuItemDelete"

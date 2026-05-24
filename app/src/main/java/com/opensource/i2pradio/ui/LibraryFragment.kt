@@ -362,7 +362,8 @@ class LibraryFragment : Fragment() {
             getString(R.string.sort_name),
             getString(R.string.sort_recent),
             getString(R.string.sort_liked),
-            getString(R.string.sort_genre)
+            getString(R.string.sort_genre),
+            getString(R.string.sort_custom)
         )
         val currentIndex = currentSortOrder.ordinal
 
@@ -705,6 +706,7 @@ class LibraryFragment : Fragment() {
             SortOrder.RECENTLY_PLAYED -> getString(R.string.sort_recent)
             SortOrder.LIKED -> getString(R.string.sort_liked)
             SortOrder.GENRE -> getString(R.string.sort_genre)
+            SortOrder.CUSTOM -> getString(R.string.sort_custom)
         }
 
         // Use hamburger icon for Default and Genre, sort icon for others
@@ -827,6 +829,24 @@ class LibraryFragment : Fragment() {
             dialog.show(parentFragmentManager, "AddEditRadioDialog")
         }
 
+        // Move up/down are only meaningful in Custom order, and only for the full,
+        // unfiltered list (manual order isn't well-defined inside a genre/search subset).
+        val canReorder = currentSortOrder == SortOrder.CUSTOM &&
+            currentGenreFilter == null &&
+            currentSearchQuery.isEmpty()
+        val moveUpItem = popupView.findViewById<View>(R.id.menuItemMoveUp)
+        val moveDownItem = popupView.findViewById<View>(R.id.menuItemMoveDown)
+        moveUpItem.visibility = if (canReorder) View.VISIBLE else View.GONE
+        moveDownItem.visibility = if (canReorder) View.VISIBLE else View.GONE
+        moveUpItem.setOnClickListener {
+            popupWindow.dismiss()
+            moveStation(station, -1)
+        }
+        moveDownItem.setOnClickListener {
+            popupWindow.dismiss()
+            moveStation(station, 1)
+        }
+
         popupView.findViewById<View>(R.id.menuItemDelete).setOnClickListener {
             popupWindow.dismiss()
             lifecycleScope.launch(Dispatchers.IO) {
@@ -835,6 +855,24 @@ class LibraryFragment : Fragment() {
         }
 
         popupWindow.showAsDropDown(anchor, 0, -anchor.height)
+    }
+
+    // Swap a station with its neighbour in the custom order and persist the result.
+    // Operates on the full, unfiltered library (guaranteed by the canReorder gate).
+    private fun moveStation(station: RadioStation, direction: Int) {
+        val list = allStationsCache.toMutableList()
+        val i = list.indexOfFirst { it.id == station.id }
+        if (i < 0) return
+        val j = i + direction
+        if (j < 0 || j >= list.size) return
+        val tmp = list[i]
+        list[i] = list[j]
+        list[j] = tmp
+        val orderedIds = list.map { it.id }
+        lifecycleScope.launch {
+            repository.setStationOrder(orderedIds)
+            // The CUSTOM LiveData re-emits in the new order and the list animates.
+        }
     }
 
     /**

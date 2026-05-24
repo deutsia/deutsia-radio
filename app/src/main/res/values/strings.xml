@@ -34,6 +34,9 @@
     <string name="sort_recent">Recent</string>
     <string name="sort_liked">Liked</string>
     <string name="sort_genre">Genre</string>
+    <string name="sort_custom">Custom order</string>
+    <string name="menu_move_up">Move up</string>
+    <string name="menu_move_down">Move down</string>
 
     <!-- Search -->
     <string name="search_stations">Search library</string>

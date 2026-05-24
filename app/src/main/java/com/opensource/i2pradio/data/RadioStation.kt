@@ -132,6 +132,8 @@ data class RadioStation(
     val addedTimestamp: Long = System.currentTimeMillis(),
     val isLiked: Boolean = false,
     val lastPlayedAt: Long = 0L,
+    // User-defined position for the "Custom order" sort. Lower sorts first.
+    val displayOrder: Int = 0,
     // New fields for RadioBrowser integration
     val source: String = StationSource.USER.name, // Source of this station
     val radioBrowserUuid: String? = null, // UUID from RadioBrowser for dedup

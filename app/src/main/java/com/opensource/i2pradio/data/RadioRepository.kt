@@ -11,7 +11,8 @@ enum class SortOrder {
     NAME,            // Alphabetical by name
     RECENTLY_PLAYED, // Most recently played first
     LIKED,           // Only liked stations
-    GENRE            // Sorted by genre alphabetically, then by name
+    GENRE,           // Sorted by genre alphabetically, then by name
+    CUSTOM           // User-defined order (move up/down)
 }
 
 class RadioRepository(context: Context) {
@@ -26,6 +27,7 @@ class RadioRepository(context: Context) {
             SortOrder.RECENTLY_PLAYED -> radioDao.getAllStationsSortedByRecentlyPlayed()
             SortOrder.LIKED -> radioDao.getLikedStations()
             SortOrder.GENRE -> radioDao.getAllStationsSortedByGenre()
+            SortOrder.CUSTOM -> radioDao.getAllStationsSortedByCustom()
         }
     }
 
@@ -36,6 +38,7 @@ class RadioRepository(context: Context) {
             SortOrder.RECENTLY_PLAYED -> radioDao.getStationsByGenreSortedByRecentlyPlayed(genre)
             SortOrder.LIKED -> radioDao.getLikedStationsByGenre(genre)
             SortOrder.GENRE -> radioDao.getStationsByGenreDefault(genre) // Same as default when filtered by genre
+            SortOrder.CUSTOM -> radioDao.getStationsByGenreDefault(genre) // Manual reorder only applies to the full, unfiltered list
         }
     }
 
@@ -56,6 +59,16 @@ class RadioRepository(context: Context) {
     suspend fun countStationsByGenre(genre: String): Int {
         return withContext(Dispatchers.IO) {
             radioDao.countStationsByGenre(genre)
+        }
+    }
+
+    // Persist a new custom order. Reassigns sequential positions to every station
+    // in the given order, so values stay distinct regardless of prior state.
+    suspend fun setStationOrder(orderedIds: List<Long>) {
+        withContext(Dispatchers.IO) {
+            orderedIds.forEachIndexed { index, id ->
+                radioDao.updateDisplayOrder(id, index)
+            }
         }
     }
 

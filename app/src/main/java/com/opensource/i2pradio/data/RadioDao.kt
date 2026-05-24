@@ -25,6 +25,14 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations ORDER BY genre ASC, name ASC")
     fun getAllStationsSortedByGenre(): LiveData<List<RadioStation>>
 
+    // User-defined custom order (drag/move up-down)
+    @Query("SELECT * FROM radio_stations ORDER BY displayOrder ASC, id ASC")
+    fun getAllStationsSortedByCustom(): LiveData<List<RadioStation>>
+
+    // Persist a station's position in the custom order
+    @Query("UPDATE radio_stations SET displayOrder = :order WHERE id = :id")
+    suspend fun updateDisplayOrder(id: Long, order: Int)
+
     @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY addedTimestamp DESC")
     fun getStationsByGenre(genre: String): LiveData<List<RadioStation>>
 
