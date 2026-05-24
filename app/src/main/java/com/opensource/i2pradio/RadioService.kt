@@ -18,6 +18,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -58,6 +59,8 @@ import okhttp3.Call
 import okhttp3.Request
 import okhttp3.Response
 import android.content.ContentValues
+import android.net.ConnectivityManager
+import android.net.Network
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -96,7 +99,13 @@ class RadioService : Service() {
     private var currentCodecHint: String = ""
     private val handler = Handler(Looper.getMainLooper())
     private var reconnectAttempts = 0
-    private val maxReconnectAttempts = 10
+    // Monotonic timestamp (elapsedRealtime) marking when the current reconnect cycle
+    // started. 0 means we're not currently recovering from an error, which also gates
+    // the network-available callback so it never resurrects a deliberately stopped stream.
+    private var reconnectCycleStartMs = 0L
+    private var connectivityManager: ConnectivityManager? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var networkCallbackRegistered = false
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -279,6 +288,8 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         val becomingNoisyFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
         registerReceiver(becomingNoisyReceiver, becomingNoisyFilter)
         becomingNoisyReceiverRegistered = true
+
+        registerNetworkCallback()
     }
 
     private fun initializeMediaSession() {
@@ -453,6 +464,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             currentStationName = stationName
             currentCoverArtUri = coverArtUri
             reconnectAttempts = 0
+            reconnectCycleStartMs = 0L
 
             startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connecting)))
             broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
@@ -2472,6 +2484,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                         when (playbackState) {
                             Player.STATE_READY -> {
                                 reconnectAttempts = 0
+                                reconnectCycleStartMs = 0L
                                 val status = if (isRecording) getString(R.string.notification_playing_recording) else getString(R.string.notification_playing)
                                 startForeground(NOTIFICATION_ID, createNotification(status))
                                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
@@ -2579,6 +2592,58 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         }
     }
 
+    // Register a callback so that when connectivity is restored after a drop
+    // (e.g. moving back into coverage, or WiFi/cellular handover) we can retry
+    // the stream immediately instead of waiting for the next scheduled attempt.
+    private fun registerNetworkCallback() {
+        if (networkCallbackRegistered) return
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return
+        connectivityManager = cm
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                handler.post { onNetworkAvailable() }
+            }
+        }
+        networkCallback = callback
+        try {
+            cm.registerDefaultNetworkCallback(callback)
+            networkCallbackRegistered = true
+        } catch (e: Exception) {
+            android.util.Log.w("RadioService", "Failed to register network callback: ${e.message}")
+        }
+    }
+
+    private fun unregisterNetworkCallback() {
+        if (!networkCallbackRegistered) return
+        try {
+            networkCallback?.let { connectivityManager?.unregisterNetworkCallback(it) }
+        } catch (e: Exception) {
+            android.util.Log.w("RadioService", "Failed to unregister network callback: ${e.message}")
+        }
+        networkCallback = null
+        networkCallbackRegistered = false
+    }
+
+    private fun onNetworkAvailable() {
+        if (!PreferencesHelper.isAutoReconnectEnabled(this)) return
+        // Only reconnect if we're mid-recovery (an error/stall set reconnectCycleStartMs)
+        // and still have a stream we were trying to play. A deliberate pause/stop nulls
+        // currentStreamUrl or never starts a cycle, so this won't resume a stopped stream.
+        if (reconnectCycleStartMs == 0L || currentStreamUrl == null) return
+        if (player?.isPlaying == true) return
+        android.util.Log.d("RadioService", "Network available - retrying stream immediately")
+        // Connectivity is back, so grant a fresh retry window from now.
+        reconnectCycleStartMs = SystemClock.elapsedRealtime()
+        reconnectAttempts = 0
+        reconnectRunnable?.let { handler.removeCallbacks(it) }
+        currentStreamUrl?.let { url ->
+            playStream(url, currentProxyHost ?: "", currentProxyPort, currentProxyType,
+                currentCustomProxyProtocol, currentProxyUsername, currentProxyPassword,
+                currentProxyAuthType, currentProxyConnectionTimeout,
+                currentHlsHint, currentCodecHint)
+        }
+    }
+
     private fun scheduleReconnect() {
         if (currentStreamUrl == null) {
             android.util.Log.d("RadioService", "No stream to reconnect to")
@@ -2586,19 +2651,36 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             return
         }
 
-        if (reconnectAttempts >= maxReconnectAttempts) {
-            android.util.Log.e("RadioService", "Max reconnection attempts reached")
-            // Broadcast final failure to UI
+        if (!PreferencesHelper.isAutoReconnectEnabled(this)) {
+            android.util.Log.d("RadioService", "Auto-reconnect disabled, giving up")
             broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
             broadcastStreamError(ERROR_TYPE_MAX_RETRIES)
             startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connection_failed)))
             return
         }
 
-        val delay = minOf(1000L * reconnectAttempts, 5000L)
+        val now = SystemClock.elapsedRealtime()
+        if (reconnectCycleStartMs == 0L) {
+            reconnectCycleStartMs = now
+        }
+
+        // Total time budget for recovery. Once it elapses we stop hammering the
+        // network and surface a failure; the network-available callback can still
+        // kick off a fresh attempt later if connectivity returns.
+        val budgetMs = PreferencesHelper.getReconnectDurationMinutes(this).coerceAtLeast(1) * 60_000L
+        if (now - reconnectCycleStartMs > budgetMs) {
+            android.util.Log.e("RadioService", "Reconnect window exhausted (${budgetMs}ms), giving up")
+            reconnectCycleStartMs = 0L
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+            broadcastStreamError(ERROR_TYPE_MAX_RETRIES)
+            startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connection_failed)))
+            return
+        }
+
+        val intervalMs = PreferencesHelper.getReconnectIntervalSeconds(this).coerceAtLeast(1) * 1000L
         reconnectAttempts++
 
-        android.util.Log.d("RadioService", "Reconnecting in ${delay}ms (attempt $reconnectAttempts)")
+        android.util.Log.d("RadioService", "Reconnecting in ${intervalMs}ms (attempt $reconnectAttempts)")
         // Keep buffering state while reconnecting
         broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
         startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_reconnecting)))
@@ -2614,7 +2696,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                     currentHlsHint, currentCodecHint)
             }
         }
-        handler.postDelayed(reconnectRunnable!!, delay)
+        handler.postDelayed(reconnectRunnable!!, intervalMs)
     }
     
    private fun pauseOrStopForLive() {
@@ -3025,6 +3107,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             unregisterReceiver(becomingNoisyReceiver)
             becomingNoisyReceiverRegistered = false
         }
+        unregisterNetworkCallback()
         stopRecording()
         cancelSleepTimer()
         equalizerManager?.release()

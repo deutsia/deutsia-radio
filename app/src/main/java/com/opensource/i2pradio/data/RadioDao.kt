@@ -49,6 +49,15 @@ interface RadioDao {
     @Query("SELECT DISTINCT genre FROM radio_stations ORDER BY genre ASC")
     suspend fun getAllGenresSync(): List<String>
 
+    // Reassign every station using oldGenre to newGenre. Used to rename a genre,
+    // or to delete one by moving its stations to "Other".
+    @Query("UPDATE radio_stations SET genre = :newGenre WHERE genre = :oldGenre")
+    suspend fun renameGenre(oldGenre: String, newGenre: String)
+
+    // Count how many stations currently use a given genre
+    @Query("SELECT COUNT(*) FROM radio_stations WHERE genre = :genre")
+    suspend fun countStationsByGenre(genre: String): Int
+
     // Get all stations synchronously for search filtering
     @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, isPreset DESC, addedTimestamp ASC")
     suspend fun getAllStationsSync(): List<RadioStation>

@@ -426,6 +426,9 @@ class LibraryFragment : Fragment() {
                     tempSelectedGenre = selectedGenre
                 })
                 .setNegativeButton(android.R.string.cancel, null)
+                .setNeutralButton(getString(R.string.manage_genres)) { _, _ ->
+                    showManageGenresDialog()
+                }
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     // Apply the selection when OK is clicked
                     // Store English genre name for language portability
@@ -445,6 +448,130 @@ class LibraryFragment : Fragment() {
 
             dialog.show()
         }
+    }
+
+    private fun showManageGenresDialog() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val dbGenres = try {
+                repository.getAllGenresSync()
+            } catch (e: Exception) {
+                emptyList()
+            }
+            // Only user-managed genres are deletable; "Other" is the fallback sink.
+            val manageable = dbGenres.filter { it.isNotBlank() && it != "Other" }.sorted()
+            if (!isAdded) return@launch
+
+            if (manageable.isEmpty()) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.manage_genres))
+                    .setMessage(getString(R.string.manage_genres_empty))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+                return@launch
+            }
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.manage_genres))
+                .setItems(manageable.toTypedArray()) { _, which ->
+                    showGenreActionDialog(manageable[which])
+                }
+                .setNegativeButton(getString(R.string.button_cancel), null)
+                .show()
+        }
+    }
+
+    private fun showGenreActionDialog(genre: String) {
+        val options = arrayOf(
+            getString(R.string.genre_action_rename),
+            getString(R.string.genre_action_delete)
+        )
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(genre)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> showRenameGenreDialog(genre)
+                    1 -> confirmDeleteGenre(genre)
+                }
+            }
+            .setNegativeButton(getString(R.string.button_cancel), null)
+            .show()
+    }
+
+    private fun confirmDeleteGenre(genre: String) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val count = try {
+                repository.countStationsByGenre(genre)
+            } catch (e: Exception) {
+                0
+            }
+            if (!isAdded) return@launch
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.genre_delete_confirm_title))
+                .setMessage(getString(R.string.genre_delete_confirm_message, genre, count))
+                .setPositiveButton(getString(R.string.genre_action_delete)) { _, _ ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        repository.renameGenre(genre, "Other")
+                        if (!isAdded) return@launch
+                        // Reset the filter if we just deleted the genre being filtered on
+                        if (currentGenreFilter == genre) {
+                            currentGenreFilter = null
+                            PreferencesHelper.setGenreFilter(requireContext(), null)
+                            updateGenreFilterButtonText()
+                        }
+                        observeStations()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.genre_deleted_toast, genre),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+                .setNegativeButton(getString(R.string.button_cancel), null)
+                .show()
+        }
+    }
+
+    private fun showRenameGenreDialog(oldGenre: String) {
+        val context = requireContext()
+        val density = resources.displayMetrics.density
+        fun dp(v: Int) = (v * density).toInt()
+        val input = TextInputEditText(context).apply {
+            setText(oldGenre)
+            setSelection(text?.length ?: 0)
+        }
+        val wrapper = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(24), dp(8), dp(24), 0)
+            addView(input)
+        }
+        MaterialAlertDialogBuilder(context)
+            .setTitle(getString(R.string.genre_rename_title))
+            .setView(wrapper)
+            .setPositiveButton(getString(R.string.button_save)) { _, _ ->
+                val newGenre = input.text?.toString()?.trim().orEmpty()
+                if (newGenre.isEmpty() || newGenre == oldGenre) return@setPositiveButton
+                lifecycleScope.launch(Dispatchers.Main) {
+                    repository.renameGenre(oldGenre, newGenre)
+                    if (!isAdded) return@launch
+                    if (currentGenreFilter == oldGenre) {
+                        currentGenreFilter = newGenre
+                        PreferencesHelper.setGenreFilter(requireContext(), newGenre)
+                        updateGenreFilterButtonText()
+                    }
+                    observeStations()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.genre_renamed_toast),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+            .setNegativeButton(getString(R.string.button_cancel), null)
+            .show()
     }
 
     private fun createGenreSearchView(genres: List<String>, selectedIndex: Int, onGenreSelected: (String) -> Unit): View {

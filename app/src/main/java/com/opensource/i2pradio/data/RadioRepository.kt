@@ -47,6 +47,18 @@ class RadioRepository(context: Context) {
         }
     }
 
+    suspend fun renameGenre(oldGenre: String, newGenre: String) {
+        withContext(Dispatchers.IO) {
+            radioDao.renameGenre(oldGenre, newGenre)
+        }
+    }
+
+    suspend fun countStationsByGenre(genre: String): Int {
+        return withContext(Dispatchers.IO) {
+            radioDao.countStationsByGenre(genre)
+        }
+    }
+
     suspend fun getAllStationsSync(): List<RadioStation> {
         return withContext(Dispatchers.IO) {
             radioDao.getAllStationsSync()

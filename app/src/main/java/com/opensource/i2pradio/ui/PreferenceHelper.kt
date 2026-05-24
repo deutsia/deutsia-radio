@@ -64,6 +64,15 @@ object PreferencesHelper {
     private const val KEY_DISABLE_RADIO_REGISTRY_API = "disable_radio_registry_api"
     private const val KEY_DISABLE_COVER_ART = "disable_cover_art"
 
+    // Auto-reconnect settings
+    private const val KEY_AUTO_RECONNECT_ENABLED = "auto_reconnect_enabled"
+    private const val KEY_RECONNECT_DURATION_MINUTES = "reconnect_duration_minutes"
+    private const val KEY_RECONNECT_INTERVAL_SECONDS = "reconnect_interval_seconds"
+
+    // Defaults for auto-reconnect (minutes of total retry window, seconds between attempts)
+    const val DEFAULT_RECONNECT_DURATION_MINUTES = 5
+    const val DEFAULT_RECONNECT_INTERVAL_SECONDS = 10
+
     // Integrations
     private const val KEY_ANDROID_AUTO_ENABLED = "android_auto_enabled"
     private const val KEY_AA_FIRST_CONNECT_HANDLED = "aa_first_connect_handled"
@@ -144,6 +153,43 @@ object PreferencesHelper {
     fun getSleepTimerMinutes(context: Context): Int {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getInt(KEY_SLEEP_TIMER_MINUTES, 0)
+    }
+
+    // Auto-reconnect preferences
+    fun setAutoReconnectEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_AUTO_RECONNECT_ENABLED, enabled)
+            .apply()
+    }
+
+    fun isAutoReconnectEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_AUTO_RECONNECT_ENABLED, true)
+    }
+
+    fun setReconnectDurationMinutes(context: Context, minutes: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_RECONNECT_DURATION_MINUTES, minutes)
+            .apply()
+    }
+
+    fun getReconnectDurationMinutes(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_RECONNECT_DURATION_MINUTES, DEFAULT_RECONNECT_DURATION_MINUTES)
+    }
+
+    fun setReconnectIntervalSeconds(context: Context, seconds: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_RECONNECT_INTERVAL_SECONDS, seconds)
+            .apply()
+    }
+
+    fun getReconnectIntervalSeconds(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_RECONNECT_INTERVAL_SECONDS, DEFAULT_RECONNECT_INTERVAL_SECONDS)
     }
 
     // Sort order preferences

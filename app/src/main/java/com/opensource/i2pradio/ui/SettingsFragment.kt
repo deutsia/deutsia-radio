@@ -455,6 +455,13 @@ class SettingsFragment : Fragment() {
             showSleepTimerDialog(sleepTimerButton)
         }
 
+        // Auto-reconnect button
+        val autoReconnectButton = view.findViewById<MaterialButton>(R.id.autoReconnectButton)
+        updateAutoReconnectButtonText(autoReconnectButton)
+        autoReconnectButton.setOnClickListener {
+            showAutoReconnectDialog(autoReconnectButton)
+        }
+
         // Equalizer button - opens built-in equalizer
         val equalizerButton = view.findViewById<MaterialButton>(R.id.equalizerButton)
         equalizerButton.setOnClickListener {
@@ -660,6 +667,85 @@ class SettingsFragment : Fragment() {
         // Show the equalizer bottom sheet
         val bottomSheet = EqualizerBottomSheet.newInstance(equalizerManager)
         bottomSheet.show(parentFragmentManager, EqualizerBottomSheet.TAG)
+    }
+
+    private fun updateAutoReconnectButtonText(button: MaterialButton) {
+        val context = requireContext()
+        button.text = if (PreferencesHelper.isAutoReconnectEnabled(context)) {
+            getString(R.string.settings_auto_reconnect_on, PreferencesHelper.getReconnectDurationMinutes(context))
+        } else {
+            getString(R.string.settings_auto_reconnect_off)
+        }
+    }
+
+    private fun showAutoReconnectDialog(button: MaterialButton) {
+        val context = requireContext()
+        val density = resources.displayMetrics.density
+        fun dp(v: Int) = (v * density).toInt()
+
+        val enabled = PreferencesHelper.isAutoReconnectEnabled(context)
+        val durationMin = PreferencesHelper.getReconnectDurationMinutes(context).coerceIn(1, 30)
+        val intervalSec = PreferencesHelper.getReconnectIntervalSeconds(context).coerceIn(5, 60)
+
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(24), dp(8), dp(24), dp(8))
+        }
+
+        val enableSwitch = MaterialSwitch(context).apply {
+            text = getString(R.string.settings_auto_reconnect)
+            isChecked = enabled
+        }
+        container.addView(enableSwitch)
+
+        val durationLabel = TextView(context).apply {
+            text = getString(R.string.settings_reconnect_duration)
+            setPadding(0, dp(16), 0, 0)
+        }
+        container.addView(durationLabel)
+        val durationPicker = android.widget.NumberPicker(context).apply {
+            minValue = 1
+            maxValue = 30
+            value = durationMin
+            wrapSelectorWheel = false
+        }
+        container.addView(durationPicker)
+
+        val intervalLabel = TextView(context).apply {
+            text = getString(R.string.settings_reconnect_interval)
+            setPadding(0, dp(16), 0, 0)
+        }
+        container.addView(intervalLabel)
+        val intervalPicker = android.widget.NumberPicker(context).apply {
+            minValue = 5
+            maxValue = 60
+            value = intervalSec
+            wrapSelectorWheel = false
+        }
+        container.addView(intervalPicker)
+
+        fun setPickersEnabled(on: Boolean) {
+            durationLabel.isEnabled = on
+            durationPicker.isEnabled = on
+            intervalLabel.isEnabled = on
+            intervalPicker.isEnabled = on
+        }
+        setPickersEnabled(enabled)
+        enableSwitch.setOnCheckedChangeListener { _, isChecked -> setPickersEnabled(isChecked) }
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(getString(R.string.settings_auto_reconnect))
+            .setView(container)
+            .setPositiveButton(getString(R.string.button_save)) { _, _ ->
+                durationPicker.clearFocus()
+                intervalPicker.clearFocus()
+                PreferencesHelper.setAutoReconnectEnabled(context, enableSwitch.isChecked)
+                PreferencesHelper.setReconnectDurationMinutes(context, durationPicker.value)
+                PreferencesHelper.setReconnectIntervalSeconds(context, intervalPicker.value)
+                updateAutoReconnectButtonText(button)
+            }
+            .setNegativeButton(getString(R.string.button_cancel), null)
+            .show()
     }
 
     private fun updateSleepTimerButtonText(button: MaterialButton) {
