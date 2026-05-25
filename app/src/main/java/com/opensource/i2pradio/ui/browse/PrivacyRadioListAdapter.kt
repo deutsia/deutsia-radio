@@ -98,7 +98,6 @@ class PrivacyRadioListAdapter(
 
         fun bind(station: RadioRegistryStation) {
             stationName.text = station.name
-            stationName.isSelected = true // drive marquee scrolling for long names
 
             // Build station info with "Online" in green
             val genreWithNetwork = station.getGenreWithNetwork()

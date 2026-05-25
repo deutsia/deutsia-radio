@@ -71,7 +71,6 @@ class BrowseCarouselAdapter(
 
         fun bind(station: RadioBrowserStation, rank: Int) {
             stationName.text = station.name
-            stationName.isSelected = true // drive marquee scrolling for long names
             stationInfo.text = buildString {
                 val genreWithNetwork = station.getGenreWithNetwork()
                 if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {
