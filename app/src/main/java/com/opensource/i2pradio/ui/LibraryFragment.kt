@@ -452,53 +452,84 @@ class LibraryFragment : Fragment() {
     }
 
     private fun showManageGenresDialog() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            val dbGenres = try {
-                repository.getAllGenresSync()
-            } catch (e: Exception) {
-                emptyList()
-            }
-            // Only user-managed genres are deletable; "Other" is the fallback sink.
-            val manageable = dbGenres.filter { it.isNotBlank() && it != "Other" }.sorted()
-            if (!isAdded) return@launch
+        val context = requireContext()
+        val view = layoutInflater.inflate(R.layout.dialog_manage_genres, null)
+        val recycler = view.findViewById<MaxHeightRecyclerView>(R.id.manageGenresRecycler)
+        recycler.maxHeightPx = (360 * resources.displayMetrics.density).toInt()
+        val emptyView = view.findViewById<TextView>(R.id.manageGenresEmpty)
+        val titleView = view.findViewById<TextView>(R.id.manageGenresTitle)
+        val selectAllButton = view.findViewById<MaterialButton>(R.id.selectAllButton)
+        val deleteSelectedButton = view.findViewById<MaterialButton>(R.id.deleteSelectedButton)
+        val closeButton = view.findViewById<MaterialButton>(R.id.closeButton)
 
-            if (manageable.isEmpty()) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(getString(R.string.manage_genres))
-                    .setMessage(getString(R.string.manage_genres_empty))
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show()
-                return@launch
-            }
+        recycler.layoutManager = LinearLayoutManager(context)
 
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(R.string.manage_genres))
-                .setItems(manageable.toTypedArray()) { _, which ->
-                    showGenreActionDialog(manageable[which])
-                }
-                .setNegativeButton(getString(R.string.button_cancel), null)
-                .show()
+        var reload: () -> Unit = {}
+        lateinit var adapter: ManageGenreAdapter
+
+        fun updateChrome() {
+            if (adapter.selectionMode) {
+                titleView.text = getString(R.string.manage_genres_selected_count, adapter.selectedCount())
+                selectAllButton.visibility = View.VISIBLE
+                deleteSelectedButton.visibility = View.VISIBLE
+                closeButton.text = getString(R.string.button_cancel)
+            } else {
+                titleView.text = getString(R.string.manage_genres)
+                selectAllButton.visibility = View.GONE
+                deleteSelectedButton.visibility = View.GONE
+                closeButton.text = getString(R.string.button_close)
+            }
         }
-    }
 
-    private fun showGenreActionDialog(genre: String) {
-        val options = arrayOf(
-            getString(R.string.genre_action_rename),
-            getString(R.string.genre_action_delete)
+        adapter = ManageGenreAdapter(
+            onRename = { genre -> showRenameGenreDialog(genre) { reload() } },
+            onDelete = { genre -> confirmDeleteGenre(genre) { reload() } },
+            onSelectionChanged = { updateChrome() }
         )
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(genre)
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> showRenameGenreDialog(genre)
-                    1 -> confirmDeleteGenre(genre)
+        recycler.adapter = adapter
+
+        val dialog = MaterialAlertDialogBuilder(context)
+            .setView(view)
+            .create()
+
+        reload = {
+            lifecycleScope.launch(Dispatchers.Main) {
+                val dbGenres = try {
+                    repository.getAllGenresSync()
+                } catch (e: Exception) {
+                    emptyList()
+                }
+                // Only user-managed genres are deletable; "Other" is the fallback sink.
+                val manageable = dbGenres.filter { it.isNotBlank() && it != "Other" }.sorted()
+                if (!isAdded) return@launch
+                adapter.setGenres(manageable)
+                val isEmpty = manageable.isEmpty()
+                emptyView.visibility = if (isEmpty) View.VISIBLE else View.GONE
+                recycler.visibility = if (isEmpty) View.GONE else View.VISIBLE
+                updateChrome()
+            }
+        }
+
+        closeButton.setOnClickListener {
+            if (adapter.selectionMode) adapter.exitSelectionMode() else dialog.dismiss()
+        }
+        selectAllButton.setOnClickListener { adapter.selectAll() }
+        deleteSelectedButton.setOnClickListener {
+            val selected = adapter.selectedGenres()
+            if (selected.isNotEmpty()) {
+                confirmDeleteGenres(selected) {
+                    adapter.exitSelectionMode()
+                    reload()
                 }
             }
-            .setNegativeButton(getString(R.string.button_cancel), null)
-            .show()
+        }
+
+        updateChrome()
+        reload()
+        dialog.show()
     }
 
-    private fun confirmDeleteGenre(genre: String) {
+    private fun confirmDeleteGenre(genre: String, onComplete: (() -> Unit)? = null) {
         lifecycleScope.launch(Dispatchers.Main) {
             val count = try {
                 repository.countStationsByGenre(genre)
@@ -527,6 +558,7 @@ class LibraryFragment : Fragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+                        onComplete?.invoke()
                     }
                 }
                 .setNegativeButton(getString(R.string.button_cancel), null)
@@ -534,7 +566,37 @@ class LibraryFragment : Fragment() {
         }
     }
 
-    private fun showRenameGenreDialog(oldGenre: String) {
+    private fun confirmDeleteGenres(genres: List<String>, onComplete: () -> Unit) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.genres_delete_selected_title))
+            .setMessage(getString(R.string.genres_delete_selected_message, genres.size))
+            .setPositiveButton(getString(R.string.genre_action_delete)) { _, _ ->
+                lifecycleScope.launch(Dispatchers.Main) {
+                    for (genre in genres) {
+                        repository.renameGenre(genre, "Other")
+                    }
+                    if (!isAdded) return@launch
+                    if (currentGenreFilter != null && genres.contains(currentGenreFilter)) {
+                        currentGenreFilter = null
+                        PreferencesHelper.setGenreFilter(requireContext(), null)
+                        updateGenreFilterButtonText()
+                    }
+                    observeStations()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.genres_deleted_toast, genres.size),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    onComplete()
+                }
+            }
+            .setNegativeButton(getString(R.string.button_cancel), null)
+            .show()
+    }
+
+    private fun showRenameGenreDialog(oldGenre: String, onComplete: (() -> Unit)? = null) {
         val context = requireContext()
         val density = resources.displayMetrics.density
         fun dp(v: Int) = (v * density).toInt()
@@ -569,10 +631,112 @@ class LibraryFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                    onComplete?.invoke()
                 }
             }
             .setNegativeButton(getString(R.string.button_cancel), null)
             .show()
+    }
+
+    // Adapter for the Manage genres dialog: per-row rename/delete, plus long-press
+    // multi-select for mass delete (mirrors the library's selection behaviour).
+    private inner class ManageGenreAdapter(
+        private val onRename: (String) -> Unit,
+        private val onDelete: (String) -> Unit,
+        private val onSelectionChanged: () -> Unit
+    ) : RecyclerView.Adapter<ManageGenreAdapter.ViewHolder>() {
+
+        private val genres = mutableListOf<String>()
+        private val selected = mutableSetOf<String>()
+        var selectionMode = false
+            private set
+
+        fun setGenres(newGenres: List<String>) {
+            genres.clear()
+            genres.addAll(newGenres)
+            selected.retainAll(genres.toSet())
+            if (selected.isEmpty()) selectionMode = false
+            notifyDataSetChanged()
+        }
+
+        fun selectedGenres(): List<String> = selected.toList()
+
+        fun selectedCount(): Int = selected.size
+
+        fun enterSelectionMode(genre: String) {
+            selectionMode = true
+            selected.clear()
+            selected.add(genre)
+            notifyDataSetChanged()
+            onSelectionChanged()
+        }
+
+        fun exitSelectionMode() {
+            selectionMode = false
+            selected.clear()
+            notifyDataSetChanged()
+            onSelectionChanged()
+        }
+
+        fun selectAll() {
+            selected.clear()
+            selected.addAll(genres)
+            notifyDataSetChanged()
+            onSelectionChanged()
+        }
+
+        private fun toggle(genre: String) {
+            if (!selected.add(genre)) selected.remove(genre)
+            if (selected.isEmpty()) {
+                exitSelectionMode()
+            } else {
+                notifyDataSetChanged()
+                onSelectionChanged()
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val v = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_manage_genre, parent, false)
+            return ViewHolder(v)
+        }
+
+        override fun getItemCount() = genres.size
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            if (position >= genres.size) return
+            holder.bind(genres[position])
+        }
+
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val name: TextView = itemView.findViewById(R.id.genreName)
+            private val checkBox: MaterialCheckBox = itemView.findViewById(R.id.genreCheckBox)
+            private val renameButton: MaterialButton = itemView.findViewById(R.id.renameButton)
+            private val deleteButton: MaterialButton = itemView.findViewById(R.id.deleteButton)
+
+            fun bind(genre: String) {
+                name.text = genre
+                if (selectionMode) {
+                    checkBox.visibility = View.VISIBLE
+                    checkBox.isChecked = selected.contains(genre)
+                    renameButton.visibility = View.GONE
+                    deleteButton.visibility = View.GONE
+                } else {
+                    checkBox.visibility = View.GONE
+                    renameButton.visibility = View.VISIBLE
+                    deleteButton.visibility = View.VISIBLE
+                }
+                itemView.setOnClickListener {
+                    if (selectionMode) toggle(genre)
+                }
+                itemView.setOnLongClickListener {
+                    if (selectionMode) toggle(genre) else enterSelectionMode(genre)
+                    true
+                }
+                renameButton.setOnClickListener { onRename(genre) }
+                deleteButton.setOnClickListener { onDelete(genre) }
+            }
+        }
     }
 
     private fun createGenreSearchView(genres: List<String>, selectedIndex: Int, onGenreSelected: (String) -> Unit): View {

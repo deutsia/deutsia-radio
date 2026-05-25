@@ -50,12 +50,16 @@
     <!-- Manage genres -->
     <string name="manage_genres">Manage genres</string>
     <string name="manage_genres_empty">You don\'t have any custom genres to manage yet. Genres are added when you set them on a station.</string>
+    <string name="manage_genres_selected_count">%1$d selected</string>
     <string name="genre_action_rename">Rename</string>
     <string name="genre_action_delete">Delete</string>
     <string name="genre_rename_title">Rename genre</string>
     <string name="genre_delete_confirm_title">Delete genre?</string>
     <string name="genre_delete_confirm_message">Move %2$d station(s) using \"%1$s\" to Other? The genre will be removed from the list.</string>
+    <string name="genres_delete_selected_title">Delete genres?</string>
+    <string name="genres_delete_selected_message">Move all stations from %1$d genre(s) to Other? The genres will be removed from the list.</string>
     <string name="genre_deleted_toast">Deleted genre \"%1$s\"</string>
+    <string name="genres_deleted_toast">Deleted %1$d genre(s)</string>
     <string name="genre_renamed_toast">Genre renamed</string>
 
     <!-- Genre Names -->
@@ -177,6 +181,7 @@
     <string name="button_edit">Edit</string>
     <string name="button_select_all">Select All</string>
     <string name="button_cancel">Cancel</string>
+    <string name="button_close">Close</string>
     <string name="button_import">Import</string>
     <string name="button_export">Export</string>
     <string name="button_add">Add</string>
