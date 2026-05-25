@@ -85,6 +85,31 @@ class RadioRepository(context: Context) {
         }
     }
 
+    // The playback queue for skip-next/previous: the library in the given sort and
+    // genre filter, matching what the user currently sees in the library list.
+    suspend fun getQueueStations(sortOrder: SortOrder, genreFilter: String?): List<RadioStation> {
+        return withContext(Dispatchers.IO) {
+            if (genreFilter != null) {
+                when (sortOrder) {
+                    SortOrder.NAME -> radioDao.getStationsByGenreNameSync(genreFilter)
+                    SortOrder.RECENTLY_PLAYED -> radioDao.getStationsByGenreRecentlyPlayedSync(genreFilter)
+                    SortOrder.LIKED -> radioDao.getLikedStationsByGenreSync(genreFilter)
+                    // DEFAULT, GENRE and CUSTOM all fall back to the genre's default order
+                    else -> radioDao.getStationsByGenreDefaultSync(genreFilter)
+                }
+            } else {
+                when (sortOrder) {
+                    SortOrder.DEFAULT -> radioDao.getAllStationsSync()
+                    SortOrder.NAME -> radioDao.getStationsByNameSync()
+                    SortOrder.RECENTLY_PLAYED -> radioDao.getStationsByRecentlyPlayedSync()
+                    SortOrder.LIKED -> radioDao.getLikedStationsSync()
+                    SortOrder.GENRE -> radioDao.getStationsByGenreOrderSync()
+                    SortOrder.CUSTOM -> radioDao.getStationsByCustomOrderSync()
+                }
+            }
+        }
+    }
+
     fun getLikedStations(): LiveData<List<RadioStation>> = radioDao.getLikedStations()
 
     suspend fun insertStation(station: RadioStation): Long {

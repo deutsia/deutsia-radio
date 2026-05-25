@@ -137,6 +137,8 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
                                !path.endsWith(".mpd")  && !path.contains(".mpd")
             }
         })
+        // Wrap around at the ends of the queue when skipping.
+        exoPlayer.repeatMode = Player.REPEAT_MODE_ALL
         player = exoPlayer
 
         val sessionActivity = PendingIntent.getActivity(
@@ -268,6 +270,56 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
             }
             return Futures.submit(callable, backgroundExecutor)
         }
+
+        /**
+         * When a station is chosen to play, expand it into the full custom-order
+         * queue (direct stations only) so the car's next/previous buttons skip
+         * through the library. Proxy stations are kept out of multi-item queues so
+         * ExoPlayer's look-ahead preparation can never issue a Tor/I2P request
+         * through the wrong (non-proxy) data source — those play as a single item.
+         */
+        override fun onSetMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>,
+            startIndex: Int,
+            startPositionMs: Long
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+            val callable = Callable<MediaSession.MediaItemsWithStartPosition> {
+                val factory = dataSourceFactory
+                val pickIndex = if (startIndex in mediaItems.indices) startIndex else 0
+                val requestedId = mediaItems.getOrNull(pickIndex)?.mediaId
+                val requestedStation = requestedId
+                    ?.takeIf { it.startsWith(STATION_PREFIX) }
+                    ?.let { loadStation(it) }
+
+                if (factory == null || requestedStation == null) {
+                    // Not a resolvable station request; resolve items as-is.
+                    val resolved = mediaItems.mapNotNull { item ->
+                        loadStation(item.mediaId)?.let { st ->
+                            factory?.setStation(st)
+                            stationToMediaItem(st)
+                        }
+                    }
+                    return@Callable MediaSession.MediaItemsWithStartPosition(resolved, 0, startPositionMs)
+                }
+
+                val queue = queueStations()
+                val queueIndex = queue.indexOfFirst { "$STATION_PREFIX${it.id}" == "$STATION_PREFIX${requestedStation.id}" }
+                factory.setStation(requestedStation)
+                currentIcyTitle = null
+                if (queueIndex >= 0) {
+                    val items = queue.map { stationToMediaItem(it) }
+                    MediaSession.MediaItemsWithStartPosition(items, queueIndex, startPositionMs)
+                } else {
+                    // Proxy / excluded station: play it on its own (no skip queue).
+                    MediaSession.MediaItemsWithStartPosition(
+                        listOf(stationToMediaItem(requestedStation)), 0, startPositionMs
+                    )
+                }
+            }
+            return Futures.submit(callable, backgroundExecutor)
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -339,6 +391,17 @@ class DeutsiaMediaLibraryService : MediaLibraryService() {
 
     private fun loadStationItem(mediaId: String): MediaItem? =
         loadStation(mediaId)?.let { stationToMediaItem(it) }
+
+    /**
+     * The skip queue for Android Auto: the library in custom order, direct
+     * stations only. Proxy (Tor/I2P) stations are excluded so a multi-item queue
+     * never carries one through ExoPlayer's look-ahead data-source preparation.
+     */
+    private fun queueStations(): List<RadioStation> {
+        val dao = RadioDatabase.getDatabase(this).radioDao()
+        val stations = kotlinx.coroutines.runBlocking { dao.getStationsByCustomOrderSync() }
+        return stations.filter { it.getProxyTypeEnum() == ProxyType.NONE }
+    }
 
     private fun stationToMediaItem(station: RadioStation): MediaItem {
         val metadataBuilder = MediaMetadata.Builder()

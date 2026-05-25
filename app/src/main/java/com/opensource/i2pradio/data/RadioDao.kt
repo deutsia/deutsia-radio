@@ -33,6 +33,32 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations ORDER BY displayOrder ASC, id ASC")
     suspend fun getStationsByCustomOrderSync(): List<RadioStation>
 
+    // Synchronous queue snapshots mirroring each sort/filter, so skip-next/previous
+    // walks stations in the same order the user currently sees them.
+    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, name ASC")
+    suspend fun getStationsByNameSync(): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, lastPlayedAt DESC")
+    suspend fun getStationsByRecentlyPlayedSync(): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE isLiked = 1 ORDER BY name ASC")
+    suspend fun getLikedStationsSync(): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations ORDER BY genre ASC, name ASC")
+    suspend fun getStationsByGenreOrderSync(): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, isPreset DESC, addedTimestamp ASC")
+    suspend fun getStationsByGenreDefaultSync(genre: String): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, name ASC")
+    suspend fun getStationsByGenreNameSync(genre: String): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, lastPlayedAt DESC")
+    suspend fun getStationsByGenreRecentlyPlayedSync(genre: String): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre AND isLiked = 1 ORDER BY name ASC")
+    suspend fun getLikedStationsByGenreSync(genre: String): List<RadioStation>
+
     // Persist a station's position in the custom order
     @Query("UPDATE radio_stations SET displayOrder = :order WHERE id = :id")
     suspend fun updateDisplayOrder(id: Long, order: Int)

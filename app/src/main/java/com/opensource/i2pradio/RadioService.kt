@@ -52,6 +52,7 @@ import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.data.RadioStationPasswordHelper
+import com.opensource.i2pradio.data.SortOrder
 import com.opensource.i2pradio.i2p.I2PManager
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
@@ -2784,8 +2785,16 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         val id = currentStationId
         if (id <= 0L) return
         serviceScope.launch {
+            // The queue follows the current library view: its persisted sort order
+            // and genre filter. Each sort is effectively its own queue.
+            val sortOrder = try {
+                SortOrder.valueOf(PreferencesHelper.getSortOrder(this@RadioService))
+            } catch (e: Exception) {
+                SortOrder.DEFAULT
+            }
+            val genreFilter = PreferencesHelper.getGenreFilter(this@RadioService)
             val stations = try {
-                radioRepository.getStationsByCustomOrderSync()
+                radioRepository.getQueueStations(sortOrder, genreFilter)
             } catch (e: Exception) {
                 emptyList()
             }

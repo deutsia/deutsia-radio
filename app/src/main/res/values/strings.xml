@@ -34,11 +34,11 @@
     <string name="sort_recent">Recent</string>
     <string name="sort_liked">Liked</string>
     <string name="sort_genre">Genre</string>
-    <string name="sort_custom">Custom order</string>
+    <string name="sort_custom">Custom queue</string>
     <string name="menu_move_up">Move up</string>
     <string name="menu_move_down">Move down</string>
-    <string name="custom_order_hint_title">Arrange your stations</string>
-    <string name="custom_order_hint_message">In Custom order you can put stations in any order you like. Press and hold a station — or drag the grip handle on the right — to move it up or down. Your order is saved automatically.</string>
+    <string name="custom_order_hint_title">Custom queue</string>
+    <string name="custom_order_hint_message">Stations play in the order you arrange here, and you can skip through them from the notification, lockscreen, and Android Auto. Press and hold a station — or drag the grip handle — to move it. Your order is saved automatically.</string>
     <string name="button_got_it">Got it</string>
 
     <!-- Search -->
