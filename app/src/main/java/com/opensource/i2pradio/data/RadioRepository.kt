@@ -11,7 +11,8 @@ enum class SortOrder {
     NAME,            // Alphabetical by name
     RECENTLY_PLAYED, // Most recently played first
     LIKED,           // Only liked stations
-    GENRE            // Sorted by genre alphabetically, then by name
+    GENRE,           // Sorted by genre alphabetically, then by name
+    CUSTOM           // User-defined order (move up/down)
 }
 
 class RadioRepository(context: Context) {
@@ -26,6 +27,7 @@ class RadioRepository(context: Context) {
             SortOrder.RECENTLY_PLAYED -> radioDao.getAllStationsSortedByRecentlyPlayed()
             SortOrder.LIKED -> radioDao.getLikedStations()
             SortOrder.GENRE -> radioDao.getAllStationsSortedByGenre()
+            SortOrder.CUSTOM -> radioDao.getAllStationsSortedByCustom()
         }
     }
 
@@ -36,6 +38,7 @@ class RadioRepository(context: Context) {
             SortOrder.RECENTLY_PLAYED -> radioDao.getStationsByGenreSortedByRecentlyPlayed(genre)
             SortOrder.LIKED -> radioDao.getLikedStationsByGenre(genre)
             SortOrder.GENRE -> radioDao.getStationsByGenreDefault(genre) // Same as default when filtered by genre
+            SortOrder.CUSTOM -> radioDao.getStationsByGenreDefault(genre) // Manual reorder only applies to the full, unfiltered list
         }
     }
 
@@ -47,9 +50,63 @@ class RadioRepository(context: Context) {
         }
     }
 
+    suspend fun renameGenre(oldGenre: String, newGenre: String) {
+        withContext(Dispatchers.IO) {
+            radioDao.renameGenre(oldGenre, newGenre)
+        }
+    }
+
+    suspend fun countStationsByGenre(genre: String): Int {
+        return withContext(Dispatchers.IO) {
+            radioDao.countStationsByGenre(genre)
+        }
+    }
+
+    // Persist a new custom order. Reassigns sequential positions to every station
+    // in the given order, so values stay distinct regardless of prior state.
+    suspend fun setStationOrder(orderedIds: List<Long>) {
+        withContext(Dispatchers.IO) {
+            orderedIds.forEachIndexed { index, id ->
+                radioDao.updateDisplayOrder(id, index)
+            }
+        }
+    }
+
     suspend fun getAllStationsSync(): List<RadioStation> {
         return withContext(Dispatchers.IO) {
             radioDao.getAllStationsSync()
+        }
+    }
+
+    // Library in custom order as a flat list, used as the playback queue.
+    suspend fun getStationsByCustomOrderSync(): List<RadioStation> {
+        return withContext(Dispatchers.IO) {
+            radioDao.getStationsByCustomOrderSync()
+        }
+    }
+
+    // The playback queue for skip-next/previous: the library in the given sort and
+    // genre filter, matching what the user currently sees in the library list.
+    suspend fun getQueueStations(sortOrder: SortOrder, genreFilter: String?): List<RadioStation> {
+        return withContext(Dispatchers.IO) {
+            if (genreFilter != null) {
+                when (sortOrder) {
+                    SortOrder.NAME -> radioDao.getStationsByGenreNameSync(genreFilter)
+                    SortOrder.RECENTLY_PLAYED -> radioDao.getStationsByGenreRecentlyPlayedSync(genreFilter)
+                    SortOrder.LIKED -> radioDao.getLikedStationsByGenreSync(genreFilter)
+                    // DEFAULT, GENRE and CUSTOM all fall back to the genre's default order
+                    else -> radioDao.getStationsByGenreDefaultSync(genreFilter)
+                }
+            } else {
+                when (sortOrder) {
+                    SortOrder.DEFAULT -> radioDao.getAllStationsSync()
+                    SortOrder.NAME -> radioDao.getStationsByNameSync()
+                    SortOrder.RECENTLY_PLAYED -> radioDao.getStationsByRecentlyPlayedSync()
+                    SortOrder.LIKED -> radioDao.getLikedStationsSync()
+                    SortOrder.GENRE -> radioDao.getStationsByGenreOrderSync()
+                    SortOrder.CUSTOM -> radioDao.getStationsByCustomOrderSync()
+                }
+            }
         }
     }
 

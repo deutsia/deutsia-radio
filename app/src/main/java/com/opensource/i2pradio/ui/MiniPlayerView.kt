@@ -399,6 +399,7 @@ class MiniPlayerView @JvmOverloads constructor(
                 putExtra("cover_art_uri", station.coverArtUri)
                 putExtra("hls_hint", station.hlsHint)
                 putExtra("codec_hint", station.codecHint)
+                putExtra(RadioService.EXTRA_STATION_ID, station.id)
             }
             ContextCompat.startForegroundService(context, intent)
             // Don't update playing state here - wait for service to confirm playback started

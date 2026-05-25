@@ -19,6 +19,7 @@ object PreferencesHelper {
     private const val KEY_AUTO_START_TOR = "auto_start_tor"
     private const val KEY_SLEEP_TIMER_MINUTES = "sleep_timer_minutes"
     private const val KEY_SORT_ORDER = "sort_order"
+    private const val KEY_CUSTOM_ORDER_HINT_SHOWN = "custom_order_hint_shown"
     private const val KEY_EQUALIZER_ENABLED = "equalizer_enabled"
     private const val KEY_EQUALIZER_PRESET = "equalizer_preset"
     private const val KEY_EQUALIZER_BANDS = "equalizer_bands"
@@ -63,6 +64,15 @@ object PreferencesHelper {
     private const val KEY_DISABLE_RADIOBROWSER_API = "disable_radiobrowser_api"
     private const val KEY_DISABLE_RADIO_REGISTRY_API = "disable_radio_registry_api"
     private const val KEY_DISABLE_COVER_ART = "disable_cover_art"
+
+    // Auto-reconnect settings
+    private const val KEY_AUTO_RECONNECT_ENABLED = "auto_reconnect_enabled"
+    private const val KEY_RECONNECT_DURATION_MINUTES = "reconnect_duration_minutes"
+    private const val KEY_RECONNECT_INTERVAL_SECONDS = "reconnect_interval_seconds"
+
+    // Defaults for auto-reconnect (minutes of total retry window, seconds between attempts)
+    const val DEFAULT_RECONNECT_DURATION_MINUTES = 5
+    const val DEFAULT_RECONNECT_INTERVAL_SECONDS = 10
 
     // Integrations
     private const val KEY_ANDROID_AUTO_ENABLED = "android_auto_enabled"
@@ -146,6 +156,43 @@ object PreferencesHelper {
             .getInt(KEY_SLEEP_TIMER_MINUTES, 0)
     }
 
+    // Auto-reconnect preferences
+    fun setAutoReconnectEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_AUTO_RECONNECT_ENABLED, enabled)
+            .apply()
+    }
+
+    fun isAutoReconnectEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_AUTO_RECONNECT_ENABLED, true)
+    }
+
+    fun setReconnectDurationMinutes(context: Context, minutes: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_RECONNECT_DURATION_MINUTES, minutes)
+            .apply()
+    }
+
+    fun getReconnectDurationMinutes(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_RECONNECT_DURATION_MINUTES, DEFAULT_RECONNECT_DURATION_MINUTES)
+    }
+
+    fun setReconnectIntervalSeconds(context: Context, seconds: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(KEY_RECONNECT_INTERVAL_SECONDS, seconds)
+            .apply()
+    }
+
+    fun getReconnectIntervalSeconds(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_RECONNECT_INTERVAL_SECONDS, DEFAULT_RECONNECT_INTERVAL_SECONDS)
+    }
+
     // Sort order preferences
     fun setSortOrder(context: Context, sortOrder: String) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -157,6 +204,19 @@ object PreferencesHelper {
     fun getSortOrder(context: Context): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_SORT_ORDER, "DEFAULT") ?: "DEFAULT"
+    }
+
+    // One-time hint explaining how to reorder in Custom order
+    fun isCustomOrderHintShown(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_CUSTOM_ORDER_HINT_SHOWN, false)
+    }
+
+    fun setCustomOrderHintShown(context: Context, shown: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_CUSTOM_ORDER_HINT_SHOWN, shown)
+            .apply()
     }
 
     // Equalizer preferences

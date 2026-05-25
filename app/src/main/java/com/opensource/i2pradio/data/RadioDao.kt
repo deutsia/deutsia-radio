@@ -25,6 +25,44 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations ORDER BY genre ASC, name ASC")
     fun getAllStationsSortedByGenre(): LiveData<List<RadioStation>>
 
+    // User-defined custom order (drag/move up-down)
+    @Query("SELECT * FROM radio_stations ORDER BY displayOrder ASC, id ASC")
+    fun getAllStationsSortedByCustom(): LiveData<List<RadioStation>>
+
+    // Custom order as a plain list, for the playback queue (skip next/previous)
+    @Query("SELECT * FROM radio_stations ORDER BY displayOrder ASC, id ASC")
+    suspend fun getStationsByCustomOrderSync(): List<RadioStation>
+
+    // Synchronous queue snapshots mirroring each sort/filter, so skip-next/previous
+    // walks stations in the same order the user currently sees them.
+    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, name ASC")
+    suspend fun getStationsByNameSync(): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, lastPlayedAt DESC")
+    suspend fun getStationsByRecentlyPlayedSync(): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE isLiked = 1 ORDER BY name ASC")
+    suspend fun getLikedStationsSync(): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations ORDER BY genre ASC, name ASC")
+    suspend fun getStationsByGenreOrderSync(): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, isPreset DESC, addedTimestamp ASC")
+    suspend fun getStationsByGenreDefaultSync(genre: String): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, name ASC")
+    suspend fun getStationsByGenreNameSync(genre: String): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY isLiked DESC, lastPlayedAt DESC")
+    suspend fun getStationsByGenreRecentlyPlayedSync(genre: String): List<RadioStation>
+
+    @Query("SELECT * FROM radio_stations WHERE genre = :genre AND isLiked = 1 ORDER BY name ASC")
+    suspend fun getLikedStationsByGenreSync(genre: String): List<RadioStation>
+
+    // Persist a station's position in the custom order
+    @Query("UPDATE radio_stations SET displayOrder = :order WHERE id = :id")
+    suspend fun updateDisplayOrder(id: Long, order: Int)
+
     @Query("SELECT * FROM radio_stations WHERE genre = :genre ORDER BY addedTimestamp DESC")
     fun getStationsByGenre(genre: String): LiveData<List<RadioStation>>
 
@@ -49,12 +87,26 @@ interface RadioDao {
     @Query("SELECT DISTINCT genre FROM radio_stations ORDER BY genre ASC")
     suspend fun getAllGenresSync(): List<String>
 
+    // Reassign every station using oldGenre to newGenre. Used to rename a genre,
+    // or to delete one by moving its stations to "Other".
+    @Query("UPDATE radio_stations SET genre = :newGenre WHERE genre = :oldGenre")
+    suspend fun renameGenre(oldGenre: String, newGenre: String)
+
+    // Count how many stations currently use a given genre
+    @Query("SELECT COUNT(*) FROM radio_stations WHERE genre = :genre")
+    suspend fun countStationsByGenre(genre: String): Int
+
     // Get all stations synchronously for search filtering
     @Query("SELECT * FROM radio_stations ORDER BY isLiked DESC, isPreset DESC, addedTimestamp ASC")
     suspend fun getAllStationsSync(): List<RadioStation>
 
     @Query("SELECT * FROM radio_stations WHERE id = :id")
     suspend fun getStationById(id: Long): RadioStation?
+
+    // Find an existing station by its stream URL (used to avoid saving duplicates
+    // of a station that's already in the library under a different source/UUID).
+    @Query("SELECT * FROM radio_stations WHERE streamUrl = :streamUrl LIMIT 1")
+    suspend fun getStationByStreamUrl(streamUrl: String): RadioStation?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStation(station: RadioStation): Long

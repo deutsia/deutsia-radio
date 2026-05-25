@@ -18,6 +18,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -48,6 +49,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
+import com.opensource.i2pradio.data.RadioRepository
+import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.data.RadioStationPasswordHelper
+import com.opensource.i2pradio.data.SortOrder
 import com.opensource.i2pradio.i2p.I2PManager
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
@@ -58,6 +63,8 @@ import okhttp3.Call
 import okhttp3.Request
 import okhttp3.Response
 import android.content.ContentValues
+import android.net.ConnectivityManager
+import android.net.Network
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -96,7 +103,13 @@ class RadioService : Service() {
     private var currentCodecHint: String = ""
     private val handler = Handler(Looper.getMainLooper())
     private var reconnectAttempts = 0
-    private val maxReconnectAttempts = 10
+    // Monotonic timestamp (elapsedRealtime) marking when the current reconnect cycle
+    // started. 0 means we're not currently recovering from an error, which also gates
+    // the network-available callback so it never resurrects a deliberately stopped stream.
+    private var reconnectCycleStartMs = 0L
+    private var connectivityManager: ConnectivityManager? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var networkCallbackRegistered = false
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -108,26 +121,51 @@ class RadioService : Service() {
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: android.media.AudioFocusRequest? = null
     @Volatile private var hasAudioFocus = false
+    // Set when we pause for a transient interruption (e.g. a phone call) so we know
+    // to resume once focus returns. wasDuckedByFocusLoss tracks a temporary volume duck.
+    @Volatile private var resumeOnFocusGain = false
+    @Volatile private var wasDuckedByFocusLoss = false
 
     private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
         when (focusChange) {
             AudioManager.AUDIOFOCUS_GAIN -> {
                 hasAudioFocus = true
                 android.util.Log.d("RadioService", "Audio focus gained")
+                if (wasDuckedByFocusLoss) {
+                    player?.volume = 1.0f
+                    wasDuckedByFocusLoss = false
+                }
+                if (resumeOnFocusGain) {
+                    resumeOnFocusGain = false
+                    handler.post { resumeFromInterruption() }
+                }
             }
             AudioManager.AUDIOFOCUS_LOSS -> {
+                // Permanent loss (another media app took over). Stop for good.
                 hasAudioFocus = false
+                resumeOnFocusGain = false
+                wasDuckedByFocusLoss = false
                 android.util.Log.d("RadioService", "Audio focus lost permanently")
                 handler.post {
                     stopStream()
                 }
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                // e.g. an incoming phone call. Pause now; resume when focus returns.
                 hasAudioFocus = false
                 android.util.Log.d("RadioService", "Audio focus lost transiently")
+                handler.post { pauseForInterruption() }
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                // Brief interruption (e.g. a notification). Duck the volume instead
+                // of stopping, then restore it on AUDIOFOCUS_GAIN.
                 android.util.Log.d("RadioService", "Audio focus ducking")
+                player?.let {
+                    if (it.isPlaying) {
+                        it.volume = 0.2f
+                        wasDuckedByFocusLoss = true
+                    }
+                }
             }
         }
     }
@@ -154,6 +192,11 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
 
     private var isRecording = false
     private var currentStationName: String = "Unknown Station"
+    // Id of the station currently playing, used to find neighbours in the
+    // custom-order queue for skip next/previous. -1 when the station isn't
+    // from the library (e.g. played from Browse), which disables skipping.
+    @Volatile private var currentStationId: Long = -1L
+    private val radioRepository by lazy { RadioRepository(this) }
     private var recordingCall: Call? = null
     private var recordingThread: Thread? = null
     private var recordingOutputStream: OutputStream? = null
@@ -189,6 +232,8 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         const val ACTION_PLAY = "com.opensource.i2pradio.PLAY"
         const val ACTION_PAUSE = "com.opensource.i2pradio.PAUSE"
         const val ACTION_STOP = "com.opensource.i2pradio.STOP"
+        const val ACTION_SKIP_TO_NEXT = "com.opensource.i2pradio.SKIP_TO_NEXT"
+        const val ACTION_SKIP_TO_PREVIOUS = "com.opensource.i2pradio.SKIP_TO_PREVIOUS"
         const val ACTION_START_RECORDING = "com.opensource.i2pradio.START_RECORDING"
         const val ACTION_STOP_RECORDING = "com.opensource.i2pradio.STOP_RECORDING"
         const val ACTION_SWITCH_RECORDING_STREAM = "com.opensource.i2pradio.SWITCH_RECORDING_STREAM"
@@ -200,6 +245,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         const val BROADCAST_METADATA_CHANGED = "com.opensource.i2pradio.METADATA_CHANGED"
         const val BROADCAST_STREAM_INFO_CHANGED = "com.opensource.i2pradio.STREAM_INFO_CHANGED"
         const val BROADCAST_PLAYBACK_STATE_CHANGED = "com.opensource.i2pradio.PLAYBACK_STATE_CHANGED"
+        const val BROADCAST_CURRENT_STATION_CHANGED = "com.opensource.i2pradio.CURRENT_STATION_CHANGED"
         const val BROADCAST_RECORDING_ERROR = "com.opensource.i2pradio.RECORDING_ERROR"
         const val BROADCAST_RECORDING_COMPLETE = "com.opensource.i2pradio.RECORDING_COMPLETE"
         const val EXTRA_METADATA = "metadata"
@@ -279,6 +325,8 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         val becomingNoisyFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
         registerReceiver(becomingNoisyReceiver, becomingNoisyFilter)
         becomingNoisyReceiverRegistered = true
+
+        registerNetworkCallback()
     }
 
     private fun initializeMediaSession() {
@@ -311,6 +359,14 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                 }
                 startService(stopIntent)
             }
+
+            override fun onSkipToNext() {
+                skipToStation(1)
+            }
+
+            override fun onSkipToPrevious() {
+                skipToStation(-1)
+            }
         })
     }
 }
@@ -320,7 +376,9 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                 PlaybackStateCompat.ACTION_PLAY or
                 PlaybackStateCompat.ACTION_PAUSE or
                 PlaybackStateCompat.ACTION_STOP or
-                PlaybackStateCompat.ACTION_PLAY_PAUSE
+                PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
             )
             .setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f)
 
@@ -452,7 +510,10 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             currentCodecHint = codecHint
             currentStationName = stationName
             currentCoverArtUri = coverArtUri
+            currentStationId = intent.getLongExtra(EXTRA_STATION_ID, -1L)
             reconnectAttempts = 0
+            reconnectCycleStartMs = 0L
+            resumeOnFocusGain = false
 
             startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connecting)))
             broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
@@ -476,6 +537,12 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         }
         ACTION_PAUSE -> {
             pauseOrStopForLive()
+        }
+        ACTION_SKIP_TO_NEXT -> {
+            skipToStation(1)
+        }
+        ACTION_SKIP_TO_PREVIOUS -> {
+            skipToStation(-1)
         }
         ACTION_STOP -> {
             stopRecording()
@@ -2423,7 +2490,11 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
 
             player = ExoPlayer.Builder(this)
                 .setLoadControl(loadControl)
-                .setAudioAttributes(audioAttributes, true)
+                // We manage audio focus ourselves (see audioFocusChangeListener) so we
+                // can fully release the network on a phone call and reconnect after,
+                // instead of letting ExoPlayer pause-and-buffer. Passing true here would
+                // create a second, conflicting focus owner.
+                .setAudioAttributes(audioAttributes, false)
                 .setWakeMode(androidx.media3.common.C.WAKE_MODE_NETWORK)
                 .build().apply {
                 // Combine URL extension signals with the hlsHint from Radio
@@ -2472,6 +2543,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                         when (playbackState) {
                             Player.STATE_READY -> {
                                 reconnectAttempts = 0
+                                reconnectCycleStartMs = 0L
                                 val status = if (isRecording) getString(R.string.notification_playing_recording) else getString(R.string.notification_playing)
                                 startForeground(NOTIFICATION_ID, createNotification(status))
                                 updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
@@ -2579,6 +2651,58 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         }
     }
 
+    // Register a callback so that when connectivity is restored after a drop
+    // (e.g. moving back into coverage, or WiFi/cellular handover) we can retry
+    // the stream immediately instead of waiting for the next scheduled attempt.
+    private fun registerNetworkCallback() {
+        if (networkCallbackRegistered) return
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return
+        connectivityManager = cm
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                handler.post { onNetworkAvailable() }
+            }
+        }
+        networkCallback = callback
+        try {
+            cm.registerDefaultNetworkCallback(callback)
+            networkCallbackRegistered = true
+        } catch (e: Exception) {
+            android.util.Log.w("RadioService", "Failed to register network callback: ${e.message}")
+        }
+    }
+
+    private fun unregisterNetworkCallback() {
+        if (!networkCallbackRegistered) return
+        try {
+            networkCallback?.let { connectivityManager?.unregisterNetworkCallback(it) }
+        } catch (e: Exception) {
+            android.util.Log.w("RadioService", "Failed to unregister network callback: ${e.message}")
+        }
+        networkCallback = null
+        networkCallbackRegistered = false
+    }
+
+    private fun onNetworkAvailable() {
+        if (!PreferencesHelper.isAutoReconnectEnabled(this)) return
+        // Only reconnect if we're mid-recovery (an error/stall set reconnectCycleStartMs)
+        // and still have a stream we were trying to play. A deliberate pause/stop nulls
+        // currentStreamUrl or never starts a cycle, so this won't resume a stopped stream.
+        if (reconnectCycleStartMs == 0L || currentStreamUrl == null) return
+        if (player?.isPlaying == true) return
+        android.util.Log.d("RadioService", "Network available - retrying stream immediately")
+        // Connectivity is back, so grant a fresh retry window from now.
+        reconnectCycleStartMs = SystemClock.elapsedRealtime()
+        reconnectAttempts = 0
+        reconnectRunnable?.let { handler.removeCallbacks(it) }
+        currentStreamUrl?.let { url ->
+            playStream(url, currentProxyHost ?: "", currentProxyPort, currentProxyType,
+                currentCustomProxyProtocol, currentProxyUsername, currentProxyPassword,
+                currentProxyAuthType, currentProxyConnectionTimeout,
+                currentHlsHint, currentCodecHint)
+        }
+    }
+
     private fun scheduleReconnect() {
         if (currentStreamUrl == null) {
             android.util.Log.d("RadioService", "No stream to reconnect to")
@@ -2586,19 +2710,36 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             return
         }
 
-        if (reconnectAttempts >= maxReconnectAttempts) {
-            android.util.Log.e("RadioService", "Max reconnection attempts reached")
-            // Broadcast final failure to UI
+        if (!PreferencesHelper.isAutoReconnectEnabled(this)) {
+            android.util.Log.d("RadioService", "Auto-reconnect disabled, giving up")
             broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
             broadcastStreamError(ERROR_TYPE_MAX_RETRIES)
             startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connection_failed)))
             return
         }
 
-        val delay = minOf(1000L * reconnectAttempts, 5000L)
+        val now = SystemClock.elapsedRealtime()
+        if (reconnectCycleStartMs == 0L) {
+            reconnectCycleStartMs = now
+        }
+
+        // Total time budget for recovery. Once it elapses we stop hammering the
+        // network and surface a failure; the network-available callback can still
+        // kick off a fresh attempt later if connectivity returns.
+        val budgetMs = PreferencesHelper.getReconnectDurationMinutes(this).coerceAtLeast(1) * 60_000L
+        if (now - reconnectCycleStartMs > budgetMs) {
+            android.util.Log.e("RadioService", "Reconnect window exhausted (${budgetMs}ms), giving up")
+            reconnectCycleStartMs = 0L
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+            broadcastStreamError(ERROR_TYPE_MAX_RETRIES)
+            startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_connection_failed)))
+            return
+        }
+
+        val intervalMs = PreferencesHelper.getReconnectIntervalSeconds(this).coerceAtLeast(1) * 1000L
         reconnectAttempts++
 
-        android.util.Log.d("RadioService", "Reconnecting in ${delay}ms (attempt $reconnectAttempts)")
+        android.util.Log.d("RadioService", "Reconnecting in ${intervalMs}ms (attempt $reconnectAttempts)")
         // Keep buffering state while reconnecting
         broadcastPlaybackStateChanged(isBuffering = true, isPlaying = false)
         startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_reconnecting)))
@@ -2614,7 +2755,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                     currentHlsHint, currentCodecHint)
             }
         }
-        handler.postDelayed(reconnectRunnable!!, delay)
+        handler.postDelayed(reconnectRunnable!!, intervalMs)
     }
     
    private fun pauseOrStopForLive() {
@@ -2634,6 +2775,111 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
     }
 }
+
+    // ---- Skip / queue (custom-order library) ----
+    // The queue is the library in Custom order. Skipping replays the neighbouring
+    // station through the normal ACTION_PLAY path, so each station's proxy is set
+    // up exactly as a manual play would. No-ops when the current station isn't in
+    // the library or there's nothing to skip to. Wraps around at the ends.
+    private fun skipToStation(direction: Int) {
+        val id = currentStationId
+        if (id <= 0L) return
+        serviceScope.launch {
+            // The queue follows the current library view: its persisted sort order
+            // and genre filter. Each sort is effectively its own queue.
+            val sortOrder = try {
+                SortOrder.valueOf(PreferencesHelper.getSortOrder(this@RadioService))
+            } catch (e: Exception) {
+                SortOrder.DEFAULT
+            }
+            val genreFilter = PreferencesHelper.getGenreFilter(this@RadioService)
+            val stations = try {
+                radioRepository.getQueueStations(sortOrder, genreFilter)
+            } catch (e: Exception) {
+                emptyList()
+            }
+            if (stations.size < 2) return@launch
+            val index = stations.indexOfFirst { it.id == id }
+            if (index < 0) return@launch
+            val n = stations.size
+            val nextIndex = ((index + direction) % n + n) % n
+            val next = stations[nextIndex]
+            currentStationId = next.id
+            startService(buildPlayIntent(next))
+            broadcastCurrentStationChanged(next.id)
+        }
+    }
+
+    private fun buildPlayIntent(station: RadioStation): Intent {
+        val proxyType = station.getProxyTypeEnum()
+        return Intent(this, RadioService::class.java).apply {
+            action = ACTION_PLAY
+            putExtra("stream_url", station.streamUrl)
+            putExtra("station_name", station.name)
+            putExtra("proxy_host", if (station.useProxy) station.proxyHost else "")
+            putExtra("proxy_port", station.proxyPort)
+            putExtra("proxy_type", proxyType.name)
+            putExtra("cover_art_uri", station.coverArtUri)
+            putExtra("custom_proxy_protocol", station.customProxyProtocol)
+            putExtra("proxy_username", station.proxyUsername)
+            putExtra("proxy_password", RadioStationPasswordHelper.getDecryptedPassword(this@RadioService, station))
+            putExtra("proxy_auth_type", station.proxyAuthType)
+            putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
+            putExtra("hls_hint", station.hlsHint)
+            putExtra("codec_hint", station.codecHint)
+            putExtra(EXTRA_STATION_ID, station.id)
+        }
+    }
+
+    private fun broadcastCurrentStationChanged(stationId: Long) {
+        val intent = Intent(BROADCAST_CURRENT_STATION_CHANGED).apply {
+            putExtra(EXTRA_STATION_ID, stationId)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    // Pause for a transient interruption (phone call, navigation prompt, etc.).
+    // For a live (Icecast/Shoutcast) stream we fully release the network connection
+    // so we don't keep pulling audio nobody can hear; for on-demand/HLS content a
+    // normal pause preserves position. We deliberately keep our audio-focus request
+    // (do NOT abandon it) so the system still delivers AUDIOFOCUS_GAIN to resume.
+    private fun pauseForInterruption() {
+        val p = player ?: return
+        if (!p.isPlaying &&
+            p.playbackState != Player.STATE_BUFFERING &&
+            p.playbackState != Player.STATE_READY
+        ) {
+            return
+        }
+        resumeOnFocusGain = true
+        if (isLiveStream) {
+            p.stop()
+        } else {
+            p.pause()
+        }
+        updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
+        broadcastPlaybackStateChanged(isBuffering = false, isPlaying = false)
+        startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
+    }
+
+    // Resume after a transient interruption ends. Live streams reconnect fresh to the
+    // live edge (avoiding the stale-buffer-then-stall problem); other content just plays.
+    private fun resumeFromInterruption() {
+        if (isLiveStream) {
+            val url = currentStreamUrl ?: return
+            playStream(
+                url, currentProxyHost ?: "", currentProxyPort, currentProxyType,
+                currentCustomProxyProtocol, currentProxyUsername, currentProxyPassword,
+                currentProxyAuthType, currentProxyConnectionTimeout,
+                currentHlsHint, currentCodecHint
+            )
+        } else {
+            player?.play()
+            updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
+            broadcastPlaybackStateChanged(isBuffering = false, isPlaying = true)
+        }
+    }
+
     private fun stopStream() {
         // Stop playback time updates first
         stopPlaybackTimeUpdates()
@@ -2737,9 +2983,21 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        // Build media style with session token for Now Playing card integration
+        val previousPendingIntent = PendingIntent.getService(
+            this, 3,
+            Intent(this, RadioService::class.java).apply { action = ACTION_SKIP_TO_PREVIOUS },
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val nextPendingIntent = PendingIntent.getService(
+            this, 4,
+            Intent(this, RadioService::class.java).apply { action = ACTION_SKIP_TO_NEXT },
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        // Build media style with session token for Now Playing card integration.
+        // Compact view shows previous / play-pause / next (action indices 0,1,2).
         val mediaStyle = MediaNotificationCompat.MediaStyle()
-            .setShowActionsInCompactView(0, 1)
+            .setShowActionsInCompactView(0, 1, 2)
 
         // Set session token for media notification integration
         mediaSession?.sessionToken?.let { token ->
@@ -2751,7 +3009,9 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             .setContentText(status)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentIntent(pendingIntent)
+            .addAction(R.drawable.ic_skip_previous, getString(R.string.notification_action_previous), previousPendingIntent)
             .addAction(R.drawable.ic_pause, getString(R.string.notification_action_pause), playPausePendingIntent)
+            .addAction(R.drawable.ic_skip_next, getString(R.string.notification_action_next), nextPendingIntent)
             .addAction(R.drawable.ic_stop, getString(R.string.notification_action_stop), stopPendingIntent)
             .setStyle(mediaStyle)
             .setOngoing(true)
@@ -3025,6 +3285,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             unregisterReceiver(becomingNoisyReceiver)
             becomingNoisyReceiverRegistered = false
         }
+        unregisterNetworkCallback()
         stopRecording()
         cancelSleepTimer()
         equalizerManager?.release()

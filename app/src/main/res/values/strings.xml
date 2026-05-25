@@ -34,6 +34,12 @@
     <string name="sort_recent">Recent</string>
     <string name="sort_liked">Liked</string>
     <string name="sort_genre">Genre</string>
+    <string name="sort_custom">Custom queue</string>
+    <string name="menu_move_up">Move up</string>
+    <string name="menu_move_down">Move down</string>
+    <string name="custom_order_hint_title">Custom queue</string>
+    <string name="custom_order_hint_message">Stations play in the order you arrange here, and you can skip through them from the notification, lockscreen, and Android Auto. Press and hold a station — or drag the grip handle — to move it. Your order is saved automatically.</string>
+    <string name="button_got_it">Got it</string>
 
     <!-- Search -->
     <string name="search_stations">Search library</string>
@@ -43,6 +49,21 @@
     <!-- Genre filter -->
     <string name="genre_all">All Genres</string>
     <string name="filter_by_genre">Filter by Genre</string>
+
+    <!-- Manage genres -->
+    <string name="manage_genres">Manage genres</string>
+    <string name="manage_genres_empty">You don\'t have any custom genres to manage yet. Genres are added when you set them on a station.</string>
+    <string name="manage_genres_selected_count">%1$d selected</string>
+    <string name="genre_action_rename">Rename</string>
+    <string name="genre_action_delete">Delete</string>
+    <string name="genre_rename_title">Rename genre</string>
+    <string name="genre_delete_confirm_title">Delete genre?</string>
+    <string name="genre_delete_confirm_message">Move %2$d station(s) using \"%1$s\" to Other? The genre will be removed from the list.</string>
+    <string name="genres_delete_selected_title">Delete genres?</string>
+    <string name="genres_delete_selected_message">Move all stations from %1$d genre(s) to Other? The genres will be removed from the list.</string>
+    <string name="genre_deleted_toast">Deleted genre \"%1$s\"</string>
+    <string name="genres_deleted_toast">Deleted %1$d genre(s)</string>
+    <string name="genre_renamed_toast">Genre renamed</string>
 
     <!-- Genre Names -->
     <string name="genre_alternative">Alternative</string>
@@ -145,6 +166,8 @@
     <string name="notification_channel_description">Shows radio playback status</string>
     <string name="notification_action_pause">Pause</string>
     <string name="notification_action_stop">Stop</string>
+    <string name="notification_action_previous">Previous</string>
+    <string name="notification_action_next">Next</string>
 
     <!-- Recording Messages -->
     <string name="recording_failed">Recording failed: %s</string>
@@ -163,6 +186,7 @@
     <string name="button_edit">Edit</string>
     <string name="button_select_all">Select All</string>
     <string name="button_cancel">Cancel</string>
+    <string name="button_close">Close</string>
     <string name="button_import">Import</string>
     <string name="button_export">Export</string>
     <string name="button_add">Add</string>
@@ -282,6 +306,12 @@
     <string name="settings_record_across_stations_description">Keep recording when switching stations</string>
     <string name="settings_record_all_stations">Record All Stations</string>
     <string name="settings_record_all_stations_description">Switch to new station\'s stream in same file</string>
+    <string name="settings_auto_reconnect">Auto-reconnect</string>
+    <string name="settings_auto_reconnect_description">Keep retrying a dropped stream and resume when the connection returns</string>
+    <string name="settings_auto_reconnect_off">Off</string>
+    <string name="settings_auto_reconnect_on">%1$d min</string>
+    <string name="settings_reconnect_duration">Keep trying for (minutes)</string>
+    <string name="settings_reconnect_interval">Retry every (seconds)</string>
 
     <!-- Settings - Station Management -->
     <string name="settings_station_management">Station Management</string>
@@ -724,6 +754,7 @@
     <string name="cd_invizible_pro">InviZible Pro</string>
     <string name="cd_open">Open</string>
     <string name="cd_more_options">More options</string>
+    <string name="cd_drag_handle">Drag to reorder</string>
     <string name="cd_tor_status">Tor status</string>
     <string name="cd_bandwidth_icon">Bandwidth icon</string>
     <string name="cd_like_station">Like station</string>

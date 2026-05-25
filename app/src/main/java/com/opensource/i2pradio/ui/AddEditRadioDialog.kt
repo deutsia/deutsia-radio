@@ -381,6 +381,12 @@ class AddEditRadioDialog : DialogFragment() {
                         proxyPort = proxyPort,
                         coverArtUri = coverArt,
                         isPreset = stationToEdit?.isPreset ?: false,
+                        // Preserve stateful fields on edit so changing a station's details
+                        // doesn't wipe its liked state, added time, or custom sort position.
+                        isLiked = stationToEdit?.isLiked ?: false,
+                        addedTimestamp = stationToEdit?.addedTimestamp ?: System.currentTimeMillis(),
+                        lastPlayedAt = stationToEdit?.lastPlayedAt ?: 0L,
+                        displayOrder = stationToEdit?.displayOrder ?: 0,
                         // Preserve existing fields for RadioBrowser stations
                         source = stationToEdit?.source ?: com.opensource.i2pradio.data.StationSource.USER.name,
                         radioBrowserUuid = stationToEdit?.radioBrowserUuid,

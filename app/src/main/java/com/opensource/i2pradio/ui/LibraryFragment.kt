@@ -31,6 +31,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.request.Disposable
@@ -69,6 +70,70 @@ class LibraryFragment : Fragment() {
 
     // Cache for search filtering
     private var allStationsCache: List<RadioStation> = emptyList()
+
+    // Drag-to-reorder (Custom order). While a drag is in progress we hold off on
+    // re-submitting the list from LiveData so the database write doesn't fight the gesture.
+    private var isDraggingStation = false
+    private val reorderTouchHelper by lazy {
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
+        ) {
+            override fun isLongPressDragEnabled() = adapter.isReorderable()
+            override fun isItemViewSwipeEnabled() = false
+
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                val dragFlags = if (adapter.isReorderable()) {
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                } else {
+                    0
+                }
+                return makeMovementFlags(dragFlags, 0)
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                val from = viewHolder.bindingAdapterPosition
+                val to = target.bindingAdapterPosition
+                if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION) return false
+                adapter.moveItem(from, to)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    isDraggingStation = true
+                    viewHolder?.itemView?.alpha = 0.85f
+                }
+            }
+
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                viewHolder.itemView.alpha = 1f
+                if (isDraggingStation) {
+                    isDraggingStation = false
+                    persistCustomOrder()
+                }
+            }
+        })
+    }
+
+    private fun persistCustomOrder() {
+        val ordered = adapter.currentStations()
+        allStationsCache = ordered
+        val ids = ordered.map { it.id }
+        lifecycleScope.launch {
+            repository.setStationOrder(ids)
+        }
+    }
 
     // Selection mode
     private var actionMode: ActionMode? = null
@@ -230,9 +295,11 @@ class LibraryFragment : Fragment() {
             onMenuClick = { station, anchor -> showStationMenu(station, anchor) },
             onLikeClick = { station -> toggleLike(station) },
             onLongPress = { station -> startSelectionMode(station) },
-            onSelectionChanged = { updateActionModeTitle() }
+            onSelectionChanged = { updateActionModeTitle() },
+            onStartDrag = { viewHolder -> reorderTouchHelper.startDrag(viewHolder) }
         )
         recyclerView.adapter = adapter
+        reorderTouchHelper.attachToRecyclerView(recyclerView)
 
         // Load saved sort order
         val savedSortOrder = PreferencesHelper.getSortOrder(requireContext())
@@ -318,6 +385,14 @@ class LibraryFragment : Fragment() {
     }
 
     private fun filterStations() {
+        // Don't clobber the list mid-drag; persistCustomOrder() refreshes it on drop.
+        if (isDraggingStation) return
+
+        // Drag-to-reorder is offered only for the full, unfiltered Custom-order list.
+        val reorderable = currentSortOrder == SortOrder.CUSTOM &&
+            currentGenreFilter == null &&
+            currentSearchQuery.isEmpty()
+
         val filteredStations = if (currentSearchQuery.isEmpty()) {
             allStationsCache
         } else {
@@ -354,6 +429,11 @@ class LibraryFragment : Fragment() {
             emptyStateContainer.visibility = View.GONE
             adapter.submitList(filteredStations)
         }
+
+        // Toggle handles AFTER submitting the list. setReorderEnabled triggers a
+        // full rebind when the flag changes, which must be the last update so the
+        // grip handles actually appear (DiffUtil move-dispatch alone won't rebind them).
+        adapter.setReorderEnabled(reorderable)
     }
 
     private fun showSortDialog() {
@@ -362,7 +442,8 @@ class LibraryFragment : Fragment() {
             getString(R.string.sort_name),
             getString(R.string.sort_recent),
             getString(R.string.sort_liked),
-            getString(R.string.sort_genre)
+            getString(R.string.sort_genre),
+            getString(R.string.sort_custom)
         )
         val currentIndex = currentSortOrder.ordinal
 
@@ -374,7 +455,21 @@ class LibraryFragment : Fragment() {
                 updateSortButtonText()
                 observeStations()
                 dialog.dismiss()
+                if (currentSortOrder == SortOrder.CUSTOM &&
+                    !PreferencesHelper.isCustomOrderHintShown(requireContext())
+                ) {
+                    PreferencesHelper.setCustomOrderHintShown(requireContext(), true)
+                    showCustomOrderHintDialog()
+                }
             }
+            .show()
+    }
+
+    private fun showCustomOrderHintDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.custom_order_hint_title))
+            .setMessage(getString(R.string.custom_order_hint_message))
+            .setPositiveButton(getString(R.string.button_got_it), null)
             .show()
     }
 
@@ -426,6 +521,9 @@ class LibraryFragment : Fragment() {
                     tempSelectedGenre = selectedGenre
                 })
                 .setNegativeButton(android.R.string.cancel, null)
+                .setNeutralButton(getString(R.string.manage_genres)) { _, _ ->
+                    showManageGenresDialog()
+                }
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     // Apply the selection when OK is clicked
                     // Store English genre name for language portability
@@ -444,6 +542,294 @@ class LibraryFragment : Fragment() {
                 .create()
 
             dialog.show()
+        }
+    }
+
+    private fun showManageGenresDialog() {
+        val context = requireContext()
+        val view = layoutInflater.inflate(R.layout.dialog_manage_genres, null)
+        val recycler = view.findViewById<MaxHeightRecyclerView>(R.id.manageGenresRecycler)
+        recycler.maxHeightPx = (360 * resources.displayMetrics.density).toInt()
+        val emptyView = view.findViewById<TextView>(R.id.manageGenresEmpty)
+        val titleView = view.findViewById<TextView>(R.id.manageGenresTitle)
+        val selectAllButton = view.findViewById<MaterialButton>(R.id.selectAllButton)
+        val deleteSelectedButton = view.findViewById<MaterialButton>(R.id.deleteSelectedButton)
+        val closeButton = view.findViewById<MaterialButton>(R.id.closeButton)
+
+        recycler.layoutManager = LinearLayoutManager(context)
+
+        var reload: () -> Unit = {}
+        lateinit var adapter: ManageGenreAdapter
+
+        fun updateChrome() {
+            if (adapter.selectionMode) {
+                titleView.text = getString(R.string.manage_genres_selected_count, adapter.selectedCount())
+                selectAllButton.visibility = View.VISIBLE
+                deleteSelectedButton.visibility = View.VISIBLE
+                closeButton.text = getString(R.string.button_cancel)
+            } else {
+                titleView.text = getString(R.string.manage_genres)
+                selectAllButton.visibility = View.GONE
+                deleteSelectedButton.visibility = View.GONE
+                closeButton.text = getString(R.string.button_close)
+            }
+        }
+
+        adapter = ManageGenreAdapter(
+            onRename = { genre -> showRenameGenreDialog(genre) { reload() } },
+            onDelete = { genre -> confirmDeleteGenre(genre) { reload() } },
+            onSelectionChanged = { updateChrome() }
+        )
+        recycler.adapter = adapter
+
+        val dialog = MaterialAlertDialogBuilder(context)
+            .setView(view)
+            .create()
+
+        reload = {
+            lifecycleScope.launch(Dispatchers.Main) {
+                val dbGenres = try {
+                    repository.getAllGenresSync()
+                } catch (e: Exception) {
+                    emptyList()
+                }
+                // Only user-managed genres are deletable; "Other" is the fallback sink.
+                val manageable = dbGenres.filter { it.isNotBlank() && it != "Other" }.sorted()
+                if (!isAdded) return@launch
+                adapter.setGenres(manageable)
+                val isEmpty = manageable.isEmpty()
+                emptyView.visibility = if (isEmpty) View.VISIBLE else View.GONE
+                recycler.visibility = if (isEmpty) View.GONE else View.VISIBLE
+                updateChrome()
+            }
+        }
+
+        closeButton.setOnClickListener {
+            if (adapter.selectionMode) adapter.exitSelectionMode() else dialog.dismiss()
+        }
+        selectAllButton.setOnClickListener { adapter.selectAll() }
+        deleteSelectedButton.setOnClickListener {
+            val selected = adapter.selectedGenres()
+            if (selected.isNotEmpty()) {
+                confirmDeleteGenres(selected) {
+                    adapter.exitSelectionMode()
+                    reload()
+                }
+            }
+        }
+
+        updateChrome()
+        reload()
+        dialog.show()
+    }
+
+    private fun confirmDeleteGenre(genre: String, onComplete: (() -> Unit)? = null) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val count = try {
+                repository.countStationsByGenre(genre)
+            } catch (e: Exception) {
+                0
+            }
+            if (!isAdded) return@launch
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.genre_delete_confirm_title))
+                .setMessage(getString(R.string.genre_delete_confirm_message, genre, count))
+                .setPositiveButton(getString(R.string.genre_action_delete)) { _, _ ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        repository.renameGenre(genre, "Other")
+                        if (!isAdded) return@launch
+                        // Reset the filter if we just deleted the genre being filtered on
+                        if (currentGenreFilter == genre) {
+                            currentGenreFilter = null
+                            PreferencesHelper.setGenreFilter(requireContext(), null)
+                            updateGenreFilterButtonText()
+                        }
+                        observeStations()
+                        if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.genre_deleted_toast, genre),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        onComplete?.invoke()
+                    }
+                }
+                .setNegativeButton(getString(R.string.button_cancel), null)
+                .show()
+        }
+    }
+
+    private fun confirmDeleteGenres(genres: List<String>, onComplete: () -> Unit) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.genres_delete_selected_title))
+            .setMessage(getString(R.string.genres_delete_selected_message, genres.size))
+            .setPositiveButton(getString(R.string.genre_action_delete)) { _, _ ->
+                lifecycleScope.launch(Dispatchers.Main) {
+                    for (genre in genres) {
+                        repository.renameGenre(genre, "Other")
+                    }
+                    if (!isAdded) return@launch
+                    if (currentGenreFilter != null && genres.contains(currentGenreFilter)) {
+                        currentGenreFilter = null
+                        PreferencesHelper.setGenreFilter(requireContext(), null)
+                        updateGenreFilterButtonText()
+                    }
+                    observeStations()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.genres_deleted_toast, genres.size),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    onComplete()
+                }
+            }
+            .setNegativeButton(getString(R.string.button_cancel), null)
+            .show()
+    }
+
+    private fun showRenameGenreDialog(oldGenre: String, onComplete: (() -> Unit)? = null) {
+        val context = requireContext()
+        val density = resources.displayMetrics.density
+        fun dp(v: Int) = (v * density).toInt()
+        val input = TextInputEditText(context).apply {
+            setText(oldGenre)
+            setSelection(text?.length ?: 0)
+        }
+        val wrapper = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(24), dp(8), dp(24), 0)
+            addView(input)
+        }
+        MaterialAlertDialogBuilder(context)
+            .setTitle(getString(R.string.genre_rename_title))
+            .setView(wrapper)
+            .setPositiveButton(getString(R.string.button_save)) { _, _ ->
+                val newGenre = input.text?.toString()?.trim().orEmpty()
+                if (newGenre.isEmpty() || newGenre == oldGenre) return@setPositiveButton
+                lifecycleScope.launch(Dispatchers.Main) {
+                    repository.renameGenre(oldGenre, newGenre)
+                    if (!isAdded) return@launch
+                    if (currentGenreFilter == oldGenre) {
+                        currentGenreFilter = newGenre
+                        PreferencesHelper.setGenreFilter(requireContext(), newGenre)
+                        updateGenreFilterButtonText()
+                    }
+                    observeStations()
+                    if (!PreferencesHelper.isToastMessagesDisabled(requireContext())) {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.genre_renamed_toast),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    onComplete?.invoke()
+                }
+            }
+            .setNegativeButton(getString(R.string.button_cancel), null)
+            .show()
+    }
+
+    // Adapter for the Manage genres dialog: per-row rename/delete, plus long-press
+    // multi-select for mass delete (mirrors the library's selection behaviour).
+    private inner class ManageGenreAdapter(
+        private val onRename: (String) -> Unit,
+        private val onDelete: (String) -> Unit,
+        private val onSelectionChanged: () -> Unit
+    ) : RecyclerView.Adapter<ManageGenreAdapter.ViewHolder>() {
+
+        private val genres = mutableListOf<String>()
+        private val selected = mutableSetOf<String>()
+        var selectionMode = false
+            private set
+
+        fun setGenres(newGenres: List<String>) {
+            genres.clear()
+            genres.addAll(newGenres)
+            selected.retainAll(genres.toSet())
+            if (selected.isEmpty()) selectionMode = false
+            notifyDataSetChanged()
+        }
+
+        fun selectedGenres(): List<String> = selected.toList()
+
+        fun selectedCount(): Int = selected.size
+
+        fun enterSelectionMode(genre: String) {
+            selectionMode = true
+            selected.clear()
+            selected.add(genre)
+            notifyDataSetChanged()
+            onSelectionChanged()
+        }
+
+        fun exitSelectionMode() {
+            selectionMode = false
+            selected.clear()
+            notifyDataSetChanged()
+            onSelectionChanged()
+        }
+
+        fun selectAll() {
+            selected.clear()
+            selected.addAll(genres)
+            notifyDataSetChanged()
+            onSelectionChanged()
+        }
+
+        private fun toggle(genre: String) {
+            if (!selected.add(genre)) selected.remove(genre)
+            if (selected.isEmpty()) {
+                exitSelectionMode()
+            } else {
+                notifyDataSetChanged()
+                onSelectionChanged()
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val v = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_manage_genre, parent, false)
+            return ViewHolder(v)
+        }
+
+        override fun getItemCount() = genres.size
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            if (position >= genres.size) return
+            holder.bind(genres[position])
+        }
+
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val name: TextView = itemView.findViewById(R.id.genreName)
+            private val checkBox: MaterialCheckBox = itemView.findViewById(R.id.genreCheckBox)
+            private val renameButton: MaterialButton = itemView.findViewById(R.id.renameButton)
+            private val deleteButton: MaterialButton = itemView.findViewById(R.id.deleteButton)
+
+            fun bind(genre: String) {
+                name.text = genre
+                if (selectionMode) {
+                    checkBox.visibility = View.VISIBLE
+                    checkBox.isChecked = selected.contains(genre)
+                    renameButton.visibility = View.GONE
+                    deleteButton.visibility = View.GONE
+                } else {
+                    checkBox.visibility = View.GONE
+                    renameButton.visibility = View.VISIBLE
+                    deleteButton.visibility = View.VISIBLE
+                }
+                itemView.setOnClickListener {
+                    if (selectionMode) toggle(genre)
+                }
+                itemView.setOnLongClickListener {
+                    if (selectionMode) toggle(genre) else enterSelectionMode(genre)
+                    true
+                }
+                renameButton.setOnClickListener { onRename(genre) }
+                deleteButton.setOnClickListener { onDelete(genre) }
+            }
         }
     }
 
@@ -578,6 +964,7 @@ class LibraryFragment : Fragment() {
             SortOrder.RECENTLY_PLAYED -> getString(R.string.sort_recent)
             SortOrder.LIKED -> getString(R.string.sort_liked)
             SortOrder.GENRE -> getString(R.string.sort_genre)
+            SortOrder.CUSTOM -> getString(R.string.sort_custom)
         }
 
         // Use hamburger icon for Default and Genre, sort icon for others
@@ -622,6 +1009,7 @@ class LibraryFragment : Fragment() {
             putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
             putExtra("hls_hint", station.hlsHint)
             putExtra("codec_hint", station.codecHint)
+            putExtra(RadioService.EXTRA_STATION_ID, station.id)
         }
         // Use startForegroundService for Android 8+ compatibility
         ContextCompat.startForegroundService(requireContext(), intent)
@@ -700,6 +1088,24 @@ class LibraryFragment : Fragment() {
             dialog.show(parentFragmentManager, "AddEditRadioDialog")
         }
 
+        // Move up/down are only meaningful in Custom order, and only for the full,
+        // unfiltered list (manual order isn't well-defined inside a genre/search subset).
+        val canReorder = currentSortOrder == SortOrder.CUSTOM &&
+            currentGenreFilter == null &&
+            currentSearchQuery.isEmpty()
+        val moveUpItem = popupView.findViewById<View>(R.id.menuItemMoveUp)
+        val moveDownItem = popupView.findViewById<View>(R.id.menuItemMoveDown)
+        moveUpItem.visibility = if (canReorder) View.VISIBLE else View.GONE
+        moveDownItem.visibility = if (canReorder) View.VISIBLE else View.GONE
+        moveUpItem.setOnClickListener {
+            popupWindow.dismiss()
+            moveStation(station, -1)
+        }
+        moveDownItem.setOnClickListener {
+            popupWindow.dismiss()
+            moveStation(station, 1)
+        }
+
         popupView.findViewById<View>(R.id.menuItemDelete).setOnClickListener {
             popupWindow.dismiss()
             lifecycleScope.launch(Dispatchers.IO) {
@@ -708,6 +1114,24 @@ class LibraryFragment : Fragment() {
         }
 
         popupWindow.showAsDropDown(anchor, 0, -anchor.height)
+    }
+
+    // Swap a station with its neighbour in the custom order and persist the result.
+    // Operates on the full, unfiltered library (guaranteed by the canReorder gate).
+    private fun moveStation(station: RadioStation, direction: Int) {
+        val list = allStationsCache.toMutableList()
+        val i = list.indexOfFirst { it.id == station.id }
+        if (i < 0) return
+        val j = i + direction
+        if (j < 0 || j >= list.size) return
+        val tmp = list[i]
+        list[i] = list[j]
+        list[j] = tmp
+        val orderedIds = list.map { it.id }
+        lifecycleScope.launch {
+            repository.setStationOrder(orderedIds)
+            // The CUSTOM LiveData re-emits in the new order and the list animates.
+        }
     }
 
     /**
@@ -847,13 +1271,15 @@ class RadioStationAdapter(
     private val onMenuClick: (RadioStation, View) -> Unit,
     private val onLikeClick: (RadioStation) -> Unit,
     private val onLongPress: (RadioStation) -> Unit,
-    private val onSelectionChanged: () -> Unit
+    private val onSelectionChanged: () -> Unit,
+    private val onStartDrag: (RecyclerView.ViewHolder) -> Unit = {}
 ) : RecyclerView.Adapter<RadioStationAdapter.ViewHolder>() {
 
     private var stations = listOf<RadioStation>()
     private val selectedStations = mutableSetOf<Long>()
     var isSelectionMode = false
         private set
+    private var reorderEnabled = false
 
     init {
         setHasStableIds(true)
@@ -864,6 +1290,27 @@ class RadioStationAdapter(
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         stations = newStations
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    // Drag-to-reorder support (Custom order only). Show grip handles when enabled,
+    // and expose the live list so the fragment can persist the order on drop.
+    fun setReorderEnabled(enabled: Boolean) {
+        if (reorderEnabled != enabled) {
+            reorderEnabled = enabled
+            notifyDataSetChanged()
+        }
+    }
+
+    fun isReorderable(): Boolean = reorderEnabled && !isSelectionMode
+
+    fun currentStations(): List<RadioStation> = stations
+
+    fun moveItem(from: Int, to: Int) {
+        if (from !in stations.indices || to !in stations.indices) return
+        val list = stations.toMutableList()
+        list.add(to, list.removeAt(from))
+        stations = list
+        notifyItemMoved(from, to)
     }
 
     override fun getItemId(position: Int): Long = stations[position].id
@@ -921,6 +1368,7 @@ class RadioStationAdapter(
         private val menuButton: MaterialButton = itemView.findViewById(R.id.menuButton)
         private val likeButton: MaterialButton = itemView.findViewById(R.id.likeButton)
         private val selectionCheckBox: MaterialCheckBox = itemView.findViewById(R.id.selectionCheckBox)
+        private val dragHandle: ImageView = itemView.findViewById(R.id.dragHandle)
         private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioStation) {
@@ -983,6 +1431,21 @@ class RadioStationAdapter(
                 removeSelectionHighlight()
             }
 
+            // Drag handle: visible only when reordering (Custom order, not selecting).
+            // Touching the handle starts the drag via the ItemTouchHelper.
+            if (isReorderable()) {
+                dragHandle.visibility = View.VISIBLE
+                dragHandle.setOnTouchListener { _, event ->
+                    if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                        onStartDrag(this@ViewHolder)
+                    }
+                    false
+                }
+            } else {
+                dragHandle.visibility = View.GONE
+                dragHandle.setOnTouchListener(null)
+            }
+
             // Touch animation for press feedback
             itemView.setOnTouchListener { v, event ->
                 when (event.action) {
@@ -1015,9 +1478,10 @@ class RadioStationAdapter(
                 }
             }
 
-            // Long press to enter selection mode
+            // Long press enters multi-select — except in Custom order, where a
+            // long press starts a drag-to-reorder instead (handled by ItemTouchHelper).
             itemView.setOnLongClickListener {
-                if (!isSelectionMode) {
+                if (!isSelectionMode && !reorderEnabled) {
                     onLongPress(station)
                     true
                 } else {

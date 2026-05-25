@@ -5,9 +5,14 @@ import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.opensource.i2pradio.RadioService
+import com.opensource.i2pradio.data.RadioRepository
 import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.ui.PreferencesHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Recording state to track the current recording status.
@@ -120,6 +125,22 @@ class RadioViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getCurrentStation(): RadioStation? = _currentStation.value
+
+    /**
+     * Sync the current station from a library id. Used when playback changes from
+     * outside the app (e.g. skip on the lockscreen/notification) so the in-app UI
+     * follows along.
+     */
+    fun syncCurrentStationById(stationId: Long) {
+        if (stationId <= 0L) return
+        if (_currentStation.value?.id == stationId) return
+        viewModelScope.launch {
+            val station = withContext(Dispatchers.IO) {
+                RadioRepository(getApplication()).getStationById(stationId)
+            }
+            station?.let { setCurrentStation(it) }
+        }
+    }
 
     /**
      * Update only the like state of the current station without triggering full UI refresh.

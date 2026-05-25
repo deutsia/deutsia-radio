@@ -786,6 +786,7 @@ class NowPlayingFragment : Fragment() {
                     putExtra("cover_art_uri", station.coverArtUri)
                     putExtra("hls_hint", station.hlsHint)
                     putExtra("codec_hint", station.codecHint)
+                    putExtra(RadioService.EXTRA_STATION_ID, station.id)
                 }
                 ContextCompat.startForegroundService(requireContext(), intent)
                 // Show buffering state while connecting - service will update when ready
