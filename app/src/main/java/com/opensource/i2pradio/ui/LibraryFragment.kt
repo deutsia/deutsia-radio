@@ -1373,6 +1373,7 @@ class RadioStationAdapter(
 
         fun bind(station: RadioStation) {
             stationName.text = station.name
+            stationName.isSelected = true // drive marquee scrolling for long names
 
             // Show proxy type indicator (I2P or Tor only - Custom proxy is indicated by top-right icon)
             val proxyIndicator = if (station.useProxy) {

@@ -75,6 +75,7 @@ class PrivacyRadioCarouselAdapter(
 
         fun bind(station: RadioRegistryStation, rank: Int) {
             stationName.text = station.name
+            stationName.isSelected = true // drive marquee scrolling for long names
             // Build station info with "Online" in green
             val genreWithNetwork = station.getGenreWithNetwork()
             val baseText = if (genreWithNetwork.isNotEmpty() && genreWithNetwork != "Other") {

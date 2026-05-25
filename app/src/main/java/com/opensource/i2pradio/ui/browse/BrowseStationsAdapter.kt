@@ -117,6 +117,7 @@ class BrowseStationsAdapter(
 
         fun bind(station: RadioBrowserStation, isSaved: Boolean, isLiked: Boolean) {
             stationName.text = station.name
+            stationName.isSelected = true // drive marquee scrolling for long names
 
             // Build info string: genre (with network indicator) + country/status
             val isPrivacyStation = station.proxyType.uppercase() in listOf("TOR", "I2P")
