@@ -166,6 +166,8 @@
     <string name="notification_channel_description">Shows radio playback status</string>
     <string name="notification_action_pause">Pause</string>
     <string name="notification_action_stop">Stop</string>
+    <string name="notification_action_previous">Previous</string>
+    <string name="notification_action_next">Next</string>
 
     <!-- Recording Messages -->
     <string name="recording_failed">Recording failed: %s</string>

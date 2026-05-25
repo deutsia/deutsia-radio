@@ -101,6 +101,12 @@ class MainActivity : AppCompatActivity() {
                     // Update ViewModel which will trigger MiniPlayer update
                     viewModel.updateCoverArt(coverArtUri, stationId)
                 }
+                RadioService.BROADCAST_CURRENT_STATION_CHANGED -> {
+                    // Playback moved to another station from outside the app
+                    // (e.g. skip on the lockscreen/notification); follow it.
+                    val stationId = intent.getLongExtra(RadioService.EXTRA_STATION_ID, -1L)
+                    viewModel.syncCurrentStationById(stationId)
+                }
                 BROADCAST_LIKE_STATE_CHANGED -> {
                     val isLiked = intent.getBooleanExtra(EXTRA_IS_LIKED, false)
                     val stationId = intent.getLongExtra(EXTRA_STATION_ID, -1L)
@@ -362,6 +368,7 @@ class MainActivity : AppCompatActivity() {
         val filter = IntentFilter().apply {
             addAction(RadioService.BROADCAST_PLAYBACK_STATE_CHANGED)
             addAction(RadioService.BROADCAST_COVER_ART_CHANGED)
+            addAction(RadioService.BROADCAST_CURRENT_STATION_CHANGED)
             addAction(RadioService.BROADCAST_STREAM_ERROR)
             addAction(RadioService.BROADCAST_SLEEP_TIMER_STATE_CHANGED)
             addAction(BROADCAST_LIKE_STATE_CHANGED)

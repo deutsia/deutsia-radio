@@ -78,6 +78,13 @@ class RadioRepository(context: Context) {
         }
     }
 
+    // Library in custom order as a flat list, used as the playback queue.
+    suspend fun getStationsByCustomOrderSync(): List<RadioStation> {
+        return withContext(Dispatchers.IO) {
+            radioDao.getStationsByCustomOrderSync()
+        }
+    }
+
     fun getLikedStations(): LiveData<List<RadioStation>> = radioDao.getLikedStations()
 
     suspend fun insertStation(station: RadioStation): Long {

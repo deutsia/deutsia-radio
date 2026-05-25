@@ -1009,6 +1009,7 @@ class LibraryFragment : Fragment() {
             putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
             putExtra("hls_hint", station.hlsHint)
             putExtra("codec_hint", station.codecHint)
+            putExtra(RadioService.EXTRA_STATION_ID, station.id)
         }
         // Use startForegroundService for Android 8+ compatibility
         ContextCompat.startForegroundService(requireContext(), intent)

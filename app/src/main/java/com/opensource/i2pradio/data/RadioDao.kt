@@ -29,6 +29,10 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations ORDER BY displayOrder ASC, id ASC")
     fun getAllStationsSortedByCustom(): LiveData<List<RadioStation>>
 
+    // Custom order as a plain list, for the playback queue (skip next/previous)
+    @Query("SELECT * FROM radio_stations ORDER BY displayOrder ASC, id ASC")
+    suspend fun getStationsByCustomOrderSync(): List<RadioStation>
+
     // Persist a station's position in the custom order
     @Query("UPDATE radio_stations SET displayOrder = :order WHERE id = :id")
     suspend fun updateDisplayOrder(id: Long, order: Int)

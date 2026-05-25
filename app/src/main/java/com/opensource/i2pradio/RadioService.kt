@@ -49,6 +49,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import com.opensource.i2pradio.data.ProxyType
+import com.opensource.i2pradio.data.RadioRepository
+import com.opensource.i2pradio.data.RadioStation
+import com.opensource.i2pradio.data.RadioStationPasswordHelper
 import com.opensource.i2pradio.i2p.I2PManager
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
@@ -188,6 +191,11 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
 
     private var isRecording = false
     private var currentStationName: String = "Unknown Station"
+    // Id of the station currently playing, used to find neighbours in the
+    // custom-order queue for skip next/previous. -1 when the station isn't
+    // from the library (e.g. played from Browse), which disables skipping.
+    @Volatile private var currentStationId: Long = -1L
+    private val radioRepository by lazy { RadioRepository(this) }
     private var recordingCall: Call? = null
     private var recordingThread: Thread? = null
     private var recordingOutputStream: OutputStream? = null
@@ -223,6 +231,8 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         const val ACTION_PLAY = "com.opensource.i2pradio.PLAY"
         const val ACTION_PAUSE = "com.opensource.i2pradio.PAUSE"
         const val ACTION_STOP = "com.opensource.i2pradio.STOP"
+        const val ACTION_SKIP_TO_NEXT = "com.opensource.i2pradio.SKIP_TO_NEXT"
+        const val ACTION_SKIP_TO_PREVIOUS = "com.opensource.i2pradio.SKIP_TO_PREVIOUS"
         const val ACTION_START_RECORDING = "com.opensource.i2pradio.START_RECORDING"
         const val ACTION_STOP_RECORDING = "com.opensource.i2pradio.STOP_RECORDING"
         const val ACTION_SWITCH_RECORDING_STREAM = "com.opensource.i2pradio.SWITCH_RECORDING_STREAM"
@@ -234,6 +244,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         const val BROADCAST_METADATA_CHANGED = "com.opensource.i2pradio.METADATA_CHANGED"
         const val BROADCAST_STREAM_INFO_CHANGED = "com.opensource.i2pradio.STREAM_INFO_CHANGED"
         const val BROADCAST_PLAYBACK_STATE_CHANGED = "com.opensource.i2pradio.PLAYBACK_STATE_CHANGED"
+        const val BROADCAST_CURRENT_STATION_CHANGED = "com.opensource.i2pradio.CURRENT_STATION_CHANGED"
         const val BROADCAST_RECORDING_ERROR = "com.opensource.i2pradio.RECORDING_ERROR"
         const val BROADCAST_RECORDING_COMPLETE = "com.opensource.i2pradio.RECORDING_COMPLETE"
         const val EXTRA_METADATA = "metadata"
@@ -347,6 +358,14 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                 }
                 startService(stopIntent)
             }
+
+            override fun onSkipToNext() {
+                skipToStation(1)
+            }
+
+            override fun onSkipToPrevious() {
+                skipToStation(-1)
+            }
         })
     }
 }
@@ -356,7 +375,9 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                 PlaybackStateCompat.ACTION_PLAY or
                 PlaybackStateCompat.ACTION_PAUSE or
                 PlaybackStateCompat.ACTION_STOP or
-                PlaybackStateCompat.ACTION_PLAY_PAUSE
+                PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
             )
             .setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f)
 
@@ -488,6 +509,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             currentCodecHint = codecHint
             currentStationName = stationName
             currentCoverArtUri = coverArtUri
+            currentStationId = intent.getLongExtra(EXTRA_STATION_ID, -1L)
             reconnectAttempts = 0
             reconnectCycleStartMs = 0L
             resumeOnFocusGain = false
@@ -514,6 +536,12 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         }
         ACTION_PAUSE -> {
             pauseOrStopForLive()
+        }
+        ACTION_SKIP_TO_NEXT -> {
+            skipToStation(1)
+        }
+        ACTION_SKIP_TO_PREVIOUS -> {
+            skipToStation(-1)
         }
         ACTION_STOP -> {
             stopRecording()
@@ -2746,6 +2774,61 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
         startForeground(NOTIFICATION_ID, createNotification(getString(R.string.notification_paused)))
     }
 }
+
+    // ---- Skip / queue (custom-order library) ----
+    // The queue is the library in Custom order. Skipping replays the neighbouring
+    // station through the normal ACTION_PLAY path, so each station's proxy is set
+    // up exactly as a manual play would. No-ops when the current station isn't in
+    // the library or there's nothing to skip to. Wraps around at the ends.
+    private fun skipToStation(direction: Int) {
+        val id = currentStationId
+        if (id <= 0L) return
+        serviceScope.launch {
+            val stations = try {
+                radioRepository.getStationsByCustomOrderSync()
+            } catch (e: Exception) {
+                emptyList()
+            }
+            if (stations.size < 2) return@launch
+            val index = stations.indexOfFirst { it.id == id }
+            if (index < 0) return@launch
+            val n = stations.size
+            val nextIndex = ((index + direction) % n + n) % n
+            val next = stations[nextIndex]
+            currentStationId = next.id
+            startService(buildPlayIntent(next))
+            broadcastCurrentStationChanged(next.id)
+        }
+    }
+
+    private fun buildPlayIntent(station: RadioStation): Intent {
+        val proxyType = station.getProxyTypeEnum()
+        return Intent(this, RadioService::class.java).apply {
+            action = ACTION_PLAY
+            putExtra("stream_url", station.streamUrl)
+            putExtra("station_name", station.name)
+            putExtra("proxy_host", if (station.useProxy) station.proxyHost else "")
+            putExtra("proxy_port", station.proxyPort)
+            putExtra("proxy_type", proxyType.name)
+            putExtra("cover_art_uri", station.coverArtUri)
+            putExtra("custom_proxy_protocol", station.customProxyProtocol)
+            putExtra("proxy_username", station.proxyUsername)
+            putExtra("proxy_password", RadioStationPasswordHelper.getDecryptedPassword(this@RadioService, station))
+            putExtra("proxy_auth_type", station.proxyAuthType)
+            putExtra("proxy_connection_timeout", station.proxyConnectionTimeout)
+            putExtra("hls_hint", station.hlsHint)
+            putExtra("codec_hint", station.codecHint)
+            putExtra(EXTRA_STATION_ID, station.id)
+        }
+    }
+
+    private fun broadcastCurrentStationChanged(stationId: Long) {
+        val intent = Intent(BROADCAST_CURRENT_STATION_CHANGED).apply {
+            putExtra(EXTRA_STATION_ID, stationId)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
     // Pause for a transient interruption (phone call, navigation prompt, etc.).
     // For a live (Icecast/Shoutcast) stream we fully release the network connection
     // so we don't keep pulling audio nobody can hear; for on-demand/HLS content a
@@ -2891,9 +2974,21 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        // Build media style with session token for Now Playing card integration
+        val previousPendingIntent = PendingIntent.getService(
+            this, 3,
+            Intent(this, RadioService::class.java).apply { action = ACTION_SKIP_TO_PREVIOUS },
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val nextPendingIntent = PendingIntent.getService(
+            this, 4,
+            Intent(this, RadioService::class.java).apply { action = ACTION_SKIP_TO_NEXT },
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        // Build media style with session token for Now Playing card integration.
+        // Compact view shows previous / play-pause / next (action indices 0,1,2).
         val mediaStyle = MediaNotificationCompat.MediaStyle()
-            .setShowActionsInCompactView(0, 1)
+            .setShowActionsInCompactView(0, 1, 2)
 
         // Set session token for media notification integration
         mediaSession?.sessionToken?.let { token ->
@@ -2905,7 +3000,9 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             .setContentText(status)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentIntent(pendingIntent)
+            .addAction(R.drawable.ic_skip_previous, getString(R.string.notification_action_previous), previousPendingIntent)
             .addAction(R.drawable.ic_pause, getString(R.string.notification_action_pause), playPausePendingIntent)
+            .addAction(R.drawable.ic_skip_next, getString(R.string.notification_action_next), nextPendingIntent)
             .addAction(R.drawable.ic_stop, getString(R.string.notification_action_stop), stopPendingIntent)
             .setStyle(mediaStyle)
             .setOngoing(true)
