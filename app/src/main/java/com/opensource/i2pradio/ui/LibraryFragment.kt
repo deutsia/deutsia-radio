@@ -31,6 +31,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.request.Disposable
@@ -69,6 +70,70 @@ class LibraryFragment : Fragment() {
 
     // Cache for search filtering
     private var allStationsCache: List<RadioStation> = emptyList()
+
+    // Drag-to-reorder (Custom order). While a drag is in progress we hold off on
+    // re-submitting the list from LiveData so the database write doesn't fight the gesture.
+    private var isDraggingStation = false
+    private val reorderTouchHelper by lazy {
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
+        ) {
+            override fun isLongPressDragEnabled() = false
+            override fun isItemViewSwipeEnabled() = false
+
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                val dragFlags = if (adapter.isReorderable()) {
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                } else {
+                    0
+                }
+                return makeMovementFlags(dragFlags, 0)
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                val from = viewHolder.bindingAdapterPosition
+                val to = target.bindingAdapterPosition
+                if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION) return false
+                adapter.moveItem(from, to)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    isDraggingStation = true
+                    viewHolder?.itemView?.alpha = 0.85f
+                }
+            }
+
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                viewHolder.itemView.alpha = 1f
+                if (isDraggingStation) {
+                    isDraggingStation = false
+                    persistCustomOrder()
+                }
+            }
+        })
+    }
+
+    private fun persistCustomOrder() {
+        val ordered = adapter.currentStations()
+        allStationsCache = ordered
+        val ids = ordered.map { it.id }
+        lifecycleScope.launch {
+            repository.setStationOrder(ids)
+        }
+    }
 
     // Selection mode
     private var actionMode: ActionMode? = null
@@ -230,9 +295,11 @@ class LibraryFragment : Fragment() {
             onMenuClick = { station, anchor -> showStationMenu(station, anchor) },
             onLikeClick = { station -> toggleLike(station) },
             onLongPress = { station -> startSelectionMode(station) },
-            onSelectionChanged = { updateActionModeTitle() }
+            onSelectionChanged = { updateActionModeTitle() },
+            onStartDrag = { viewHolder -> reorderTouchHelper.startDrag(viewHolder) }
         )
         recyclerView.adapter = adapter
+        reorderTouchHelper.attachToRecyclerView(recyclerView)
 
         // Load saved sort order
         val savedSortOrder = PreferencesHelper.getSortOrder(requireContext())
@@ -318,6 +385,16 @@ class LibraryFragment : Fragment() {
     }
 
     private fun filterStations() {
+        // Don't clobber the list mid-drag; persistCustomOrder() refreshes it on drop.
+        if (isDraggingStation) return
+
+        // Drag-to-reorder is offered only for the full, unfiltered Custom-order list.
+        adapter.setReorderEnabled(
+            currentSortOrder == SortOrder.CUSTOM &&
+                currentGenreFilter == null &&
+                currentSearchQuery.isEmpty()
+        )
+
         val filteredStations = if (currentSearchQuery.isEmpty()) {
             allStationsCache
         } else {
@@ -1176,13 +1253,15 @@ class RadioStationAdapter(
     private val onMenuClick: (RadioStation, View) -> Unit,
     private val onLikeClick: (RadioStation) -> Unit,
     private val onLongPress: (RadioStation) -> Unit,
-    private val onSelectionChanged: () -> Unit
+    private val onSelectionChanged: () -> Unit,
+    private val onStartDrag: (RecyclerView.ViewHolder) -> Unit = {}
 ) : RecyclerView.Adapter<RadioStationAdapter.ViewHolder>() {
 
     private var stations = listOf<RadioStation>()
     private val selectedStations = mutableSetOf<Long>()
     var isSelectionMode = false
         private set
+    private var reorderEnabled = false
 
     init {
         setHasStableIds(true)
@@ -1193,6 +1272,27 @@ class RadioStationAdapter(
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         stations = newStations
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    // Drag-to-reorder support (Custom order only). Show grip handles when enabled,
+    // and expose the live list so the fragment can persist the order on drop.
+    fun setReorderEnabled(enabled: Boolean) {
+        if (reorderEnabled != enabled) {
+            reorderEnabled = enabled
+            notifyDataSetChanged()
+        }
+    }
+
+    fun isReorderable(): Boolean = reorderEnabled && !isSelectionMode
+
+    fun currentStations(): List<RadioStation> = stations
+
+    fun moveItem(from: Int, to: Int) {
+        if (from !in stations.indices || to !in stations.indices) return
+        val list = stations.toMutableList()
+        list.add(to, list.removeAt(from))
+        stations = list
+        notifyItemMoved(from, to)
     }
 
     override fun getItemId(position: Int): Long = stations[position].id
@@ -1250,6 +1350,7 @@ class RadioStationAdapter(
         private val menuButton: MaterialButton = itemView.findViewById(R.id.menuButton)
         private val likeButton: MaterialButton = itemView.findViewById(R.id.likeButton)
         private val selectionCheckBox: MaterialCheckBox = itemView.findViewById(R.id.selectionCheckBox)
+        private val dragHandle: ImageView = itemView.findViewById(R.id.dragHandle)
         private var imageLoadDisposable: Disposable? = null
 
         fun bind(station: RadioStation) {
@@ -1310,6 +1411,21 @@ class RadioStationAdapter(
                 menuButton.visibility = View.VISIBLE
                 likeButton.visibility = View.VISIBLE
                 removeSelectionHighlight()
+            }
+
+            // Drag handle: visible only when reordering (Custom order, not selecting).
+            // Touching the handle starts the drag via the ItemTouchHelper.
+            if (isReorderable()) {
+                dragHandle.visibility = View.VISIBLE
+                dragHandle.setOnTouchListener { _, event ->
+                    if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                        onStartDrag(this@ViewHolder)
+                    }
+                    false
+                }
+            } else {
+                dragHandle.visibility = View.GONE
+                dragHandle.setOnTouchListener(null)
             }
 
             // Touch animation for press feedback

@@ -118,6 +118,22 @@
             app:iconPadding="0dp"
             app:iconTint="?attr/colorOnSurfaceVariant"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/dragHandle"
+            app:layout_goneMarginEnd="0dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Drag handle (shown only in Custom order to reorder by dragging) -->
+        <ImageView
+            android:id="@+id/dragHandle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_drag_handle"
+            android:contentDescription="@string/cd_drag_handle"
+            android:visibility="gone"
+            app:tint="?attr/colorOnSurfaceVariant"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
