@@ -103,6 +103,11 @@ interface RadioDao {
     @Query("SELECT * FROM radio_stations WHERE id = :id")
     suspend fun getStationById(id: Long): RadioStation?
 
+    // Find an existing station by its stream URL (used to avoid saving duplicates
+    // of a station that's already in the library under a different source/UUID).
+    @Query("SELECT * FROM radio_stations WHERE streamUrl = :streamUrl LIMIT 1")
+    suspend fun getStationByStreamUrl(streamUrl: String): RadioStation?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStation(station: RadioStation): Long
 

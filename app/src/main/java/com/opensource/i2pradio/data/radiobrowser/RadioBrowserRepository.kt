@@ -191,8 +191,11 @@ class RadioBrowserRepository(context: Context) {
      */
     suspend fun saveStationAsLiked(station: RadioBrowserStation): Long? {
         return withContext(Dispatchers.IO) {
-            // Check if already saved
+            // Check if already saved — by RadioBrowser UUID, or failing that by stream
+            // URL, so we don't create a duplicate of a station that's already in the
+            // library under a different source (e.g. a bundled preset or manual add).
             val existing = radioDao.getStationByRadioBrowserUuid(station.stationuuid)
+                ?: radioDao.getStationByStreamUrl(station.getStreamUrl())
             if (existing != null) {
                 // If exists but not liked, toggle like
                 if (!existing.isLiked) {
@@ -223,8 +226,10 @@ class RadioBrowserRepository(context: Context) {
         asUserStation: Boolean = true
     ): Long? {
         return withContext(Dispatchers.IO) {
-            // Check if already saved
+            // Check if already saved — by UUID, or failing that by stream URL, to
+            // avoid duplicating a station already in the library from another source.
             val existing = radioDao.getStationByRadioBrowserUuid(station.stationuuid)
+                ?: radioDao.getStationByStreamUrl(station.getStreamUrl())
             if (existing != null) {
                 Log.d(TAG, "Station already saved: ${station.name}")
                 return@withContext existing.id
