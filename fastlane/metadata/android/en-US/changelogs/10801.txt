@@ -1,0 +1,13 @@
+## What's New
+- Library is now a playback queue: skip stations from the notification, lockscreen, Bluetooth & Android Auto
+- Custom queue with drag-to-reorder
+- Rename/delete genres
+- Configurable auto-reconnect
+- Live streams reconnect cleanly after phone calls
+
+## Bug Fixes
+- Sleep timer: hour/minute pickers + app-wide countdown
+- Recording now stops with playback
+- Last-played station restores on launch
+- Track info now shows in media panel
+- Fixed status bar contrast & duplicate stations
