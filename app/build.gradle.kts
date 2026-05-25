@@ -15,7 +15,7 @@ android {
         applicationId = "com.opensource.i2pradio"
         minSdk = 24
         targetSdk = 34
-        versionCode = 10800
+        versionCode = 10801
         versionName = "1.8.1"
     }
 
