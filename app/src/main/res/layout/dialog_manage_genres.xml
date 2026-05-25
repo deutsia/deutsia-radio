@@ -34,7 +34,12 @@
         android:id="@+id/manageGenresRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:paddingEnd="4dp"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb_vertical"
+        android:scrollbarSize="4dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
