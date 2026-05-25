@@ -16,7 +16,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 10800
-        versionName = "1.8.0"
+        versionName = "1.8.1"
     }
 
     // Load keystore properties
