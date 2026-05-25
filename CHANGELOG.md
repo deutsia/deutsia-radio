@@ -2,6 +2,30 @@
 
 All notable changes to deutsia radio will be documented in this file.
 
+## [1.8.1]
+
+### Added
+- **Library playback queue**: Skip to the next/previous station from the notification, lockscreen, Bluetooth controls, and Android Auto #481 #472 #451
+- **Custom queue**: New sort with drag-to-reorder (plus Move up/down); next/previous follows your order #481 #453
+- **Genre management**: Rename or delete genres from the filter dialog (delete moves stations to Other), now a scrollable list with multi-select #453
+- **Configurable auto-reconnect**: Set a reconnect time budget and interval in Settings > Playback; dropped streams also retry immediately when connectivity returns #453
+
+### Changed
+- **Phone-call handling**: Live streams now reconnect to the live edge after a call instead of replaying a stale buffer #453
+- **Color scheme**: Purple is the new default, Classic renamed to Greyscale, and the picker is disabled while Material You is on #474
+
+### Fixed
+- **Sleep timer**: Hour/minute pickers, an app-wide toolbar countdown, and a fix for the timer showing active after it had already fired #475
+- **Recording**: Now stops when playback stops #474
+- **Last-played station**: Reappears in Now Playing after launch #474
+- **Track metadata**: ICY song/artist now shows in the system media panel, lockscreen, and Bluetooth controls #474
+- **Status bar contrast**: Icons stay legible on light-tinted themes in dark mode #474 #471
+- **Duplicate stations**: Saving a station already in your library no longer creates a duplicate
+- **Long station names**: Library rows wrap to two lines; Now Playing/mini-player titles scroll #481 #453
+
+### Localization
+- Translated 35 new strings across all 16 locales
+
 ## [1.8.0]
 
 ### Added
