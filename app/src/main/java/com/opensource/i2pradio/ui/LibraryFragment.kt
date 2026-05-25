@@ -78,7 +78,7 @@ class LibraryFragment : Fragment() {
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {
-            override fun isLongPressDragEnabled() = false
+            override fun isLongPressDragEnabled() = adapter.isReorderable()
             override fun isItemViewSwipeEnabled() = false
 
             override fun getMovementFlags(
@@ -389,11 +389,9 @@ class LibraryFragment : Fragment() {
         if (isDraggingStation) return
 
         // Drag-to-reorder is offered only for the full, unfiltered Custom-order list.
-        adapter.setReorderEnabled(
-            currentSortOrder == SortOrder.CUSTOM &&
-                currentGenreFilter == null &&
-                currentSearchQuery.isEmpty()
-        )
+        val reorderable = currentSortOrder == SortOrder.CUSTOM &&
+            currentGenreFilter == null &&
+            currentSearchQuery.isEmpty()
 
         val filteredStations = if (currentSearchQuery.isEmpty()) {
             allStationsCache
@@ -431,6 +429,11 @@ class LibraryFragment : Fragment() {
             emptyStateContainer.visibility = View.GONE
             adapter.submitList(filteredStations)
         }
+
+        // Toggle handles AFTER submitting the list. setReorderEnabled triggers a
+        // full rebind when the flag changes, which must be the last update so the
+        // grip handles actually appear (DiffUtil move-dispatch alone won't rebind them).
+        adapter.setReorderEnabled(reorderable)
     }
 
     private fun showSortDialog() {
@@ -452,7 +455,21 @@ class LibraryFragment : Fragment() {
                 updateSortButtonText()
                 observeStations()
                 dialog.dismiss()
+                if (currentSortOrder == SortOrder.CUSTOM &&
+                    !PreferencesHelper.isCustomOrderHintShown(requireContext())
+                ) {
+                    PreferencesHelper.setCustomOrderHintShown(requireContext(), true)
+                    showCustomOrderHintDialog()
+                }
             }
+            .show()
+    }
+
+    private fun showCustomOrderHintDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.custom_order_hint_title))
+            .setMessage(getString(R.string.custom_order_hint_message))
+            .setPositiveButton(getString(R.string.button_got_it), null)
             .show()
     }
 
@@ -1460,9 +1477,10 @@ class RadioStationAdapter(
                 }
             }
 
-            // Long press to enter selection mode
+            // Long press enters multi-select — except in Custom order, where a
+            // long press starts a drag-to-reorder instead (handled by ItemTouchHelper).
             itemView.setOnLongClickListener {
-                if (!isSelectionMode) {
+                if (!isSelectionMode && !reorderEnabled) {
                     onLongPress(station)
                     true
                 } else {

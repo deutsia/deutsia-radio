@@ -19,6 +19,7 @@ object PreferencesHelper {
     private const val KEY_AUTO_START_TOR = "auto_start_tor"
     private const val KEY_SLEEP_TIMER_MINUTES = "sleep_timer_minutes"
     private const val KEY_SORT_ORDER = "sort_order"
+    private const val KEY_CUSTOM_ORDER_HINT_SHOWN = "custom_order_hint_shown"
     private const val KEY_EQUALIZER_ENABLED = "equalizer_enabled"
     private const val KEY_EQUALIZER_PRESET = "equalizer_preset"
     private const val KEY_EQUALIZER_BANDS = "equalizer_bands"
@@ -203,6 +204,19 @@ object PreferencesHelper {
     fun getSortOrder(context: Context): String {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_SORT_ORDER, "DEFAULT") ?: "DEFAULT"
+    }
+
+    // One-time hint explaining how to reorder in Custom order
+    fun isCustomOrderHintShown(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_CUSTOM_ORDER_HINT_SHOWN, false)
+    }
+
+    fun setCustomOrderHintShown(context: Context, shown: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_CUSTOM_ORDER_HINT_SHOWN, shown)
+            .apply()
     }
 
     // Equalizer preferences
