@@ -293,7 +293,11 @@ enum class BrowseCategory {
  * Result wrapper for RadioBrowser API calls
  */
 sealed class RadioBrowserResult<out T> {
-    data class Success<T>(val data: T) : RadioBrowserResult<T>()
+    /**
+     * [offline] is true when the data came from the local station snapshot
+     * because the Radio Browser API was unavailable (5xx / timeout).
+     */
+    data class Success<T>(val data: T, val offline: Boolean = false) : RadioBrowserResult<T>()
     data class Error(val message: String, val exception: Exception? = null) : RadioBrowserResult<Nothing>()
     data object Loading : RadioBrowserResult<Nothing>()
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.opensource.i2pradio.R
 import com.opensource.i2pradio.data.radiobrowser.BrowseCategory
 import com.opensource.i2pradio.data.radiobrowser.CountryInfo
 import com.opensource.i2pradio.data.radiobrowser.LanguageInfo
@@ -57,6 +58,9 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
     // Error message
     private val _errorMessage = MutableLiveData<String?>(null)
     val errorMessage: LiveData<String?> = _errorMessage
+
+    // Only tell the user once per outage that results come from the offline catalog
+    private var offlineCatalogNoticeShown = false
 
     // Tor warning (when Force Tor enabled but not connected)
     private val _showTorWarning = MutableLiveData(false)
@@ -1293,6 +1297,16 @@ class BrowseViewModel(application: Application) : AndroidViewModel(application) 
             when (result) {
                 is RadioBrowserResult.Success -> {
                     var newStations = result.data
+
+                    if (result.offline) {
+                        if (!offlineCatalogNoticeShown) {
+                            offlineCatalogNoticeShown = true
+                            _errorMessage.value = getApplication<Application>()
+                                .getString(R.string.browse_offline_catalog_message)
+                        }
+                    } else {
+                        offlineCatalogNoticeShown = false
+                    }
 
                     // Store original API response size BEFORE any filtering
                     // This is critical for pagination - we need to know if the API

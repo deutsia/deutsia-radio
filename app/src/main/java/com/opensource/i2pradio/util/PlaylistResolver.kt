@@ -204,7 +204,7 @@ object PlaylistResolver {
 
         val request = Request.Builder()
             .url(url)
-            .header("User-Agent", "DeutsiaRadio/1.0")
+            .header("User-Agent", StreamUserAgent.VALUE)
             .header("Accept", "*/*")
             .build()
 

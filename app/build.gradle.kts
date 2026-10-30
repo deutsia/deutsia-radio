@@ -82,6 +82,9 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+    // Streaming JSON parsing for the offline Radio Browser catalog fallback
+    implementation("com.google.code.gson:gson:2.11.0")
+
     // Coroutines for async operations
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
