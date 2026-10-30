@@ -729,6 +729,8 @@
     <string name="error_station_geoblocked">Station blocked in your region (or from this exit node)</string>
     <string name="error_station_gone">Station no longer exists at that URL</string>
     <string name="error_station_auth_required">Station requires authentication</string>
+    <string name="error_radio_browser_unavailable">Radio Browser is unavailable (HTTP %1$s). The station directory server is down; try again later.</string>
+    <string name="browse_offline_catalog_message">Radio Browser is unavailable — showing stations from the offline catalog.</string>
     <string name="notification_unsupported_codec">%1$s streams aren\'t supported</string>
     <string name="notification_playlist_unreadable">Couldn\'t read playlist</string>
 

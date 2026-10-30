@@ -2,6 +2,7 @@ package com.opensource.i2pradio.data.radiobrowser
 
 import android.content.Context
 import android.util.Log
+import com.opensource.i2pradio.R
 import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +11,7 @@ import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
+import java.io.File
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -192,9 +194,18 @@ class RadioBrowserClient(private val context: Context) {
     }
 
     /**
-     * Execute an API request with retry logic
+     * Execute an API request with retry logic.
+     *
+     * [offlineFallback] is invoked only after every retry failed. It answers the
+     * query from the local station snapshot (see [RadioBrowserOfflineCatalog])
+     * so browsing/search keeps working while the API is down. Returning null
+     * keeps the original error.
      */
-    private suspend fun executeRequest(endpoint: String, retries: Int = 2): RadioBrowserResult<List<RadioBrowserStation>> {
+    private suspend fun executeRequest(
+        endpoint: String,
+        retries: Int = 2,
+        offlineFallback: ((File) -> List<RadioBrowserStation>)? = null
+    ): RadioBrowserResult<List<RadioBrowserStation>> {
         // Check if API is disabled by user preference
         if (isApiDisabled()) {
             Log.d(TAG, "RadioBrowser API is disabled by user preference")
@@ -251,6 +262,17 @@ class RadioBrowserClient(private val context: Context) {
                         return@repeat
                     }
 
+                    if (!body.trimStart().startsWith("[")) {
+                        // HTML error pages / captive portals must not be mistaken
+                        // for a valid empty station list.
+                        Log.w(TAG, "Unexpected API response body (not a JSON array)")
+                        lastException = Exception("Unexpected response")
+                        if (attempt < retries) {
+                            cycleServer()
+                        }
+                        return@repeat
+                    }
+
                     val stations = parseStationsJson(body)
                     Log.d(TAG, "Successfully parsed ${stations.size} stations")
                     return@withContext RadioBrowserResult.Success(stations)
@@ -264,10 +286,54 @@ class RadioBrowserClient(private val context: Context) {
                 }
             }
 
-            RadioBrowserResult.Error(
-                lastException?.message ?: "Unknown error",
-                lastException
-            )
+            if (offlineFallback != null) {
+                val offline = offlineCatalogResult(offlineFallback)
+                if (offline != null) return@withContext offline
+            }
+
+            RadioBrowserResult.Error(describeFailure(lastException), lastException)
+        }
+    }
+
+    /**
+     * Load/refresh the offline catalog and run [query] against it. Returns null
+     * when no catalog is available or the proxy policy forbids network access.
+     */
+    private suspend fun <T> offlineCatalogResult(
+        query: (File) -> T
+    ): RadioBrowserResult.Success<T>? = withContext(Dispatchers.IO) {
+        val client = try {
+            buildHttpClient()
+        } catch (e: Exception) {
+            Log.w(TAG, "Offline catalog client unavailable: ${e.message}")
+            null
+        } ?: return@withContext null
+
+        try {
+            if (RadioBrowserOfflineCatalog.ensureAvailable(context, client)) {
+                val data = query(RadioBrowserOfflineCatalog.cacheFile(context))
+                Log.i(TAG, "Answered request from offline Radio Browser catalog")
+                RadioBrowserResult.Success(data, offline = true)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Offline catalog query failed: ${e.message}")
+            null
+        }
+    }
+
+    /**
+     * Turn raw HTTP failures into a message users can act on. A 503 from
+     * Radio Browser means its own frontend has no healthy backend.
+     */
+    private fun describeFailure(exception: Exception?): String {
+        val message = exception?.message ?: "Unknown error"
+        val code = message.removePrefix("HTTP ").toIntOrNull()
+        return if (code != null && code >= 500) {
+            context.getString(R.string.error_radio_browser_unavailable, code.toString())
+        } else {
+            message
         }
     }
 
@@ -314,7 +380,11 @@ class RadioBrowserClient(private val context: Context) {
             append("&reverse=$reverse")
             append("&hidebroken=$hidebroken")
         }
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            RadioBrowserOfflineCatalog.search(
+                file = file, name = query, limit = limit, offset = offset
+            )
+        }
     }
 
     /**
@@ -345,7 +415,13 @@ class RadioBrowserClient(private val context: Context) {
             countrycode?.let { append("&countrycode=${java.net.URLEncoder.encode(it, "UTF-8")}") }
             language?.let { append("&language=${java.net.URLEncoder.encode(it, "UTF-8")}") }
         }
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            RadioBrowserOfflineCatalog.search(
+                file = file, name = name, tag = tag, country = country,
+                countrycode = countrycode, language = language,
+                limit = limit, offset = offset
+            )
+        }
     }
 
     /**
@@ -357,7 +433,9 @@ class RadioBrowserClient(private val context: Context) {
         hidebroken: Boolean = true
     ): RadioBrowserResult<List<RadioBrowserStation>> {
         val params = "/stations/topvote/$limit?offset=$offset&hidebroken=$hidebroken"
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            RadioBrowserOfflineCatalog.list(file, limit, offset)
+        }
     }
 
     /**
@@ -369,7 +447,9 @@ class RadioBrowserClient(private val context: Context) {
         hidebroken: Boolean = true
     ): RadioBrowserResult<List<RadioBrowserStation>> {
         val params = "/stations/topclick/$limit?offset=$offset&hidebroken=$hidebroken"
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            RadioBrowserOfflineCatalog.list(file, limit, offset)
+        }
     }
 
     /**
@@ -381,7 +461,9 @@ class RadioBrowserClient(private val context: Context) {
         hidebroken: Boolean = true
     ): RadioBrowserResult<List<RadioBrowserStation>> {
         val params = "/stations/lastchange/$limit?offset=$offset&hidebroken=$hidebroken"
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            RadioBrowserOfflineCatalog.list(file, limit, offset)
+        }
     }
 
     /**
@@ -403,7 +485,11 @@ class RadioBrowserClient(private val context: Context) {
             append("&reverse=$reverse")
             append("&hidebroken=$hidebroken")
         }
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            RadioBrowserOfflineCatalog.search(
+                file = file, countrycode = countryCode, limit = limit, offset = offset
+            )
+        }
     }
 
     /**
@@ -425,7 +511,11 @@ class RadioBrowserClient(private val context: Context) {
             append("&reverse=$reverse")
             append("&hidebroken=$hidebroken")
         }
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            RadioBrowserOfflineCatalog.search(
+                file = file, tag = tag, limit = limit, offset = offset
+            )
+        }
     }
 
     /**
@@ -433,7 +523,9 @@ class RadioBrowserClient(private val context: Context) {
      */
     suspend fun getByUuid(uuid: String): RadioBrowserResult<List<RadioBrowserStation>> {
         val params = "/stations/byuuid/$uuid"
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            listOfNotNull(RadioBrowserOfflineCatalog.byUuid(file, uuid))
+        }
     }
 
     /**
@@ -446,7 +538,7 @@ class RadioBrowserClient(private val context: Context) {
             return RadioBrowserResult.Success(emptyList())
         }
 
-        return withContext(Dispatchers.IO) {
+        val result = withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
                 if (client == null) {
@@ -500,6 +592,12 @@ class RadioBrowserClient(private val context: Context) {
                 RadioBrowserResult.Error(e.message ?: "Unknown error", e)
             }
         }
+
+        if (result is RadioBrowserResult.Error) {
+            offlineCatalogResult { RadioBrowserOfflineCatalog.countries(it) }
+                ?.let { return it }
+        }
+        return result
     }
 
     /**
@@ -512,7 +610,7 @@ class RadioBrowserClient(private val context: Context) {
             return RadioBrowserResult.Success(emptyList())
         }
 
-        return withContext(Dispatchers.IO) {
+        val result = withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
                 if (client == null) {
@@ -568,6 +666,12 @@ class RadioBrowserClient(private val context: Context) {
                 RadioBrowserResult.Error(e.message ?: "Unknown error", e)
             }
         }
+
+        if (result is RadioBrowserResult.Error) {
+            offlineCatalogResult { RadioBrowserOfflineCatalog.tags(it, limit) }
+                ?.let { return it }
+        }
+        return result
     }
 
     /**
@@ -580,7 +684,7 @@ class RadioBrowserClient(private val context: Context) {
             return RadioBrowserResult.Success(emptyList())
         }
 
-        return withContext(Dispatchers.IO) {
+        val result = withContext(Dispatchers.IO) {
             try {
                 val client = buildHttpClient()
                 if (client == null) {
@@ -636,6 +740,12 @@ class RadioBrowserClient(private val context: Context) {
                 RadioBrowserResult.Error(e.message ?: "Unknown error", e)
             }
         }
+
+        if (result is RadioBrowserResult.Error) {
+            offlineCatalogResult { RadioBrowserOfflineCatalog.languages(it, limit) }
+                ?.let { return it }
+        }
+        return result
     }
 
     /**
@@ -657,7 +767,11 @@ class RadioBrowserClient(private val context: Context) {
             append("&reverse=$reverse")
             append("&hidebroken=$hidebroken")
         }
-        return executeRequest(params)
+        return executeRequest(params) { file ->
+            RadioBrowserOfflineCatalog.search(
+                file = file, language = language, limit = limit, offset = offset
+            )
+        }
     }
 
     /**

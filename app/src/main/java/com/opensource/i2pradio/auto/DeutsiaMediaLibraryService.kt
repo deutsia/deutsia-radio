@@ -32,6 +32,7 @@ import com.opensource.i2pradio.data.ProxyType
 import com.opensource.i2pradio.data.RadioDatabase
 import com.opensource.i2pradio.data.RadioStation
 import com.opensource.i2pradio.ui.PreferencesHelper
+import com.opensource.i2pradio.util.StreamUserAgent
 import okhttp3.OkHttpClient
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
@@ -604,7 +605,7 @@ private class StationProxyDataSourceFactory(
     }
 
     companion object {
-        private const val USER_AGENT = "DeutsiaRadio/1.0 (AA)"
+        private const val USER_AGENT = StreamUserAgent.VALUE
     }
 }
 

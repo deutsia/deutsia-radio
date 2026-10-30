@@ -1,5 +1,6 @@
 package com.opensource.i2pradio
 
+import com.opensource.i2pradio.util.StreamUserAgent
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -233,7 +234,7 @@ class HlsRecorder(
     private fun fetchUrlAsText(client: OkHttpClient, url: String): String? {
         val request = Request.Builder()
             .url(url)
-            .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+            .header("User-Agent", StreamUserAgent.VALUE)
             .header("Accept", "*/*")
             .build()
         val call = client.newCall(request)
@@ -261,7 +262,7 @@ class HlsRecorder(
     ): Long {
         val request = Request.Builder()
             .url(url)
-            .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+            .header("User-Agent", StreamUserAgent.VALUE)
             .header("Accept", "*/*")
             .build()
         val call = client.newCall(request)

@@ -58,6 +58,7 @@ import com.opensource.i2pradio.tor.TorManager
 import com.opensource.i2pradio.ui.PreferencesHelper
 import com.opensource.i2pradio.util.BandwidthTrackingInterceptor
 import com.opensource.i2pradio.util.SecureImageLoader
+import com.opensource.i2pradio.util.StreamUserAgent
 import com.opensource.i2pradio.utils.DigestAuthenticator
 import okhttp3.Call
 import okhttp3.Request
@@ -721,7 +722,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             }
             val request = Request.Builder()
                 .url(streamUrl)
-                .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+                .header("User-Agent", StreamUserAgent.VALUE)
                 .header("Icy-MetaData", "0")
                 .header("Accept", "*/*")
                 .header("Connection", "keep-alive")
@@ -875,7 +876,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                         }
                         val detectRequest = Request.Builder()
                             .url(finalStreamUrl)
-                            .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+                            .header("User-Agent", StreamUserAgent.VALUE)
                             .build()
                         val detectCall = detectClient.newCall(detectRequest)
                         val playlistText = detectCall.execute().use { r ->
@@ -890,7 +891,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                                     val mediaUrl = HlsRecorder.resolveUrl(finalStreamUrl, variant.uri)
                                     val mediaRequest = Request.Builder()
                                         .url(mediaUrl)
-                                        .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+                                        .header("User-Agent", StreamUserAgent.VALUE)
                                         .build()
                                     val mediaText = detectClient.newCall(mediaRequest).execute().use { r ->
                                         if (r.isSuccessful) r.body?.string() else null
@@ -1136,7 +1137,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
                                         }
                                         val newRequest = Request.Builder()
                                             .url(newStreamUrl)
-                                            .header("User-Agent", "DeutsiaRadio-Recorder/1.0")
+                                            .header("User-Agent", StreamUserAgent.VALUE)
                                             .header("Icy-MetaData", "0")
                                             .header("Accept", "*/*")
                                             .header("Connection", "keep-alive")
@@ -2476,7 +2477,7 @@ private val becomingNoisyReceiver = object : BroadcastReceiver() {
             }
 
             val dataSourceFactory = OkHttpDataSource.Factory(okHttpClient)
-                .setUserAgent("DeutsiaRadio/1.0")
+                .setUserAgent(StreamUserAgent.VALUE)
                 .setDefaultRequestProperties(mapOf("Icy-MetaData" to "1"))
 
             val loadControl = DefaultLoadControl.Builder()
